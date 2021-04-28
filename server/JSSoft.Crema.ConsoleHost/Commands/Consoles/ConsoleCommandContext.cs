@@ -58,18 +58,6 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             await this.InitializeAsync(authentication);
         }
 
-#if DEBUG
-        public Task LoginAsync(string userID, string password)
-        {
-            var secureString = new SecureString();
-            foreach (var item in password)
-            {
-                secureString.AppendChar(item);
-            }
-            return this.LoginAsync(userID, secureString);
-        }
-#endif
-
         public async Task LogoutAsync()
         {
             if (this.authentication == null)

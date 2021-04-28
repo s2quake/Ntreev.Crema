@@ -61,6 +61,13 @@ namespace JSSoft.Crema.ServiceHosts
             return this.serviceProvider.GetService(serviceType);
         }
 
+        public string GetPath(CremaPath pathType, params string[] paths)
+        {
+            if (this.cremaHost == null)
+                throw new InvalidOperationException();
+            return this.cremaHost.GetPath(pathType, paths);
+        }
+
         public void Dispose()
         {
             this.Dispatcher.Dispose();

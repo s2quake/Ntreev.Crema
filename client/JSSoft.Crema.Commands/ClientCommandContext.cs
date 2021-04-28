@@ -32,8 +32,8 @@
 //namespace JSSoft.Crema.Client.Commands
 //{
 //    [Export(typeof(ClientCommandContext))]
-//    [Export(typeof(CremaCommandContextBase))]
-//    public class ClientCommandContext : CremaCommandContextBase
+//    [Export(typeof(ConsoleCommandContextBase))]
+//    public class ClientCommandContext : ConsoleCommandContextBase
 //    {
 //        [ImportingConstructor]
 //        public ClientCommandContext(ICremaHost cremaHost, [ImportMany] IEnumerable<ICommand> commands) 

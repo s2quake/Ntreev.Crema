@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost
@@ -90,6 +91,12 @@ namespace JSSoft.Crema.ConsoleHost
         }
 
         public ServiceState ServiceState => this.service.ServiceState;
+
+        public string Title
+        {
+            get => Console.Title;
+            set => Console.Title = value;
+        }
 
         public event EventHandler Opening
         {

@@ -46,11 +46,11 @@ namespace JSSoft.Crema.Commands.Consoles.TableTemplate
             {
                 if (item is SaveCommand saveCommand)
                 {
-                    saveCommand.CloseAction = () => terminal.Cancel();
+                    // saveCommand.CloseAction = () => terminal.Cancel();
                 }
                 else if (item is CancelCommand cancelCommand)
                 {
-                    cancelCommand.CloseAction = () => terminal.Cancel();
+                    // cancelCommand.CloseAction = () => terminal.Cancel();
                 }
             }
 

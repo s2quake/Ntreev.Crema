@@ -42,19 +42,12 @@ namespace JSSoft.Crema.ConsoleHost.Commands
     {
         private readonly CremaApplication application;
         private readonly ScriptContext scriptContext;
-        private CancellationTokenSource cancellation;
 
         [ImportingConstructor]
         public RunCommand(CremaApplication application, ScriptContext scriptContext)
-            : base("run")
         {
             this.application = application;
             this.scriptContext = scriptContext;
-        }
-
-        public void Cancel()
-        {
-            this.cancellation.Cancel();
         }
 
         [CommandPropertyRequired("path")]
@@ -70,7 +63,6 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             get;
             set;
         }
-
 
 #if DEBUG
         [CommandProperty("timeout", InitValue = -1)]
@@ -147,14 +139,6 @@ namespace JSSoft.Crema.ConsoleHost.Commands
         }
 
 #if DEBUG
-
-        [CommandProperty('l', DefaultValue = "admin:admin")]
-        public string LoginAuthentication
-        {
-            get;
-            set;
-        }
-
         [CommandProperty("validation", 'v')]
         public bool ValidationMode
         {
@@ -177,41 +161,25 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             this.application.Port = this.Port;
             this.application.Timeout = this.Timeout;
             await this.application.OpenAsync();
-            this.application.Closed += Application_Closed;
-            Console.Title = $"{this.application.BasePath} --port {this.application.Port}";
-            var cremaHost = this.application.GetService(typeof(ICremaHost)) as ICremaHost;
-            await this.WaitAsync(cremaHost);
+            this.application.Title = $"{this.application.BasePath} --port {this.application.Port}";
+            await this.WaitAsync();
             if (this.application.ServiceState == ServiceState.Open)
             {
-                Console.WriteLine(Resources.StoppingServer);
+                await this.Out.WriteLineAsync(Resources.StoppingServer);
                 await this.application.CloseAsync();
             }
-            Console.WriteLine(Resources.ServerHasBeenStopped);
+            await this.Out.WriteLineAsync(Resources.ServerHasBeenStopped);
         }
 
-        private void Application_Closed(object sender, ClosedEventArgs e)
-        {
-            if (e.Reason == CloseReason.Shutdown)
-            {
-                this.Cancel();
-            }
-        }
-
-        private async Task WaitAsync(ICremaHost cremaHost)
+        private async Task WaitAsync()
         {
             if (this.IsPromptMode == true)
             {
-                var terminal = this.application.GetService(typeof(ConsoleTerminal)) as ConsoleTerminal;
-                this.cancellation = new CancellationTokenSource();
-#if DEBUG
-                await terminal.StartAsync(this.LoginAuthentication, this.cancellation.Token);
-#else
-                await Task.Delay(1);
-                terminal.Start();
-#endif
+                await this.Terminal.StartAsync();
             }
             else if (this.ScriptPath != string.Empty)
             {
+                var cremaHost = this.application.GetService(typeof(ICremaHost)) as ICremaHost;
                 var script = File.ReadAllText(this.ScriptPath);
                 var basePath = cremaHost.GetPath(CremaPath.Documents);
                 var oldPath = Directory.GetCurrentDirectory();
@@ -239,5 +207,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
                 }
             }
         }
+
+        private ConsoleTerminal Terminal => this.application.GetService(typeof(ConsoleTerminal)) as ConsoleTerminal;
     }
 }

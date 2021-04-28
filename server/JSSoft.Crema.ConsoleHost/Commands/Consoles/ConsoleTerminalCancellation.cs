@@ -19,29 +19,28 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Crema.Commands.Consoles;
-using JSSoft.Library.Commands;
 using System.ComponentModel.Composition;
+using System.Threading;
 
 namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 {
-    [Export(typeof(IConsoleCommand))]
-    [ResourceUsageDescription("Resources")]
-    class ExitCommand : ConsoleCommandBase
+    [Export]
+    class ConsoleTerminalCancellation
     {
-        private readonly ConsoleTerminalCancellation cancellation;
+        private readonly CancellationTokenSource cancellation = new CancellationTokenSource();
+        private bool isRunning;
 
-        [ImportingConstructor]
-        public ExitCommand(ConsoleTerminalCancellation cancellation)
+        public CancellationToken Run()
         {
-            this.cancellation = cancellation;
+            this.isRunning = true;
+            return this.cancellation.Token;
         }
 
-        public override bool IsEnabled => this.cancellation.IsRunning == true;
-
-        protected override void OnExecute()
+        public void Cancel()
         {
             this.cancellation.Cancel();
         }
+
+        public bool IsRunning => this.isRunning;
     }
 }
