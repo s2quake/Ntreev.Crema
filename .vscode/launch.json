@@ -17,8 +17,11 @@
             "name": "launch-crema-client-console",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build client",
-            "program": "${workspaceFolder}/client/JSSoft.Crema.ConsoleHost/bin/Debug/netcoreapp3.1/crema.dll",
+            "program": "${workspaceFolder}/client/JSSoft.Crema.ConsoleHost/bin/Debug/netcoreapp3.1/cremaclient.dll",
+            "args":[
+                "run",
+                "--prompt"
+            ],
             "cwd": "${workspaceFolder}/client/JSSoft.Crema.ConsoleHost/bin/Debug/netcoreapp3.1",
             "console": "integratedTerminal",
             "stopAtEntry": false

@@ -59,7 +59,7 @@ namespace JSSoft.Crema.Commands.Consoles
                 var tb = new TerminalStringBuilder();
                 if (this.commandContext.IsOnline == false)
                 {
-                    var match = Regex.Match(prompt, $"(.+)(?<postfix>{postfixPattern})$");
+                    var match = Regex.Match(prompt, $"(.*)(?<postfix>{postfixPattern})$");
                     tb.Foreground = TerminalColor.BrightGreen;
                     tb.Append(match.Groups[1].Value);
                     tb.Foreground = null;

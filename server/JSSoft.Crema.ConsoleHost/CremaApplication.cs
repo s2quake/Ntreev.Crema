@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Crema.Commands;
 using JSSoft.Crema.ServiceHosts;
 using JSSoft.Crema.Services;
 using JSSoft.Library;
@@ -39,6 +40,14 @@ namespace JSSoft.Crema.ConsoleHost
         {
             this.service = this.GetService(typeof(CremaService)) as CremaService;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        }
+
+        public async Task RunAsync()
+        {
+            var configs = this.GetService(typeof(ConsoleConfiguration)) as ConsoleConfiguration;
+            var commandContext = this.GetService(typeof(CommandContext)) as CommandContext;
+            await commandContext.ExecuteAsync(Environment.CommandLine);
+            configs.Write();
         }
 
         public override IEnumerable<Tuple<System.Type, object>> GetParts()

@@ -19,9 +19,21 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
+using JSSoft.Crema.Services;
+using System;
+
+namespace JSSoft.Crema.ConsoleHost
 {
-    internal class CremaApplication
+    public interface ICremaService
     {
+        // int Port { get; }
+
+        event ClosedEventHandler Closed;
+
+        event EventHandler Closing;
+
+        event EventHandler Opened;
+
+        event EventHandler Opening;
     }
 }

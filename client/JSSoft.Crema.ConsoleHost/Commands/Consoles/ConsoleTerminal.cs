@@ -20,6 +20,8 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Commands.Consoles;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
 using JSSoft.Library;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
@@ -29,37 +31,39 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
     [Export]
     class ConsoleTerminal : ConsoleTerminalBase
     {
+        private readonly ICremaHost cremaHost;
+        private readonly CremaApplication application;
         private readonly ConsoleCommandContext commandContext;
+        private readonly ConsoleTerminalCancellation cancellation;
 
         [ImportingConstructor]
-        public ConsoleTerminal(ConsoleCommandContext commandContext)
+        public ConsoleTerminal(ICremaHost cremaHost, 
+            CremaApplication application,
+            ConsoleCommandContext commandContext, 
+            ConsoleTerminalCancellation cancellation)
             : base(commandContext)
         {
+            this.cremaHost = cremaHost;
+            this.cremaHost.Opened += (s, e) => this.IsEnabled = true;
+            this.cremaHost.Closing += (s, e) => this.IsEnabled = false;
+            this.application = application;
+            this.application.Closed += Application_Closed;
             this.commandContext = commandContext;
+            this.cancellation = cancellation;
         }
 
-        public async Task StartAsync(string authentication)
+        public async Task StartAsync()
         {
-            if (authentication != null)
+            this.SetPrompt();
+            await base.StartAsync(this.cancellation.Run());
+        }
+
+        private void Application_Closed(object sender, ClosedEventArgs e)
+        {
+            if (e.Reason == CloseReason.Shutdown && this.cancellation.IsRunning == true)
             {
-                var ss = StringUtility.Split(authentication, ':');
-                await this.commandContext.LoginAsync(this.commandContext.Address, ss[0], ss[1].ToSecureString());
+                this.cancellation.Cancel();
             }
-            this.SetPrompt();
-            base.Start();
-        }
-
-        public new void Start()
-        {
-            this.SetPrompt();
-            base.Start();
-        }
-
-        public async Task CancelAsync()
-        {
-            if (this.commandContext.IsOnline == true)
-                await this.commandContext.LogoutAsync();
-            base.Cancel();
         }
     }
 }

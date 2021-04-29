@@ -22,7 +22,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <AssemblyName>crema</AssemblyName>
+    <AssemblyName>cremaclient</AssemblyName>
     <Product>Crema Console</Product>
     <PublishName>crema\client\console</PublishName>
   </PropertyGroup>

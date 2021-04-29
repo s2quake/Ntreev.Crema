@@ -22,29 +22,22 @@
 using JSSoft.Crema.Services;
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost
 {
     partial class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             try
             {
-                using var application = new CremaBootstrapper();
-                var configs = application.GetService(typeof(ConsoleConfiguration)) as ConsoleConfiguration;
-                var commandContext = application.GetService(typeof(CommandContext)) as CommandContext;
-                commandContext.Execute(Environment.CommandLine);
-                configs.Commit();
-            }
-            catch (TargetInvocationException e)
-            {
-                Console.Error.WriteLine(e.InnerException.ToString());
-                Environment.Exit(1);
+                using var application = new CremaApplication();
+                await application.RunAsync();
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e.ToString());
+                Console.Error.WriteLine(e);
                 Environment.Exit(1);
             }
         }

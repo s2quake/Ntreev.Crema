@@ -29,24 +29,16 @@ namespace JSSoft.Crema.ConsoleHost
 {
     partial class Program
     {
-        static Program()
-        {
-
-        }
-
         static async Task Main(string[] args)
         {
             try
             {
                 using var application = new CremaApplication();
-                var configs = application.GetService(typeof(ConsoleConfiguration)) as ConsoleConfiguration;
-                var commandContext = application.GetService(typeof(CommandContext)) as CommandContext;
-                await commandContext.ExecuteAsync(Environment.CommandLine);
-                configs.Write();
+                await application.RunAsync();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.Error.WriteLine(e);
                 Environment.Exit(1);
             }
         }

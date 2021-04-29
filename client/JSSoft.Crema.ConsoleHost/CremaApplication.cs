@@ -23,14 +23,68 @@ using JSSoft.Crema.Services;
 using JSSoft.Library;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost
 {
     class CremaApplication : CremaBootstrapper
     {
+        private readonly CremaService service;
+
         public CremaApplication()
         {
+            this.service = this.GetService(typeof(CremaService)) as CremaService;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        }
+
+        public async Task RunAsync()
+        {
+            var configs = this.GetService(typeof(ConsoleConfiguration)) as ConsoleConfiguration;
+            var commandContext = this.GetService(typeof(CommandContext)) as CommandContext;
+            await commandContext.ExecuteAsync(Environment.CommandLine);
+            configs.Commit();
+        }
+
+        public override IEnumerable<Tuple<System.Type, object>> GetParts()
+        {
+            var service = new CremaService(this);
+            foreach (var item in base.GetParts())
+            {
+                yield return item;
+            }
+            yield return new Tuple<Type, object>(typeof(CremaApplication), this);
+            yield return new Tuple<Type, object>(typeof(CremaService), service);
+            yield return new Tuple<Type, object>(typeof(ICremaService), service);
+        }
+
+        public string Title
+        {
+            get => Console.Title;
+            set => Console.Title = value;
+        }
+
+        public event EventHandler Opening
+        {
+            add { this.service.Opening += value; }
+            remove { this.service.Opening -= value; }
+        }
+
+        public event EventHandler Opened
+        {
+            add { this.service.Opened += value; }
+            remove { this.service.Opened -= value; }
+        }
+
+        public event EventHandler Closing
+        {
+            add { this.service.Closing += value; }
+            remove { this.service.Closing -= value; }
+        }
+
+        public event ClosedEventHandler Closed
+        {
+            add { this.service.Closed += value; }
+            remove { this.service.Closed -= value; }
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

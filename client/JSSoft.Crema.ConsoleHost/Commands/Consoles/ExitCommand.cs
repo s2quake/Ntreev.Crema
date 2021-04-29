@@ -30,21 +30,21 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceUsageDescription("Resources")]
-    class ExitCommand : ConsoleCommandAsyncBase
+    class ExitCommand : ConsoleCommandBase
     {
-        private readonly Lazy<ConsoleTerminal> terminal;
+        private readonly ConsoleTerminalCancellation cancellation;
 
-        public ExitCommand(Lazy<ConsoleTerminal> terminal)
-            : base("exit")
+        [ImportingConstructor]
+        public ExitCommand(ConsoleTerminalCancellation cancellation)
         {
-            this.terminal = terminal;
+            this.cancellation = cancellation;
         }
 
-        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
-        {
-            await this.Terminal.CancelAsync();
-        }
+        public override bool IsEnabled => this.cancellation.IsRunning == true;
 
-        private ConsoleTerminal Terminal => this.terminal.Value;
+        protected override void OnExecute()
+        {
+            this.cancellation.Cancel();
+        }
     }
 }

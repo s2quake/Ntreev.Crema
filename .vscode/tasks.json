@@ -34,6 +34,16 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "label": "build client-console",
+            "command": "dotnet build ./client/JSSoft.Crema.ConsoleHost --framework netcoreapp3.1",
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "build all",
             "command": "dotnet build crema.sln --framework netcoreapp3.1",
             "type": "shell",

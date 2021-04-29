@@ -38,8 +38,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
         {
         }
 
-        [CommandProperty]
-        [DefaultValue("")]
+        [CommandProperty(InitValue = "")]
         public string Address
         {
             get; set;
@@ -52,9 +51,9 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
         protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             var terminal = new Terminal();
+            var address = terminal.ReadString("Address:");
             var userID = terminal.ReadString("UserID:");
             var password = terminal.ReadSecureString("Password:");
-            var address = this.Address == string.Empty ? this.CommandContext.Address : this.Address;
             return this.CommandContext.LoginAsync(address, userID, password);
         }
     }

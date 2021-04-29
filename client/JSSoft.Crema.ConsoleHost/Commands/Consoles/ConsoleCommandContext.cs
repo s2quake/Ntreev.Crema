@@ -52,11 +52,6 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 
         public override ICremaHost CremaHost => this.cremaHost;
 
-        public void SetAddress(string address)
-        {
-            this.address = address;
-        }
-
         public async Task LoginAsync(string address, string userID, SecureString password)
         {
             this.token = await this.CremaHost.OpenAsync(address, userID, password);
