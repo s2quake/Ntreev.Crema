@@ -27,14 +27,18 @@ using JSSoft.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Security;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost
 {
-    class CremaService : ICremaService
+    class CremaService : ICremaService, IServiceProvider
     {
+        public const string Namespace = "http://www.ntreev.com";
+        private const string cremaString = "Crema";
         private readonly IServiceProvider serviceProvider;
         private ICremaHost cremaHost;
+        private Guid token;
 
         public CremaService(IServiceProvider serviceProvider)
         {
@@ -42,21 +46,75 @@ namespace JSSoft.Crema.ConsoleHost
             this.Dispatcher = new CremaDispatcher(typeof(CremaService));
         }
 
-        public async Task OpenAsync()
+        public object GetService(Type serviceType)
         {
-            // this.cremaHost = cremaHost;
-            // this.cremaHost.Opening += CremaHost_Opening;
-            // this.cremaHost.Opened += CremaHost_Opened;
-            // this.cremaHost.Closing += CremaHost_Closing;
-            // this.cremaHost.Closed += CremaHost_Closed;
+            return this.serviceProvider.GetService(serviceType);
         }
 
-        public async Task CloseAsync()
-        {
+        // public string GetPath(CremaPath pathType, params string[] paths)
+        // {
+        //     if (this.cremaHost == null)
+        //         throw new InvalidOperationException();
+        //     return this.cremaHost.GetPath(pathType, paths);
+        // }
 
+        public void Dispose()
+        {
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
         }
+
+        // public async Task OpenAsync(string address, string userID, SecureString password)
+        // {
+        //     this.ValidateOpen();
+        //     this.ServiceState = JSSoft.Crema.Services.ServiceState.Opening;
+        //     await this.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         this.OnOpening(EventArgs.Empty);
+        //         this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
+        //     });
+        //     this.token = await this.cremaHost.OpenAsync(address, userID, password);
+        //     await this.cremaHost.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         this.cremaHost.CloseRequested += CremaHost_CloseRequested;
+        //         this.cremaHost.Closed += CremaHost_Closed;
+        //     });
+        //     await this.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         this.ServiceState = JSSoft.Crema.Services.ServiceState.Open;
+        //         this.OnOpened(EventArgs.Empty);
+        //     });
+        // }
+
+        // public async Task CloseAsync()
+        // {
+        //     this.ValidateClose();
+        //     this.ServiceState = JSSoft.Crema.Services.ServiceState.Closing;
+        //     await this.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         this.OnClosing(EventArgs.Empty);
+        //     });
+        //     await this.cremaHost.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         this.cremaHost.CloseRequested -= CremaHost_CloseRequested;
+        //         this.cremaHost.Closed -= CremaHost_Closed;
+        //     });
+        //     await this.cremaHost.CloseAsync(this.token);
+        //     await this.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         this.token = Guid.Empty;
+        //         this.ServiceState = JSSoft.Crema.Services.ServiceState.Closed;
+        //         this.OnClosed(new ClosedEventArgs(CloseReason.Shutdown, string.Empty));
+        //     });
+        // }
+
+        // public int Port { get; set; } = AddressUtility.DefaultPort;
+
+        // public int Timeout { get; set; } = 60000;
 
         public CremaDispatcher Dispatcher { get; private set; }
+
+        public JSSoft.Crema.Services.ServiceState ServiceState { get; set; }
 
         public event EventHandler Opening;
 
@@ -66,24 +124,80 @@ namespace JSSoft.Crema.ConsoleHost
 
         public event ClosedEventHandler Closed;
 
-        // private async void CremaHost_Opening(object sender, EventArgs e)
-        // {
-        //     await this.dispatcher.InvokeAsync(() => this.Opening?.Invoke(this, e));
-        // }
+        protected virtual void OnOpening(EventArgs e)
+        {
+            this.Opening?.Invoke(this, e);
+        }
 
-        // private async void CremaHost_Opened(object sender, EventArgs e)
-        // {
-        //     await this.dispatcher.InvokeAsync(() => this.Opened?.Invoke(this, e));
-        // }
+        protected virtual void OnOpened(EventArgs e)
+        {
+            this.Opened?.Invoke(this, e);
+        }
 
-        // private async void CremaHost_Closing(object sender, EventArgs e)
-        // {
-        //     await this.dispatcher.InvokeAsync(() => this.Closing?.Invoke(this, e));
-        // }
+        protected virtual void OnClosing(EventArgs e)
+        {
+            this.Closing?.Invoke(this, e);
+        }
 
-        // private async void CremaHost_Closed(object sender, ClosedEventArgs e)
-        // {
-        //     await this.dispatcher.InvokeAsync(() => this.Closed?.Invoke(this, e));
-        // }
+        protected virtual void OnClosed(ClosedEventArgs e)
+        {
+            this.Closed?.Invoke(this, e);
+        }
+
+        protected ILogService LogService => this.cremaHost.GetService(typeof(ILogService)) as ILogService;
+
+        private async void CremaHost_Opened(object sender, EventArgs e)
+        {
+            if (sender is ICremaHost cremaHost)
+            {
+                this.cremaHost.Opened -= CremaHost_Opened;
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ServiceState = JSSoft.Crema.Services.ServiceState.Opening;
+                });
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ServiceState = JSSoft.Crema.Services.ServiceState.Open;
+                });
+            }
+        }
+
+        private void CremaHost_CloseRequested(object sender, CloseRequestedEventArgs e)
+        {
+            e.AddTask(InvokeAsync());
+            async Task InvokeAsync()
+            {
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ServiceState = JSSoft.Crema.Services.ServiceState.Closing;
+                });
+            }
+        }
+
+        private async void CremaHost_Closed(object sender, ClosedEventArgs e)
+        {
+            if (sender is ICremaHost)
+            {
+                if (e.Reason == CloseReason.Restart)
+                    this.cremaHost.Opened += CremaHost_Opened;
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ServiceState = JSSoft.Crema.Services.ServiceState.Closed;
+                    this.OnClosed(e);
+                });
+            }
+        }
+
+        private void ValidateOpen()
+        {
+            if (this.ServiceState != JSSoft.Crema.Services.ServiceState.None)
+                throw new InvalidOperationException();
+        }
+
+        private void ValidateClose()
+        {
+            if (this.ServiceState != JSSoft.Crema.Services.ServiceState.Open)
+                throw new InvalidOperationException();
+        }
     }
 }

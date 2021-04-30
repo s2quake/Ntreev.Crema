@@ -139,6 +139,8 @@ namespace JSSoft.Crema.Services
                     this.ServiceState = ServiceState.Opening;
                     this.OnOpening(EventArgs.Empty);
                 });
+                this.clientContext.Host = AddressUtility.GetIPAddress(address);
+                this.clientContext.Port = AddressUtility.GetPort(address);
                 this.serviceToken = await this.clientContext.OpenAsync();
                 this.ServiceInfo = (await this.Service.GetServiceInfoAsync()).Value;
                 var version = typeof(CremaHost).Assembly.GetName().Version;
@@ -180,10 +182,11 @@ namespace JSSoft.Crema.Services
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ServiceState = ServiceState.None;
-                    this.UserContext = null;
                     this.log?.Dispose();
                     this.log = null;
                     this.Address = null;
+                    this.ServiceState = ServiceState.Closed;
+                    this.OnClosed(new ClosedEventArgs(CloseReason.None, string.Empty));
                 });
                 CremaLog.Error(e);
                 throw;
@@ -483,9 +486,6 @@ namespace JSSoft.Crema.Services
             await Task.Delay(100);
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.DomainContext = null;
-                this.DataBaseContext = null;
-                this.UserContext = null;
                 foreach (var item in this.authentications)
                 {
                     item.InvokeExpiredEvent(Authentication.SystemID);

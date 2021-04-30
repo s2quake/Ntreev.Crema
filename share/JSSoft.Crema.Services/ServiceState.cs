@@ -34,8 +34,5 @@ namespace JSSoft.Crema.Services
         Closing,
 
         Closed = None,
-
-        [Obsolete]
-        Opened = Open,
     }
 }

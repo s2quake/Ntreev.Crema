@@ -46,6 +46,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += (s, e) => this.IsEnabled = true;
             this.cremaHost.Closing += (s, e) => this.IsEnabled = false;
+            this.cremaHost.Closed += (s, e) => this.IsEnabled = true;
             this.application = application;
             this.application.Closed += Application_Closed;
             this.commandContext = commandContext;

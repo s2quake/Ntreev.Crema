@@ -100,13 +100,6 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             get; set;
         }
 
-        [CommandProperty]
-        public string Address
-        {
-            get;
-            set;
-        }
-
         protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             this.application.Culture = this.Culture;

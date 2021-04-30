@@ -255,6 +255,7 @@ namespace JSSoft.Crema.Services.Users
             if (result == false)
                 return;
 
+            await this.Service.UnsubscribeAsync();
             await Task.Delay(100);
             await this.callbackEvent.DisposeAsync();
             await this.Dispatcher.DisposeAsync();

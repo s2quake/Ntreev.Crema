@@ -20,10 +20,12 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Commands.Consoles;
+using JSSoft.Library;
 using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,6 +41,18 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
         }
 
         [CommandProperty(InitValue = "")]
+        public string UserID
+        {
+            get; set;
+        }
+
+        [CommandProperty(InitValue = "")]
+        public string Password
+        {
+            get; set;
+        }
+
+        [CommandProperty(InitValue = "localhost")]
         public string Address
         {
             get; set;
@@ -50,10 +64,9 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 
         protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
-            var terminal = new Terminal();
-            var address = terminal.ReadString("Address:");
-            var userID = terminal.ReadString("UserID:");
-            var password = terminal.ReadSecureString("Password:");
+            var address = this.Address;
+            var userID = this.UserID != string.Empty ? this.UserID : this.CommandContext.ReadString("UserID:");
+            var password = this.Password != string.Empty ? StringUtility.ToSecureString(this.Password) : this.CommandContext.ReadSecureString("Password:");
             return this.CommandContext.LoginAsync(address, userID, password);
         }
     }

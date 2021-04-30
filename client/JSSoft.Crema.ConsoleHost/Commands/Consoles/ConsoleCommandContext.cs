@@ -35,7 +35,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
     {
         private readonly ICremaHost cremaHost;
         private Guid token;
-        private string address;
+        private string address = "localhost";
         private Authentication authenticator;
 
         [ImportingConstructor]
