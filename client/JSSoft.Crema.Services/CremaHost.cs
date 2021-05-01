@@ -55,7 +55,7 @@ namespace JSSoft.Crema.Services
 
         private LogService log;
         private Guid token;
-        private readonly CremaHostServiceHost host;
+        // private readonly CremaHostServiceHost host;
         private readonly ClientContext clientContext;
         private Guid serviceToken;
 
@@ -156,7 +156,7 @@ namespace JSSoft.Crema.Services
                     this.plugins = (this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>).ToArray();
                     foreach (var item in this.plugins)
                     {
-                        var authentication = new Authentication(new AuthenticationProvider(this.UserContext), item.ID);
+                        var authentication = new Authentication(new AuthenticationProvider(this), item.ID);
                         this.authentications.Add(authentication);
                         item.Initialize(authentication);
                     }
@@ -204,8 +204,7 @@ namespace JSSoft.Crema.Services
                         Verbose = this.settings.Verbose
                     };
                 });
-                this.UserID = userID;
-                await this.UserContext.InitializeAsync(this.AuthenticationToken);
+                await this.UserContext.InitializeAsync(userID, this.AuthenticationToken);
                 await this.DataBaseContext.InitializeAsync(this.AuthenticationToken);
                 await this.DomainContext.InitializeAsync(this.AuthenticationToken);
                 await this.Dispatcher.InvokeAsync(() =>
@@ -231,13 +230,9 @@ namespace JSSoft.Crema.Services
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.UserID = string.Empty;
                     this.ServiceState = ServiceState.None;
                     this.log?.Dispose();
                     this.log = null;
-                    this.Address = null;
-                    this.ServiceState = ServiceState.Closed;
-                    this.OnClosed(new ClosedEventArgs(CloseReason.None, string.Empty));
                 });
                 CremaLog.Error(e);
                 throw;
@@ -421,9 +416,13 @@ namespace JSSoft.Crema.Services
 
         public string Address { get; private set; }
 
-        public string UserID { get; private set; } = string.Empty;
+        public string UserID => this.User != null ? this.User.ID : string.Empty;
 
-        // public Authority Authority { get; private set; }
+        public string UserName => this.User != null ? this.User.UserName : string.Empty;
+
+        public Authority Authority => this.User != null ? this.User.Authority : Authority.Guest;
+
+        public User User => this.UserContext.CurrentUser;
 
         public DataBaseContext DataBaseContext { get; private set; }
 

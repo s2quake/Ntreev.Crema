@@ -20,28 +20,18 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
 
 namespace JSSoft.Crema.Services
 {
-    class AuthenticationProvider : IAuthenticationProvider
+    class AuthenticationSignatureDateProvider : IAuthenticationProvider
     {
-        private readonly CremaHost cremaHost;
-
-        public AuthenticationProvider(CremaHost cremaHost)
+        public AuthenticationSignatureDateProvider(SignatureDate signatureDate)
         {
-            this.cremaHost = cremaHost;
-            // this.isUser = true;
-            // this.ID = user.ID;
-            // this.Name = user.UserName;
-            // this.Authority = user.Authority;
+            this.ID = signatureDate.ID;
+            this.Name = signatureDate.ID;
+            this.Authority = Authority.Guest;
         }
-
-        // public AuthenticationProvider(string name)
-        // {
-        //     this.ID = name;
-        //     this.Name = name;
-        //     this.Authority = Authority.Guest;
-        // }
 
         internal AuthenticationType AuthenticationTypes
         {
@@ -53,7 +43,7 @@ namespace JSSoft.Crema.Services
                 else if (authority == Authority.Member)
                     return AuthenticationType.User;
                 else
-                    return AuthenticationType.User | AuthenticationType.ReadOnly;
+                    return AuthenticationType.None;
             }
         }
 

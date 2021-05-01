@@ -55,7 +55,6 @@ namespace JSSoft.Crema.Services.Domains
         public TaskResetEvent<string> enterEvent;
         public TaskResetEvent<string> leaveEvent;
         private DomainMetaData metaData;
-        private string userID;
 
         protected Domain(DomainInfo domainInfo)
         {
@@ -328,7 +327,6 @@ namespace JSSoft.Crema.Services.Domains
             base.DomainState = metaData.DomainState;
             this.metaData = metaData;
             this.modifiedTableList.Clear();
-            this.userID = userID;
             foreach (var item in metaData.ModifiedTables)
             {
                 this.modifiedTableList.Add(item);
@@ -426,7 +424,7 @@ namespace JSSoft.Crema.Services.Domains
         {
             this.Users.Remove(domainUser.ID);
             this.Users.Owner = ownerUser;
-            if (domainUser.ID == this.userID)
+            if (domainUser.ID == this.CremaHost.UserID)
             {
                 await this.DataDispatcher.InvokeAsync(() =>
                 {

@@ -65,9 +65,8 @@ namespace JSSoft.Crema.Services.Users
             this.callbackEvent.Dispose();
         }
 
-        public async Task InitializeAsync(Guid authenticationToken)
+        public async Task InitializeAsync(string userID, Guid authenticationToken)
         {
-            var userID = this.CremaHost.UserID;
             var result = await this.Service.SubscribeAsync(authenticationToken);
             await this.Dispatcher.InvokeAsync(() =>
             {
@@ -141,7 +140,7 @@ namespace JSSoft.Crema.Services.Users
 
             if (this.customAuthentications.ContainsKey(signatureDate.ID) == false)
             {
-                this.customAuthentications.Add(signatureDate.ID, new Authentication(new AuthenticationProvider(signatureDate.ID)));
+                this.customAuthentications.Add(signatureDate.ID, new Authentication(new AuthenticationSignatureDateProvider(signatureDate)));
             }
 
             var authentication = this.customAuthentications[signatureDate.ID];

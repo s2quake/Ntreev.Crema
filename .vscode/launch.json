@@ -43,10 +43,10 @@
             "program": "${workspaceFolder}/server/JSSoft.Crema.ConsoleHost/bin/Debug/netcoreapp3.1/cremaserver.dll",
             "args":[
                 "run",
-                "/Users/s2quake-mac/Projects/workspace/repository",
+                "../repository",
                 "--prompt"
             ],
-            "cwd": "${workspaceFolder}/server/JSSoft.Crema.ConsoleHost/bin/Debug/netcoreapp3.1",
+            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "stopAtEntry": false
         }
