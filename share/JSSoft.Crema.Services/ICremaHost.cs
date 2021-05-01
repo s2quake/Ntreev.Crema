@@ -61,8 +61,6 @@ namespace JSSoft.Crema.Services
 
         event EventHandler Disposed;
 
-        //void SaveConfigs();
-
         Task CloseAsync(Guid token);
 
         Task ShutdownAsync(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message);

@@ -57,6 +57,24 @@ namespace JSSoft.Crema.ConsoleHost
             yield return new Tuple<Type, object>(typeof(ICremaService), service);
         }
 
+        public Task OpenAsync()
+        {
+            return this.service.OpenAsync();
+        }
+
+        public Task CloseAsync()
+        {
+            return this.service.CloseAsync();
+        }
+        
+        public string Address
+        {
+            get => this.service.Address;
+            set => this.service.Address = value;
+        }
+
+        public ServiceState ServiceState => this.service.ServiceState;
+
         public string Title
         {
             get => Console.Title;

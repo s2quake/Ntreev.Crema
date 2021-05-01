@@ -34,9 +34,9 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
     public class ConsoleCommandContext : ConsoleCommandContextBase
     {
         private readonly ICremaHost cremaHost;
+        private readonly CremaApplication application;
+        private Authentication authentication;
         private Guid token;
-        private string address = "localhost";
-        private Authentication authenticator;
 
         [ImportingConstructor]
         public ConsoleCommandContext(ICremaHost cremaHost,
@@ -45,10 +45,11 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             : base(driveItems, commands)
         {
             this.cremaHost = cremaHost;
+            this.application = cremaHost.GetService(typeof(CremaApplication)) as CremaApplication;
             this.BaseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         }
 
-        public override string Address => this.address;
+        public override string Address => this.application.Address;
 
         public override ICremaHost CremaHost => this.cremaHost;
 
@@ -56,18 +57,18 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
         {
             this.token = await this.CremaHost.OpenAsync(address, userID, password);
             await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.Closed += CremaHost_Closed);
-            this.authenticator = this.CremaHost.GetService(typeof(Authenticator)) as Authenticator;
-            this.address = address;
-            await this.InitializeAsync(this.authenticator);
+            this.authentication = this.CremaHost.GetService(typeof(Authenticator)) as Authenticator;
+            this.application.Address = address;
+            await this.InitializeAsync(this.authentication);
         }
 
         public async Task LogoutAsync()
         {
-            if (this.authenticator == null)
+            if (this.authentication == null)
                 throw new Exception("로그인되어 있지 않습니다.");
 
             await this.CremaHost.CloseAsync(this.token);
-            this.authenticator = null;
+            this.authentication = null;
             this.token = Guid.Empty;
             this.Release();
         }

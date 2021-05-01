@@ -49,7 +49,7 @@ namespace JSSoft.Crema.Javascript.Consoles
             get; set;
         }
 
-        [CommandProperty()]
+        [CommandProperty]
         [DefaultValue("")]
         [CommandPropertyTrigger(nameof(Scripts), "")]
         [CommandPropertyTrigger(nameof(List), false)]

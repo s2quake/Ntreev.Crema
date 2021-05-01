@@ -51,7 +51,7 @@ namespace JSSoft.Crema.Commands.Consoles.TypeTemplate
 
         public Authentication Authentication { get { return this.CommandContext.Authentication; } }
 
-        [CommandProperty(InitValue = "")]
+        [CommandProperty]
         public string MemberName
         {
             get; set;

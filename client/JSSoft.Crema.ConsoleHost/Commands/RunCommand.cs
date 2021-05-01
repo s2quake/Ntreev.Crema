@@ -52,31 +52,41 @@ namespace JSSoft.Crema.ConsoleHost.Commands
 
         [CommandPropertySwitch("prompt", 'p')]
         [CommandPropertyTrigger(nameof(ScriptPath), "")]
+        [CommandPropertyTrigger(nameof(Script), "")]
         public bool IsPromptMode
         {
             get;
             set;
         }
 
-        [CommandProperty(InitValue = "")]
+        [CommandProperty]
         [CommandPropertyTrigger(nameof(IsPromptMode), false)]
+        [CommandPropertyTrigger(nameof(Script), "")]
         public string ScriptPath
         {
             get;
             set;
         }
 
-        [CommandProperty("list", 'l')]
+        [CommandProperty]
+        [CommandPropertyTrigger(nameof(IsPromptMode), false)]
         [CommandPropertyTrigger(nameof(ScriptPath), "")]
-        [DefaultValue(false)]
-        public bool List
+        public string Script
         {
-            get; set;
+            get;
+            set;
         }
 
-        [CommandProperty("entry")]
-        [CommandPropertyTrigger(nameof(List), false)]
-        [DefaultValue("")]
+        // [CommandProperty("list", 'l')]
+        // [CommandPropertyTrigger(nameof(ScriptPath), "")]
+        // [DefaultValue(false)]
+        // public bool List
+        // {
+        //     get; set;
+        // }
+
+        [CommandProperty]
+        [CommandPropertyTrigger(nameof(IsPromptMode), false)]
         public string ScriptEntry
         {
             get;
@@ -93,7 +103,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
 #if DEBUG
         [CommandProperty(InitValue = "en-US")]
 #else
-        [CommandProperty(InitValue = "")]
+        [CommandProperty]
 #endif
         public string Culture
         {
@@ -104,14 +114,15 @@ namespace JSSoft.Crema.ConsoleHost.Commands
         {
             this.application.Culture = this.Culture;
             this.application.Verbose = LogVerbose.None;
-            // this.application.Address = this.Address
 
             // this.CommandContext.SetAddress(this.Address);
             // this.CommandContext.SetAddress(this.Address);
-            await Task.Delay(100);
-            if (this.IsPromptMode == true)
+            await this.application.OpenAsync();
+            await this.WaitAsync();
+
+            if (this.application.ServiceState == ServiceState.Open)
             {
-                await this.Terminal.StartAsync();
+                await this.application.CloseAsync();
             }
 
             // if (this.List == true)
@@ -126,48 +137,42 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             // }
         }
 
-        // private IDictionary<string, object> GetProperties()
-        // {
-        //     return CommandStringUtility.ArgumentsToDictionary(this.Arguments);
-        // }
-
-        // private Dictionary<string, Type> GetArgumentTypes()
-        // {
-        //     var properties = new Dictionary<string, Type>(this.Arguments.Length);
-        //     foreach (var item in this.Arguments)
-        //     {
-        //         if (CommandStringUtility.TryGetKeyValue(item, out var key, out var value) == true)
-        //         {
-        //             var typeName = value;
-        //             if (CommandStringUtility.IsWrappedOfQuote(value))
-        //             {
-        //                 value = CommandStringUtility.TrimQuot(value);
-        //             }
-
-        //             if (value == "number")
-        //             {
-        //                 properties.Add(key, typeof(decimal));
-        //             }
-        //             else if (value == "boolean")
-        //             {
-        //                 properties.Add(key, typeof(bool));
-        //             }
-        //             else if (value == "string")
-        //             {
-        //                 properties.Add(key, typeof(string));
-        //             }
-        //             else
-        //             {
-        //                 throw new ArgumentException(typeName);
-        //             }
-        //         }
-        //         else
-        //         {
-        //             throw new ArgumentException(item);
-        //         }
-        //     }
-        //     return properties;
-        // }
+        private async Task WaitAsync()
+        {
+            if (this.IsPromptMode == true)
+            {
+                await this.Terminal.StartAsync();
+            }
+            else if (this.ScriptPath != string.Empty)
+            {
+                // var cremaHost = this.application.GetService(typeof(ICremaHost)) as ICremaHost;
+                // var script = File.ReadAllText(this.ScriptPath);
+                // var basePath = cremaHost.GetPath(CremaPath.Documents);
+                // var oldPath = Directory.GetCurrentDirectory();
+                // try
+                // {
+                //     DirectoryUtility.Prepare(basePath);
+                //     Directory.SetCurrentDirectory(basePath);
+                //     this.scriptContext.RunInternal(script, null);
+                // }
+                // finally
+                // {
+                //     Directory.SetCurrentDirectory(oldPath);
+                // }
+            }
+            else
+            {
+                // Console.WriteLine(Resources.ConnectionMessage);
+                // if (Console.IsInputRedirected == false)
+                // {
+                //     while (Console.ReadKey().Key != ConsoleKey.Q) ;
+                // }
+                // else
+                // {
+                //     while (Console.ReadLine() != "exit") ;
+                // }
+            }
+        }
 
         private ConsoleTerminal Terminal => this.application.GetService(typeof(ConsoleTerminal)) as ConsoleTerminal;
     }

@@ -53,7 +53,7 @@ namespace JSSoft.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty("add", InitValue = "")]
+        [CommandProperty("add")]
         [CommandPropertyTrigger(nameof(MemberIDToSet), "", Group = 0)]
         [CommandPropertyTrigger(nameof(MemberIDToRemove), "", Group = 0)]
         [CommandPropertyTrigger(nameof(Information), false, Group = 0)]
@@ -62,7 +62,7 @@ namespace JSSoft.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty("set", InitValue = "")]
+        [CommandProperty("set")]
         [CommandPropertyTrigger(nameof(MemberIDToAdd), "", Group = 0)]
         [CommandPropertyTrigger(nameof(MemberIDToRemove), "", Group = 0)]
         [CommandPropertyTrigger(nameof(Information), false, Group = 0)]
@@ -71,7 +71,7 @@ namespace JSSoft.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty("remove", InitValue = "")]
+        [CommandProperty("remove")]
         [CommandPropertyTrigger(nameof(MemberIDToAdd), "", Group = 0)]
         [CommandPropertyTrigger(nameof(MemberIDToSet), "", Group = 0)]
         [CommandPropertyTrigger(nameof(Information), false, Group = 0)]

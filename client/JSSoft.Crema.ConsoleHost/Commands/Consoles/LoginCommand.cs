@@ -40,19 +40,19 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
         {
         }
 
-        [CommandProperty(InitValue = "")]
+        [CommandProperty]
         public string UserID
         {
             get; set;
         }
 
-        [CommandProperty(InitValue = "")]
+        [CommandProperty]
         public string Password
         {
             get; set;
         }
 
-        [CommandProperty(InitValue = "localhost")]
+        [CommandProperty]
         public string Address
         {
             get; set;
@@ -64,7 +64,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 
         protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
-            var address = this.Address;
+            var address = this.Address == string.Empty ? this.CommandContext.Address : this.Address;
             var userID = this.UserID != string.Empty ? this.UserID : this.CommandContext.ReadString("UserID:");
             var password = this.Password != string.Empty ? StringUtility.ToSecureString(this.Password) : this.CommandContext.ReadSecureString("Password:");
             return this.CommandContext.LoginAsync(address, userID, password);

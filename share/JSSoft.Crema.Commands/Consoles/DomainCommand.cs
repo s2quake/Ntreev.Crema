@@ -148,7 +148,7 @@ namespace JSSoft.Crema.Commands.Consoles
         //    get; set;
         //}
 
-        [CommandProperty("database", InitValue = "")]
+        [CommandProperty("database")]
         [CommandCompletion(nameof(GetDataBaseNamesAsync))]
         public string DataBaseName
         {

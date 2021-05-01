@@ -28,14 +28,14 @@ namespace JSSoft.Crema.Commands.Consoles.Properties
     [ResourceUsageDescription("../Resources")]
     public static class FilterProperties
     {
-        [CommandProperty("filter", InitValue = "")]
+        [CommandProperty("filter")]
         [CommandPropertyTrigger(nameof(FilterFile), "")]
         public static string Filter
         {
             get; set;
         }
 
-        [CommandProperty(InitValue = "")]
+        [CommandProperty]
         [CommandPropertyTrigger(nameof(Filter), "")]
         public static string FilterFile
         {

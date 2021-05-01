@@ -369,7 +369,7 @@ namespace JSSoft.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty("parent", InitValue = "")]
+        [CommandProperty("parent")]
         [CommandCompletion(nameof(GetPathsAsync))]
         public string ParentPath
         {

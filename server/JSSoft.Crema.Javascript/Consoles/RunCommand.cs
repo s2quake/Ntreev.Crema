@@ -50,7 +50,7 @@ namespace JSSoft.Crema.Javascript.Consoles
             get; set;
         }
 
-        [CommandProperty(InitValue = "")]
+        [CommandProperty]
         [CommandPropertyTrigger(nameof(Scripts), "")]
         [CommandPropertyTrigger(nameof(List), false)]
         public string Filename

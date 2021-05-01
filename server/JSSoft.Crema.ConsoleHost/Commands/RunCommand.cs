@@ -93,7 +93,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             set;
         }
 
-        [CommandProperty(InitValue = "")]
+        [CommandProperty]
         [CommandPropertyTrigger(nameof(IsPromptMode), false)]
         public string ScriptPath
         {
@@ -124,7 +124,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
 #if DEBUG
         [CommandProperty(InitValue = "en-US")]
 #else
-        [CommandProperty(InitValue = "")]
+        [CommandProperty]
 #endif
         public string Culture
         {

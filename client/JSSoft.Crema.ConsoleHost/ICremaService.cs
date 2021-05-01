@@ -26,7 +26,7 @@ namespace JSSoft.Crema.ConsoleHost
 {
     public interface ICremaService
     {
-        // int Port { get; }
+        // string Address { get; }
 
         event ClosedEventHandler Closed;
 

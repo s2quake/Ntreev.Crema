@@ -77,6 +77,16 @@ namespace JSSoft.Crema.ConsoleHost
             }
         }
 
+        public Task OpenAsync()
+        {
+            return this.service.OpenAsync();
+        }
+
+        public Task CloseAsync()
+        {
+            return this.service.CloseAsync();
+        }
+
         public int Port
         {
             get => this.service.Port;
@@ -87,16 +97,6 @@ namespace JSSoft.Crema.ConsoleHost
         {
             get => this.service.Timeout;
             set => this.service.Timeout = value;
-        }
-
-        public Task OpenAsync()
-        {
-            return this.service.OpenAsync();
-        }
-
-        public Task CloseAsync()
-        {
-            return this.service.CloseAsync();
         }
 
         public ServiceState ServiceState => this.service.ServiceState;

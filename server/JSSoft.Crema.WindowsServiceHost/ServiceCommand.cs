@@ -77,7 +77,7 @@ namespace JSSoft.Crema.WindowsServiceHost
             set;
         }
 
-        [CommandProperty("display-name", InitValue = "")]
+        [CommandProperty("display-name")]
         public string DisplayName
         {
             get;

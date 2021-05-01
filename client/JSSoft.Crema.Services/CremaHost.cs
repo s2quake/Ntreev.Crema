@@ -130,6 +130,7 @@ namespace JSSoft.Crema.Services
 
         public async Task<Guid> OpenAsync(string address, string userID, SecureString password)
         {
+            this.ValidateOpen(address, userID, password);
             try
             {
                 await this.Dispatcher.InvokeAsync(() =>
@@ -420,6 +421,16 @@ namespace JSSoft.Crema.Services
         protected virtual void OnDisposed(EventArgs e)
         {
             this.Disposed?.Invoke(this, e);
+        }
+
+        private void ValidateOpen(string address, string userID, SecureString password)
+        {
+            if (address is null)
+                throw new ArgumentNullException(nameof(address));
+            if (userID is null)
+                throw new ArgumentNullException(nameof(userID));
+            if (password is null)
+                throw new ArgumentNullException(nameof(password));
         }
 
         private void ValidateDispose()
