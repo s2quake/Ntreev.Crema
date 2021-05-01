@@ -50,6 +50,13 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             this.scriptContext = scriptContext;
         }
 
+        [CommandProperty(InitValue = "localhost")]
+        public string Address
+        {
+            get;
+            set;
+        }
+
         [CommandPropertySwitch("prompt", 'p')]
         [CommandPropertyTrigger(nameof(ScriptPath), "")]
         [CommandPropertyTrigger(nameof(Script), "")]
@@ -114,7 +121,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
         {
             this.application.Culture = this.Culture;
             this.application.Verbose = LogVerbose.None;
-
+            this.application.Address = this.Address;
             // this.CommandContext.SetAddress(this.Address);
             // this.CommandContext.SetAddress(this.Address);
             await this.application.OpenAsync();

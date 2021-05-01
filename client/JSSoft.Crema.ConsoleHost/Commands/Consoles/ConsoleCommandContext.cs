@@ -53,12 +53,11 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 
         public override ICremaHost CremaHost => this.cremaHost;
 
-        public async Task LoginAsync(string address, string userID, SecureString password)
+        public async Task LoginAsync(string userID, SecureString password)
         {
-            this.token = await this.CremaHost.OpenAsync(address, userID, password);
+            this.token = await this.CremaHost.LoginAsync(userID, password);
             await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.Closed += CremaHost_Closed);
             this.authentication = this.CremaHost.GetService(typeof(Authenticator)) as Authenticator;
-            this.application.Address = address;
             await this.InitializeAsync(this.authentication);
         }
 

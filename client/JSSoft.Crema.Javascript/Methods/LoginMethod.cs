@@ -30,14 +30,14 @@ namespace JSSoft.Crema.Javascript.Methods
     {
         protected override Delegate CreateDelegate()
         {
-            return new Func<string, string, string, string>(this.Login);
+            return new Func<string, string, string>(this.Login);
         }
 
-        private string Login(string address, string userID, string password)
+        private string Login(string userID, string password)
         {
             if (this.Context is ScriptMethodContext context)
             {
-                var task = context.LoginAsync(address, userID, password);
+                var task = context.LoginAsync(userID, password);
                 task.Wait();
                 return task.Result;
             }

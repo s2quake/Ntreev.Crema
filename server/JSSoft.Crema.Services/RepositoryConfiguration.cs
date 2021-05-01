@@ -38,8 +38,11 @@ namespace JSSoft.Crema.Services
             try
             {
                 var filename = this.itemName + ".xml";
-                using var stream = File.OpenRead(filename);
-                this.Read(stream, this.serializer);
+                if (File.Exists(filename) == true)
+                {
+                    using var stream = File.OpenRead(filename);
+                    this.Read(stream, this.serializer);
+                }
             }
             catch (Exception e)
             {

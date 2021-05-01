@@ -26,6 +26,8 @@ namespace JSSoft.Crema.Services
     [Export(typeof(CremaSettings))]
     class CremaSettings
     {
+        public string Address { get; set; }
+
         public LogVerbose Verbose { get; set; } = LogVerbose.Info;
     }
 }

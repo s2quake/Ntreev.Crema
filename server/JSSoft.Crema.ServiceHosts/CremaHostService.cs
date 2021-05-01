@@ -33,6 +33,7 @@ namespace JSSoft.Crema.ServiceHosts
 {
     class CremaHostService : CremaServiceItemBase<ICremaHostEventCallback>, ICremaHostService
     {
+        private bool isSubscribed;
         private Guid authenticationToken;
         private Authentication authentication;
         private long index = 0;
@@ -44,9 +45,9 @@ namespace JSSoft.Crema.ServiceHosts
             this.OwnerID = nameof(CremaHostService);
         }
 
-        public async Task<ResultBase<Guid>> SubscribeAsync(string userID, byte[] password, string version, string platformID, string culture)
+        public async Task<ResultBase> SubscribeAsync(string version, string platformID, string culture)
         {
-            var result = new ResultBase<Guid>();
+            var result = new ResultBase();
             try
             {
                 var serverVersion = typeof(ICremaHost).Assembly.GetName().Version;
@@ -55,12 +56,28 @@ namespace JSSoft.Crema.ServiceHosts
                 if (clientVersion < serverVersion)
                     throw new ArgumentException(Resources.Exception_LowerVersion, nameof(version));
 
+                this.isSubscribed = true;
+                result.SignatureDate = this.authentication.SignatureDate;
+                this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(SubscribeAsync)}");
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault(e);
+            }
+            return result;
+        }
+
+        public async Task<ResultBase<Guid>> LoginAsync(string userID, byte[] password)
+        {
+            var result = new ResultBase<Guid>();
+            try
+            {
                 this.authenticationToken = await this.CremaHost.LoginAsync(userID, ToSecureString(userID, password));
                 this.authentication = await this.CremaHost.AuthenticateAsync(this.authenticationToken);
                 this.OwnerID = this.authentication.ID;
                 result.Value = this.authenticationToken;
                 result.SignatureDate = this.authentication.SignatureDate;
-                this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(SubscribeAsync)}");
+                this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(LoginAsync)}");
             }
             catch (Exception e)
             {
@@ -70,13 +87,25 @@ namespace JSSoft.Crema.ServiceHosts
             return result;
         }
 
-        private async void AuthenticationUtility_Disconnected(object sender, EventArgs e)
+        public async Task<ResultBase> LogoutAsync()
         {
-            var authentication = sender as Authentication;
-            if (this.authentication != null && this.authentication == authentication)
+            var result = new ResultBase();
+            try
             {
                 await this.CremaHost.LogoutAsync(this.authentication);
+                this.authentication = null;
+                this.OwnerID = nameof(CremaHostService);
+                this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(LogoutAsync)}");
             }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault(e);
+            }
+            finally
+            {
+                result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
+            }
+            return result;
         }
 
         public async Task<ResultBase> UnsubscribeAsync()
@@ -84,13 +113,13 @@ namespace JSSoft.Crema.ServiceHosts
             var result = new ResultBase();
             try
             {
-                await this.CremaHost.LogoutAsync(this.authentication);
-                this.authentication = null;
+                this.isSubscribed = await Task.Run(() => false);
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
                 this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(UnsubscribeAsync)}");
             }
             catch (Exception e)
             {
+                this.OwnerID = nameof(CremaHostService);
                 result.Fault = new CremaFault(e);
             }
             return result;
@@ -195,6 +224,15 @@ namespace JSSoft.Crema.ServiceHosts
             this.LogService.Debug($"[{this.authentication}] {nameof(CremaHostService)}.{nameof(IsAliveAsync)} : {DateTime.Now}");
             await Task.Delay(1);
             return true;
+        }
+
+        private async void AuthenticationUtility_Disconnected(object sender, EventArgs e)
+        {
+            var authentication = sender as Authentication;
+            if (this.authentication != null && this.authentication == authentication)
+            {
+                await this.CremaHost.LogoutAsync(this.authentication);
+            }
         }
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)

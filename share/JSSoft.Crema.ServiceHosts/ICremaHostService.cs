@@ -29,7 +29,13 @@ namespace JSSoft.Crema.ServiceHosts
     public interface ICremaHostService
     {
         [OperationContract]
-        Task<ResultBase<Guid>> SubscribeAsync(string userID, byte[] password, string version, string platformID, string culture);
+        Task<ResultBase> SubscribeAsync(string version, string platformID, string culture);
+
+        [OperationContract]
+        Task<ResultBase<Guid>> LoginAsync(string userID, byte[] password);
+
+        [OperationContract]
+        Task<ResultBase> LogoutAsync();
 
         [OperationContract]
         Task<ResultBase> UnsubscribeAsync();

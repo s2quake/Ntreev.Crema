@@ -65,8 +65,9 @@ namespace JSSoft.Crema.Services.Users
             this.callbackEvent.Dispose();
         }
 
-        public async Task InitializeAsync(string userID, Guid authenticationToken)
+        public async Task InitializeAsync(Guid authenticationToken)
         {
+            var userID = this.CremaHost.UserID;
             var result = await this.Service.SubscribeAsync(authenticationToken);
             await this.Dispatcher.InvokeAsync(() =>
             {

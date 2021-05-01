@@ -236,6 +236,8 @@ namespace JSSoft.Crema.Services.Domains
 
         public IDomainContextService Service { get; set; }
 
+        public string UserID => this.CremaHost.UserID;
+
         public event ItemsCreatedEventHandler<IDomainItem> ItemsCreated
         {
             add

@@ -28,23 +28,29 @@ namespace JSSoft.Crema.Services
 {
     public interface ICremaHost : IServiceProvider, IDisposable, IDispatcherObject
     {
-#if CLIENT
-        Task<Guid> OpenAsync(string address, string userID, SecureString password);
-
-        string Address { get; }
-
-        string UserID { get; }
-
-        Authority Authority { get; }
-
-#elif SERVER
         Task<Guid> OpenAsync();
 
         Task<Guid> LoginAsync(string userID, SecureString password);
 
+        Task LogoutAsync(Authentication authentication);
+
+#if CLIENT
+        // Task<Guid> OpenAsync(string address, string userID, SecureString password);
+
+        // string Address { get; }
+
+        // string UserID { get; }
+
+        // Authority Authority { get; }
+
+#elif SERVER
+        
+
+        
+
         Task<Authentication> AuthenticateAsync(Guid authenticationToken);
 
-        Task LogoutAsync(Authentication authentication);
+        
 
         string GetPath(CremaPath pathType, params string[] paths);
 

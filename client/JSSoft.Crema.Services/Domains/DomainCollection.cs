@@ -115,7 +115,6 @@ namespace JSSoft.Crema.Services.Domains
         {
             var args = new DomainUserEventArgs(authentication, domain, domainUser) { TaskID = taskID };
             this.OnDomainUserEditEnded(args);
-
         }
 
         public void InvokeDomainOwnerChangedEvent(Authentication authentication, Domain domain, DomainUser domainUser, Guid taskID)

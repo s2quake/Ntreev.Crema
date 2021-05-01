@@ -27,12 +27,12 @@ namespace JSSoft.Crema.Services
     {
         private readonly bool isUser;
 
-        public AuthenticationProvider(IUser user)
+        public AuthenticationProvider(IUserContext userContext)
         {
             this.isUser = true;
-            this.ID = user.ID;
-            this.Name = user.UserName;
-            this.Authority = user.Authority;
+            // this.ID = user.ID;
+            // this.Name = user.UserName;
+            // this.Authority = user.Authority;
         }
 
         public AuthenticationProvider(string name)

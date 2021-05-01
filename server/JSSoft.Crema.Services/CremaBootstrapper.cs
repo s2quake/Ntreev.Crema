@@ -59,7 +59,7 @@ namespace JSSoft.Crema.Services
 
         public static void CreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, string dataBaseUrl)
         {
-            ValidateCreateRepository(serviceProvider, basePath, repositoryModule, fileType);
+            ValidateCreateRepository(serviceProvider, basePath, repositoryModule, fileType, dataBaseUrl);
             var repositoryProvider = GetRepositoryProvider(serviceProvider, repositoryModule);
             var serializer = GetSerializer(serviceProvider, fileType);
 
@@ -76,7 +76,7 @@ namespace JSSoft.Crema.Services
                 UserContext.GenerateDefaultUserInfos(usersPath, serializer);
                 repositoryProvider.InitializeRepository(usersRepo, usersPath, new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion });
 
-                if (dataBaseUrl == null)
+                if (dataBaseUrl == string.Empty)
                 {
                     var dataBasesPath = DirectoryUtility.Prepare(tempPath, CremaString.DataBases);
                     var dataSet = new CremaDataSet();
@@ -417,8 +417,14 @@ namespace JSSoft.Crema.Services
 
         internal static IObjectSerializer GetSerializer(IServiceProvider serviceProvider, string fileType)
         {
+            if (serviceProvider is null)
+                throw new ArgumentNullException(nameof(serviceProvider));
+            if (fileType is null)
+                throw new ArgumentNullException(nameof(fileType));
+
+            var name = fileType == string.Empty ? "xml" : fileType;
             var serializers = serviceProvider.GetService(typeof(IEnumerable<IObjectSerializer>)) as IEnumerable<IObjectSerializer>;
-            var serializer = serializers.FirstOrDefault(item => item.Name == (fileType ?? "xml"));
+            var serializer = serializers.FirstOrDefault(item => item.Name == name);
             if (serializer == null)
                 throw new InvalidOperationException("no serializer");
             return serializer;
@@ -426,8 +432,14 @@ namespace JSSoft.Crema.Services
 
         internal static IRepositoryProvider GetRepositoryProvider(IServiceProvider serviceProvider, string repositoryModule)
         {
+            if (serviceProvider is null)
+                throw new ArgumentNullException(nameof(serviceProvider));
+            if (repositoryModule is null)
+                throw new ArgumentNullException(nameof(repositoryModule));
+
+            var name = repositoryModule == string.Empty ? "git" : repositoryModule;
             var repositoryProviders = serviceProvider.GetService(typeof(IEnumerable<IRepositoryProvider>)) as IEnumerable<IRepositoryProvider>;
-            var repositoryProvider = repositoryProviders.FirstOrDefault(item => item.Name == (repositoryModule ?? "git"));
+            var repositoryProvider = repositoryProviders.FirstOrDefault(item => item.Name == name);
             if (repositoryProvider == null)
                 throw new InvalidOperationException(Resources.Exception_NoRepositoryModule);
             return repositoryProvider;
@@ -459,12 +471,18 @@ namespace JSSoft.Crema.Services
             CremaLog.Debug("Initialized.");
         }
 
-        private static void ValidateCreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType)
+        private static void ValidateCreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, string dataBaseUrl)
         {
-            if (serviceProvider == null)
+            if (serviceProvider is null)
                 throw new ArgumentNullException(nameof(serviceProvider));
-            if (basePath == null)
+            if (basePath is null)
                 throw new ArgumentNullException(nameof(basePath));
+            if (repositoryModule is null)
+                throw new ArgumentNullException(nameof(repositoryModule));
+            if (fileType is null)
+                throw new ArgumentNullException(nameof(fileType));
+            if (dataBaseUrl is null)
+                throw new ArgumentNullException(nameof(dataBaseUrl));
 
             var directoryInfo = new DirectoryInfo(basePath);
             if (directoryInfo.Exists == false)

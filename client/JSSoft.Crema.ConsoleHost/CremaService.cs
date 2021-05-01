@@ -38,6 +38,7 @@ namespace JSSoft.Crema.ConsoleHost
         private const string cremaString = "Crema";
         private readonly IServiceProvider serviceProvider;
         private ICremaHost cremaHost;
+        private Guid token;
 
         public CremaService(IServiceProvider serviceProvider)
         {
@@ -72,6 +73,7 @@ namespace JSSoft.Crema.ConsoleHost
                 this.OnOpening(EventArgs.Empty);
                 this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
             });
+            this.token = await this.cremaHost.OpenAsync();
             await this.cremaHost.Dispatcher.InvokeAsync(() =>
             {
                 this.cremaHost.CloseRequested += CremaHost_CloseRequested;
@@ -97,14 +99,16 @@ namespace JSSoft.Crema.ConsoleHost
                 this.cremaHost.CloseRequested -= CremaHost_CloseRequested;
                 this.cremaHost.Closed -= CremaHost_Closed;
             });
+            await this.cremaHost.CloseAsync(this.token);
             await this.Dispatcher.InvokeAsync(() =>
             {
+                this.token = Guid.Empty;
                 this.ServiceState = JSSoft.Crema.Services.ServiceState.Closed;
                 this.OnClosed(new ClosedEventArgs(CloseReason.Shutdown, string.Empty));
             });
         }
 
-        public string Address { get; set; } = "localhost";
+        // public string Address { get; set; } = "localhost";
 
         // public int Timeout { get; set; } = 60000;
 

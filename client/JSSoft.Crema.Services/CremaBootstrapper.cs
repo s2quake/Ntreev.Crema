@@ -142,6 +142,12 @@ namespace JSSoft.Crema.Services
             set => this.settings.Verbose = value;
         }
 
+        public string Address
+        {
+            get => this.settings.Address;
+            set => this.settings.Address = value;
+        }
+
         public event EventHandler Disposed;
 
         public virtual IEnumerable<Tuple<System.Type, object>> GetParts()

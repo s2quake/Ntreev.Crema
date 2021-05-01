@@ -128,11 +128,14 @@ namespace JSSoft.Crema.Services
             return this.CloseAsync(closeInfo);
         }
 
-        public async Task<Guid> OpenAsync(string address, string userID, SecureString password)
+        public async Task<Guid> OpenAsync()
         {
-            this.ValidateOpen(address, userID, password);
             try
             {
+                var address = this.settings.Address;
+                var version = typeof(CremaHost).Assembly.GetName().Version;
+                var platform = Environment.OSVersion.Platform;
+                var culture = CultureInfo.CurrentCulture;
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     if (this.ServiceState != ServiceState.Closed)
@@ -140,41 +143,27 @@ namespace JSSoft.Crema.Services
                     this.ServiceState = ServiceState.Opening;
                     this.OnOpening(EventArgs.Empty);
                 });
+                this.Address = address;
                 this.clientContext.Host = AddressUtility.GetIPAddress(address);
                 this.clientContext.Port = AddressUtility.GetPort(address);
                 this.serviceToken = await this.clientContext.OpenAsync();
                 this.ServiceInfo = (await this.Service.GetServiceInfoAsync()).Value;
-                var version = typeof(CremaHost).Assembly.GetName().Version;
-                var result = await this.Service.SubscribeAsync(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}");
+                await this.Service.SubscribeAsync($"{version}", $"{platform}", $"{culture}");
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.AuthenticationToken = result.Value;
-                    this.IPAddress = AddressUtility.GetIPAddress(address);
-                    this.Address = AddressUtility.GetDisplayAddress(address);
-                    this.UserID = userID;
-                    this.log = new LogService(this.Address.Replace(':', '_'), userID, AppUtility.UserAppDataPath)
-                    {
-                        Verbose = this.settings.Verbose
-                    };
-                });
-                await this.UserContext.InitializeAsync(userID, this.AuthenticationToken);
-                await this.DataBaseContext.InitializeAsync(this.AuthenticationToken);
-                await this.DomainContext.InitializeAsync(this.AuthenticationToken);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.Authority = this.UserContext.CurrentUser.Authority;
-                    this.configs = new UserConfiguration(this.ConfigPath, this.propertiesProviders);
+                    // this.Authority = this.UserContext.CurrentUser.Authority;
+                    // this.configs = new UserConfiguration(this.ConfigPath, this.propertiesProviders);
                     this.plugins = (this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>).ToArray();
                     foreach (var item in this.plugins)
                     {
-                        var authentication = new Authentication(new AuthenticationProvider(this.UserContext.CurrentUser), item.ID);
+                        var authentication = new Authentication(new AuthenticationProvider(this.UserContext), item.ID);
                         this.authentications.Add(authentication);
                         item.Initialize(authentication);
                     }
                     this.ServiceState = ServiceState.Open;
                     this.OnOpened(EventArgs.Empty);
                     this.token = Guid.NewGuid();
-                    CremaLog.Debug($"Crema opened : {address} {userID}");
+                    CremaLog.Debug($"Crema opened : {address}");
                 });
                 return this.token;
             }
@@ -192,6 +181,77 @@ namespace JSSoft.Crema.Services
                 CremaLog.Error(e);
                 throw;
             }
+        }
+
+        public async Task<Guid> LoginAsync(string userID, SecureString password)
+        {
+            try
+            {
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    if (this.ServiceState != ServiceState.Open)
+                        throw new InvalidOperationException(Resources.Exception_NotOpened);
+                });
+                var result = await this.Service.LoginAsync(userID, UserContext.Encrypt(userID, password));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.AuthenticationToken = result.Value;
+                    // this.IPAddress = AddressUtility.GetIPAddress(address);
+                    // this.Address = AddressUtility.GetDisplayAddress(address);
+                    // this.UserID = userID;
+                    this.log = new LogService(this.Address.Replace(':', '_'), userID, AppUtility.UserAppDataPath)
+                    {
+                        Verbose = this.settings.Verbose
+                    };
+                });
+                this.UserID = userID;
+                await this.UserContext.InitializeAsync(this.AuthenticationToken);
+                await this.DataBaseContext.InitializeAsync(this.AuthenticationToken);
+                await this.DomainContext.InitializeAsync(this.AuthenticationToken);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.configs = new UserConfiguration(this.GetConfigPath(userID), this.propertiesProviders);
+                    // this.Authority = this.UserContext.CurrentUser.Authority;
+                    // this.configs = new UserConfiguration(this.ConfigPath, this.propertiesProviders);
+                    // this.plugins = (this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>).ToArray();
+                    // foreach (var item in this.plugins)
+                    // {
+                    //     var authentication = new Authentication(new AuthenticationProvider(this.UserContext.CurrentUser), item.ID);
+                    //     this.authentications.Add(authentication);
+                    //     item.Initialize(authentication);
+                    // }
+                    // this.ServiceState = ServiceState.Open;
+                    // this.OnOpened(EventArgs.Empty);
+                    // this.token = Guid.NewGuid();
+                    // CremaLog.Debug($"Crema opened : {address} {userID}");
+                });
+                return this.token;
+            }
+            catch (Exception e)
+            {
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.UserID = string.Empty;
+                    this.ServiceState = ServiceState.None;
+                    this.log?.Dispose();
+                    this.log = null;
+                    this.Address = null;
+                    this.ServiceState = ServiceState.Closed;
+                    this.OnClosed(new ClosedEventArgs(CloseReason.None, string.Empty));
+                });
+                CremaLog.Error(e);
+                throw;
+            }
+        }
+
+        public Task<Authentication> AuthenticateAsync(Guid authenticationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task LogoutAsync(Authentication authentication)
+        {
+            throw new NotImplementedException();
         }
 
         public void SaveConfigs()
@@ -361,9 +421,9 @@ namespace JSSoft.Crema.Services
 
         public string Address { get; private set; }
 
-        public string UserID { get; private set; }
+        public string UserID { get; private set; } = string.Empty;
 
-        public Authority Authority { get; private set; }
+        // public Authority Authority { get; private set; }
 
         public DataBaseContext DataBaseContext { get; private set; }
 
@@ -375,7 +435,7 @@ namespace JSSoft.Crema.Services
 
         public ServiceInfo ServiceInfo { get; private set; }
 
-        public string IPAddress { get; private set; }
+        // public string IPAddress { get; private set; }
 
         public ServiceState ServiceState { get; set; }
 
@@ -504,7 +564,7 @@ namespace JSSoft.Crema.Services
                 this.log?.Dispose();
                 this.log = null;
                 this.Address = null;
-                this.UserID = null;
+                // this.UserID = null;
                 this.ServiceState = ServiceState.Closed;
                 this.token = Guid.Empty;
                 this.OnClosed(new ClosedEventArgs(closeInfo.Reason, closeInfo.Message));
@@ -514,15 +574,12 @@ namespace JSSoft.Crema.Services
             });
         }
 
-        private string ConfigPath
+        private string GetConfigPath(string userID)
         {
-            get
-            {
-                var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                var productName = AppUtility.ProductName;
-                var address = this.Address.Replace(':', '-');
-                return Path.Combine(path, productName, $"{this.UserID}@{address}.config");
-            }
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var productName = AppUtility.ProductName;
+            var address = this.Address.Replace(':', '-');
+            return Path.Combine(path, productName, $"{userID}@{address}.config");
         }
 
         private LogService Log
@@ -577,10 +634,10 @@ namespace JSSoft.Crema.Services
 
         #endregion
 
-        #region ICremaHost
+        // #region ICremaHost
 
-        string ICremaHost.Address => this.Address;
+        // string ICremaHost.Address => this.Address;
 
-        #endregion
+        // #endregion
     }
 }
