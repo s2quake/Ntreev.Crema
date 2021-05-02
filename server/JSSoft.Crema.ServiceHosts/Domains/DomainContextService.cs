@@ -43,6 +43,15 @@ namespace JSSoft.Crema.ServiceHosts.Domains
             this.LogService.Debug($"{nameof(DomainContextService)} Constructor");
         }
 
+        public async Task DisposeAsync()
+        {
+            if (this.authentication != null)
+            {
+                await this.DetachEventHandlersAsync();
+                this.authentication = null;
+            }
+        }
+
         public async Task<ResultBase<DomainContextMetaData>> SubscribeAsync(Guid authenticationToken)
         {
             var result = new ResultBase<DomainContextMetaData>();

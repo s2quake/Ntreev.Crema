@@ -37,5 +37,13 @@ namespace JSSoft.Crema.ServiceHosts.Domains
         {
             return Task.Run<IDomainContextService>(() => new DomainContextService(this.service, callback));
         }
+
+        protected override async Task DestroyServiceAsync(IDomainContextService service)
+        {
+            if (service is DomainContextService domainContextService)
+            {
+                await domainContextService.DisposeAsync();
+            }
+        }
     }
 }

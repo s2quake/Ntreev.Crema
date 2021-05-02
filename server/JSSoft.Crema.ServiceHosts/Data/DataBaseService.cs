@@ -48,6 +48,15 @@ namespace JSSoft.Crema.ServiceHosts.Data
             this.LogService.Debug($"{nameof(DataBaseService)} Constructor");
         }
 
+        public async Task DisposeAsync()
+        {
+            if (this.authentication != null)
+            {
+                await this.DetachEventHandlersAsync();
+                this.authentication = null;
+            }
+        }
+
         public async Task<ResultBase<DataBaseMetaData>> SubscribeAsync(Guid authenticationToken, string dataBaseName)
         {
             var result = new ResultBase<DataBaseMetaData>();

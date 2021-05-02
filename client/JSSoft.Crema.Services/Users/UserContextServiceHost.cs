@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System.Threading.Tasks;
 using JSSoft.Communication;
 using JSSoft.Crema.ServiceHosts.Users;
 
@@ -35,10 +36,13 @@ namespace JSSoft.Crema.Services.Users
 
         public IUserContextService Service { get; private set; }
 
-        protected override IUserContextEventCallback CreateCallback(IUserContextService service)
+        protected override Task<IUserContextEventCallback> CreateCallbackAsync(IUserContextService service)
         {
-            this.userContext.Service = service;
-            return this.userContext;
+            return Task.Run<IUserContextEventCallback>(() =>
+            {
+                this.userContext.Service = service;
+                return this.userContext;
+            });
         }
     }
 }

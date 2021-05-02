@@ -38,9 +38,12 @@ namespace JSSoft.Crema.ServiceHosts
             return Task.Run<ICremaHostService>(() => new CremaHostService(this.service, callback));
         }
 
-        protected override Task DestroyServiceAsync(ICremaHostService service)
+        protected override async Task DestroyServiceAsync(ICremaHostService service)
         {
-            return Task.CompletedTask;
+            if (service is CremaHostService cremaHostService)
+            {
+                await cremaHostService.DisposeAsync();
+            }
         }
     }
 }

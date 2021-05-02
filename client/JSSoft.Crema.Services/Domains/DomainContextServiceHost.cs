@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System.Threading.Tasks;
 using JSSoft.Communication;
 using JSSoft.Crema.ServiceHosts.Domains;
 
@@ -33,10 +34,13 @@ namespace JSSoft.Crema.Services.Domains
             this.domainContext = domainContext;
         }
 
-        protected override IDomainContextEventCallback CreateCallback(IDomainContextService service)
+        protected override Task<IDomainContextEventCallback> CreateCallbackAsync(IDomainContextService service)
         {
-            this.domainContext.Service = service;
-            return this.domainContext;
+            return Task.Run<IDomainContextEventCallback>(() =>
+            {
+                this.domainContext.Service = service;
+                return this.domainContext;
+            });
         }
     }
 }

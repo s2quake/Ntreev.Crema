@@ -39,5 +39,13 @@ namespace JSSoft.Crema.ServiceHosts.Data
         {
             return Task.Run<IDataBaseContextService>(() => new DataBaseContextService(this.service, callback));
         }
+
+        protected override async Task DestroyServiceAsync(IDataBaseContextService service)
+        {
+            if (service is DataBaseContextService dataBaseContextService)
+            {
+                await dataBaseContextService.DisposeAsync();
+            }
+        }
     }
 }

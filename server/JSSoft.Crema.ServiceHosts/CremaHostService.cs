@@ -45,6 +45,11 @@ namespace JSSoft.Crema.ServiceHosts
             this.OwnerID = nameof(CremaHostService);
         }
 
+        public async Task DisposeAsync()
+        {
+            await Task.CompletedTask;
+        }
+
         public async Task<ResultBase> SubscribeAsync(string version, string platformID, string culture)
         {
             var result = new ResultBase();
