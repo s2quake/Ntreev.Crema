@@ -244,9 +244,28 @@ namespace JSSoft.Crema.Services
             throw new NotImplementedException();
         }
 
-        public Task LogoutAsync(Authentication authentication)
+        public async Task LogoutAsync(Authentication authentication)
         {
-            throw new NotImplementedException();
+            await this.Dispatcher.InvokeAsync(() =>
+                {
+                    if (this.ServiceState != ServiceState.Open)
+                        throw new InvalidOperationException(Resources.Exception_NotOpened);
+                });
+            await this.Service.UnsubscribeAsync();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.AuthenticationToken = Guid.Empty;
+                this.log?.Dispose();
+                this.log = null;
+            });
+            await this.DomainContext.ReleaseAsync();
+            await this.DataBaseContext.ReleaseAsync();
+            await this.UserContext.ReleaseAsync();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.configs.Commit();
+                this.configs = null;
+            });
         }
 
         public void SaveConfigs()
@@ -549,26 +568,19 @@ namespace JSSoft.Crema.Services
                     item.Release();
                 }
             });
-            await this.DomainContext.CloseAsync(closeInfo);
-            await this.DataBaseContext.CloseAsync(closeInfo);
-            await this.UserContext.CloseAsync(closeInfo);
             await this.Service.UnsubscribeAsync();
-            await Task.Delay(100);
+            await this.clientContext.CloseAsync(this.serviceToken);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 foreach (var item in this.authentications)
                 {
                     item.InvokeExpiredEvent(Authentication.SystemID);
                 }
-                this.log?.Dispose();
-                this.log = null;
+                this.serviceToken = Guid.Empty;
                 this.Address = null;
-                // this.UserID = null;
                 this.ServiceState = ServiceState.Closed;
                 this.token = Guid.Empty;
                 this.OnClosed(new ClosedEventArgs(closeInfo.Reason, closeInfo.Message));
-                this.configs.Commit();
-                this.configs = null;
                 CremaLog.Debug("Crema closed.");
             });
         }

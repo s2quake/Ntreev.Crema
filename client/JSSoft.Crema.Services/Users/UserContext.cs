@@ -243,23 +243,25 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        public async Task CloseAsync(CloseInfo closeInfo)
+        public async Task ReleaseAsync()
         {
-            var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.isDisposed == true)
-                    return false;
-                this.isDisposed = true;
-                return true;
-            });
-            if (result == false)
-                return;
+            // var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
+            // {
+            //     if (this.isDisposed == true)
+            //         return false;
+            //     this.isDisposed = true;
+            //     return true;
+            // });
+            // if (result == false)
+            //     return;
 
             await this.Service.UnsubscribeAsync();
-            await Task.Delay(100);
-            await this.callbackEvent.DisposeAsync();
-            await this.Dispatcher.DisposeAsync();
-            this.Dispatcher = null;
+            await this.Dispatcher.InvokeAsync(this.Clear);
+            this.CurrentUser = null;
+            // await Task.Delay(100);
+            // await this.callbackEvent.DisposeAsync();
+            // await this.Dispatcher.DisposeAsync();
+            // this.Dispatcher = null;
         }
 
         public User CurrentUser { get; private set; }
@@ -390,7 +392,7 @@ namespace JSSoft.Crema.Services.Users
 
         async void IUserContextEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
-            await this.CloseAsync(closeInfo);
+            await this.ReleaseAsync();
         }
 
         async void IUserContextEventCallback.OnUsersChanged(CallbackInfo callbackInfo, UserInfo[] userInfos)

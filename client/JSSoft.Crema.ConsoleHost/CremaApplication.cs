@@ -99,6 +99,12 @@ namespace JSSoft.Crema.ConsoleHost
             remove { this.service.Closed -= value; }
         }
 
+        protected override void OnDisposed(EventArgs e)
+        {
+            base.OnDisposed(e);
+            this.service.Dispose();
+        }
+
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             try

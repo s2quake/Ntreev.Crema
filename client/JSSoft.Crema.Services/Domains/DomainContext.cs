@@ -82,6 +82,39 @@ namespace JSSoft.Crema.Services.Domains
             });
         }
 
+        public async Task ReleaseAsync()
+        {
+            // var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
+            // {
+            //     if (this.isDisposed == true)
+            //         return false;
+            //     this.isDisposed = true;
+            //     return true;
+            // });
+            // if (result == false)
+            //     return;
+
+            await this.Service.UnsubscribeAsync();
+            await Task.Delay(100);
+            var tasks = await this.Dispatcher.InvokeAsync(() =>
+            {
+                var taskList = new List<Task>(this.Domains.Count);
+                foreach (var item in this.Domains.ToArray<Domain>())
+                {
+                    if (item.Logger != null)
+                    {
+                        taskList.Add(item.Logger.DisposeAsync());
+                    }
+                }
+                return taskList.ToArray();
+            });
+            await Task.WhenAll(tasks);
+            await this.Dispatcher.InvokeAsync(this.Clear);
+            // await this.Dispatcher.DisposeAsync();
+            // await this.callbackEvent.DisposeAsync();
+            // this.Dispatcher = null;
+        }
+
         public void InvokeItemsCreatedEvent(Authentication authentication, IDomainItem[] items, object[] args)
         {
             this.OnItemsCreated(new ItemsCreatedEventArgs<IDomainItem>(authentication, items, args));
@@ -121,38 +154,6 @@ namespace JSSoft.Crema.Services.Domains
         public async Task DeleteAsync(Authentication authentication, Domain domain)
         {
             await this.deletionEvent.WaitAsync(domain.ID);
-        }
-
-        public async Task CloseAsync(CloseInfo closeInfo)
-        {
-            var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.isDisposed == true)
-                    return false;
-                this.isDisposed = true;
-                return true;
-            });
-            if (result == false)
-                return;
-
-            await this.Service.UnsubscribeAsync();
-            await Task.Delay(100);
-            var tasks = await this.Dispatcher.InvokeAsync(() =>
-            {
-                var taskList = new List<Task>(this.Domains.Count);
-                foreach (var item in this.Domains.ToArray<Domain>())
-                {
-                    if (item.Logger != null)
-                    {
-                        taskList.Add(item.Logger.DisposeAsync());
-                    }
-                }
-                return taskList.ToArray();
-            });
-            await Task.WhenAll(tasks);
-            await this.Dispatcher.DisposeAsync();
-            await this.callbackEvent.DisposeAsync();
-            this.Dispatcher = null;
         }
 
         public DomainContextMetaData GetMetaData(Authentication authentication)
@@ -446,7 +447,7 @@ namespace JSSoft.Crema.Services.Domains
 
         async void IDomainContextEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
-            await this.CloseAsync(closeInfo);
+            await this.ReleaseAsync();
         }
 
         async void IDomainContextEventCallback.OnDomainsCreated(CallbackInfo callbackInfo, DomainMetaData[] metaDatas)

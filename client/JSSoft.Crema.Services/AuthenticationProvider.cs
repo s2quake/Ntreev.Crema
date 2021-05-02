@@ -57,11 +57,11 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        public Authority Authority { get; }
+        public Authority Authority => this.cremaHost.Authority;
 
-        public string ID { get; }
+        public string ID => this.cremaHost.UserID;
 
-        public string Name { get; }
+        public string Name => this.cremaHost.UserName;
 
         #region IAuthenticationProvider
 

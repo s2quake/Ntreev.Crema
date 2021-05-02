@@ -86,6 +86,35 @@ namespace JSSoft.Crema.Services.Data
             });
         }
 
+        public async Task ReleaseAsync()
+        {
+            // var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
+            // {
+            //     if (this.isDisposed == true)
+            //         return false;
+            //     this.isDisposed = true;
+            //     return true;
+            // });
+            // if (result == false)
+            //     return;
+
+            await this.Service.UnsubscribeAsync();
+            var dataBases = await this.Dispatcher.InvokeAsync(() => this.ToArray<DataBase>());
+            foreach (var item in dataBases)
+            {
+                await item.ReleaseAsync();
+            }
+            await this.Dispatcher.InvokeAsync(this.Clear);
+
+            // if (this.Service == null)
+            //     return;
+            // await Task.Delay(100);
+            // await this.callbackEvent.DisposeAsync();
+            // await this.Dispatcher.DisposeAsync();
+            // this.Service = null;
+            // this.Dispatcher = null;
+        }
+
         public async Task<LockInfo> InvokeDataBaseLock(Authentication authentication, DataBase dataBase, string comment)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseLock), dataBase, comment);
@@ -401,34 +430,6 @@ namespace JSSoft.Crema.Services.Data
             this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskID));
         }
 
-        public async Task CloseAsync(CloseInfo closeInfo)
-        {
-            var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.isDisposed == true)
-                    return false;
-                this.isDisposed = true;
-                return true;
-            });
-            if (result == false)
-                return;
-
-            var dataBases = await this.Dispatcher.InvokeAsync(() => this.ToArray<DataBase>());
-            foreach (var item in dataBases)
-            {
-                await item.CloseAsync(closeInfo);
-            }
-
-            if (this.Service == null)
-                return;
-            await this.Service.UnsubscribeAsync();
-            await Task.Delay(100);
-            await this.callbackEvent.DisposeAsync();
-            await this.Dispatcher.DisposeAsync();
-            this.Service = null;
-            this.Dispatcher = null;
-        }
-
         public Task<ResultBase> LoadDataBase(DataBase dataBase)
         {
             return this.Service.LoadAsync(dataBase.Name);
@@ -739,7 +740,7 @@ namespace JSSoft.Crema.Services.Data
 
         async void IDataBaseContextEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
-            await this.CloseAsync(closeInfo);
+            await this.ReleaseAsync();
         }
 
         async void IDataBaseContextEventCallback.OnDataBasesCreated(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseInfo[] dataBaseInfos, string comment)

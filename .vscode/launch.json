@@ -5,10 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        },
+        {
             "name": "launch-crema-client-application",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build client",
             "program": "${workspaceFolder}/client/JSSoft.Crema.ApplicationHost/bin/Debug/netcoreapp3.1/cremaApp.dll",
             "cwd": "${workspaceFolder}/client/JSSoft.Crema.ApplicationHost/bin/Debug/netcoreapp3.1",
             "stopAtEntry": false
@@ -18,19 +23,19 @@
             "type": "coreclr",
             "request": "launch",
             "program": "${workspaceFolder}/client/JSSoft.Crema.ConsoleHost/bin/Debug/netcoreapp3.1/cremaclient.dll",
-            "args":[
+            "args": [
                 "run",
                 "--prompt"
             ],
             "cwd": "${workspaceFolder}/client/JSSoft.Crema.ConsoleHost/bin/Debug/netcoreapp3.1",
             "console": "integratedTerminal",
-            "stopAtEntry": false
+            "stopAtEntry": false,
+            "internalConsoleOptions": "neverOpen"
         },
         {
             "name": "launch-crema-server-application",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build server",
             "program": "${workspaceFolder}/server/JSSoft.Crema.ApplicationHost/bin/Debug/netcoreapp3.1/cremaserverApp.dll",
             "cwd": "${workspaceFolder}/server/JSSoft.Crema.ApplicationHost/bin/Debug/netcoreapp3.1",
             "stopAtEntry": false
@@ -39,9 +44,8 @@
             "name": "launch-crema-server-console",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build server-console",
             "program": "${workspaceFolder}/server/JSSoft.Crema.ConsoleHost/bin/Debug/netcoreapp3.1/cremaserver.dll",
-            "args":[
+            "args": [
                 "run",
                 "../repository",
                 "--prompt"

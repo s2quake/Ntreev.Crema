@@ -298,22 +298,24 @@ namespace JSSoft.Crema.Commands.Consoles
         {
             this.authentication = authentication;
             this.authentication.Expired += Authentication_Expired;
-            this.Authority = await GetAuthorityAsync();
+            this.Authority = authentication.Authority;
             this.path = PathUtility.Separator;
 
-            Task<Authority> GetAuthorityAsync()
-            {
-                var userContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
-                return userContext.Dispatcher.InvokeAsync(() => userContext.Users[authentication.ID].Authority);
-            }
+            // Task<Authority> GetAuthorityAsync()
+            // {
+            //     var userContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            //     return userContext.Dispatcher.InvokeAsync(() => userContext.Users[authentication.ID].Authority);
+            // }
         }
 
         protected void Release()
         {
-            if (this.authentication != null)
-            {
+            // if (this.authentication != null)
+            // {
                 this.authentication.Expired -= Authentication_Expired;
-            }
+            // }
+            if (this.commission != null && this.authentication != null)
+                this.authentication.EndCommission(this.commission);
             this.authentication = null;
             this.commission = null;
             this.OnPathChanged(EventArgs.Empty);

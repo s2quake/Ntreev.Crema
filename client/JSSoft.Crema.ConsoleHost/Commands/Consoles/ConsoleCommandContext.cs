@@ -56,7 +56,6 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
         public async Task LoginAsync(string userID, SecureString password)
         {
             this.token = await this.CremaHost.LoginAsync(userID, password);
-            await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.Closed += CremaHost_Closed);
             this.authentication = this.CremaHost.GetService(typeof(Authenticator)) as Authenticator;
             await this.InitializeAsync(this.authentication);
         }
@@ -66,10 +65,10 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             if (this.authentication == null)
                 throw new Exception("로그인되어 있지 않습니다.");
 
-            await this.CremaHost.CloseAsync(this.token);
+            await this.CremaHost.LogoutAsync(this.authentication);
+            this.Release();
             this.authentication = null;
             this.token = Guid.Empty;
-            this.Release();
         }
 
         private static string SecureStringToString(SecureString value)

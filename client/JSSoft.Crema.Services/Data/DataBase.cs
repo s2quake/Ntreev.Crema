@@ -40,7 +40,6 @@ namespace JSSoft.Crema.Services.Data
     {
         private bool isDisposed;
         private DataBaseMetaData metaData;
-        //private PingTimer pingTimer;
 
         private EventHandler<AuthenticationEventArgs> authenticationEntered;
         private EventHandler<AuthenticationEventArgs> authenticationLeft;
@@ -732,22 +731,23 @@ namespace JSSoft.Crema.Services.Data
             this.Dispatcher.Invoke(action);
         }
 
-        public async Task CloseAsync(CloseInfo closeInfo)
+        public async Task ReleaseAsync()
         {
-            var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.isDisposed == true)
-                    return false;
-                this.isDisposed = true;
-                return this.Dispatcher.Owner is DataBase;
-            });
-            if (result == false)
-                return;
+            // var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
+            // {
+            //     if (this.isDisposed == true)
+            //         return false;
+            //     this.isDisposed = true;
+            //     return this.Dispatcher.Owner is DataBase;
+            // });
+            // if (result == false)
+            //     return;
 
-            await this.Service.UnsubscribeAsync();
-            await Task.Delay(100);
-            await this.callbackEvent.DisposeAsync();
-            await this.Dispatcher.DisposeAsync();
+            await (this.Service?.UnsubscribeAsync() ?? Task.CompletedTask);
+
+            // await Task.Delay(100);
+            await (this.callbackEvent?.DisposeAsync() ?? Task.CompletedTask);
+            // await (this.Dispatcher?.DisposeAsync() ?? Task.CompletedTask);
             this.Dispatcher = null;
         }
 
@@ -1124,21 +1124,11 @@ namespace JSSoft.Crema.Services.Data
             this.taskCompleted?.Invoke(this, e);
         }
 
-        //private ResultBase ReleaseService()
-        //{
-        //    var result = this.CremaHost.InvokeService(() => this.service.Unsubscribe());
-        //    this.service.CloseService(CloseReason.None);
-        //    this.pingTimer.Dispose();
-        //    this.pingTimer = null;
-        //    this.service = null;
-        //    return result;
-        //}
-
         #region IDataBaseEventCallback
 
         async void IDataBaseEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
-            await this.CloseAsync(closeInfo);
+            await this.ReleaseAsync();
         }
 
         async void IDataBaseEventCallback.OnTablesChanged(CallbackInfo callbackInfo, TableInfo[] tableInfos, string itemType)
