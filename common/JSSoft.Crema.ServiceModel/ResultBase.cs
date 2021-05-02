@@ -83,6 +83,8 @@ namespace JSSoft.Crema.ServiceModel
                 throw new CremaFaultException(this.Fault.Message);
             }
         }
+
+        public static implicit operator T(ResultBase<T> result) => result.Value;
     }
 
     [DataContract(Namespace = SchemaUtility.Namespace)]

@@ -49,14 +49,12 @@ namespace JSSoft.Crema.Services
         private readonly CremaSettings settings;
         private readonly List<Authentication> authentications = new List<Authentication>();
         private readonly List<ServiceHostBase> hosts;
+        private readonly ClientContext clientContext;
 
         private UserConfiguration configs;
         private IEnumerable<IPlugin> plugins;
-
         private LogService log;
         private Guid token;
-        // private readonly CremaHostServiceHost host;
-        private readonly ClientContext clientContext;
         private Guid serviceToken;
 
         [ImportingConstructor]
@@ -147,12 +145,10 @@ namespace JSSoft.Crema.Services
                 this.clientContext.Host = AddressUtility.GetIPAddress(address);
                 this.clientContext.Port = AddressUtility.GetPort(address);
                 this.serviceToken = await this.clientContext.OpenAsync();
-                this.ServiceInfo = (await this.Service.GetServiceInfoAsync()).Value;
+                this.ServiceInfo = await this.Service.GetServiceInfoAsync();
                 await this.Service.SubscribeAsync($"{version}", $"{platform}", $"{culture}");
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    // this.Authority = this.UserContext.CurrentUser.Authority;
-                    // this.configs = new UserConfiguration(this.ConfigPath, this.propertiesProviders);
                     this.plugins = (this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>).ToArray();
                     foreach (var item in this.plugins)
                     {
@@ -160,9 +156,9 @@ namespace JSSoft.Crema.Services
                         this.authentications.Add(authentication);
                         item.Initialize(authentication);
                     }
+                    this.token = Guid.NewGuid();
                     this.ServiceState = ServiceState.Open;
                     this.OnOpened(EventArgs.Empty);
-                    this.token = Guid.NewGuid();
                     CremaLog.Debug($"Crema opened : {address}");
                 });
                 return this.token;
@@ -171,11 +167,10 @@ namespace JSSoft.Crema.Services
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.ServiceState = ServiceState.None;
                     this.log?.Dispose();
                     this.log = null;
-                    this.Address = null;
-                    this.ServiceState = ServiceState.Closed;
+                    this.Address = string.Empty;
+                    this.ServiceState = ServiceState.None;
                     this.OnClosed(new ClosedEventArgs(CloseReason.None, string.Empty));
                 });
                 CremaLog.Error(e);
@@ -192,13 +187,9 @@ namespace JSSoft.Crema.Services
                     if (this.ServiceState != ServiceState.Open)
                         throw new InvalidOperationException(Resources.Exception_NotOpened);
                 });
-                var result = await this.Service.LoginAsync(userID, UserContext.Encrypt(userID, password));
+                this.AuthenticationToken = await this.Service.LoginAsync(userID, UserContext.Encrypt(userID, password));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.AuthenticationToken = result.Value;
-                    // this.IPAddress = AddressUtility.GetIPAddress(address);
-                    // this.Address = AddressUtility.GetDisplayAddress(address);
-                    // this.UserID = userID;
                     this.log = new LogService(this.Address.Replace(':', '_'), userID, AppUtility.UserAppDataPath)
                     {
                         Verbose = this.settings.Verbose
@@ -210,19 +201,6 @@ namespace JSSoft.Crema.Services
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.configs = new UserConfiguration(this.GetConfigPath(userID), this.propertiesProviders);
-                    // this.Authority = this.UserContext.CurrentUser.Authority;
-                    // this.configs = new UserConfiguration(this.ConfigPath, this.propertiesProviders);
-                    // this.plugins = (this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>).ToArray();
-                    // foreach (var item in this.plugins)
-                    // {
-                    //     var authentication = new Authentication(new AuthenticationProvider(this.UserContext.CurrentUser), item.ID);
-                    //     this.authentications.Add(authentication);
-                    //     item.Initialize(authentication);
-                    // }
-                    // this.ServiceState = ServiceState.Open;
-                    // this.OnOpened(EventArgs.Empty);
-                    // this.token = Guid.NewGuid();
-                    // CremaLog.Debug($"Crema opened : {address} {userID}");
                 });
                 return this.token;
             }
@@ -230,9 +208,10 @@ namespace JSSoft.Crema.Services
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.ServiceState = ServiceState.None;
+                    this.AuthenticationToken = Guid.Empty;
                     this.log?.Dispose();
                     this.log = null;
+                    this.configs = null;
                 });
                 CremaLog.Error(e);
                 throw;
@@ -247,22 +226,19 @@ namespace JSSoft.Crema.Services
         public async Task LogoutAsync(Authentication authentication)
         {
             await this.Dispatcher.InvokeAsync(() =>
-                {
-                    if (this.ServiceState != ServiceState.Open)
-                        throw new InvalidOperationException(Resources.Exception_NotOpened);
-                });
-            await this.Service.UnsubscribeAsync();
-            await this.Dispatcher.InvokeAsync(() =>
             {
-                this.AuthenticationToken = Guid.Empty;
-                this.log?.Dispose();
-                this.log = null;
+                if (this.ServiceState != ServiceState.Open)
+                    throw new InvalidOperationException(Resources.Exception_NotOpened);
             });
+            await this.Service.LogoutAsync();
             await this.DomainContext.ReleaseAsync();
             await this.DataBaseContext.ReleaseAsync();
             await this.UserContext.ReleaseAsync();
             await this.Dispatcher.InvokeAsync(() =>
             {
+                this.AuthenticationToken = Guid.Empty;
+                this.log?.Dispose();
+                this.log = null;
                 this.configs.Commit();
                 this.configs = null;
             });
@@ -433,7 +409,7 @@ namespace JSSoft.Crema.Services
 
         public ConfigurationBase Configs => this.configs;
 
-        public string Address { get; private set; }
+        public string Address { get; private set; } = string.Empty;
 
         public string UserID => this.User != null ? this.User.ID : string.Empty;
 
@@ -452,8 +428,6 @@ namespace JSSoft.Crema.Services
         public CremaDispatcher Dispatcher { get; private set; }
 
         public ServiceInfo ServiceInfo { get; private set; }
-
-        // public string IPAddress { get; private set; }
 
         public ServiceState ServiceState { get; set; }
 

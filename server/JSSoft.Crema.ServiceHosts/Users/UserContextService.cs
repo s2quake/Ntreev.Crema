@@ -43,6 +43,15 @@ namespace JSSoft.Crema.ServiceHosts.Users
             this.LogService.Debug($"{nameof(UserContextService)} Constructor");
         }
 
+        public async Task DisposeAsync()
+        {
+            if (this.authentication != null)
+            {
+                await this.DetachEventHandlersAsync();
+                this.authentication = null;
+            }
+        }
+
         public async Task<ResultBase<UserContextMetaData>> SubscribeAsync(Guid authenticationToken)
         {
             var result = new ResultBase<UserContextMetaData>();

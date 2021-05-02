@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System.Threading.Tasks;
 using JSSoft.Communication;
 
 namespace JSSoft.Crema.ServiceHosts.Data
@@ -32,14 +33,14 @@ namespace JSSoft.Crema.ServiceHosts.Data
             this.service = service;
         }
 
-        protected override IDataBaseService CreateService(IDataBaseEventCallback callback)
+        protected override Task<IDataBaseService> CreateServiceAsync(IDataBaseEventCallback callback)
         {
-            return new DataBaseService(this.service, callback);
+            return Task.Run<IDataBaseService>(() => new DataBaseService(this.service, callback));
         }
 
-        protected override void DestroyService(IDataBaseService service)
+        protected override Task DestroyServiceAsync(IDataBaseService service)
         {
-
+            return Task.CompletedTask;
         }
     }
 }

@@ -26,16 +26,14 @@ namespace JSSoft.Crema.Services
 {
     public class ClosedEventArgs : EventArgs
     {
-        private readonly string message;
-
         public ClosedEventArgs(CloseReason reason, string message)
         {
             this.Reason = reason;
-            this.message = message;
+            this.Message = message ?? throw new ArgumentNullException(nameof(message));
         }
 
         public CloseReason Reason { get; }
 
-        public string Message => this.message ?? string.Empty;
+        public string Message { get; }
     }
 }
