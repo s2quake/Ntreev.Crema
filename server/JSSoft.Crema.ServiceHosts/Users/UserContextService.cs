@@ -281,22 +281,22 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         public IUserContext UserContext { get; set; }
 
-        protected override async Task OnCloseAsync(bool disconnect)
-        {
-            if (this.authentication != null)
-            {
-                await this.DetachEventHandlersAsync();
-                if (disconnect == false)
-                    await this.CremaHost.LogoutAsync(this.authentication);
-                this.authentication = null;
-            }
-        }
+        // protected override async Task OnCloseAsync(bool disconnect)
+        // {
+        //     if (this.authentication != null)
+        //     {
+        //         await this.DetachEventHandlersAsync();
+        //         if (disconnect == false)
+        //             await this.CremaHost.LogoutAsync(this.authentication);
+        //         this.authentication = null;
+        //     }
+        // }
 
-        protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
-        {
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = signatureDate };
-            this.Callback?.OnServiceClosed(callbackInfo, closeInfo);
-        }
+        // protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
+        // {
+        //     var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = signatureDate };
+        //     this.Callback?.OnServiceClosed(callbackInfo, closeInfo);
+        // }
 
         private async Task<UserContextMetaData> AttachEventHandlersAsync()
         {

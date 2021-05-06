@@ -34,9 +34,6 @@ namespace JSSoft.Crema.ServiceModel
         Faulted,
 
         [EnumMember]
-        NoResponding,
-
-        [EnumMember]
         Reconnected,
 
         [EnumMember]
@@ -44,9 +41,6 @@ namespace JSSoft.Crema.ServiceModel
 
         [EnumMember]
         Banned,
-
-        [EnumMember]
-        Shutdown,
 
         [EnumMember]
         Restart,

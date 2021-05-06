@@ -37,6 +37,7 @@ using System.IO;
 using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace JSSoft.Crema.Services
 {
@@ -121,12 +122,7 @@ namespace JSSoft.Crema.Services
             return null;
         }
 
-        public Task InvokeCloseAsync(CloseInfo closeInfo)
-        {
-            return this.CloseAsync(closeInfo);
-        }
-
-        public async Task<Guid> OpenAsync()
+        public async Task OpenAsync()
         {
             try
             {
@@ -142,6 +138,7 @@ namespace JSSoft.Crema.Services
                     this.OnOpening(EventArgs.Empty);
                 });
                 this.Address = address;
+                this.clientContext.Closed += ClientContext_Closed;
                 this.clientContext.Host = AddressUtility.GetIPAddress(address);
                 this.clientContext.Port = AddressUtility.GetPort(address);
                 this.serviceToken = await this.clientContext.OpenAsync();
@@ -161,7 +158,6 @@ namespace JSSoft.Crema.Services
                     this.OnOpened(EventArgs.Empty);
                     CremaLog.Debug($"Crema opened : {address}");
                 });
-                return this.token;
             }
             catch (Exception e)
             {
@@ -257,16 +253,44 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        public async Task CloseAsync(Guid token)
+        public async Task CloseAsync()
         {
             try
             {
-                if (this.token != token)
-                    throw new ArgumentException(Resources.Exception_InvalidToken, nameof(token));
-                if (this.ServiceState != ServiceState.Open)
-                    throw new InvalidOperationException(Resources.Exception_NotConnected);
-                await this.CloseAsync(CloseInfo.Empty);
-
+                var waiter = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    if (this.ServiceState != ServiceState.Open)
+                        throw new InvalidOperationException(Resources.Exception_NotConnected);
+                    this.ServiceState = ServiceState.Closing;
+                    var closer = new InternalCloseRequestedEventArgs(CloseReason.None);
+                    this.OnCloseRequested(closer);
+                    return closer.WhenAll();
+                });
+                await waiter;
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.OnClosing(EventArgs.Empty);
+                    foreach (var item in this.plugins.Reverse())
+                    {
+                        item.Release();
+                    }
+                });
+                await this.Service.UnsubscribeAsync();
+                this.clientContext.Closed -= ClientContext_Closed;
+                await this.clientContext.CloseAsync(this.serviceToken, 0);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    foreach (var item in this.authentications)
+                    {
+                        item.InvokeExpiredEvent(Authentication.SystemID);
+                    }
+                    this.serviceToken = Guid.Empty;
+                    this.Address = null;
+                    this.ServiceState = ServiceState.Closed;
+                    this.token = Guid.Empty;
+                    this.OnClosed(new ClosedEventArgs(CloseReason.None));
+                    CremaLog.Debug("Crema closed.");
+                });
             }
             catch (Exception e)
             {
@@ -493,70 +517,68 @@ namespace JSSoft.Crema.Services
                 throw new InvalidOperationException(Resources.Exception_AlreadyDisposed);
         }
 
-        private async void PingTimer_Faulted(object sender, EventArgs e)
+        // private async Task CloseAsync(CloseInfo closeInfo)
+        // {
+        //     var waiter = await this.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         if (this.ServiceState != ServiceState.Open)
+        //             throw new InvalidOperationException();
+        //         this.ServiceState = ServiceState.Closing;
+        //         var closer = new InternalCloseRequestedEventArgs(closeInfo.Reason);
+        //         this.OnCloseRequested(closer);
+        //         return closer.WhenAll();
+        //     });
+        //     await waiter;
+        //     await this.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         this.OnClosing(EventArgs.Empty);
+        //         foreach (var item in this.plugins.Reverse())
+        //         {
+        //             item.Release();
+        //         }
+        //     });
+        //     await this.Service.UnsubscribeAsync();
+        //     this.clientContext.Closed -= ClientContext_Closed;
+        //     await this.clientContext.CloseAsync(this.serviceToken, 0);
+        //     await this.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         foreach (var item in this.authentications)
+        //         {
+        //             item.InvokeExpiredEvent(Authentication.SystemID);
+        //         }
+        //         this.serviceToken = Guid.Empty;
+        //         this.Address = null;
+        //         this.ServiceState = ServiceState.Closed;
+        //         this.token = Guid.Empty;
+        //         this.OnClosed(new ClosedEventArgs(closeInfo.Reason, closeInfo.Message));
+        //         CremaLog.Debug("Crema closed.");
+        //     });
+        // }
+
+        public async Task ReleaseAsync()
         {
-            try
-            {
-                await this.CloseAsync(new CloseInfo(CloseReason.NoResponding, string.Empty));
-            }
-            catch
-            {
-
-            }
-        }
-
-        private void Service_Closed(object sender, EventArgs e)
-        {
-
-        }
-
-        private async void Service_Faulted(object sender, EventArgs e)
-        {
-            try
-            {
-                await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
-            }
-            catch
-            {
-
-            }
-        }
-
-        private async Task CloseAsync(CloseInfo closeInfo)
-        {
-            var waiter = await this.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.ServiceState != ServiceState.Open)
-                    throw new InvalidOperationException();
-                this.ServiceState = ServiceState.Closing;
-                var closer = new InternalCloseRequestedEventArgs();
-                this.OnCloseRequested(closer);
-                return closer.WhenAll();
-            });
-            await waiter;
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.OnClosing(EventArgs.Empty);
-                foreach (var item in this.plugins.Reverse())
-                {
-                    item.Release();
-                }
-            });
-            await this.Service.UnsubscribeAsync();
-            await this.clientContext.CloseAsync(this.serviceToken);
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                foreach (var item in this.authentications)
-                {
-                    item.InvokeExpiredEvent(Authentication.SystemID);
-                }
-                this.serviceToken = Guid.Empty;
-                this.Address = null;
-                this.ServiceState = ServiceState.Closed;
-                this.token = Guid.Empty;
-                this.OnClosed(new ClosedEventArgs(closeInfo.Reason, closeInfo.Message));
-                CremaLog.Debug("Crema closed.");
-            });
+            // await this.Dispatcher.InvokeAsync(() =>
+            // {
+            //     this.OnClosing(EventArgs.Empty);
+            //     foreach (var item in this.plugins.Reverse())
+            //     {
+            //         item.Release();
+            //     }
+            // });
+            // await this.WaitReleaseAsync();
+            // await this.Dispatcher.InvokeAsync(() =>
+            // {
+            //     foreach (var item in this.authentications)
+            //     {
+            //         item.InvokeExpiredEvent(Authentication.SystemID);
+            //     }
+            //     this.serviceToken = Guid.Empty;
+            //     this.Address = null;
+            //     this.ServiceState = ServiceState.Closed;
+            //     this.token = Guid.Empty;
+            //     this.OnClosed(new ClosedEventArgs(CloseReason.None, string.Empty));
+            //     CremaLog.Debug("Crema closed.");
+            // });
         }
 
         private string GetConfigPath(string userID)
@@ -565,6 +587,64 @@ namespace JSSoft.Crema.Services
             var productName = AppUtility.ProductName;
             var address = this.Address.Replace(':', '-');
             return Path.Combine(path, productName, $"{userID}@{address}.config");
+        }
+
+        private async Task WaitReleaseAsync()
+        {
+            var handles = new ManualResetEvent[]
+            {
+                this.DataBaseContext.ReleaseHandle,
+                this.UserContext.ReleaseHandle,
+                this.DomainContext.ReleaseHandle,
+            };
+            await Task.Run(() => ManualResetEvent.WaitAll(handles));
+        }
+
+        private async void ClientContext_Closed(object sender, CloseEventArgs e)
+        {
+            await Task.Run(async () =>
+            {
+                var closeReason = (CloseReason)e.CloseCode;
+                this.clientContext.Closed -= ClientContext_Closed;
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.OnClosing(EventArgs.Empty);
+                    foreach (var item in this.plugins.Reverse())
+                    {
+                        item.Release();
+                    }
+                });
+                await this.WaitReleaseAsync();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    foreach (var item in this.authentications)
+                    {
+                        item.InvokeExpiredEvent(Authentication.SystemID);
+                    }
+                    this.serviceToken = Guid.Empty;
+                    this.Address = null;
+                    this.ServiceState = ServiceState.Closed;
+                    this.token = Guid.Empty;
+                    this.OnClosed(new ClosedEventArgs(closeReason, string.Empty));
+                    CremaLog.Debug("Crema closed.");
+                });
+                if (closeReason == CloseReason.Restart)
+                {
+                    while (true)
+                    {
+                        await Task.Delay(500);
+                        try
+                        {
+                            await this.OpenAsync();
+                            break;
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                }
+            });
         }
 
         private LogService Log
@@ -580,11 +660,6 @@ namespace JSSoft.Crema.Services
         internal Guid AuthenticationToken { get; set; }
 
         #region ICremaHostEventCallback
-
-        async void ICremaHostEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
-        {
-            await this.CloseAsync(closeInfo);
-        }
 
         void ICremaHostEventCallback.OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs)
         {
@@ -619,10 +694,23 @@ namespace JSSoft.Crema.Services
 
         #endregion
 
-        // #region ICremaHost
+        #region ICremaHost
 
-        // string ICremaHost.Address => this.Address;
+        async Task<Guid> ICremaHost.OpenAsync()
+        {
+            await this.OpenAsync();
+            this.token = Guid.NewGuid();
+            return this.token;
+        }
 
-        // #endregion
+        async Task ICremaHost.CloseAsync(Guid token)
+        {
+            if (this.token != token)
+                throw new InvalidOperationException(Resources.Exception_InvalidToken);
+            await this.CloseAsync();
+            this.token = Guid.Empty;
+        }
+
+        #endregion
     }
 }

@@ -77,7 +77,7 @@ namespace JSSoft.Crema.Services
             }
             finally
             {
-                await clientContext.CloseAsync(token);
+                await clientContext.CloseAsync(token, 0);
             }
         }
 
@@ -97,7 +97,7 @@ namespace JSSoft.Crema.Services
             }
             finally
             {
-                await clientContext.CloseAsync(token);
+                await clientContext.CloseAsync(token, 0);
             }
         }
 

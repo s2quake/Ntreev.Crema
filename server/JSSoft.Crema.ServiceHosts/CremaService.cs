@@ -118,7 +118,7 @@ namespace JSSoft.Crema.ServiceHosts
                 this.cremaHost.CloseRequested -= CremaHost_CloseRequested;
                 this.cremaHost.Closed -= CremaHost_Closed;
             });
-            await this.StopServicesAsync();
+            await this.StopServicesAsync(CloseReason.None);
             await this.cremaHost.CloseAsync(this.token);
             this.configCommitter.Commit();
             this.configCommitter = null;
@@ -126,7 +126,7 @@ namespace JSSoft.Crema.ServiceHosts
             {
                 this.token = Guid.Empty;
                 this.ServiceState = JSSoft.Crema.Services.ServiceState.Closed;
-                this.OnClosed(new ClosedEventArgs(CloseReason.Shutdown, string.Empty));
+                this.OnClosed(new ClosedEventArgs(CloseReason.None, string.Empty));
             });
         }
 
@@ -206,7 +206,7 @@ namespace JSSoft.Crema.ServiceHosts
                 {
                     this.ServiceState = JSSoft.Crema.Services.ServiceState.Closing;
                 });
-                await this.StopServicesAsync();
+                await this.StopServicesAsync(e.CloseReason);
             }
         }
 
@@ -245,9 +245,9 @@ namespace JSSoft.Crema.ServiceHosts
             });
         }
 
-        private async Task StopServicesAsync()
+        private async Task StopServicesAsync(CloseReason closeReason)
         {
-            await this.serverContext.CloseAsync(this.serviceToken);
+            await this.serverContext.CloseAsync(this.serviceToken, (int)closeReason);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 foreach (var item in this.hosts.Reverse<ServiceHostBase>())

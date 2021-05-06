@@ -294,20 +294,20 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         public IUserContext UserContext { get; }
 
-        protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
-        {
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = signatureDate };
-            this.Callback?.OnServiceClosed(callbackInfo, closeInfo);
-        }
+        // protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
+        // {
+        //     var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = signatureDate };
+        //     this.Callback?.OnServiceClosed(callbackInfo, closeInfo);
+        // }
 
-        protected override async Task OnCloseAsync(bool disconnect)
-        {
-            if (this.authentication != null)
-            {
-                await this.DetachEventHandlersAsync();
-                this.authentication = null;
-            }
-        }
+        // protected override async Task OnCloseAsync(bool disconnect)
+        // {
+        //     if (this.authentication != null)
+        //     {
+        //         await this.DetachEventHandlersAsync();
+        //         this.authentication = null;
+        //     }
+        // }
 
         private async Task<IDomain> GetDomainAsync(Guid domainID)
         {

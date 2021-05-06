@@ -27,6 +27,7 @@ using JSSoft.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Domains
@@ -80,21 +81,13 @@ namespace JSSoft.Crema.Services.Domains
                 this.CremaHost.DataBaseContext.ItemsRenamed += DataBaseContext_ItemsRenamed;
                 this.CremaHost.DataBaseContext.ItemsDeleted += DataBaseContext_ItemDeleted;
             });
+            this.ReleaseHandle.Reset();
         }
 
         public async Task ReleaseAsync()
         {
-            // var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
-            // {
-            //     if (this.isDisposed == true)
-            //         return false;
-            //     this.isDisposed = true;
-            //     return true;
-            // });
-            // if (result == false)
-            //     return;
-
-            await this.Service.UnsubscribeAsync();
+            if (this.Service != null)
+                await this.Service.UnsubscribeAsync();
             await Task.Delay(100);
             var tasks = await this.Dispatcher.InvokeAsync(() =>
             {
@@ -110,9 +103,7 @@ namespace JSSoft.Crema.Services.Domains
             });
             await Task.WhenAll(tasks);
             await this.Dispatcher.InvokeAsync(this.Clear);
-            // await this.Dispatcher.DisposeAsync();
-            // await this.callbackEvent.DisposeAsync();
-            // this.Dispatcher = null;
+            this.ReleaseHandle.Set();
         }
 
         public void InvokeItemsCreatedEvent(Authentication authentication, IDomainItem[] items, object[] args)
@@ -238,6 +229,8 @@ namespace JSSoft.Crema.Services.Domains
         public IDomainContextService Service { get; set; }
 
         public string UserID => this.CremaHost.UserID;
+
+        public ManualResetEvent ReleaseHandle { get; } = new ManualResetEvent(false);
 
         public event ItemsCreatedEventHandler<IDomainItem> ItemsCreated
         {
@@ -447,7 +440,7 @@ namespace JSSoft.Crema.Services.Domains
 
         async void IDomainContextEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
-            await this.ReleaseAsync();
+            // await this.CloseAsync(closeInfo);
         }
 
         async void IDomainContextEventCallback.OnDomainsCreated(CallbackInfo callbackInfo, DomainMetaData[] metaDatas)

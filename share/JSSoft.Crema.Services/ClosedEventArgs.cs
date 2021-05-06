@@ -26,6 +26,11 @@ namespace JSSoft.Crema.Services
 {
     public class ClosedEventArgs : EventArgs
     {
+        public ClosedEventArgs(CloseReason reason)
+            : this(reason, string.Empty)
+        {
+        }
+        
         public ClosedEventArgs(CloseReason reason, string message)
         {
             this.Reason = reason;

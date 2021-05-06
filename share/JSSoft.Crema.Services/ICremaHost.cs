@@ -35,22 +35,10 @@ namespace JSSoft.Crema.Services
         Task LogoutAsync(Authentication authentication);
 
 #if CLIENT
-        // Task<Guid> OpenAsync(string address, string userID, SecureString password);
-
-        // string Address { get; }
-
-        // string UserID { get; }
-
-        // Authority Authority { get; }
 
 #elif SERVER
-        
-
-        
 
         Task<Authentication> AuthenticateAsync(Guid authenticationToken);
-
-        
 
         string GetPath(CremaPath pathType, params string[] paths);
 

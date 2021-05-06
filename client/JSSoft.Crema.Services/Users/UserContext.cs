@@ -30,6 +30,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Users
@@ -87,6 +88,19 @@ namespace JSSoft.Crema.Services.Users
                 this.CurrentUser = this.Users[userID];
                 this.CurrentUser.SetUserState(UserState.Online);
             });
+            this.ReleaseHandle.Reset();
+        }
+
+        public async Task ReleaseAsync()
+        {
+            if (this.Service != null)
+                await this.Service.UnsubscribeAsync();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.CurrentUser = null;
+                this.Clear();
+            });
+            this.ReleaseHandle.Set();
         }
 
         public Task WaitAsync(Guid taskID)
@@ -243,27 +257,6 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        public async Task ReleaseAsync()
-        {
-            // var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
-            // {
-            //     if (this.isDisposed == true)
-            //         return false;
-            //     this.isDisposed = true;
-            //     return true;
-            // });
-            // if (result == false)
-            //     return;
-
-            await this.Service.UnsubscribeAsync();
-            await this.Dispatcher.InvokeAsync(this.Clear);
-            this.CurrentUser = null;
-            // await Task.Delay(100);
-            // await this.callbackEvent.DisposeAsync();
-            // await this.Dispatcher.DisposeAsync();
-            // this.Dispatcher = null;
-        }
-
         public User CurrentUser { get; private set; }
 
         public IUserContextService Service { get; set; }
@@ -273,6 +266,8 @@ namespace JSSoft.Crema.Services.Users
         public CremaHost CremaHost { get; }
 
         public CremaDispatcher Dispatcher { get; set; }
+
+        public ManualResetEvent ReleaseHandle { get; } = new ManualResetEvent(false);
 
         public event ItemsCreatedEventHandler<IUserItem> ItemsCreated
         {

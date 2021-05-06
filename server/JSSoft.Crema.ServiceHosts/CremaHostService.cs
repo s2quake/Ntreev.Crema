@@ -52,110 +52,88 @@ namespace JSSoft.Crema.ServiceHosts
 
         public async Task<ResultBase> SubscribeAsync(string version, string platformID, string culture)
         {
-            var result = new ResultBase();
             var serverVersion = typeof(ICremaHost).Assembly.GetName().Version;
             var clientVersion = new Version(version);
             if (clientVersion < serverVersion)
                 throw new ArgumentException(Resources.Exception_LowerVersion, nameof(version));
 
             this.isSubscribed = true;
-            result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
             this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(SubscribeAsync)}");
-            return result;
+            return new ResultBase()
+            {
+                SignatureDate = new SignatureDateProvider(this.OwnerID)
+            };
         }
 
         public async Task<ResultBase<Guid>> LoginAsync(string userID, byte[] password)
         {
-            var result = new ResultBase<Guid>();
-            try
+            this.authenticationToken = await this.CremaHost.LoginAsync(userID, ToSecureString(userID, password));
+            this.authentication = await this.CremaHost.AuthenticateAsync(this.authenticationToken);
+            this.OwnerID = this.authentication.ID;
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(LoginAsync)}");
+            return new ResultBase<Guid>()
             {
-                this.authenticationToken = await this.CremaHost.LoginAsync(userID, ToSecureString(userID, password));
-                this.authentication = await this.CremaHost.AuthenticateAsync(this.authenticationToken);
-                this.OwnerID = this.authentication.ID;
-                result.Value = this.authenticationToken;
-                result.SignatureDate = this.authentication.SignatureDate;
-                this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(LoginAsync)}");
-            }
-            catch (Exception e)
-            {
-                this.OwnerID = $"{userID} - failed";
-                result.Fault = new CremaFault(e);
-            }
-            return result;
+                Value = this.authenticationToken,
+                SignatureDate = this.authentication.SignatureDate
+            };
         }
 
         public async Task<ResultBase> LogoutAsync()
         {
+            var ownerID = this.OwnerID;
             await this.CremaHost.LogoutAsync(this.authentication);
             this.authentication = null;
             this.OwnerID = nameof(CremaHostService);
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(LogoutAsync)}");
+            this.LogService.Debug($"[{ownerID}] {nameof(CremaHostService)} {nameof(LogoutAsync)}");
             return new ResultBase()
             {
-                SignatureDate = new SignatureDateProvider(this.OwnerID).Provide()
+                SignatureDate = new SignatureDateProvider(ownerID)
             };
         }
 
         public async Task<ResultBase> UnsubscribeAsync()
         {
-            var result = new ResultBase();
-            try
+            if (this.authentication != null)
             {
-                this.isSubscribed = await Task.Run(() => false);
-                result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-                this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(UnsubscribeAsync)}");
+                await this.CremaHost.LogoutAsync(this.authentication);
+                this.authentication = null;
             }
-            catch (Exception e)
+            this.isSubscribed = false;
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(UnsubscribeAsync)}");
+            return new ResultBase()
             {
-                this.OwnerID = nameof(CremaHostService);
-                result.Fault = new CremaFault(e);
-            }
-            return result;
+                SignatureDate = new SignatureDateProvider(this.OwnerID)
+            };
         }
 
         public async Task<ResultBase<ServiceInfo>> GetServiceInfoAsync()
         {
-            var result = new ResultBase<ServiceInfo>();
-            try
+            var value = await Task.Run(() => this.Service.ServiceInfo);
+            return new ResultBase<ServiceInfo>()
             {
-                result.Value = await Task.Run(() => this.Service.ServiceInfo);
-                result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
-            return result;
+                SignatureDate = new SignatureDateProvider(this.OwnerID),
+                Value = value
+            };
         }
 
         public async Task<ResultBase<DataBaseInfo[]>> GetDataBaseInfosAsync()
         {
-            var result = new ResultBase<DataBaseInfo[]>();
-            try
+            var value = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext.Select(item => item.DataBaseInfo).ToArray());
+            return new ResultBase<DataBaseInfo[]>()
             {
-                result.Value = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext.Select(item => item.DataBaseInfo).ToArray());
-                result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
-            return result;
+                SignatureDate = new SignatureDateProvider(this.OwnerID),
+                Value = value
+            };
         }
 
         public async Task<ResultBase<string>> GetVersionAsync()
         {
-            var result = new ResultBase<string>();
-            try
+            var value = await Task.Run(() => AppUtility.ProductVersion.ToString());
+            return new ResultBase<string>()
             {
-                result.Value = await Task.Run(() => AppUtility.ProductVersion.ToString());
-                result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
-            return result;
+                SignatureDate = new SignatureDateProvider(this.OwnerID),
+                Value = value
+            };
         }
 
         public async Task<ResultBase<bool>> IsOnlineAsync(string userID, byte[] password)
@@ -177,32 +155,20 @@ namespace JSSoft.Crema.ServiceHosts
 
         public async Task<ResultBase> ShutdownAsync(int milliseconds, ShutdownType shutdownType, string message)
         {
-            var result = new ResultBase();
-            try
+            await this.CremaHost.ShutdownAsync(this.authentication, milliseconds, shutdownType, message);
+            return new ResultBase()
             {
-                await this.CremaHost.ShutdownAsync(this.authentication, milliseconds, shutdownType, message);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
-            return result;
+                SignatureDate = this.authentication.SignatureDate
+            };
         }
 
         public async Task<ResultBase> CancelShutdownAsync()
         {
-            var result = new ResultBase();
-            try
+            await this.CremaHost.CancelShutdownAsync(this.authentication);
+            return new ResultBase()
             {
-                await this.CremaHost.CancelShutdownAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
-            return result;
+                SignatureDate = this.authentication.SignatureDate
+            };
         }
 
         public async Task<bool> IsAliveAsync()
@@ -223,12 +189,6 @@ namespace JSSoft.Crema.ServiceHosts
             }
         }
 
-        protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
-        {
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = signatureDate };
-            this.Callback?.OnServiceClosed(callbackInfo, closeInfo);
-        }
-
         private static SecureString ToSecureString(string userID, byte[] password)
         {
             var text = Encoding.UTF8.GetString(password);
@@ -246,18 +206,5 @@ namespace JSSoft.Crema.ServiceHosts
         }
 
         private IDataBaseContext DataBaseContext => this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
-
-        #region ICremaServiceItem
-
-        protected override async Task OnCloseAsync(bool disconnect)
-        {
-            await Task.Delay(1);
-            if (this.authentication != null)
-            {
-                this.authentication = null;
-            }
-        }
-
-        #endregion
     }
 }

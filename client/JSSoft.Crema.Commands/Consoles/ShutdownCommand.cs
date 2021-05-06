@@ -49,19 +49,19 @@ namespace JSSoft.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty('r')]
+        [CommandPropertySwitch('r')]
         public bool IsRestart
         {
             get; set;
         }
 
-        [CommandProperty]
+        [CommandPropertySwitch]
         public bool NoCache
         {
             get; set;
         }
 
-        [CommandProperty('c')]
+        [CommandPropertySwitch('c')]
         public bool IsCancelled
         {
             get; set;

@@ -184,7 +184,7 @@ namespace JSSoft.Crema.Services
                     if (this.ServiceState != ServiceState.Open)
                         throw new InvalidOperationException();
                     this.ServiceState = ServiceState.Closing;
-                    var closer = new InternalCloseRequestedEventArgs();
+                    var closer = new InternalCloseRequestedEventArgs(reason);
                     this.OnCloseRequested(closer);
                     return closer.WhenAll();
                 });
@@ -496,7 +496,7 @@ namespace JSSoft.Crema.Services
             }
 
             var isRestart = shutdownType.HasFlag(ShutdownType.Restart);
-            await this.CloseAsync(isRestart ? CloseReason.Restart : CloseReason.Shutdown, string.Empty);
+            await this.CloseAsync(isRestart ? CloseReason.Restart : CloseReason.None, string.Empty);
             if (isRestart == true)
             {
                 this.settings.NoCache = shutdownType.HasFlag(ShutdownType.NoCache);

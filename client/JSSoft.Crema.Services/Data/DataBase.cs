@@ -364,7 +364,7 @@ namespace JSSoft.Crema.Services.Data
                         return result.TaskID;
                     });
                     await this.DataBaseContext.WaitAsync(taskID);
-                    await this.clientContext.CloseAsync(this.serviceToken);
+                    await this.clientContext.CloseAsync(this.serviceToken, 0);
                 }
             }
             catch (Exception e)
@@ -604,9 +604,7 @@ namespace JSSoft.Crema.Services.Data
             this.authentications.Clear();
             base.DataBaseState = DataBaseState.None;
             base.Unload(authentication);
-#pragma warning disable CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
-            this.clientContext.CloseAsync(this.serviceToken);
-#pragma warning restore CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
+            await this.clientContext.CloseAsync(this.serviceToken, 0);
         }
 
         public void SetResetting(Authentication authentication)

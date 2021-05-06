@@ -42,5 +42,14 @@ namespace JSSoft.Crema.Services
                 return this.cremaHost;
             });
         }
+
+        protected override async Task DestroyCallbackAsync(ICremaHostEventCallback callback)
+        {
+            if (callback is CremaHost cremaHost)
+            {
+                cremaHost.Service = null;
+                await cremaHost.ReleaseAsync();
+            }
+        }
     }
 }

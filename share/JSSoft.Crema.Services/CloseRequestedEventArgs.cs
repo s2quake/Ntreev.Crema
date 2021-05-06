@@ -22,6 +22,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using JSSoft.Crema.ServiceModel;
 
 namespace JSSoft.Crema.Services
 {
@@ -29,9 +30,9 @@ namespace JSSoft.Crema.Services
     {
         private readonly List<Task> taskList = new List<Task>();
 
-        public CloseRequestedEventArgs()
+        public CloseRequestedEventArgs(CloseReason closeReason)
         {
-
+            this.CloseReason = closeReason;
         }
 
         public void AddTask(Task task)
@@ -39,11 +40,18 @@ namespace JSSoft.Crema.Services
             this.taskList.Add(task);
         }
 
+        public CloseReason CloseReason { get; }
+
         protected Task[] Tasks => this.taskList.ToArray();
     }
 
     public class InternalCloseRequestedEventArgs : CloseRequestedEventArgs
     {
+        public InternalCloseRequestedEventArgs(CloseReason closeReason)
+            : base(closeReason)
+        {
+        }
+
         public Task WhenAll()
         {
             return Task.WhenAll(this.Tasks);

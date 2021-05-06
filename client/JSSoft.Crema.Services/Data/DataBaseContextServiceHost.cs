@@ -42,5 +42,14 @@ namespace JSSoft.Crema.Services.Data
                 return this.dataBaseContext;
             });
         }
+
+        protected override async Task DestroyCallbackAsync(IDataBaseContextEventCallback callback)
+        {
+            if (callback is DataBaseContext dataBaseContext)
+            {
+                dataBaseContext.Service = null;
+                await dataBaseContext.ReleaseAsync();
+            }
+        }
     }
 }

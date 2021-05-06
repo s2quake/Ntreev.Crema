@@ -44,5 +44,14 @@ namespace JSSoft.Crema.Services.Users
                 return this.userContext;
             });
         }
+
+        protected override async Task DestroyCallbackAsync(IUserContextEventCallback callback)
+        {
+            if (callback is UserContext userContext)
+            {
+                userContext.Service = null;
+                await userContext.ReleaseAsync();
+            }
+        }
     }
 }

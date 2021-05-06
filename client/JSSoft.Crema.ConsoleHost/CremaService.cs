@@ -104,7 +104,7 @@ namespace JSSoft.Crema.ConsoleHost
             {
                 this.token = Guid.Empty;
                 this.ServiceState = JSSoft.Crema.Services.ServiceState.Closed;
-                this.OnClosed(new ClosedEventArgs(CloseReason.Shutdown, string.Empty));
+                this.OnClosed(new ClosedEventArgs(CloseReason.None, string.Empty));
             });
         }
 

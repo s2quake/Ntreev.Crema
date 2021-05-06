@@ -42,5 +42,14 @@ namespace JSSoft.Crema.Services.Domains
                 return this.domainContext;
             });
         }
+
+        protected override async Task DestroyCallbackAsync(IDomainContextEventCallback callback)
+        {
+            if (callback is DomainContext domainContext)
+            {
+                domainContext.Service = null;
+                await domainContext.ReleaseAsync();
+            }
+        }
     }
 }

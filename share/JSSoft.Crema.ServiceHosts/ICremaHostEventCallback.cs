@@ -28,9 +28,6 @@ namespace JSSoft.Crema.ServiceHosts
     public interface ICremaHostEventCallback
     {
         [OperationContract]
-        void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
-
-        [OperationContract]
         void OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs);
     }
 }

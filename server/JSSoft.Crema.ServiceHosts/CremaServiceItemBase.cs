@@ -51,7 +51,7 @@ namespace JSSoft.Crema.ServiceHosts
 
         protected T Callback { get; }
 
-        protected abstract void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo);
+        // protected abstract void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo);
 
         protected string OwnerID { get; set; }
 
@@ -61,22 +61,22 @@ namespace JSSoft.Crema.ServiceHosts
 
         protected ILogService LogService { get; }
 
-        protected abstract Task OnCloseAsync(bool disconnect);
+        // protected abstract Task OnCloseAsync(bool disconnect);
 
-        private async Task CloseAsync(bool disconnect)
-        {
-            await this.OnCloseAsync(disconnect);
-            if (disconnect == true)
-            {
-                // if (this.Channel != null)
-                // {
-                //     this.Channel.Closed -= Channel_Closed;
-                //     this.Channel.Faulted -= Channel_Faulted;
-                //     this.Channel.Abort();
-                // }
-                // this.Channel = null;
-            }
-            this.LogService.Debug($"{this.GetType().Name}.{nameof(OnCloseAsync)}");
-        }
+        // private async Task CloseAsync(bool disconnect)
+        // {
+        //     await this.OnCloseAsync(disconnect);
+        //     if (disconnect == true)
+        //     {
+        //         // if (this.Channel != null)
+        //         // {
+        //         //     this.Channel.Closed -= Channel_Closed;
+        //         //     this.Channel.Faulted -= Channel_Faulted;
+        //         //     this.Channel.Abort();
+        //         // }
+        //         // this.Channel = null;
+        //     }
+        //     this.LogService.Debug($"{this.GetType().Name}.{nameof(OnCloseAsync)}");
+        // }
     }
 }

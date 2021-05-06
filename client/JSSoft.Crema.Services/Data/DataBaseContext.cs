@@ -30,6 +30,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Data
@@ -84,35 +85,20 @@ namespace JSSoft.Crema.Services.Data
                 var metaData = result.Value;
                 this.Initialize(metaData);
             });
+            this.ReleaseHandle.Reset();
         }
 
         public async Task ReleaseAsync()
         {
-            // var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
-            // {
-            //     if (this.isDisposed == true)
-            //         return false;
-            //     this.isDisposed = true;
-            //     return true;
-            // });
-            // if (result == false)
-            //     return;
-
-            await this.Service.UnsubscribeAsync();
+            if (this.Service != null)
+                await this.Service.UnsubscribeAsync();
             var dataBases = await this.Dispatcher.InvokeAsync(() => this.ToArray<DataBase>());
             foreach (var item in dataBases)
             {
                 await item.ReleaseAsync();
             }
             await this.Dispatcher.InvokeAsync(this.Clear);
-
-            // if (this.Service == null)
-            //     return;
-            // await Task.Delay(100);
-            // await this.callbackEvent.DisposeAsync();
-            // await this.Dispatcher.DisposeAsync();
-            // this.Service = null;
-            // this.Dispatcher = null;
+            this.ReleaseHandle.Set();
         }
 
         public async Task<LockInfo> InvokeDataBaseLock(Authentication authentication, DataBase dataBase, string comment)
@@ -453,6 +439,8 @@ namespace JSSoft.Crema.Services.Data
         public UserContext UserContext => this.CremaHost.UserContext;
 
         public new int Count => base.Count;
+        
+        public ManualResetEvent ReleaseHandle { get; } = new ManualResetEvent(false);
 
         public event ItemsCreatedEventHandler<IDataBase> ItemsCreated
         {

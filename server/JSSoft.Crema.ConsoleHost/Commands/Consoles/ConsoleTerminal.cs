@@ -59,7 +59,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 
         private void Application_Closed(object sender, ClosedEventArgs e)
         {
-            if (e.Reason == CloseReason.Shutdown && this.cancellation.IsRunning == true)
+            if (e.Reason != CloseReason.Restart && this.cancellation.IsRunning == true)
             {
                 this.cancellation.Cancel();
             }
