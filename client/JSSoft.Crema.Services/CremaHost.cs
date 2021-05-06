@@ -153,7 +153,6 @@ namespace JSSoft.Crema.Services
                         this.authentications.Add(authentication);
                         item.Initialize(authentication);
                     }
-                    this.token = Guid.NewGuid();
                     this.ServiceState = ServiceState.Open;
                     this.OnOpened(EventArgs.Empty);
                     CremaLog.Debug($"Crema opened : {address}");
