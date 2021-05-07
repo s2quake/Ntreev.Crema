@@ -166,7 +166,6 @@ namespace JSSoft.Crema.Services
                     this.log = null;
                     this.Address = string.Empty;
                     this.ServiceState = ServiceState.None;
-                    this.OnClosed(new ClosedEventArgs(CloseReason.None, string.Empty));
                 });
                 CremaLog.Error(e);
                 throw;
@@ -286,7 +285,6 @@ namespace JSSoft.Crema.Services
                     this.serviceToken = Guid.Empty;
                     this.Address = null;
                     this.ServiceState = ServiceState.Closed;
-                    this.token = Guid.Empty;
                     this.OnClosed(new ClosedEventArgs(CloseReason.None));
                     CremaLog.Debug("Crema closed.");
                 });
@@ -554,8 +552,9 @@ namespace JSSoft.Crema.Services
         //     });
         // }
 
-        public async Task ReleaseAsync()
+        public Task ReleaseAsync()
         {
+            return Task.Delay(1);
             // await this.Dispatcher.InvokeAsync(() =>
             // {
             //     this.OnClosing(EventArgs.Empty);
@@ -599,9 +598,9 @@ namespace JSSoft.Crema.Services
             await Task.Run(() => ManualResetEvent.WaitAll(handles));
         }
 
-        private async void ClientContext_Closed(object sender, CloseEventArgs e)
+        private void ClientContext_Closed(object sender, CloseEventArgs e)
         {
-            await Task.Run(async () =>
+            Task.Run(async () =>
             {
                 var closeReason = (CloseReason)e.CloseCode;
                 this.clientContext.Closed -= ClientContext_Closed;
@@ -623,7 +622,6 @@ namespace JSSoft.Crema.Services
                     this.serviceToken = Guid.Empty;
                     this.Address = null;
                     this.ServiceState = ServiceState.Closed;
-                    this.token = Guid.Empty;
                     this.OnClosed(new ClosedEventArgs(closeReason, string.Empty));
                     CremaLog.Debug("Crema closed.");
                 });
@@ -631,7 +629,7 @@ namespace JSSoft.Crema.Services
                 {
                     while (true)
                     {
-                        await Task.Delay(500);
+                        await Task.Delay(1000);
                         try
                         {
                             await this.OpenAsync();

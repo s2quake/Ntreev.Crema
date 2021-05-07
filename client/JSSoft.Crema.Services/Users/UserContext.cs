@@ -38,8 +38,6 @@ namespace JSSoft.Crema.Services.Users
     class UserContext : ItemContext<User, UserCategory, UserCollection, UserCategoryCollection, UserContext>,
         IUserContextEventCallback, IUserContext
     {
-        private bool isDisposed;
-
         private ItemsCreatedEventHandler<IUserItem> itemsCreated;
         private ItemsRenamedEventHandler<IUserItem> itemsRenamed;
         private ItemsMovedEventHandler<IUserItem> itemsMoved;

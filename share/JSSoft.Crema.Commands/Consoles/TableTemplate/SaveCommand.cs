@@ -38,7 +38,7 @@ namespace JSSoft.Crema.Commands.Consoles.TableTemplate
 
         }
 
-        [Obsolete]
+        // [Obsolete]
         public Action CloseAction
         {
             get; set;

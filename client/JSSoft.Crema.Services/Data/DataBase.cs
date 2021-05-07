@@ -38,7 +38,6 @@ namespace JSSoft.Crema.Services.Data
     class DataBase : DataBaseBase<Type, TypeCategory, TypeCollection, TypeCategoryCollection, TypeContext, Table, TableCategory, TableCollection, TableCategoryCollection, TableContext>,
         IDataBaseEventCallback, IDataBase, IInfoProvider, IStateProvider
     {
-        private bool isDisposed;
         private DataBaseMetaData metaData;
 
         private EventHandler<AuthenticationEventArgs> authenticationEntered;

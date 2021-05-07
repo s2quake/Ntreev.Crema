@@ -35,8 +35,6 @@ namespace JSSoft.Crema.Services.Domains
     class DomainContext : ItemContext<Domain, DomainCategory, DomainCollection, DomainCategoryCollection, DomainContext>,
         IDomainContextEventCallback, IDomainContext, IServiceProvider
     {
-        private bool isDisposed;
-
         private ItemsCreatedEventHandler<IDomainItem> itemsCreated;
         private ItemsRenamedEventHandler<IDomainItem> itemsRenamed;
         private ItemsMovedEventHandler<IDomainItem> itemsMoved;
@@ -438,7 +436,7 @@ namespace JSSoft.Crema.Services.Domains
 
         #region IDomainContextEventCallback
 
-        async void IDomainContextEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
+        void IDomainContextEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
             // await this.CloseAsync(closeInfo);
         }

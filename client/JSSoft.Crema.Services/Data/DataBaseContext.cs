@@ -37,8 +37,6 @@ namespace JSSoft.Crema.Services.Data
 {
     class DataBaseContext : ContainerBase<DataBase>, IDataBaseContext, IDataBaseContextEventCallback
     {
-        private bool isDisposed;
-
         private ItemsCreatedEventHandler<IDataBase> itemsCreated;
         private ItemsRenamedEventHandler<IDataBase> itemsRenamed;
         private ItemsDeletedEventHandler<IDataBase> itemsDeleted;
