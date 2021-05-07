@@ -40,7 +40,7 @@ namespace JSSoft.Crema.Services
 {
     [Export(typeof(ILogService))]
     [InheritedExport(typeof(ICremaHost))]
-    class CremaHost : ICremaHost, ILogService, IDisposable
+    class CremaHost : ICremaHost, IServiceProvider, ILogService, IDisposable
     {
         private RepositoryConfiguration configs;
         private IPlugin[] plugins;
@@ -224,63 +224,41 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        public async Task ShutdownAsync(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message)
+        public async Task ShutdownAsync(Authentication authentication, ShutdownContext context)
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(context));
+                if (context is null)
+                    throw new ArgumentNullException(nameof(context));
                 if (this.ServiceState != ServiceState.Open)
                     throw new InvalidOperationException();
+                if (this.shutdownTimer != null)
+                    throw new InvalidOperationException("Shutdown is in progress.");
+
+                var milliseconds = context.Milliseconds;
+                var isRestart = context.IsRestart;
+                var message = context.Message;
+                var dateTime = context.Now;
+
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, shutdownType, message);
+                    this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, isRestart, message);
                     this.ValidateShutdown(authentication, milliseconds);
                 });
-                if (string.IsNullOrEmpty(message) == false)
+                if (message != string.Empty)
                     await this.UserContext.NotifyMessageAsync(Authentication.System, message);
-                var dateTime = DateTime.Now.AddMilliseconds(milliseconds);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    if (this.shutdownTimer == null)
-                    {
-                        this.shutdownTimer = new ShutdownTimer()
-                        {
-                            Interval = 1000,
-                        };
-                        this.shutdownTimer.Elapsed += ShutdownTimer_Elapsed;
-                    }
-                    this.shutdownTimer.DateTime = dateTime;
-                    this.shutdownTimer.ShutdownType = shutdownType;
+                    this.shutdownTimer = new ShutdownTimer(context);
+                    this.shutdownTimer.Done += ShutdownTimer_Done;
+                    this.shutdownTimer.Elapsed += ShutdownTimer_Elapsed;
+                    this.shutdownTimer.Cancelled += ShutdownTimer_Cancelled;
                     this.shutdownTimer.Start();
                 });
                 if (milliseconds >= 1000)
                     await this.SendShutdownMessageAsync((dateTime - DateTime.Now) + new TimeSpan(0, 0, 0, 0, 500), true);
-            }
-            catch (Exception e)
-            {
-                this.log.Error(e);
-                throw;
-            }
-        }
-
-        public async Task CancelShutdownAsync(Authentication authentication)
-        {
-            try
-            {
-                if (this.ServiceState != ServiceState.Open)
-                    throw new InvalidOperationException();
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.DebugMethod(authentication, this, nameof(CancelShutdownAsync), this);
-                    this.ValidateCancelShutdown(authentication);
-                    if (this.shutdownTimer != null)
-                    {
-                        this.shutdownTimer.Elapsed -= ShutdownTimer_Elapsed;
-                        this.shutdownTimer.Stop();
-                        this.shutdownTimer.Dispose();
-                        this.shutdownTimer = null;
-                        this.Info($"[{authentication}] Shutdown cancelled.");
-                    }
-                });
             }
             catch (Exception e)
             {
@@ -438,17 +416,47 @@ namespace JSSoft.Crema.Services
             this.Disposed?.Invoke(this, e);
         }
 
-        private async void ShutdownTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private async void ShutdownTimer_Done(object sender, EventArgs e)
         {
-            if (DateTime.Now >= this.shutdownTimer.DateTime)
+            var isRestart = this.shutdownTimer.IsRestart;
+            var context = this.shutdownTimer.Context;
+            this.shutdownTimer.Stop();
+            this.shutdownTimer = null;
+            await this.CloseAsync(isRestart ? CloseReason.Restart : CloseReason.None, string.Empty);
+            if (isRestart == true)
             {
-                await this.Shutdown(this.shutdownTimer.ShutdownType);
+                try
+                {
+                    await this.OpenAsync();
+                }
+                catch (Exception ex)
+                {
+                    if (context.ShutdownException != null)
+                    {
+                        context.ShutdownException.Invoke(this, new ShutdownEventArgs(ex));
+                    }
+                    else
+                    {
+                        throw ex;
+                    }
+                }
             }
-            else
+        }
+
+        private async void ShutdownTimer_Cancelled(object sender, EventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                var timeSpan = this.shutdownTimer.DateTime - DateTime.Now;
-                await this.SendShutdownMessageAsync(timeSpan, false);
-            }
+                this.shutdownTimer.Stop();
+                this.shutdownTimer = null;
+                this.Info($"Shutdown cancelled.");
+            });
+        }
+
+        private async void ShutdownTimer_Elapsed(object sender, EventArgs e)
+        {
+            var timeSpan = this.shutdownTimer.DateTime - DateTime.Now;
+            await this.SendShutdownMessageAsync(timeSpan, false);
         }
 
         private async Task SendShutdownMessageAsync(TimeSpan timeSpan, bool about)
@@ -485,25 +493,6 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        private async Task Shutdown(ShutdownType shutdownType)
-        {
-            if (this.shutdownTimer != null)
-            {
-                this.shutdownTimer.Elapsed -= ShutdownTimer_Elapsed;
-                this.shutdownTimer.Stop();
-                this.shutdownTimer.Dispose();
-                this.shutdownTimer = null;
-            }
-
-            var isRestart = shutdownType.HasFlag(ShutdownType.Restart);
-            await this.CloseAsync(isRestart ? CloseReason.Restart : CloseReason.None, string.Empty);
-            if (isRestart == true)
-            {
-                this.settings.NoCache = shutdownType.HasFlag(ShutdownType.NoCache);
-                await this.OpenAsync();
-            }
-        }
-
         private void ValidateShutdown(Authentication authentication, int milliseconds)
         {
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
@@ -511,23 +500,6 @@ namespace JSSoft.Crema.Services
             if (milliseconds < 0)
                 throw new ArgumentOutOfRangeException(nameof(milliseconds), "invalid milliseconds value");
         }
-
-        private void ValidateCancelShutdown(Authentication authentication)
-        {
-            if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
-                throw new PermissionDeniedException();
-        }
-
-        #region classes
-
-        class ShutdownTimer : Timer
-        {
-            public DateTime DateTime { get; set; }
-
-            public ShutdownType ShutdownType { get; set; }
-        }
-
-        #endregion
 
         #region ILogService
 

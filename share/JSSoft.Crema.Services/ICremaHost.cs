@@ -22,11 +22,12 @@
 using JSSoft.Crema.ServiceModel;
 using System;
 using System.Security;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services
 {
-    public interface ICremaHost : IServiceProvider, IDisposable, IDispatcherObject
+    public interface ICremaHost : IServiceProvider, IDispatcherObject
     {
         Task<Guid> OpenAsync();
 
@@ -34,9 +35,7 @@ namespace JSSoft.Crema.Services
 
         Task LogoutAsync(Authentication authentication);
 
-#if CLIENT
-
-#elif SERVER
+#if SERVER
 
         Task<Authentication> AuthenticateAsync(Guid authenticationToken);
 
@@ -53,13 +52,9 @@ namespace JSSoft.Crema.Services
 
         event ClosedEventHandler Closed;
 
-        event EventHandler Disposed;
-
         Task CloseAsync(Guid token);
 
-        Task ShutdownAsync(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message);
-
-        Task CancelShutdownAsync(Authentication authentication);
+        Task ShutdownAsync(Authentication authentication, ShutdownContext context);
 
         ServiceState ServiceState { get; }
     }

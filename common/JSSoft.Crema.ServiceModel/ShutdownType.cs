@@ -25,6 +25,7 @@ using System.Runtime.Serialization;
 
 namespace JSSoft.Crema.ServiceModel
 {
+    [Obsolete]
     [Flags]
     [DataContract(Namespace = SchemaUtility.Namespace)]
     public enum ShutdownType

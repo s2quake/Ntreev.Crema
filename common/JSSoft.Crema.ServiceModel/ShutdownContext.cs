@@ -18,47 +18,38 @@
 // 
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
-using JSSoft.Communication;
-using JSSoft.Crema.ServiceModel;
+
+using JSSoft.Library;
 using System;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
+using System.Threading;
 
-namespace JSSoft.Crema.ServiceHosts
+namespace JSSoft.Crema.ServiceModel
 {
-    [ServiceContract(PerPeer = true)]
-    public interface ICremaHostService
+    public class ShutdownContext
     {
-        [OperationContract]
-        Task<ResultBase> SubscribeAsync(string version, string platformID, string culture);
+        public ShutdownContext()
+            : this(string.Empty)
+        {
+        }
 
-        [OperationContract]
-        Task<ResultBase<Guid>> LoginAsync(string userID, byte[] password);
+        public ShutdownContext(string message)
+        {
+            this.Message = Message ?? throw new ArgumentNullException(nameof(message));
+        }
 
-        [OperationContract]
-        Task<ResultBase> LogoutAsync();
+        public int Milliseconds { get; set; }
 
-        [OperationContract]
-        Task<ResultBase> UnsubscribeAsync();
+        public string Message { get; }
 
-        [OperationContract]
-        Task<ResultBase<string>> GetVersionAsync();
+        public bool IsRestart { get; set; }
 
-        [OperationContract]
-        Task<ResultBase<bool>> IsOnlineAsync(string userID, byte[] password);
+        public CancellationToken Cancellation { get; set; }
 
-        [OperationContract]
-        Task<ResultBase<DataBaseInfo[]>> GetDataBaseInfosAsync();
+        public ShutdownEventHandler ShutdownException { get; set; }
 
-        [OperationContract]
-        Task<ResultBase<ServiceInfo>> GetServiceInfoAsync();
+        public static ShutdownContext None { get; } = new ShutdownContext();
 
-        [OperationContract]
-        Task<ResultBase> ShutdownAsync(int milliseconds, bool isRestart, string message);
-
-        [OperationContract]
-        Task<ResultBase> CancelShutdownAsync();
-
-        [OperationContract]
-        Task<bool> IsAliveAsync();
+        internal DateTime Now => DateTime.Now.AddMilliseconds(this.Milliseconds);
     }
 }

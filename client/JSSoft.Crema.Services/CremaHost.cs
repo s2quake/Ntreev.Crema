@@ -43,7 +43,7 @@ namespace JSSoft.Crema.Services
 {
     [Export(typeof(ILogService))]
     [InheritedExport(typeof(ICremaHost))]
-    class CremaHost : ICremaHost, IServiceProvider, ILogService, ICremaHostEventCallback
+    class CremaHost : ICremaHost, IServiceProvider, ILogService, ICremaHostEventCallback, IDisposable
     {
         private readonly IServiceProvider container;
         private readonly IConfigurationPropertyProvider[] propertiesProviders;
@@ -629,10 +629,11 @@ namespace JSSoft.Crema.Services
                 {
                     while (true)
                     {
-                        await Task.Delay(1000);
+                        await Task.Delay(10000);
+                        throw new Exception("qwerqwerqwer");
                         try
                         {
-                            await this.OpenAsync();
+                            // await this.OpenAsync();
                             break;
                         }
                         catch

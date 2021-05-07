@@ -18,47 +18,13 @@
 // 
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
-using JSSoft.Communication;
-using JSSoft.Crema.ServiceModel;
+
+using JSSoft.Library;
 using System;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
+using System.Threading;
 
-namespace JSSoft.Crema.ServiceHosts
+namespace JSSoft.Crema.ServiceModel
 {
-    [ServiceContract(PerPeer = true)]
-    public interface ICremaHostService
-    {
-        [OperationContract]
-        Task<ResultBase> SubscribeAsync(string version, string platformID, string culture);
-
-        [OperationContract]
-        Task<ResultBase<Guid>> LoginAsync(string userID, byte[] password);
-
-        [OperationContract]
-        Task<ResultBase> LogoutAsync();
-
-        [OperationContract]
-        Task<ResultBase> UnsubscribeAsync();
-
-        [OperationContract]
-        Task<ResultBase<string>> GetVersionAsync();
-
-        [OperationContract]
-        Task<ResultBase<bool>> IsOnlineAsync(string userID, byte[] password);
-
-        [OperationContract]
-        Task<ResultBase<DataBaseInfo[]>> GetDataBaseInfosAsync();
-
-        [OperationContract]
-        Task<ResultBase<ServiceInfo>> GetServiceInfoAsync();
-
-        [OperationContract]
-        Task<ResultBase> ShutdownAsync(int milliseconds, bool isRestart, string message);
-
-        [OperationContract]
-        Task<ResultBase> CancelShutdownAsync();
-
-        [OperationContract]
-        Task<bool> IsAliveAsync();
-    }
+    public delegate void ShutdownEventHandler(object sender, ShutdownEventArgs e);
 }
