@@ -51,17 +51,7 @@ namespace JSSoft.Crema.Services
                 this.timer.Stop();
         }
 
-        public void InvokeExceptionHandler(Exception e)
-        {
-            if (this.shutdownContext.ShutdownException != null)
-            {
-                this.shutdownContext.ShutdownException.Invoke(this, new ShutdownEventArgs(e));
-            }
-            else
-            {
-                throw e;
-            }
-        }
+        public void InvokeExceptionHandler(Exception e) => this.shutdownContext.InvokeShutdownException(e);
 
         public CloseReason CloseReason => this.shutdownContext.IsRestart ? CloseReason.Restart : CloseReason.None;
 

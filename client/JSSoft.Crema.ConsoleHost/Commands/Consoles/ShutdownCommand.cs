@@ -19,27 +19,29 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Crema.Commands;
+using JSSoft.Crema.Commands.Consoles;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
 using JSSoft.Library.Commands;
-using System;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace JSSoft.Crema.Commands.Consoles
+namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceUsageDescription]
     class ShutdownCommand : ConsoleCommandAsyncBase
     {
         private readonly ICremaHost cremaHost;
+        private readonly ConsoleTerminalCancellation cancellation;
 
         [ImportingConstructor]
-        public ShutdownCommand(ICremaHost cremaHost)
+        public ShutdownCommand(ICremaHost cremaHost, ConsoleTerminalCancellation cancellation)
         {
             this.cremaHost = cremaHost;
+            this.cancellation = cancellation;
         }
 
         [CommandPropertyRequired(DefaultValue = "")]
@@ -87,8 +89,15 @@ namespace JSSoft.Crema.Commands.Consoles
                     IsRestart = this.IsRestart,
                     Message = this.Message
                 };
+                shutdownContext.ShutdownException += ShutdownContext_ShutdownException;
                 await this.cremaHost.ShutdownAsync(authentication, shutdownContext);
             }
+        }
+
+        private void ShutdownContext_ShutdownException(object sender, ShutdownEventArgs e)
+        {
+            this.Error.WriteLine(e.Exception);
+            this.cancellation.Cancel();
         }
     }
 }

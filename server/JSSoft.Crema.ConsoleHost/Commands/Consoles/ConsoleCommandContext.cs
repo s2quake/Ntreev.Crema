@@ -55,7 +55,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             var token = await this.CremaHost.LoginAsync(userID, password);
             this.authentication = await this.CremaHost.AuthenticateAsync(token);
             this.authentication.Expired += (s, e) => this.authentication = null;
-            await this.InitializeAsync(authentication);
+            this.Initialize(authentication);
         }
 
         public async Task LogoutAsync()

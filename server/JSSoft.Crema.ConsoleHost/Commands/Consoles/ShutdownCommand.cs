@@ -36,11 +36,13 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
     class ShutdownCommand : ConsoleCommandAsyncBase
     {
         private readonly ICremaHost cremaHost;
+        private readonly ConsoleTerminalCancellation cancellation;
 
         [ImportingConstructor]
-        public ShutdownCommand(ICremaHost cremaHost)
+        public ShutdownCommand(ICremaHost cremaHost, ConsoleTerminalCancellation cancellation)
         {
             this.cremaHost = cremaHost;
+            this.cancellation = cancellation;
         }
 
         [CommandPropertyRequired(DefaultValue = "")]
@@ -88,8 +90,15 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
                     IsRestart = this.IsRestart,
                     Message = this.Message
                 };
+                shutdownContext.ShutdownException += ShutdownContext_ShutdownException;
                 await this.cremaHost.ShutdownAsync(authentication, shutdownContext);
             }
+        }
+
+        private void ShutdownContext_ShutdownException(object sender, ShutdownEventArgs e)
+        {
+            this.Error.WriteLine(e.Exception);
+            this.cancellation.Cancel();
         }
     }
 }

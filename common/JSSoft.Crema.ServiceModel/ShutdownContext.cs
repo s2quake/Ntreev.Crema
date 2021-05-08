@@ -40,9 +40,21 @@ namespace JSSoft.Crema.ServiceModel
 
         public bool IsRestart { get; set; }
 
-        public ShutdownEventHandler ShutdownException { get; set; }
+        public event ShutdownEventHandler ShutdownException;
 
         public static ShutdownContext None { get; } = new ShutdownContext();
+
+        internal void InvokeShutdownException(Exception e)
+        {
+            if (this.ShutdownException != null)
+            {
+                this.ShutdownException.Invoke(this, new ShutdownEventArgs(e));
+            }
+            else
+            {
+                throw e;
+            }
+        }
 
         internal DateTime Now => DateTime.Now.AddMilliseconds(this.Milliseconds);
     }

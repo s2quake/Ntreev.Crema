@@ -294,13 +294,12 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public event EventHandler PathChanged;
 
-        protected async Task InitializeAsync(Authentication authentication)
+        protected void Initialize(Authentication authentication)
         {
             this.authentication = authentication;
             this.authentication.Expired += Authentication_Expired;
             this.Authority = authentication.Authority;
             this.path = PathUtility.Separator;
-
             // Task<Authority> GetAuthorityAsync()
             // {
             //     var userContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
@@ -312,7 +311,7 @@ namespace JSSoft.Crema.Commands.Consoles
         {
             // if (this.authentication != null)
             // {
-                this.authentication.Expired -= Authentication_Expired;
+            this.authentication.Expired -= Authentication_Expired;
             // }
             if (this.commission != null && this.authentication != null)
                 this.authentication.EndCommission(this.commission);

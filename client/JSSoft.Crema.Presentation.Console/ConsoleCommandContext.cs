@@ -56,7 +56,7 @@ namespace JSSoft.Crema.Presentation.Console
 
         private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            await this.InitializeAsync(this.cremaHost.GetService(typeof(Authenticator)) as Authenticator);
+            await this.Initialize(this.cremaHost.GetService(typeof(Authenticator)) as Authenticator);
         }
 
         private void CremaHost_Closed(object sender, ClosedEventArgs e)

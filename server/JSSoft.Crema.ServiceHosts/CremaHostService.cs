@@ -59,7 +59,7 @@ namespace JSSoft.Crema.ServiceHosts
             if (clientVersion < serverVersion)
                 throw new ArgumentException(Resources.Exception_LowerVersion, nameof(version));
 
-            this.isSubscribed = true;
+            await Task.Run(() => this.isSubscribed = true);
             this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(SubscribeAsync)}");
             return new ResultBase()
             {

@@ -19,8 +19,6 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Communication;
-using JSSoft.Crema.ServiceHosts;
 using JSSoft.Crema.ServiceModel;
 using System;
 using System.Threading.Tasks;
@@ -79,16 +77,15 @@ namespace JSSoft.Crema.Services
         private async void TryOpenAsync()
         {
             var count = 0;
-            var handler = this.shutdownContext.ShutdownException;
             var address = this.address;
             while (true)
             {
-                await Task.Delay(1000);
+                await Task.Delay(1);
                 try
                 {
                     var hostname = AddressUtility.GetIPAddress(address);
                     var port = AddressUtility.GetPort(address);
-                    using var client = new System.Net.Sockets.TcpClient(hostname, port);
+                    using var client = new System.Net.Sockets.TcpClient(hostname, 4002);
                     this.OnDone(EventArgs.Empty);
                     break;
                 }
@@ -97,15 +94,8 @@ namespace JSSoft.Crema.Services
                     count++;
                     if (count > 5)
                     {
-                        if (handler != null)
-                        {
-                            handler.Invoke(this.shutdownContext, new ShutdownEventArgs(e));
-                            break;
-                        }
-                        else
-                        {
-                            throw e;
-                        }
+                        this.shutdownContext.InvokeShutdownException(e);
+                        break;
                     }
                 }
             }
