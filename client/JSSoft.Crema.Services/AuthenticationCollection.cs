@@ -19,45 +19,26 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Crema.ServiceModel;
 using System;
-using System.Security;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace JSSoft.Crema.Services
 {
-    public interface ICremaHost : IServiceProvider, IDispatcherObject
+    class PluginCollection : List<IPlugin>
     {
-        Task<Guid> OpenAsync();
+        public PluginCollection(IEnumerable<IPlugin> plugins)
+            : base(plugins.ToArray())
+        {
 
-        Task<Guid> LoginAsync(string userID, SecureString password);
+        }
 
-        Task LogoutAsync(Authentication authentication);
-
-#if SERVER
-
-        Task<Authentication> AuthenticateAsync(Guid authenticationToken);
-
-        string GetPath(CremaPath pathType, params string[] paths);
-
-#endif
-        event EventHandler Opening;
-
-        event EventHandler Opened;
-
-        event CloseRequestedEventHandler CloseRequested;
-
-        event EventHandler Closing;
-
-        event ClosedEventHandler Closed;
-
-        Task CloseAsync(Guid token);
-
-        Task ShutdownAsync(Authentication authentication, ShutdownContext context);
-
-        Task CancelShutdownAsync(Authentication authentication);
-
-        ServiceState ServiceState { get; }
+        public void Release()
+        {
+            foreach (var item in this.Reverse<IPlugin>())
+            {
+                item.Release();
+            }
+        }
     }
 }

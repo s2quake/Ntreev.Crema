@@ -50,9 +50,9 @@ namespace JSSoft.Crema.Services
         private readonly IRepositoryProvider[] repositoryProviders;
         private readonly IObjectSerializer[] serializers;
         private readonly IEnumerable<Lazy<IConfigurationPropertyProvider>> propertiesProviders;
+        private readonly ShutdownTimer shutdownTimer = new();
         private LogService log;
         private Guid token;
-        private ShutdownTimer shutdownTimer;
 
 
         [ImportingConstructor]
@@ -68,6 +68,8 @@ namespace JSSoft.Crema.Services
             this.repositoryProviders = repositoryProviders.ToArray();
             this.serializers = serializers.ToArray();
             this.propertiesProviders = propertiesProviders;
+            this.shutdownTimer.Done += ShutdownTimer_Done;
+            this.shutdownTimer.Elapsed += ShutdownTimer_Elapsed;
             CremaLog.Debug("crema log service initialized.");
             CremaLog.Debug($"available tags : {string.Join(", ", TagInfoUtility.Names)}");
             this.Dispatcher = new CremaDispatcher(this);
@@ -224,41 +226,52 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        public async Task ShutdownAsync(Authentication authentication, ShutdownContext context)
+        public async Task ShutdownAsync(Authentication authentication, ShutdownContext shutdownContext)
         {
             try
             {
                 if (authentication is null)
-                    throw new ArgumentNullException(nameof(context));
-                if (context is null)
-                    throw new ArgumentNullException(nameof(context));
-                if (this.ServiceState != ServiceState.Open)
-                    throw new InvalidOperationException();
-                if (this.shutdownTimer != null)
-                    throw new InvalidOperationException("Shutdown is in progress.");
+                    throw new ArgumentNullException(nameof(authentication));
+                if (shutdownContext is null)
+                    throw new ArgumentNullException(nameof(shutdownContext));
 
-                var milliseconds = context.Milliseconds;
-                var isRestart = context.IsRestart;
-                var message = context.Message;
-                var dateTime = context.Now;
-
+                var milliseconds = shutdownContext.Milliseconds;
+                var isRestart = shutdownContext.IsRestart;
+                var message = shutdownContext.Message;
+                var dateTime = shutdownContext.Now;
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, isRestart, message);
                     this.ValidateShutdown(authentication, milliseconds);
+                    this.shutdownTimer.Start(shutdownContext);
                 });
                 if (message != string.Empty)
                     await this.UserContext.NotifyMessageAsync(Authentication.System, message);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.shutdownTimer = new ShutdownTimer(context);
-                    this.shutdownTimer.Done += ShutdownTimer_Done;
-                    this.shutdownTimer.Elapsed += ShutdownTimer_Elapsed;
-                    this.shutdownTimer.Cancelled += ShutdownTimer_Cancelled;
-                    this.shutdownTimer.Start();
-                });
                 if (milliseconds >= 1000)
                     await this.SendShutdownMessageAsync((dateTime - DateTime.Now) + new TimeSpan(0, 0, 0, 0, 500), true);
+            }
+            catch (Exception e)
+            {
+                this.log.Error(e);
+                throw;
+            }
+        }
+
+        public async Task CancelShutdownAsync(Authentication authentication)
+        {
+            try
+            {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (this.ServiceState != ServiceState.Open)
+                    throw new InvalidOperationException();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.DebugMethod(authentication, this, nameof(CancelShutdownAsync));
+                    this.ValidateCancelShutdown(authentication);
+                    this.shutdownTimer.Stop();
+                    this.Info("Shutdown cancelled.");
+                });
             }
             catch (Exception e)
             {
@@ -315,6 +328,7 @@ namespace JSSoft.Crema.Services
             }
             this.Dispatcher.Dispose();
             this.Dispatcher = null;
+            this.shutdownTimer.Dispose();
             this.OnDisposed(EventArgs.Empty);
             CremaLog.Detach(this);
         }
@@ -418,12 +432,11 @@ namespace JSSoft.Crema.Services
 
         private async void ShutdownTimer_Done(object sender, EventArgs e)
         {
-            var isRestart = this.shutdownTimer.IsRestart;
-            var context = this.shutdownTimer.Context;
+            var closeReason = this.shutdownTimer.CloseReason;
+            var message = this.shutdownTimer.Message;
             this.shutdownTimer.Stop();
-            this.shutdownTimer = null;
-            await this.CloseAsync(isRestart ? CloseReason.Restart : CloseReason.None, string.Empty);
-            if (isRestart == true)
+            await this.CloseAsync(closeReason, message);
+            if (closeReason == CloseReason.Restart)
             {
                 try
                 {
@@ -431,26 +444,9 @@ namespace JSSoft.Crema.Services
                 }
                 catch (Exception ex)
                 {
-                    if (context.ShutdownException != null)
-                    {
-                        context.ShutdownException.Invoke(this, new ShutdownEventArgs(ex));
-                    }
-                    else
-                    {
-                        throw ex;
-                    }
+                    this.shutdownTimer.InvokeExceptionHandler(ex);
                 }
             }
-        }
-
-        private async void ShutdownTimer_Cancelled(object sender, EventArgs e)
-        {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.shutdownTimer.Stop();
-                this.shutdownTimer = null;
-                this.Info($"Shutdown cancelled.");
-            });
         }
 
         private async void ShutdownTimer_Elapsed(object sender, EventArgs e)
@@ -495,10 +491,22 @@ namespace JSSoft.Crema.Services
 
         private void ValidateShutdown(Authentication authentication, int milliseconds)
         {
+            if (this.ServiceState != ServiceState.Open)
+                throw new InvalidOperationException();
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
                 throw new PermissionDeniedException();
             if (milliseconds < 0)
                 throw new ArgumentOutOfRangeException(nameof(milliseconds), "invalid milliseconds value");
+        }
+
+        private void ValidateCancelShutdown(Authentication authentication)
+        {
+            if (this.ServiceState != ServiceState.Open)
+                throw new InvalidOperationException();
+            if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
+                throw new PermissionDeniedException();
+            if (this.shutdownTimer.Enabled == false)
+                throw new InvalidOperationException("Shutdown is not in progress.");
         }
 
         #region ILogService

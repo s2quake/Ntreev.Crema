@@ -29,7 +29,7 @@
             "type": "shell",
             "group": "build",
             "presentation": {
-                "reveal": "always"
+                "reveal": "silent"
             },
             "problemMatcher": "$msCompile"
         },

@@ -38,37 +38,33 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [ImportingConstructor]
         public ShutdownCommand(ICremaHost cremaHost)
-            : base("shutdown")
         {
             this.cremaHost = cremaHost;
         }
 
         [CommandPropertyRequired(DefaultValue = "")]
+        [CommandPropertyTrigger(nameof(IsCancelled), false)]
         public DateTimeValue Time
         {
             get; set;
         }
 
         [CommandPropertySwitch('r')]
+        [CommandPropertyTrigger(nameof(IsCancelled), false)]
         public bool IsRestart
         {
             get; set;
         }
 
-        [CommandPropertySwitch]
-        public bool NoCache
-        {
-            get; set;
-        }
-
         [CommandPropertySwitch('c')]
+        [CommandPropertyTrigger(nameof(DateTimeValue), "")]
         public bool IsCancelled
         {
             get; set;
         }
 
         [CommandProperty('m')]
-        [DefaultValue("")]
+        [CommandPropertyTrigger(nameof(IsCancelled), false)]
         public string Message
         {
             get; set;
@@ -85,22 +81,13 @@ namespace JSSoft.Crema.Commands.Consoles
             }
             else
             {
-                await this.cremaHost.ShutdownAsync(authentication, this.Time.Milliseconds, this.ShutdownType, this.Message);
-            }
-        }
-
-        private ShutdownType ShutdownType
-        {
-            get
-            {
-                var shutdownType = ShutdownType.None;
-
-                if (this.IsRestart == true)
-                    shutdownType |= ShutdownType.Restart;
-                if (this.NoCache == true)
-                    shutdownType |= ShutdownType.NoCache;
-
-                return shutdownType;
+                var shutdownContext = new ShutdownContext()
+                {
+                    Milliseconds = this.Time.Milliseconds,
+                    IsRestart = this.IsRestart,
+                    Message = this.Message
+                };
+                await this.cremaHost.ShutdownAsync(authentication, shutdownContext);
             }
         }
     }

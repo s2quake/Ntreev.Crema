@@ -48,12 +48,13 @@ namespace JSSoft.Crema.Services
         private readonly IServiceProvider container;
         private readonly IConfigurationPropertyProvider[] propertiesProviders;
         private readonly CremaSettings settings;
-        private readonly List<Authentication> authentications = new List<Authentication>();
+        private readonly AuthenticationCollection authentications = new();
         private readonly List<ServiceHostBase> hosts;
         private readonly ClientContext clientContext;
+        private readonly ShutdownTimer shutdownTimer;
 
         private UserConfiguration configs;
-        private IEnumerable<IPlugin> plugins;
+        private PluginCollection plugins;
         private LogService log;
         private Guid token;
         private Guid serviceToken;
@@ -81,6 +82,8 @@ namespace JSSoft.Crema.Services
                 new UserContextServiceHost(this.UserContext)
             };
             this.clientContext = new ClientContext(this.hosts.ToArray());
+            this.shutdownTimer = new(this);
+            this.shutdownTimer.Done += ShutdownTimer_Done;
         }
 
         public object GetService(System.Type serviceType)
@@ -146,13 +149,8 @@ namespace JSSoft.Crema.Services
                 await this.Service.SubscribeAsync($"{version}", $"{platform}", $"{culture}");
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.plugins = (this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>).ToArray();
-                    foreach (var item in this.plugins)
-                    {
-                        var authentication = new Authentication(new AuthenticationProvider(this), item.ID);
-                        this.authentications.Add(authentication);
-                        item.Initialize(authentication);
-                    }
+                    this.plugins = new PluginCollection(this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>);
+                    this.authentications.Initialize(this, this.plugins);
                     this.ServiceState = ServiceState.Open;
                     this.OnOpened(EventArgs.Empty);
                     CremaLog.Debug($"Crema opened : {address}");
@@ -268,20 +266,14 @@ namespace JSSoft.Crema.Services
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.OnClosing(EventArgs.Empty);
-                    foreach (var item in this.plugins.Reverse())
-                    {
-                        item.Release();
-                    }
+                    this.plugins.Release();
                 });
                 await this.Service.UnsubscribeAsync();
                 this.clientContext.Closed -= ClientContext_Closed;
                 await this.clientContext.CloseAsync(this.serviceToken, 0);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    foreach (var item in this.authentications)
-                    {
-                        item.InvokeExpiredEvent(Authentication.SystemID);
-                    }
+                    this.authentications.Release(Authentication.SystemID);
                     this.serviceToken = Guid.Empty;
                     this.Address = null;
                     this.ServiceState = ServiceState.Closed;
@@ -296,17 +288,27 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        public async Task ShutdownAsync(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message)
+        public async Task ShutdownAsync(Authentication authentication, ShutdownContext shutdownContext)
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (shutdownContext is null)
+                    throw new ArgumentNullException(nameof(shutdownContext));
+
+                var milliseconds = shutdownContext.Milliseconds;
+                var isRestart = shutdownContext.IsRestart;
+                var message = shutdownContext.Message;
+                var address = this.Address;
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, shutdownType, message);
+                    this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, isRestart, message);
                 });
-                var result = await this.Service.ShutdownAsync(milliseconds, shutdownType, message);
+                var result = await this.Service.ShutdownAsync(milliseconds, isRestart, message);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.shutdownTimer.Start(shutdownContext, address);
                     this.Sign(authentication, result);
                 });
             }
@@ -328,6 +330,7 @@ namespace JSSoft.Crema.Services
                 var result = await this.Service.CancelShutdownAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.shutdownTimer.Stop();
                     this.Sign(authentication, result);
                 });
             }
@@ -336,6 +339,12 @@ namespace JSSoft.Crema.Services
                 CremaLog.Error(e);
                 throw;
             }
+        }
+
+        private async void ShutdownTimer_Done(object sender, EventArgs e)
+        {
+            this.shutdownTimer.Stop();
+            await this.OpenAsync();
         }
 
         public void Dispose()
@@ -355,6 +364,7 @@ namespace JSSoft.Crema.Services
             this.UserContext = null;
             this.Dispatcher?.Dispose();
             this.Dispatcher = null;
+            this.shutdownTimer.Dispose();
             this.OnDisposed(EventArgs.Empty);
             CremaLog.Debug("Crema disposed.");
             CremaLog.Detach(this);
@@ -514,44 +524,6 @@ namespace JSSoft.Crema.Services
                 throw new InvalidOperationException(Resources.Exception_AlreadyDisposed);
         }
 
-        // private async Task CloseAsync(CloseInfo closeInfo)
-        // {
-        //     var waiter = await this.Dispatcher.InvokeAsync(() =>
-        //     {
-        //         if (this.ServiceState != ServiceState.Open)
-        //             throw new InvalidOperationException();
-        //         this.ServiceState = ServiceState.Closing;
-        //         var closer = new InternalCloseRequestedEventArgs(closeInfo.Reason);
-        //         this.OnCloseRequested(closer);
-        //         return closer.WhenAll();
-        //     });
-        //     await waiter;
-        //     await this.Dispatcher.InvokeAsync(() =>
-        //     {
-        //         this.OnClosing(EventArgs.Empty);
-        //         foreach (var item in this.plugins.Reverse())
-        //         {
-        //             item.Release();
-        //         }
-        //     });
-        //     await this.Service.UnsubscribeAsync();
-        //     this.clientContext.Closed -= ClientContext_Closed;
-        //     await this.clientContext.CloseAsync(this.serviceToken, 0);
-        //     await this.Dispatcher.InvokeAsync(() =>
-        //     {
-        //         foreach (var item in this.authentications)
-        //         {
-        //             item.InvokeExpiredEvent(Authentication.SystemID);
-        //         }
-        //         this.serviceToken = Guid.Empty;
-        //         this.Address = null;
-        //         this.ServiceState = ServiceState.Closed;
-        //         this.token = Guid.Empty;
-        //         this.OnClosed(new ClosedEventArgs(closeInfo.Reason, closeInfo.Message));
-        //         CremaLog.Debug("Crema closed.");
-        //     });
-        // }
-
         public Task ReleaseAsync()
         {
             return Task.Delay(1);
@@ -600,48 +572,24 @@ namespace JSSoft.Crema.Services
 
         private void ClientContext_Closed(object sender, CloseEventArgs e)
         {
+            this.clientContext.Closed -= ClientContext_Closed;
             Task.Run(async () =>
             {
-                var closeReason = (CloseReason)e.CloseCode;
-                this.clientContext.Closed -= ClientContext_Closed;
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.OnClosing(EventArgs.Empty);
-                    foreach (var item in this.plugins.Reverse())
-                    {
-                        item.Release();
-                    }
+                    this.plugins.Release();
                 });
                 await this.WaitReleaseAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    foreach (var item in this.authentications)
-                    {
-                        item.InvokeExpiredEvent(Authentication.SystemID);
-                    }
+                    this.authentications.Release(Authentication.SystemID);
                     this.serviceToken = Guid.Empty;
                     this.Address = null;
                     this.ServiceState = ServiceState.Closed;
-                    this.OnClosed(new ClosedEventArgs(closeReason, string.Empty));
+                    this.OnClosed(new ClosedEventArgs((CloseReason)e.CloseCode, string.Empty));
                     CremaLog.Debug("Crema closed.");
                 });
-                if (closeReason == CloseReason.Restart)
-                {
-                    while (true)
-                    {
-                        await Task.Delay(10000);
-                        throw new Exception("qwerqwerqwer");
-                        try
-                        {
-                            // await this.OpenAsync();
-                            break;
-                        }
-                        catch
-                        {
-
-                        }
-                    }
-                }
             });
         }
 

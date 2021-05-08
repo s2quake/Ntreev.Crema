@@ -28,23 +28,17 @@ namespace JSSoft.Crema.ServiceModel
 {
     public class ShutdownContext
     {
-        public ShutdownContext()
-            : this(string.Empty)
-        {
-        }
-
-        public ShutdownContext(string message)
-        {
-            this.Message = Message ?? throw new ArgumentNullException(nameof(message));
-        }
+        private string message = string.Empty;
 
         public int Milliseconds { get; set; }
 
-        public string Message { get; }
+        public string Message
+        {
+            get => this.message;
+            set => this.message = value ?? throw new ArgumentNullException(nameof(value));
+        }
 
         public bool IsRestart { get; set; }
-
-        public CancellationToken Cancellation { get; set; }
 
         public ShutdownEventHandler ShutdownException { get; set; }
 

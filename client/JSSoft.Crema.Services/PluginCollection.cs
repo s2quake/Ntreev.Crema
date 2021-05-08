@@ -19,45 +19,29 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Crema.ServiceModel;
 using System;
-using System.Security;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace JSSoft.Crema.Services
 {
-    public interface ICremaHost : IServiceProvider, IDispatcherObject
+    class AuthenticationCollection : List<Authentication>
     {
-        Task<Guid> OpenAsync();
+        public void Initialize(CremaHost cremaHost, IEnumerable<IPlugin> plugins)
+        {
+            foreach (var item in plugins)
+            {
+                var authentication = new Authentication(new AuthenticationProvider(cremaHost), item.ID);
+                item.Initialize(authentication);
+                this.Add(authentication);
+            }
+        }
 
-        Task<Guid> LoginAsync(string userID, SecureString password);
-
-        Task LogoutAsync(Authentication authentication);
-
-#if SERVER
-
-        Task<Authentication> AuthenticateAsync(Guid authenticationToken);
-
-        string GetPath(CremaPath pathType, params string[] paths);
-
-#endif
-        event EventHandler Opening;
-
-        event EventHandler Opened;
-
-        event CloseRequestedEventHandler CloseRequested;
-
-        event EventHandler Closing;
-
-        event ClosedEventHandler Closed;
-
-        Task CloseAsync(Guid token);
-
-        Task ShutdownAsync(Authentication authentication, ShutdownContext context);
-
-        Task CancelShutdownAsync(Authentication authentication);
-
-        ServiceState ServiceState { get; }
+        public void Release(string systemID)
+        {
+            foreach (var item in this)
+            {
+                item.InvokeExpiredEvent(systemID);
+            }
+        }
     }
 }

@@ -19,30 +19,35 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Communication;
+using JSSoft.Crema.ServiceHosts;
 using JSSoft.Crema.ServiceModel;
 using System;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace JSSoft.Crema.Services
 {
     class ShutdownTimer : IDisposable
     {
-        private readonly Timer timer = new Timer() { Interval = 1000 };
+        private readonly Timer timer = new Timer() { Interval = 100 };
+        private readonly CremaHost cremaHost;
+        private string address;
         private ShutdownContext shutdownContext;
-        private DateTime dateTime;
 
-        public ShutdownTimer()
+        public ShutdownTimer(CremaHost cremaHost)
         {
-            this.timer.Elapsed += Timer_Elapsed;
+            this.cremaHost = cremaHost;
+            this.cremaHost.Closed += CremaHost_Closed;
+            this.address = cremaHost.Address;
         }
 
-        public void Start(ShutdownContext shutdownContext)
+        public void Start(ShutdownContext shutdownContext, string address)
         {
             this.shutdownContext = shutdownContext;
-            this.dateTime = DateTime.Now.AddMilliseconds(shutdownContext.Milliseconds);
+            this.address = address;
             if (this.timer.Enabled == true)
                 this.timer.Stop();
-            this.timer.Start();
         }
 
         public void Stop()
@@ -51,55 +56,59 @@ namespace JSSoft.Crema.Services
                 this.timer.Stop();
         }
 
-        public void InvokeExceptionHandler(Exception e)
+        public void Dispose()
         {
-            if (this.shutdownContext.ShutdownException != null)
-            {
-                this.shutdownContext.ShutdownException.Invoke(this, new ShutdownEventArgs(e));
-            }
-            else
-            {
-                throw e;
-            }
+            this.timer.Dispose();
         }
 
-        public CloseReason CloseReason => this.shutdownContext.IsRestart ? CloseReason.Restart : CloseReason.None;
-
-        public string Message => this.shutdownContext.Message;
-
-        public DateTime DateTime => this.dateTime;
-
-        public bool Enabled => this.timer.Enabled;
-
         public event EventHandler Done;
-
-        public event EventHandler Elapsed;
 
         protected virtual void OnDone(EventArgs e)
         {
             this.Done?.Invoke(this, e);
         }
 
-        protected virtual void OnElapsed(EventArgs e)
+        private void CremaHost_Closed(object sender, ClosedEventArgs e)
         {
-            this.Elapsed?.Invoke(this, e);
-        }
-
-        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            if (DateTime.Now >= this.dateTime)
+            if (e.Reason == CloseReason.Restart)
             {
-                this.OnDone(EventArgs.Empty);
-            }
-            else
-            {
-                this.OnElapsed(EventArgs.Empty);
+                this.TryOpenAsync();
             }
         }
 
-        public void Dispose()
+        private async void TryOpenAsync()
         {
-            this.timer.Dispose();
+            var count = 0;
+            var handler = this.shutdownContext.ShutdownException;
+            var address = this.address;
+            while (true)
+            {
+                await Task.Delay(1000);
+                try
+                {
+                    var hostname = AddressUtility.GetIPAddress(address);
+                    var port = AddressUtility.GetPort(address);
+                    using var client = new System.Net.Sockets.TcpClient(hostname, port);
+                    this.OnDone(EventArgs.Empty);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    count++;
+                    if (count > 5)
+                    {
+                        if (handler != null)
+                        {
+                            handler.Invoke(this.shutdownContext, new ShutdownEventArgs(e));
+                            break;
+                        }
+                        else
+                        {
+                            throw e;
+                        }
+                    }
+                }
+            }
         }
     }
 }

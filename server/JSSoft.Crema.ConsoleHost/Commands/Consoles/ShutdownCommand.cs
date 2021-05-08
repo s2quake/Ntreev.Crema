@@ -35,34 +35,37 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
     [ResourceUsageDescription("Resources")]
     class ShutdownCommand : ConsoleCommandAsyncBase
     {
-        private ShutdownContext shutdownContext;
-        private CancellationTokenSource shutdownCancellation;
+        private readonly ICremaHost cremaHost;
 
         [ImportingConstructor]
         public ShutdownCommand(ICremaHost cremaHost)
         {
-            this.CremaHost = cremaHost;
+            this.cremaHost = cremaHost;
         }
 
         [CommandPropertyRequired(DefaultValue = "")]
+        [CommandPropertyTrigger(nameof(IsCancelled), false)]
         public DateTimeValue Time
         {
             get; set;
         }
 
         [CommandPropertySwitch('r')]
+        [CommandPropertyTrigger(nameof(IsCancelled), false)]
         public bool IsRestart
         {
             get; set;
         }
 
         [CommandPropertySwitch('c')]
+        [CommandPropertyTrigger(nameof(DateTimeValue), "")]
         public bool IsCancelled
         {
             get; set;
         }
 
         [CommandProperty('m')]
+        [CommandPropertyTrigger(nameof(IsCancelled), false)]
         public string Message
         {
             get; set;
@@ -75,29 +78,18 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             var authentication = this.CommandContext.GetAuthentication(this);
             if (this.IsCancelled == true)
             {
-                if (this.shutdownCancellation == null)
-                    throw new InvalidOperationException();
-                this.shutdownCancellation.Cancel();
-                this.shutdownCancellation = null;
-                this.shutdownContext = null;
+                await this.cremaHost.CancelShutdownAsync(authentication);
             }
             else
             {
-                if (this.shutdownCancellation != null)
-                    throw new InvalidOperationException();
-                var shutdownCancellation = new CancellationTokenSource();
-                var shutdownContext = new ShutdownContext(this.Message)
+                var shutdownContext = new ShutdownContext()
                 {
                     Milliseconds = this.Time.Milliseconds,
                     IsRestart = this.IsRestart,
-                    Cancellation = shutdownCancellation.Token
+                    Message = this.Message
                 };
-                await this.CremaHost.ShutdownAsync(authentication, shutdownContext);
-                this.shutdownContext = shutdownContext;
-                this.shutdownCancellation = shutdownCancellation;
+                await this.cremaHost.ShutdownAsync(authentication, shutdownContext);
             }
         }
-
-        private ICremaHost CremaHost { get; }
     }
 }

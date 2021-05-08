@@ -39,7 +39,6 @@ namespace JSSoft.Crema.ServiceHosts
         private Authentication authentication;
         private long index = 0;
         private ShutdownContext shutdownContext;
-        private CancellationTokenSource shutdownCancellation;
 
         public CremaHostService(CremaService service, ICremaHostEventCallback callback)
             : base(service, callback)
@@ -158,12 +157,11 @@ namespace JSSoft.Crema.ServiceHosts
 
         public async Task<ResultBase> ShutdownAsync(int milliseconds, bool isRestart, string message)
         {
-            this.shutdownCancellation = new CancellationTokenSource();
-            this.shutdownContext = new ShutdownContext(message)
+            this.shutdownContext = new ShutdownContext()
             {
                 Milliseconds = milliseconds,
                 IsRestart = isRestart,
-                Cancellation = this.shutdownCancellation.Token
+                Message = message
             };
             await this.CremaHost.ShutdownAsync(this.authentication, this.shutdownContext);
             return new ResultBase()
@@ -174,9 +172,8 @@ namespace JSSoft.Crema.ServiceHosts
 
         public async Task<ResultBase> CancelShutdownAsync()
         {
-            this.shutdownCancellation.Cancel();
+            await this.CremaHost.CancelShutdownAsync(this.authentication);
             this.shutdownContext = null;
-            await Task.Delay(1);
             return new ResultBase()
             {
                 SignatureDate = this.authentication.SignatureDate
