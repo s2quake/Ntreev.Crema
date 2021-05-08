@@ -152,7 +152,7 @@ namespace JSSoft.Crema.ApplicationHost.Views
         private void CremaHost_Closing(object sender, EventArgs e)
         {
             var logService = this.cremaHost.GetService(typeof(ILogService)) as ILogService;
-            if (this.cremaHost.Address != null && this.redirectionWriter is LogWriter writer)
+            if (this.cremaAppHost.Address != null && this.redirectionWriter is LogWriter writer)
             {
                 writer.TextBox = null;
             }
@@ -178,7 +178,7 @@ namespace JSSoft.Crema.ApplicationHost.Views
 
         private void Users_UsersKicked(object sender, ItemsEventArgs<IUser> e)
         {
-            var userID = this.cremaHost.UserID;
+            var userID = this.cremaAppHost.UserID;
             var userIDs = e.Items.Select(item => item.ID).ToArray();
             var comments = e.MetaData as string[];
 
@@ -203,7 +203,7 @@ namespace JSSoft.Crema.ApplicationHost.Views
         {
             foreach (var item in e.Items)
             {
-                if (item.ID == this.cremaHost.UserID && item.Path != string.Empty)
+                if (item.ID == this.cremaAppHost.UserID && item.Path != string.Empty)
                 {
                     await this.Dispatcher.InvokeAsync(() =>
                     {

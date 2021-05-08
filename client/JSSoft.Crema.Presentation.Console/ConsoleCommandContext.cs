@@ -20,6 +20,7 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Commands.Consoles;
+using JSSoft.Crema.Presentation.Framework;
 using JSSoft.Crema.Services;
 using JSSoft.Library.Commands;
 using System;
@@ -32,6 +33,7 @@ namespace JSSoft.Crema.Presentation.Console
     public class ConsoleCommandContext : ConsoleCommandContextBase
     {
         private readonly ICremaHost cremaHost;
+        private readonly ICremaAppHost cremaAppHost;
 
         static ConsoleCommandContext()
         {
@@ -39,7 +41,7 @@ namespace JSSoft.Crema.Presentation.Console
         }
 
         [ImportingConstructor]
-        public ConsoleCommandContext(ICremaHost cremaHost,
+        public ConsoleCommandContext(ICremaHost cremaHost, ICremaAppHost cremaAppHost,
             [ImportMany] IEnumerable<IConsoleDrive> driveItems,
             [ImportMany] IEnumerable<IConsoleCommand> commands)
             : base(driveItems, commands)
@@ -47,16 +49,17 @@ namespace JSSoft.Crema.Presentation.Console
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;
             this.cremaHost.Closed += CremaHost_Closed;
+            this.cremaAppHost = cremaAppHost;
             this.BaseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         }
 
         public override ICremaHost CremaHost => this.cremaHost;
 
-        public override string Address => this.CremaHost.Address;
+        public override string Address => this.cremaAppHost.Address;
 
-        private async void CremaHost_Opened(object sender, EventArgs e)
+        private void CremaHost_Opened(object sender, EventArgs e)
         {
-            await this.Initialize(this.cremaHost.GetService(typeof(Authenticator)) as Authenticator);
+            this.Initialize(this.cremaHost.GetService(typeof(Authenticator)) as Authenticator);
         }
 
         private void CremaHost_Closed(object sender, ClosedEventArgs e)

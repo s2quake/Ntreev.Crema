@@ -24,7 +24,7 @@ using System.ComponentModel.Composition;
 namespace JSSoft.Crema.Services
 {
     [Export(typeof(CremaSettings))]
-    class CremaSettings
+    public class CremaSettings
     {
         public string Address { get; set; }
 

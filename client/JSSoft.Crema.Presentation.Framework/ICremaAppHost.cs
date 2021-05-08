@@ -48,6 +48,8 @@ namespace JSSoft.Crema.Presentation.Framework
 
         string Address { get; }
 
+        string UserID { get; }
+
         Authority Authority { get; }
 
         IEnumerable<IDataBaseDescriptor> DataBases { get; }

@@ -122,7 +122,7 @@ namespace JSSoft.Crema.Tools.Framework.Dialogs.ViewModels
             }
             finally
             {
-                await service.CloseAsync(token);
+                await service.CloseAsync(token, 0);
             }
         }
 

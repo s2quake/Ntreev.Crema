@@ -181,7 +181,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             {
                 var cremaHost = this.application.GetService(typeof(ICremaHost)) as ICremaHost;
                 var script = File.ReadAllText(this.ScriptPath);
-                var basePath = cremaHost.GetPath(CremaPath.Documents);
+                var basePath = this.application.DocumentsPath;
                 var oldPath = Directory.GetCurrentDirectory();
                 try
                 {

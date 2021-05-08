@@ -36,7 +36,7 @@ namespace JSSoft.Crema.RuntimeService
     [Export(typeof(IPlugin))]
     [Export(typeof(IRuntimeService))]
     [Export(typeof(RuntimeService))]
-    partial class RuntimeService : IPlugin, IRuntimeService
+    partial class RuntimeService : IPlugin, IRuntimeService, IDisposable
     {
         public const string ServiceID = "B8CD9F7C-58B8-4BDA-B6AE-B99ED216DA22";
         private readonly ICremaHost cremaHost;
@@ -52,7 +52,6 @@ namespace JSSoft.Crema.RuntimeService
             this.Dispatcher = new CremaDispatcher(this);
             this.cremaHost.Opened += CremaHost_Opened;
             this.cremaHost.Closed += CremaHost_Closed;
-            this.cremaHost.Disposed += (s, e) => this.Dispatcher.Dispose();
         }
 
         public string Name => nameof(RuntimeService);
@@ -252,5 +251,14 @@ namespace JSSoft.Crema.RuntimeService
 
             metaData.Tables = tableList.ToArray();
         }
+
+        #region IDisposable
+
+        void IDisposable.Dispose()
+        {
+            this.Dispatcher.Dispose();
+        }
+
+        #endregion
     }
 }

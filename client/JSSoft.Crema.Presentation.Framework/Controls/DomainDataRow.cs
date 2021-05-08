@@ -88,6 +88,7 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
         }
 
         // null 예외 발생함. 연속으로
+        [Obsolete("this.UserID = cremaHost.UserID")]
         protected async override void PrepareContainer(DataGridContext dataGridContext, object item)
         {
             base.PrepareContainer(dataGridContext, item);
@@ -106,10 +107,10 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
                         this.domain.UserEditEnded += Domain_UserEditEnded;
                         this.domain.UserRemoved += Domain_UserRemoved;
                         this.domain.Deleted += Domain_Deleted;
-                        if (this.domain.GetService(typeof(ICremaHost)) is ICremaHost cremaHost)
-                        {
-                            this.UserID = cremaHost.UserID;
-                        }
+                        // if (this.domain.GetService(typeof(ICremaHost)) is ICremaHost cremaHost)
+                        // {
+                        //     this.UserID = cremaHost.UserID;
+                        // }
                     });
                 }
             }

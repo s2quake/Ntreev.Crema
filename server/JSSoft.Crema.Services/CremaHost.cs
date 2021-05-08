@@ -54,7 +54,6 @@ namespace JSSoft.Crema.Services
         private LogService log;
         private Guid token;
 
-
         [ImportingConstructor]
         public CremaHost(IServiceProvider container, CremaSettings settings,
             [ImportMany] IEnumerable<IRepositoryProvider> repositoryProviders,

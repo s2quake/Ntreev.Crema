@@ -34,34 +34,34 @@ namespace JSSoft.Crema.Presentation.Console
         public ConsoleWriter(TerminalControl control)
         {
             this.control = control;
-            TerminalColor.ForegroundColorChanged += TerminalColor_ForegroundColorChanged;
-            TerminalColor.BackgroundColorChanged += TerminalColor_BackgroundColorChanged;
+            // TerminalColor.ForegroundColorChanged += TerminalColor_ForegroundColorChanged;
+            // TerminalColor.BackgroundColorChanged += TerminalColor_BackgroundColorChanged;
         }
 
-        private void TerminalColor_ForegroundColorChanged(object sender, EventArgs e)
-        {
-            var foregroundColor = TerminalColor.ForegroundColor;
+        // private void TerminalColor_ForegroundColorChanged(object sender, EventArgs e)
+        // {
+        //     var foregroundColor = TerminalColor.ForegroundColor;
 
-            this.control.Dispatcher.InvokeAsync(() =>
-            {
-                if (foregroundColor == null)
-                    this.control.OutputForeground = null;
-                else
-                    this.control.OutputForeground = (Brush)this.control.FindResource(TerminalColors.FindForegroundKey(foregroundColor));
-            });
-        }
+        //     this.control.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         if (foregroundColor == null)
+        //             this.control.OutputForeground = null;
+        //         else
+        //             this.control.OutputForeground = (Brush)this.control.FindResource(TerminalColors.FindForegroundKey(foregroundColor));
+        //     });
+        // }
 
-        private void TerminalColor_BackgroundColorChanged(object sender, EventArgs e)
-        {
-            var backgroundColor = TerminalColor.BackgroundColor;
-            this.control.Dispatcher.InvokeAsync(() =>
-            {
-                if (backgroundColor == null)
-                    this.control.OutputBackground = null;
-                else
-                    this.control.OutputBackground = (Brush)this.control.FindResource(TerminalColors.FindBackgroundKey(backgroundColor));
-            });
-        }
+        // private void TerminalColor_BackgroundColorChanged(object sender, EventArgs e)
+        // {
+        //     var backgroundColor = TerminalColor.BackgroundColor;
+        //     this.control.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         if (backgroundColor == null)
+        //             this.control.OutputBackground = null;
+        //         else
+        //             this.control.OutputBackground = (Brush)this.control.FindResource(TerminalColors.FindBackgroundKey(backgroundColor));
+        //     });
+        // }
 
         public override void Write(char value)
         {

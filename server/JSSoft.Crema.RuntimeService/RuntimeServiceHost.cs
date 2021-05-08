@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System.Threading.Tasks;
 using JSSoft.Communication;
 using JSSoft.Crema.ServiceHosts.RuntimeService;
 using JSSoft.Crema.Services;
@@ -34,9 +35,9 @@ namespace JSSoft.Crema.RuntimeService
             this.service = service;
         }
 
-        protected override IRuntimeService CreateService()
+        protected override Task<IRuntimeService> CreateServiceAsync()
         {
-            return this.service;
+            return Task.Run<IRuntimeService>(() => this.service);
         }
     }
 }

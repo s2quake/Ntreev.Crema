@@ -25,6 +25,7 @@ using JSSoft.Crema.Services;
 using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel.Composition;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.RuntimeService.Consoles
@@ -60,8 +61,9 @@ namespace JSSoft.Crema.RuntimeService.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public void Info(string dataBaseName)
+        public async Task InfoAsync(string dataBaseName)
         {
+            var sb = new StringBuilder();
             var dataBaseID = this.DataBases.Dispatcher.Invoke(() =>
             {
                 var dataBase = this.DataBases[dataBaseName];
@@ -72,7 +74,10 @@ namespace JSSoft.Crema.RuntimeService.Consoles
 
             var serviceItem = this.runtimeService.GetServiceItem(dataBaseID);
             var info = serviceItem.Dispatcher.Invoke(() => serviceItem.DataServiceItemInfo);
-            this.CommandContext.WriteObjectAsync(info.ToDictionary(), FormatProperties.Format);
+            var props = info.ToDictionary();
+            var format = FormatProperties.Format;
+            sb.AppendLine(props, format);
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         public override bool IsEnabled => this.cremaHost.ServiceState == ServiceState.Open;

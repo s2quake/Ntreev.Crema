@@ -35,37 +35,37 @@ namespace JSSoft.Crema.ApplicationHost.Commands.Consoles
     [ResourceUsageDescription("Resources")]
     class ShutdownCommand : ConsoleCommandAsyncBase
     {
+        private readonly ICremaHost cremaHost;
+
         [ImportingConstructor]
         public ShutdownCommand(ICremaHost cremaHost)
         {
-            this.CremaHost = cremaHost;
+            this.cremaHost = cremaHost;
         }
 
         [CommandPropertyRequired(DefaultValue = "")]
+        [CommandPropertyTrigger(nameof(IsCancelled), false)]
         public DateTimeValue Time
         {
             get; set;
         }
 
-        [CommandProperty('r')]
+        [CommandPropertySwitch('r')]
+        [CommandPropertyTrigger(nameof(IsCancelled), false)]
         public bool IsRestart
         {
             get; set;
         }
 
-        [CommandProperty]
-        public bool NoCache
-        {
-            get; set;
-        }
-
-        [CommandProperty('c')]
+        [CommandPropertySwitch('c')]
+        [CommandPropertyTrigger(nameof(DateTimeValue), "")]
         public bool IsCancelled
         {
             get; set;
         }
 
         [CommandProperty('m')]
+        [CommandPropertyTrigger(nameof(IsCancelled), false)]
         public string Message
         {
             get; set;
@@ -78,29 +78,25 @@ namespace JSSoft.Crema.ApplicationHost.Commands.Consoles
             var authentication = this.CommandContext.GetAuthentication(this);
             if (this.IsCancelled == true)
             {
-                await this.CremaHost.CancelShutdownAsync(authentication);
+                await this.cremaHost.CancelShutdownAsync(authentication);
             }
             else
             {
-                await this.CremaHost.ShutdownAsync(authentication, this.Time.Milliseconds, this.ShutdownType, this.Message);
+                var shutdownContext = new ShutdownContext()
+                {
+                    Milliseconds = this.Time.Milliseconds,
+                    IsRestart = this.IsRestart,
+                    Message = this.Message
+                };
+                shutdownContext.ShutdownException += ShutdownContext_ShutdownException;
+                await this.cremaHost.ShutdownAsync(authentication, shutdownContext);
             }
         }
-
-        private ICremaHost CremaHost { get; }
-
-        private ShutdownType ShutdownType
+        
+        private void ShutdownContext_ShutdownException(object sender, ShutdownEventArgs e)
         {
-            get
-            {
-                var shutdownType = ShutdownType.None;
-
-                if (this.IsRestart == true)
-                    shutdownType |= ShutdownType.Restart;
-                if (this.NoCache == true)
-                    shutdownType |= ShutdownType.NoCache;
-
-                return shutdownType;
-            }
+            this.Error.WriteLine(e.Exception);
+            // this.cancellation.Cancel();
         }
     }
 }

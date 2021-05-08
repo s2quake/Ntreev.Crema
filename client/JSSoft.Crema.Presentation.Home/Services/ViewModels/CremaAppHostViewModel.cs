@@ -47,6 +47,7 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
         private readonly ICremaHost cremaHost;
         private readonly IAppConfiguration configs;
         private readonly IBuildUp buildUp;
+        private readonly CremaSettings settings;
         private readonly Lazy<DataBaseServiceViewModel> dataBaseService;
         private readonly Lazy<DataBaseListViewModel> dataBaseSelections;
         private readonly Lazy<IShell> shell;
@@ -66,6 +67,7 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
         private Color themeColor;
         private string theme;
         private string address;
+        private string userID = string.Empty;
         private IConfigurationCommitter userConfigCommitter;
 
         private IDataBase dataBase;
@@ -84,13 +86,14 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
         public static Dictionary<string, Uri> Themes { get; } = new Dictionary<string, Uri>(StringComparer.CurrentCultureIgnoreCase);
 
         [ImportingConstructor]
-        public CremaAppHostViewModel(ICremaHost cremaHost, IAppConfiguration configs, IBuildUp buildUp,
+        public CremaAppHostViewModel(ICremaHost cremaHost, IAppConfiguration configs, IBuildUp buildUp, CremaSettings settings,
             Lazy<DataBaseServiceViewModel> dataBaseService, Lazy<DataBaseListViewModel> dataBaseSelections, Lazy<IShell> shell)
         {
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;
             this.configs = configs;
             this.buildUp = buildUp;
+            this.settings = settings;
             this.dataBaseService = dataBaseService;
             this.dataBaseSelections = dataBaseSelections;
             this.shell = shell;
@@ -217,7 +220,7 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
 
         public async Task LogoutAsync()
         {
-            var closer = new InternalCloseRequestedEventArgs();
+            var closer = new InternalCloseRequestedEventArgs(CloseReason.None);
             this.OnCloseRequested(closer);
             await closer.WhenAll();
 
@@ -370,7 +373,7 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
                 throw new InvalidOperationException();
 
             await this.CloseDocumentsAsync(false);
-            var args = new InternalCloseRequestedEventArgs();
+            var args = new InternalCloseRequestedEventArgs(CloseReason.None);
             this.OnUnloadRequested(args);
             await args.WhenAll();
             this.OnUnloading(EventArgs.Empty);
@@ -429,6 +432,8 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
         public string DataBaseName => this.dataBaseName ?? string.Empty;
 
         public string Address => this.address ?? string.Empty;
+
+        public string UserID => this.userID;
 
         public Color ThemeColor
         {
@@ -678,7 +683,7 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
         private async void CremaHost_Opened(object sender, EventArgs e)
         {
             this.isOpened = true;
-            this.Authority = this.cremaHost.Authority;
+            this.Authority = this.authenticator.Authority;
             this.cremaHost.Closed += CremaHost_Closed;
             await this.Dispatcher.InvokeAsync(() =>
             {
@@ -729,8 +734,11 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
 
         private async Task OpenAsync(string address, string userID, SecureString password)
         {
-            this.token = await this.cremaHost.OpenAsync(address, userID, password);
+            this.settings.Address = address;
+            await this.cremaHost.OpenAsync();
+            this.token = await this.cremaHost.LoginAsync(userID, password);
             this.address = address;
+            this.userID = userID;
             this.IsOpened = true;
             this.connectionItem.LastConnectedDateTime = DateTime.Now;
             this.ConnectionItems.Write();
@@ -742,6 +750,7 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
         private async Task CloseAsync()
         {
             this.cremaHost.Closed -= CremaHost_Closed;
+            await this.cremaHost.LogoutAsync(this.authenticator);
             await this.cremaHost.CloseAsync(this.token);
             this.token = Guid.Empty;
             this.address = null;

@@ -45,7 +45,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
         {
             this.cremaHost = cremaHost;
             this.application = cremaHost.GetService(typeof(CremaApplication)) as CremaApplication;
-            this.BaseDirectory = cremaHost.GetPath(CremaPath.Documents);
+            this.BaseDirectory = application.DocumentsPath;
         }
 
         public async Task LoginAsync(string userID, SecureString password)

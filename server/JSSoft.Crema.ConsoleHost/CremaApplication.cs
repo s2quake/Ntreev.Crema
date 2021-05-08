@@ -107,6 +107,8 @@ namespace JSSoft.Crema.ConsoleHost
             set => Console.Title = value;
         }
 
+        public string DocumentsPath => Path.Combine(base.BasePath, "Documents");
+
         public event EventHandler Opening
         {
             add { this.service.Opening += value; }

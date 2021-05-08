@@ -130,7 +130,7 @@ namespace JSSoft.Crema.ApplicationHost.ViewModels
             get
             {
                 if (this.CremaHost.ServiceState == ServiceState.Open)
-                    return $"{AppUtility.ProductName} - {this.CremaAppHost.DataBaseName} ({this.CremaHost.Address} - {this.CremaHost.UserID})";
+                    return $"{AppUtility.ProductName} - {this.CremaAppHost.DataBaseName} ({this.CremaAppHost.Address} - {this.CremaAppHost.UserID})";
                 else
                     return AppUtility.ProductName;
             }

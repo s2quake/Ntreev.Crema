@@ -34,10 +34,12 @@ namespace JSSoft.Crema.Presentation.Console
 
         public ConsoleCommandContext CommandContext { get; set; }
 
+        public static int BufferWidth { get; private set; } = 80;
+
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
             base.OnRenderSizeChanged(sizeInfo);
-            Terminal.BufferWidth = (int)sizeInfo.NewSize.Width / 6;
+            BufferWidth = (int)sizeInfo.NewSize.Width / 6;
         }
     }
 }

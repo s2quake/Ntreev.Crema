@@ -39,7 +39,7 @@ namespace JSSoft.Crema.Services
 
         Task<Authentication> AuthenticateAsync(Guid authenticationToken);
 
-        string GetPath(CremaPath pathType, params string[] paths);
+        // string GetPath(CremaPath pathType, params string[] paths);
 
 #endif
         event EventHandler Opening;

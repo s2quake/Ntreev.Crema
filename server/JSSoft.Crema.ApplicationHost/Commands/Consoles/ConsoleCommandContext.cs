@@ -51,7 +51,7 @@ namespace JSSoft.Crema.ApplicationHost.Commands.Consoles
             : base(rootItems, commands)
         {
             this.cremaHost = cremaHost;
-            this.cremaHost.Opened += (s, e) => this.BaseDirectory = this.cremaHost.GetPath(CremaPath.Documents);
+            this.cremaHost.Opened += CremaHost_Opened;
             this.service = service;
         }
 
@@ -62,7 +62,7 @@ namespace JSSoft.Crema.ApplicationHost.Commands.Consoles
             var token = await this.CremaHost.LoginAsync(userID, password);
             this.authentication = await this.CremaHost.AuthenticateAsync(token);
             this.authentication.Expired += (s, e) => this.authentication = null;
-            await this.InitializeAsync(authentication);
+            this.Initialize(authentication);
         }
 
 #if DEBUG
@@ -89,5 +89,13 @@ namespace JSSoft.Crema.ApplicationHost.Commands.Consoles
         public override ICremaHost CremaHost => this.cremaHost;
 
         public override string Address => AddressUtility.GetDisplayAddress($"localhost:{this.service.Port}");
+
+        private void CremaHost_Opened(object sender, EventArgs e)
+        {
+            if (this.service.GetService(typeof(AppSettings)) is AppSettings settings)
+            {
+                this.BaseDirectory = System.IO.Path.Combine(settings.BasePath, "Documents");
+            }
+        }
     }
 }
