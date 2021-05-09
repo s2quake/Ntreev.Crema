@@ -126,7 +126,7 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void Indexer()
         {
-            CremaDataSet dataSet = new CremaDataSet();
+            var dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
             Assert.AreEqual(type1, dataSet.Types["Type1"]);
@@ -285,7 +285,7 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void Remove_Fail()
         {
-            CremaDataSet dataSet = new CremaDataSet();
+            var dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
             var type2 = dataSet.Types.Add("Type2", "/A/");
@@ -329,7 +329,7 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void RemoveByName()
         {
-            CremaDataSet dataSet = new CremaDataSet();
+            var dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
             var type2 = dataSet.Types.Add("Type2", "/A/");
@@ -350,7 +350,7 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void RemoveByName_Fail()
         {
-            CremaDataSet dataSet = new CremaDataSet();
+            var dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
             var type2 = dataSet.Types.Add("Type2", "/A/");
@@ -413,7 +413,7 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void CanRemove()
         {
-            CremaDataSet dataSet = new CremaDataSet();
+            var dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
             var type2 = dataSet.Types.Add("Type2", "/A/");
@@ -439,7 +439,7 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void CanRemove_Fail()
         {
-            CremaDataSet dataSet = new CremaDataSet();
+            var dataSet = new CremaDataSet();
 
             try
             {
@@ -459,7 +459,7 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void Clear()
         {
-            CremaDataSet dataSet = new CremaDataSet();
+            var dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
             var type2 = dataSet.Types.Add("Type2", "/A/");

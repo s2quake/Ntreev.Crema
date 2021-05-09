@@ -45,7 +45,7 @@ namespace JSSoft.Crema.Presentation.SmartSet
         private readonly ICremaAppHost cremaAppHost;
         private readonly ITableBrowser tableBrowser;
         private readonly IRule[] rules;
-        private readonly HashSet<string> bookmarks = new HashSet<string>();
+        private readonly HashSet<string> bookmarks = new();
         private bool isModified;
 
         [ImportingConstructor]

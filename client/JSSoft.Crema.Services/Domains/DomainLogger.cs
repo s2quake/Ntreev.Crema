@@ -34,11 +34,11 @@ namespace JSSoft.Crema.Services.Domains
         public const string PostedItemPath = "posted";
         public const string CompletedItemPath = "completed";
 
-        private static readonly XmlWriterSettings writerSettings = new XmlWriterSettings() { OmitXmlDeclaration = true, Indent = true };
+        private static readonly XmlWriterSettings writerSettings = new() { OmitXmlDeclaration = true, Indent = true };
 
         private DomainInfo domainInfo;
         private DomainCompletionItemSerializationInfo currentCompletion;
-        private readonly List<DomainCompletionItemSerializationInfo> completionList = new List<DomainCompletionItemSerializationInfo>();
+        private readonly List<DomainCompletionItemSerializationInfo> completionList = new();
 
         public DomainLogger(Domain domain)
         {

@@ -30,10 +30,10 @@ namespace JSSoft.Crema.Presentation.Framework
 {
     public abstract class BackgroundTaskBase : PropertyChangedBase, IBackgroundTask
     {
+        private readonly CancellationTokenSource cancellation = new();
         private string displayName;
         private bool isBusy;
         private bool isAlive = true;
-        private readonly CancellationTokenSource cancellation = new CancellationTokenSource();
 
         public BackgroundTaskBase()
         {

@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Presentation.Framework
     public abstract class ListBoxBase<T> : ListBoxViewModel<T> where T : ListBoxItemViewModel
     {
         private const int defaultDelay = 100;
-        private readonly List<IPropertyService> propertyServiceList = new List<IPropertyService>();
+        private readonly List<IPropertyService> propertyServiceList = new();
         private Task selectPropertyTask;
         private readonly int delay = defaultDelay;
 

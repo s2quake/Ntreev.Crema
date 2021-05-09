@@ -55,8 +55,8 @@ namespace JSSoft.Crema.Presentation.Controls
 
         private ScrollViewer scrollViewer;
         private ScrollViewer destScrollViewer;
-        private readonly FieldStack<bool> preventEvent = new FieldStack<bool>();
-        private readonly FieldStack<bool> preventSelection = new FieldStack<bool>();
+        private readonly FieldStack<bool> preventEvent = new();
+        private readonly FieldStack<bool> preventSelection = new();
 
         static DiffDataGridControl()
         {

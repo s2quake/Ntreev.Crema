@@ -27,7 +27,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
     [Export]
     class ConsoleTerminalCancellation
     {
-        private readonly CancellationTokenSource cancellation = new CancellationTokenSource();
+        private readonly CancellationTokenSource cancellation = new();
         private bool isRunning;
 
         public CancellationToken Run()

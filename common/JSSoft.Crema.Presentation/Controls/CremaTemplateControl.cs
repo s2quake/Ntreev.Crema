@@ -58,7 +58,7 @@ namespace JSSoft.Crema.Presentation.Controls
 
         public static readonly DependencyProperty TagsProperty = DependencyProperty.RegisterAttached("Tags", typeof(TagInfo), typeof(CremaTemplateControl));
 
-        private readonly DataGridCollectionViewSource viewSource = new DataGridCollectionViewSource();
+        private readonly DataGridCollectionViewSource viewSource = new();
         private ModernDataGridControl dataGridControl;
 
         public CremaTemplateControl()

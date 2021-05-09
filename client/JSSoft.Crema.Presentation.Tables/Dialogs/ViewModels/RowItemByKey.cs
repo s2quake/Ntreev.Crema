@@ -38,7 +38,7 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
             return this.Value ?? string.Empty;
         }
 
-        public readonly static RowItemByKey Empty = new RowItemByKey()
+        public readonly static RowItemByKey Empty = new()
         {
             ID = null,
             Value = null,

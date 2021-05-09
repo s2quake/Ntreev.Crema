@@ -39,7 +39,7 @@ namespace JSSoft.Crema.ServiceModel
         where _CC : CategoryContainer<_I, _C, _IC, _CC, _CT>, new()
         where _CT : ItemContext<_I, _C, _IC, _CC, _CT>
     {
-        private readonly InternalTableCollection<_I, _C, _IC, _CC, _CT> derivedTables = new InternalTableCollection<_I, _C, _IC, _CC, _CT>();
+        private readonly InternalTableCollection<_I, _C, _IC, _CC, _CT> derivedTables = new();
         private _I parent;
         private _I templatedParent;
         private bool isLoaded;

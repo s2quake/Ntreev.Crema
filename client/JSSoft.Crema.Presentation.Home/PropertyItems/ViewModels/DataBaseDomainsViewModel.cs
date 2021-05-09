@@ -39,7 +39,7 @@ namespace JSSoft.Crema.Presentation.Home.PropertyItems.ViewModels
     {
         private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
-        private readonly ObservableCollection<DomainListItemBase> domains = new ObservableCollection<DomainListItemBase>();
+        private readonly ObservableCollection<DomainListItemBase> domains = new();
         private DomainListItemBase selectedDomain;
         private IDataBaseDescriptor descriptor;
 

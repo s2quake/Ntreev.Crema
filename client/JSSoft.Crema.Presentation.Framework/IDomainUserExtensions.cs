@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Presentation.Framework
 {
     public static class IDomainUserExtensions
     {
-        private static readonly List<Color> colors = new List<Color>() {
+        private static readonly List<Color> colors = new() {
             Color.FromRgb(0xa4, 0xc4, 0x00),   // lime
             Color.FromRgb(0x60, 0xa9, 0x17),   // green
             Color.FromRgb(0x00, 0x8a, 0x00),   // emerald
@@ -53,10 +53,10 @@ namespace JSSoft.Crema.Presentation.Framework
             Color.FromRgb(0x87, 0x79, 0x4e),   // taupe
         };
 
-        private static readonly List<Color> emptyColors = new List<Color>();
-        private static readonly Random random = new Random(DateTime.Now.Millisecond);
+        private static readonly List<Color> emptyColors = new();
+        private static readonly Random random = new(DateTime.Now.Millisecond);
 
-        private static readonly Dictionary<string, Color> idToColor = new Dictionary<string, Color>();
+        private static readonly Dictionary<string, Color> idToColor = new();
 
         public static Color GetColor(this IDomainUser domainUser)
         {

@@ -38,12 +38,12 @@ namespace JSSoft.Crema.Data.Diff
         private readonly DiffMergeTypes mergeType;
         private readonly bool dummy1;
         private readonly bool dummy2;
-        private readonly List<DiffDataTypeMember> itemList = new List<DiffDataTypeMember>();
+        private readonly List<DiffDataTypeMember> itemList = new();
         private DiffState diffState;
         private bool isResolved;
         private string header1;
         private string header2;
-        private readonly HashSet<object> itemSet = new HashSet<object>();
+        private readonly HashSet<object> itemSet = new();
         //private bool isSame;
 
         [Obsolete]

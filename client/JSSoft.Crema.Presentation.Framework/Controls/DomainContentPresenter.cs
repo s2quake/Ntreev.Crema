@@ -51,22 +51,22 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
                 Path = new PropertyPath(Cell.CoercedContentTemplateProperty)
             };
 
-            Binding trimmingBinding = new Binding
+            var trimmingBinding = new Binding
             {
                 Path = new PropertyPath("(0).(1).(2)",
-              Cell.ParentCellProperty,
-              Cell.ParentColumnProperty,
-              ColumnBase.TextTrimmingProperty),
+                Cell.ParentCellProperty,
+                Cell.ParentColumnProperty,
+                ColumnBase.TextTrimmingProperty),
                 Mode = BindingMode.OneWay,
                 RelativeSource = new RelativeSource(RelativeSourceMode.Self)
             };
 
-            Binding wrappingBinding = new Binding
+            var wrappingBinding = new Binding
             {
                 Path = new PropertyPath("(0).(1).(2)",
-              Cell.ParentCellProperty,
-              Cell.ParentColumnProperty,
-              ColumnBase.TextWrappingProperty),
+                Cell.ParentCellProperty,
+                Cell.ParentColumnProperty,
+                ColumnBase.TextWrappingProperty),
                 Mode = BindingMode.OneWay,
                 RelativeSource = new RelativeSource(RelativeSourceMode.Self)
             };

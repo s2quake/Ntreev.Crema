@@ -99,8 +99,8 @@ namespace JSSoft.Crema.Presentation.Controls
 
         private DiffDataGridControl gridControl1;
         private DiffDataGridControl gridControl2;
-        private readonly List<DiffItemInfo> diffItems = new List<DiffItemInfo>();
-        private readonly List<object> visibleItems = new List<object>();
+        private readonly List<DiffItemInfo> diffItems = new();
+        private readonly List<object> visibleItems = new();
 
         public DiffDataControl()
         {

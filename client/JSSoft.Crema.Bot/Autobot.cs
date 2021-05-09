@@ -34,7 +34,7 @@ namespace JSSoft.Crema.Bot
         private readonly AutobotService service;
         private readonly string address;
         private readonly SecureString password;
-        private AutobotCremaBootstrapper app = new AutobotCremaBootstrapper() { Verbose = LogVerbose.None };
+        private AutobotCremaBootstrapper app = new() { Verbose = LogVerbose.None };
         private ICremaHost cremaHost;
         private Guid token;
 
@@ -60,7 +60,9 @@ namespace JSSoft.Crema.Bot
         protected override async Task<Authentication> OnLoginAsync()
         {
             this.cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
-            this.token = await this.cremaHost.OpenAsync(this.address, this.AutobotID, this.password);
+            app.Address = this.address;
+            this.token = await this.cremaHost.OpenAsync();
+            await this.cremaHost.LoginAsync(this.AutobotID, this.password);
             var autheticator = this.app.GetService(typeof(Authenticator)) as Authenticator;
             await this.cremaHost.Dispatcher.InvokeAsync(() => this.cremaHost.Closed += CremaHost_Closed);
             return autheticator;

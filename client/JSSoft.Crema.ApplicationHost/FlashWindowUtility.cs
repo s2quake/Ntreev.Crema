@@ -54,8 +54,8 @@ namespace JSSoft.Crema.ApplicationHost
         {
             //Don't flash if the window is active            
             if (win.IsActive) return;
-            WindowInteropHelper h = new WindowInteropHelper(win);
-            FLASHWINFO info = new FLASHWINFO
+            var h = new WindowInteropHelper(win);
+            var info = new FLASHWINFO
             {
                 hwnd = h.Handle,
                 dwFlags = FLASHW_ALL | FLASHW_TIMER,
@@ -69,8 +69,8 @@ namespace JSSoft.Crema.ApplicationHost
 
         public static void StopFlashingWindow(this Window win)
         {
-            WindowInteropHelper h = new WindowInteropHelper(win);
-            FLASHWINFO info = new FLASHWINFO
+            var h = new WindowInteropHelper(win);
+            var info = new FLASHWINFO
             {
                 hwnd = h.Handle
             };

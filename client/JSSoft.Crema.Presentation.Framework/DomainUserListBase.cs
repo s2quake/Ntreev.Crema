@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Presentation.Framework
 {
     public class DomainUserListBase : PropertyChangedBase
     {
-        private readonly ObservableCollection<DomainUserListItemBase> users = new ObservableCollection<DomainUserListItemBase>();
+        private readonly ObservableCollection<DomainUserListItemBase> users = new();
         private readonly ReadOnlyObservableCollection<DomainUserListItemBase> usersReadOnly;
         private readonly Authentication authentication;
         private readonly DomainDescriptor descriptor;

@@ -37,7 +37,7 @@ namespace JSSoft.Crema.ServiceModel
         [DataMember]
         public DomainAccessType AccessType { get; set; }
 
-        public static readonly DomainUserInfo Empty = new DomainUserInfo()
+        public static readonly DomainUserInfo Empty = new()
         {
             UserID = string.Empty,
             UserName = string.Empty,

@@ -58,7 +58,7 @@ namespace JSSoft.Crema.Presentation.Controls
         public static readonly DependencyProperty IsVerticalScrollBarOnLeftSideProperty =
             DependencyProperty.Register(nameof(IsVerticalScrollBarOnLeftSide), typeof(bool), typeof(CremaDataTypeControl));
 
-        private readonly DataGridCollectionViewSource viewSource = new DataGridCollectionViewSource();
+        private readonly DataGridCollectionViewSource viewSource = new();
         private ModernDataGridControl dataGridControl;
 
         public CremaDataTypeControl()

@@ -36,8 +36,8 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
             DependencyProperty.Register(nameof(Box2), typeof(PasswordBox), typeof(PasswordValidator),
                 new PropertyMetadata(Box2PropertyChangedCallback));
 
-        private static readonly Dictionary<PasswordBox, Brush> passwordBoxToBackground = new Dictionary<PasswordBox, Brush>();
-        private static readonly Dictionary<PasswordBox, Brush> passwordBoxToForeground = new Dictionary<PasswordBox, Brush>();
+        private static readonly Dictionary<PasswordBox, Brush> passwordBoxToBackground = new();
+        private static readonly Dictionary<PasswordBox, Brush> passwordBoxToForeground = new();
 
         public PasswordBox Box1
         {

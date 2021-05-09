@@ -53,8 +53,8 @@ namespace JSSoft.Crema.ServiceModel
 
         internal static FindResultInfo FromDataRow(CremaDataRow dataRow, CremaDataColumn dataColumn, int index)
         {
-            CremaDataTable table = dataRow.Table;
-            FindResultInfo fri = new FindResultInfo()
+            var table = dataRow.Table;
+            var fri = new FindResultInfo()
             {
                 Path = table.CategoryPath + table.Name,
                 Row = index,

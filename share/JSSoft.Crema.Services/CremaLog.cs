@@ -37,7 +37,7 @@ namespace JSSoft.Crema.Services
     public static class CremaLog
     {
         private static LogService log;
-        private static readonly List<CremaHost> references = new List<CremaHost>();
+        private static readonly List<CremaHost> references = new();
 
         static CremaLog()
         {

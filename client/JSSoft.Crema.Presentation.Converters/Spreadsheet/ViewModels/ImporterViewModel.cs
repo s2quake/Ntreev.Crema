@@ -44,7 +44,7 @@ namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
     {
         private readonly ICremaAppHost cremaAppHost;
         private readonly IAppConfiguration configs;
-        private readonly ObservableCollection<SpreadsheetTreeViewItemViewModel> itemsSource = new ObservableCollection<SpreadsheetTreeViewItemViewModel>();
+        private readonly ObservableCollection<SpreadsheetTreeViewItemViewModel> itemsSource = new();
         private string inputPath;
         private string errorMessage;
         private bool? isAllSelected;

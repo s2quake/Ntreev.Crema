@@ -156,7 +156,7 @@ namespace JSSoft.Crema.Services
             yield return new Tuple<System.Type, object>(typeof(IServiceProvider), this);
         }
 
-        private static readonly Dictionary<string, Assembly> assembliesByPath = new Dictionary<string, Assembly>();
+        private static readonly Dictionary<string, Assembly> assembliesByPath = new();
 
         public virtual IEnumerable<Assembly> GetAssemblies()
         {

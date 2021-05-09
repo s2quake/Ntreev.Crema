@@ -36,7 +36,7 @@ namespace JSSoft.Crema.ServiceModel
         [DataMember]
         public DomainUserState DomainUserState { get; set; }
 
-        public static readonly DomainUserMetaData Empty = new DomainUserMetaData();
+        public static readonly DomainUserMetaData Empty = new();
 
         public override string ToString()
         {

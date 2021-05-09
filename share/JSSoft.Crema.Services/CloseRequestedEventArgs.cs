@@ -28,7 +28,7 @@ namespace JSSoft.Crema.Services
 {
     public class CloseRequestedEventArgs : EventArgs
     {
-        private readonly List<Task> taskList = new List<Task>();
+        private readonly List<Task> taskList = new();
 
         public CloseRequestedEventArgs(CloseReason closeReason)
         {

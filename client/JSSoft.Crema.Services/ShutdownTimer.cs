@@ -28,7 +28,7 @@ namespace JSSoft.Crema.Services
 {
     class ShutdownTimer : IDisposable
     {
-        private readonly Timer timer = new Timer() { Interval = 100 };
+        private readonly Timer timer = new() { Interval = 100 };
         private readonly CremaHost cremaHost;
         private string address;
         private ShutdownContext shutdownContext;

@@ -52,7 +52,7 @@ namespace JSSoft.Crema.ServiceModel
         [DataMember]
         public long CompetionID { get; set; }
 
-        public static readonly DomainMetaData Empty = new DomainMetaData();
+        public static readonly DomainMetaData Empty = new();
 
         public override string ToString()
         {

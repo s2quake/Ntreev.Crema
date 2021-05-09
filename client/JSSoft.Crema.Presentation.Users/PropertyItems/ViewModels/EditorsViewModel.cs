@@ -34,7 +34,7 @@ namespace JSSoft.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     abstract class EditorsViewModel : PropertyItemBase
     {
-        private readonly ObservableCollection<DomainTreeItemBase> domains = new ObservableCollection<DomainTreeItemBase>();
+        private readonly ObservableCollection<DomainTreeItemBase> domains = new();
         private readonly ICremaAppHost cremaAppHost;
         private readonly Authenticator authenticator;
         private IEnumerable users;
