@@ -349,9 +349,8 @@ namespace JSSoft.Crema.Repository.Git
                 (GitPath)basePath,
             };
 
-            try
+            if (cloneCommand.TryRun() == true)
             {
-                cloneCommand.Run();
                 var fetchCommand = new GitCommand(basePath, "fetch")
                 {
                     "origin",
@@ -360,11 +359,6 @@ namespace JSSoft.Crema.Repository.Git
                 fetchCommand.Run();
                 GitConfig.SetValue(basePath, "receive.denyCurrentBranch", "ignore");
                 return;
-            }
-            catch
-            {
-                DirectoryUtility.Delete(basePath);
-                DirectoryUtility.Create(basePath);
             }
 
             var initCommand = new GitCommand(null, "init")

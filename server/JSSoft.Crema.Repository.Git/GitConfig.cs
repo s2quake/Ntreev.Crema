@@ -71,15 +71,7 @@ namespace JSSoft.Crema.Repository.Git
                 new GitCommandItem("get"),
                 name,
             };
-            configCommand.ThrowOnError = false;
-            try
-            {
-                return configCommand.ReadLine() != null;
-            }
-            catch
-            {
-                return false;
-            }
+            return configCommand.TryRun();
         }
 
         public static string GetValue(string repositoryPath, string name)
@@ -140,8 +132,7 @@ namespace JSSoft.Crema.Repository.Git
                 new GitCommandItem("get"),
                 name,
             };
-            configCommand.ThrowOnError = false;
-            return configCommand.ReadLine() != null;
+            return configCommand.TryRun();
         }
 
         public static string GetValue(string name)

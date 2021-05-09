@@ -43,7 +43,7 @@ namespace JSSoft.Crema.ServerService.Test
         private static Guid token;
         private static IDataBase dataBase;
 
-        [ClassInitialize()]
+        [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
             AppUtility.ProductName = "CremaTest";
@@ -56,7 +56,7 @@ namespace JSSoft.Crema.ServerService.Test
             token = await cremaHost.OpenAsync();
         }
 
-        [TestInitialize()]
+        [TestInitialize]
         public async Task InitializeAsync()
         {
             var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
@@ -66,7 +66,7 @@ namespace JSSoft.Crema.ServerService.Test
             await cremaHost.LogoutAsync(authentication);
         }
 
-        [TestCleanup()]
+        [TestCleanup]
         public async Task CleanupAsync()
         {
             if (dataBase != null)
@@ -77,7 +77,7 @@ namespace JSSoft.Crema.ServerService.Test
             }
         }
 
-        [ClassCleanup()]
+        [ClassCleanup]
         public static async Task ClassCleanupAsync()
         {
             await cremaHost.CloseAsync(token);
