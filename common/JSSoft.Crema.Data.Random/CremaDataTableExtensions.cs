@@ -233,6 +233,7 @@ namespace JSSoft.Crema.Data.Random
             var childTable = dataTable.Childs.Add(IdentifierUtility.Next(ChildPrefix, ChildPostfix));
             childTable.AddRandomColumns(RandomUtility.Next(CremaDataTableExtensions.MinColumnCount, CremaDataTableExtensions.MaxColumnCount));
             childTable.AddRandomRows(RandomUtility.Next(MinRowCount, MaxRowCount));
+            childTable.AcceptChanges();
             return childTable;
         }
 

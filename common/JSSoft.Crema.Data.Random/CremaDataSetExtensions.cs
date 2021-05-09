@@ -64,7 +64,7 @@ namespace JSSoft.Crema.Data.Random
             {
                 dataTable.TableName = IdentifierUtility.Next(TablePrefix, TablePostfix);
             }
-
+            dataTable.AcceptChanges();
             dataSet.Tables.Add(dataTable);
             return dataTable;
         }
