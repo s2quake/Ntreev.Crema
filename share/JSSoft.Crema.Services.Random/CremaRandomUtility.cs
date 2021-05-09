@@ -543,7 +543,7 @@ namespace JSSoft.Crema.Services.Random
         public static async Task<ITableRow> NewRandomRowAsync(this ITableContent content, Authentication authentication)
         {
             var table = content.Table;
-            var parentContent = table.Parent.Content;
+            var parentContent = table.Parent?.Content;
             if (parentContent != null)
             {
                 var parentRow = parentContent.Random();

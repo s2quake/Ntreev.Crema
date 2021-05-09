@@ -173,6 +173,7 @@ namespace JSSoft.Crema.Repository.Git
                     new GitCommandItem("binary")
                 };
                 var output = diffCommand.ReadLine();
+                FileUtility.Prepare(this.transactionPatchPath);
                 File.WriteAllText(this.transactionPatchPath, output);
                 this.transactionMessageList.Add(comment);
                 this.transactionPropertyList.AddRange(properties);

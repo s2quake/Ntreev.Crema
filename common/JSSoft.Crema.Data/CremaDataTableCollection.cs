@@ -124,10 +124,8 @@ namespace JSSoft.Crema.Data
 
         public bool Contains(string name, string categoryPath)
         {
-            throw new NotImplementedException("categoryPath 사용이 안됨.");
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-            return this.itemsByNamespace.ContainsKey(name);
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+            var itemNamespace = UriUtility.Combine(this.dataSet.TableNamespace + categoryPath, name);
+            return this.itemsByNamespace.ContainsKey(itemNamespace);
         }
 
         public void CopyTo(CremaDataTable[] array, int index)

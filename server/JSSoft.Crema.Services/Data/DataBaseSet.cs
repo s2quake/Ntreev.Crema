@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.Data;
 using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
 using JSSoft.Library.IO;
 using System;
 using System.Collections.Generic;
@@ -36,6 +37,7 @@ namespace JSSoft.Crema.Services.Data
         private readonly DataBase dataBase;
         private readonly List<CremaDataType> types = new List<CremaDataType>();
         private readonly List<CremaDataTable> tables = new List<CremaDataTable>();
+        private readonly Dictionary<string, string> hashByPath = new Dictionary<string, string>();
         private readonly DataBaseSetOptions options;
 
         private DataBaseSet(DataBase dataBase, CremaDataSet dataSet, DataBaseSetOptions options)
@@ -56,6 +58,11 @@ namespace JSSoft.Crema.Services.Data
                     }
                     if (type != null)
                     {
+                        var repositoryPath = new RepositoryPath(dataBase.TypeContext, type.Path);
+                        foreach (var i in repositoryPath.GetFiles())
+                        {
+                            hashByPath.Add(i, HashUtility.GetHashValueFromFile(i));
+                        }
                         item.ExtendedProperties[typeof(TypeInfo)] = type.TypeInfo;
                     }
                     this.types.Add(item);
@@ -243,14 +250,22 @@ namespace JSSoft.Crema.Services.Data
             {
                 var repositoryPath = new RepositoryPath(this.TypeContext, item.Path);
                 repositoryPath.ValidateExists();
-                var status = this.Repository.Status(repositoryPath.GetFiles());
-                foreach (var file in status)
+                // var status = this.Repository.Status(repositoryPath.GetFiles());
+                foreach (var i in repositoryPath.GetFiles())
                 {
-                    if (file.Status != RepositoryItemStatus.None)
-                    {
+                    var h1 = HashUtility.GetHashValueFromFile(i);
+                    var h2 = hashByPath[i];
+                    if (h1 != h2)
                         throw new CremaException("타입이 변경되었습니다.");
-                    }
+                    int qwer = 0;
                 }
+                // foreach (var file in status)
+                // {
+                //     if (file.Status != RepositoryItemStatus.None)
+                //     {
+                //         throw new CremaException("타입이 변경되었습니다.");
+                //     }
+                // }
             }
         }
 
@@ -330,6 +345,14 @@ namespace JSSoft.Crema.Services.Data
             {
                 var repositoryPath = new RepositoryPath(this.TypeContext, item.Path);
                 repositoryPath.ValidateExists();
+
+                foreach (var i in repositoryPath.GetFiles())
+                {
+                    var h1 = HashUtility.GetHashValueFromFile(i);
+                    var h2 = hashByPath[i];
+
+                    int qwer = 0;
+                }
                 var status = this.Repository.Status(repositoryPath.GetFiles());
                 foreach (var file in status)
                 {

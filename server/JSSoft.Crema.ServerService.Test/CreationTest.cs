@@ -44,21 +44,22 @@ namespace JSSoft.Crema.ServerService.Test
         private static IDataBase dataBase;
 
         [ClassInitialize()]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
+            AppUtility.ProductName = "CremaTest";
             var solutionDir = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
             tempDir = Path.Combine(solutionDir, ".test", "unit_test");
             app = new();
             CremaBootstrapper.CreateRepository(app, tempDir, "git", "xml");
             app.BasePath = tempDir;
+            cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
+            token = await cremaHost.OpenAsync();
         }
 
         [TestInitialize()]
         public async Task InitializeAsync()
         {
-            cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            token = await cremaHost.OpenAsync();
-            var authentication = await cremaHost.LoginAdminAsync();
+            var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
             var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
             dataBase = await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.First());
             await dataBase.LoadAsync(authentication);
@@ -74,12 +75,12 @@ namespace JSSoft.Crema.ServerService.Test
                 await dataBase.UnloadAsync(authentication);
                 await cremaHost.LogoutAsync(authentication);
             }
-            await cremaHost.CloseAsync(token);
         }
 
         [ClassCleanup()]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
+            await cremaHost.CloseAsync(token);
             app.Dispose();
             DirectoryUtility.Delete(tempDir);
         }
@@ -103,12 +104,14 @@ namespace JSSoft.Crema.ServerService.Test
                 var table = (template.Target as ITable[]).First();
 
                 var childTemplate1 = await table.NewTableAsync(authentication);
+                await childTemplate1.AddRandomColumnsAsync(authentication);
                 await childTemplate1.EndEditAsync(authentication);
 
-                var child = await category1.Dispatcher.InvokeAsync(() => table.Childs[childTemplate1.TableName]);
+                var child = (childTemplate1.Target as ITable[]).First();
                 await child.RenameAsync(authentication, "Child_abc");
 
                 var childTemplate2 = await table.NewTableAsync(authentication);
+                await childTemplate2.AddRandomColumnsAsync(authentication);
                 await childTemplate2.EndEditAsync(authentication);
             }
             finally
@@ -120,23 +123,18 @@ namespace JSSoft.Crema.ServerService.Test
         [TestMethod]
         public async Task GenerateStandardTestAsync()
         {
-            var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
-            var user = userContext.Users.Random(item => item.Authority != Authority.Guest);
-            var password = StringUtility.ToSecureString(user.Authority.ToString().ToLower());
-            var authenticationToken = await cremaHost.LoginAsync(user.ID, password);
-            var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
-            var dataBase = await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.First());
-            var tableContext = dataBase.TableContext;
-
-            var time = DateTime.Now;
-
-            var transaction = await dataBase.BeginTransactionAsync(authentication);
-            await dataBase.GenerateStandardAsync(authentication);
-
-            var diff = DateTime.Now - time;
-
-            await transaction.CommitAsync(authentication);
+            var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+            await dataBase.EnterAsync(authentication);
+            try
+            {
+                var transaction = await dataBase.BeginTransactionAsync(authentication);
+                await dataBase.GenerateStandardAsync(authentication);
+                await transaction.CommitAsync(authentication);
+            }
+            finally
+            {
+                await dataBase.LeaveAsync(authentication);
+            }
         }
 
         public TestContext TestContext { get; set; }
