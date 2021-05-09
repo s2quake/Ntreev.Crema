@@ -34,8 +34,8 @@ namespace JSSoft.Crema.Presentation.Differences.Documents.ViewModels
     class TableDocumentViewModel : DifferenceDocumentBase
     {
         private readonly TableTreeViewItemViewModel viewModel;
-        private readonly List<TableDocumentItemViewModel> itemList = new List<TableDocumentItemViewModel>();
-        private readonly UndoService undoService = new UndoService();
+        private readonly List<TableDocumentItemViewModel> itemList = new();
+        private readonly UndoService undoService = new();
         private TableDocumentItemViewModel selectedItem;
 
         public TableDocumentViewModel(TableTreeViewItemViewModel viewModel)

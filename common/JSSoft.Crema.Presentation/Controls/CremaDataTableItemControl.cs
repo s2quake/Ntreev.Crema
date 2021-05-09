@@ -77,7 +77,7 @@ namespace JSSoft.Crema.Presentation.Controls
 
         public static readonly RoutedEvent SourceChangedEvent = EventManager.RegisterRoutedEvent(nameof(SourceChanged), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(CremaDataTableItemControl));
 
-        private readonly DataGridCollectionViewSource viewSource = new DataGridCollectionViewSource();
+        private readonly DataGridCollectionViewSource viewSource = new();
         private ModernDataGridControl dataGridControl;
 
         public CremaDataTableItemControl()

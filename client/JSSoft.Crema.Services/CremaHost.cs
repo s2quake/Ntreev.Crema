@@ -20,7 +20,6 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Communication;
-using Microsoft.Win32;
 using JSSoft.Crema.Data;
 using JSSoft.Crema.ServiceHosts;
 using JSSoft.Crema.ServiceModel;
@@ -29,6 +28,7 @@ using JSSoft.Crema.Services.Domains;
 using JSSoft.Crema.Services.Properties;
 using JSSoft.Crema.Services.Users;
 using JSSoft.Library;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -36,8 +36,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services
 {

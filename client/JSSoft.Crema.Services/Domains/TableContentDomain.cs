@@ -33,8 +33,8 @@ namespace JSSoft.Crema.Services.Domains
 {
     class TableContentDomain : Domain
     {
-        private readonly Dictionary<string, DataView> views = new Dictionary<string, DataView>();
-        private readonly Dictionary<DataView, CremaDataTable> tables = new Dictionary<DataView, CremaDataTable>();
+        private readonly Dictionary<string, DataView> views = new();
+        private readonly Dictionary<DataView, CremaDataTable> tables = new();
 
         public TableContentDomain(DomainInfo domainInfo)
             : base(domainInfo)

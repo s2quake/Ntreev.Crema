@@ -82,6 +82,6 @@ namespace JSSoft.Crema.ServiceModel
             return null;
         }
 
-        public static readonly LogInfo Empty = new LogInfo();
+        public static readonly LogInfo Empty = new();
     }
 }

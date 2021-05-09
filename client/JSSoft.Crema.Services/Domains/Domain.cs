@@ -35,7 +35,7 @@ namespace JSSoft.Crema.Services.Domains
     abstract class Domain : DomainBase<Domain, DomainCategory, DomainCollection, DomainCategoryCollection, DomainContext>,
         IDomain, IDomainItem, IInfoProvider, IStateProvider
     {
-        private readonly HashSet<string> modifiedTableList = new HashSet<string>();
+        private readonly HashSet<string> modifiedTableList = new();
 
         private EventHandler<DomainUserEventArgs> userAdded;
         private EventHandler<DomainUserRemovedEventArgs> userRemoved;

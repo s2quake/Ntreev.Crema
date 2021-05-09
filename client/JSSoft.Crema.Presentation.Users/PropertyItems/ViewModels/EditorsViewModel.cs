@@ -22,19 +22,17 @@
 using JSSoft.Crema.Presentation.Framework;
 using JSSoft.Crema.Presentation.Users.Properties;
 using JSSoft.Crema.Services;
-using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel.Composition;
 using System.Linq;
 
 namespace JSSoft.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     abstract class EditorsViewModel : PropertyItemBase
     {
-        private readonly ObservableCollection<DomainTreeItemBase> domains = new ObservableCollection<DomainTreeItemBase>();
+        private readonly ObservableCollection<DomainTreeItemBase> domains = new();
         private readonly ICremaAppHost cremaAppHost;
         private readonly Authenticator authenticator;
         private IEnumerable users;

@@ -30,7 +30,7 @@ namespace JSSoft.Crema.ServiceModel
         [DataMember]
         public string Name { get; set; }
 
-        public readonly static ServiceItemInfo Empty = new ServiceItemInfo()
+        public readonly static ServiceItemInfo Empty = new()
         {
             Name = string.Empty,
         };

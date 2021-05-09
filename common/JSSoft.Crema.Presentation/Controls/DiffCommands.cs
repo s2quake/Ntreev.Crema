@@ -82,14 +82,14 @@ namespace JSSoft.Crema.Presentation.Controls
 
         public static readonly RoutedCommand DeleteItemOfLeftSide = new RoutedUICommand(Resources.Command_Delete, nameof(DeleteItemOfLeftSide), typeof(DiffCommands));
 
-        public static readonly RoutedCommand CopyPropertyToRightSide = new RoutedCommand(nameof(CopyPropertyToRightSide), typeof(DiffCommands));
+        public static readonly RoutedCommand CopyPropertyToRightSide = new(nameof(CopyPropertyToRightSide), typeof(DiffCommands));
 
-        public static readonly RoutedCommand CopyPropertyToLeftSide = new RoutedCommand(nameof(CopyPropertyToLeftSide), typeof(DiffCommands));
+        public static readonly RoutedCommand CopyPropertyToLeftSide = new(nameof(CopyPropertyToLeftSide), typeof(DiffCommands));
 
 
-        public static readonly RoutedCommand ExportLeft = new RoutedCommand(nameof(ExportLeft), typeof(DiffCommands));
+        public static readonly RoutedCommand ExportLeft = new(nameof(ExportLeft), typeof(DiffCommands));
 
-        public static readonly RoutedCommand ExportRight = new RoutedCommand(nameof(ExportRight), typeof(DiffCommands));
+        public static readonly RoutedCommand ExportRight = new(nameof(ExportRight), typeof(DiffCommands));
 
         static DiffCommands()
         {

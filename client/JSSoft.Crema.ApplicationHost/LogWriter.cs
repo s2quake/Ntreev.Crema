@@ -28,7 +28,7 @@ namespace JSSoft.Crema.ApplicationHost
 {
     class LogWriter : TextWriter
     {
-        private readonly StringBuilder sb = new StringBuilder();
+        private readonly StringBuilder sb = new();
         private TextBox textBox;
 
         public LogWriter()

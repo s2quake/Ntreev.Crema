@@ -52,7 +52,7 @@ namespace JSSoft.Crema.Presentation.Controls.Actions
             private readonly object dataItem;
             private readonly object[] fields;
 
-            private readonly List<ItemInfo> childList = new List<ItemInfo>();
+            private readonly List<ItemInfo> childList = new();
 
             public ItemInfo(object dataItem)
             {

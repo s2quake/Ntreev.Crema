@@ -32,7 +32,7 @@ namespace JSSoft.Crema.Presentation.Framework
         private readonly ICremaAppHost cremaAppHost;
         private readonly IBrowserItem[] browserItems;
 
-        private readonly ObservableCollection<IBrowserItem> itemsSource = new ObservableCollection<IBrowserItem>();
+        private readonly ObservableCollection<IBrowserItem> itemsSource = new();
 
         protected BrowserServiceBase(ICremaAppHost cremaAppHost, IEnumerable<IBrowserItem> browserItems)
         {

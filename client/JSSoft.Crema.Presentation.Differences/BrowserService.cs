@@ -22,7 +22,6 @@
 using JSSoft.Crema.Data.Diff;
 using JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels;
 using JSSoft.Crema.Presentation.Framework;
-using JSSoft.ModernUI.Framework;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 

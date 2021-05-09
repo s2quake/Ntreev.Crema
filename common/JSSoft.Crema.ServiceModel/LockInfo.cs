@@ -115,7 +115,7 @@ namespace JSSoft.Crema.ServiceModel
             return this.IsOwner(userID);
         }
 
-        public static readonly LockInfo Empty = new LockInfo()
+        public static readonly LockInfo Empty = new()
         {
             Path = string.Empty,
             ParentPath = string.Empty,

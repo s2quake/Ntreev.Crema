@@ -44,8 +44,8 @@ namespace JSSoft.Crema.Services.Data
         private EventHandler<AuthenticationEventArgs> authenticationLeft;
         private TaskCompletedEventHandler taskCompleted;
 
-        private readonly HashSet<AuthenticationToken> authentications = new HashSet<AuthenticationToken>();
-        private readonly HashSet<AuthenticationToken> authenticationInternals = new HashSet<AuthenticationToken>();
+        private readonly HashSet<AuthenticationToken> authentications = new();
+        private readonly HashSet<AuthenticationToken> authenticationInternals = new();
         private TaskResetEvent<Guid> taskEvent;
         private IndexedDispatcher callbackEvent;
 
@@ -740,10 +740,10 @@ namespace JSSoft.Crema.Services.Data
             // if (result == false)
             //     return;
 
-            await (this.Service?.UnsubscribeAsync() ?? Task.CompletedTask);
+            await (this.Service?.UnsubscribeAsync() ?? Task.Delay(1));
 
             // await Task.Delay(100);
-            await (this.callbackEvent?.DisposeAsync() ?? Task.CompletedTask);
+            await (this.callbackEvent?.DisposeAsync() ?? Task.Delay(1));
             // await (this.Dispatcher?.DisposeAsync() ?? Task.CompletedTask);
             this.Dispatcher = null;
         }

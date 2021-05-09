@@ -39,8 +39,8 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
         private readonly string revision;
 
         private CremaDataSet source;
-        private readonly ObservableCollection<TreeViewItemViewModel> itemsSource = new ObservableCollection<TreeViewItemViewModel>();
-        private readonly PreviewDocumentViewModel documents = new PreviewDocumentViewModel();
+        private readonly ObservableCollection<TreeViewItemViewModel> itemsSource = new();
+        private readonly PreviewDocumentViewModel documents = new();
         private object selectedItem;
 
         public PreviewTypeCategoryViewModel(Authentication authentication, ITypeCategory category, string revision)

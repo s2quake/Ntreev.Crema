@@ -50,7 +50,7 @@ namespace JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels
         private readonly Lazy<JSSoft.Crema.Presentation.Types.IPropertyService> propertyService;
 
         [ImportingConstructor]
-        public TypeSmartSetBrowserViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, [ImportMany] IEnumerable<IRule> rules, 
+        public TypeSmartSetBrowserViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, [ImportMany] IEnumerable<IRule> rules,
             TypeSmartSetContext smartSetContext, Lazy<ITypeBrowser> typeBrowser, Lazy<Types.IPropertyService> propertyService)
             : base(cremaAppHost, rules.Where(item => item.SupportType == typeof(ITypeDescriptor)))
         {

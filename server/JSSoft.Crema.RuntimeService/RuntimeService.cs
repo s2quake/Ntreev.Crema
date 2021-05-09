@@ -41,7 +41,7 @@ namespace JSSoft.Crema.RuntimeService
         public const string ServiceID = "B8CD9F7C-58B8-4BDA-B6AE-B99ED216DA22";
         private readonly ICremaHost cremaHost;
         private readonly IEnumerable<Runtime.Serialization.IDataSerializer> serializers;
-        private readonly Dictionary<Guid, RuntimeServiceItem> items = new Dictionary<Guid, RuntimeServiceItem>();
+        private readonly Dictionary<Guid, RuntimeServiceItem> items = new();
         private Authentication authentication;
 
         [ImportingConstructor]

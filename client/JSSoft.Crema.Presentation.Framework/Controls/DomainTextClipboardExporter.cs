@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
 {
     public class DomainTextClipboardExporter : ModernTextClipboardExporter
     {
-        private readonly StringBuilder sb = new StringBuilder();
+        private readonly StringBuilder sb = new();
         private bool isFistColumn;
         private DataGridContext gridContext;
 

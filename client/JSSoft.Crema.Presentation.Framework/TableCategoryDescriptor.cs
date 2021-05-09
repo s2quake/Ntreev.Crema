@@ -31,8 +31,8 @@ namespace JSSoft.Crema.Presentation.Framework
     public class TableCategoryDescriptor : DescriptorBase, ITableCategoryDescriptor, ITableItemDescriptor, ILockableDescriptor, IPermissionDescriptor, IAccessibleDescriptor
     {
         private readonly object owner;
-        private readonly ObservableCollection<TableCategoryDescriptor> categories = new ObservableCollection<TableCategoryDescriptor>();
-        private readonly ObservableCollection<TableDescriptor> tables = new ObservableCollection<TableDescriptor>();
+        private readonly ObservableCollection<TableCategoryDescriptor> categories = new();
+        private readonly ObservableCollection<TableDescriptor> tables = new();
         private ITableCategory category;
         private string categoryName;
         private string categoryPath;

@@ -34,7 +34,7 @@ namespace JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels
     {
         private readonly ISmartSet smartSet;
         private readonly SmartSetBrowserViewModel browser;
-        private readonly Dictionary<object, TreeViewItemViewModel> items = new Dictionary<object, TreeViewItemViewModel>();
+        private readonly Dictionary<object, TreeViewItemViewModel> items = new();
 
         public SmartSetTreeViewItemViewModel(ISmartSet smartSet, SmartSetBrowserViewModel browser)
         {

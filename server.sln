@@ -102,7 +102,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{922B62F6-AB6
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.WindowsServiceHost", "server\JSSoft.Crema.WindowsServiceHost\JSSoft.Crema.WindowsServiceHost.csproj", "{173044A3-0D09-4251-BFA6-B9B563AB504B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSSoft.Crema.ServerService.Test", "server\JSSoft.Crema.ServerService.Test\JSSoft.Crema.ServerService.Test.csproj", "{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ServerService.Test", "server\JSSoft.Crema.ServerService.Test\JSSoft.Crema.ServerService.Test.csproj", "{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -249,7 +249,6 @@ Global
 		{24C72B7A-46B8-4509-85AC-522643AED406}.Release|Any CPU.Build.0 = Release|Any CPU
 		{173044A3-0D09-4251-BFA6-B9B563AB504B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{173044A3-0D09-4251-BFA6-B9B563AB504B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{173044A3-0D09-4251-BFA6-B9B563AB504B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}.Release|Any CPU.ActiveCfg = Release|Any CPU

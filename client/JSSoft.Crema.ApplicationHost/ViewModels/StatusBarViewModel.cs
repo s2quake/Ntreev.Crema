@@ -32,7 +32,7 @@ namespace JSSoft.Crema.ApplicationHost.ViewModels
     [Export(typeof(IStatusBarService))]
     class StatusBarViewModel : PropertyChangedBase, IStatusBarService
     {
-        private readonly ObservableCollection<BackgroundTaskItemViewModel> taskItemList = new ObservableCollection<BackgroundTaskItemViewModel>();
+        private readonly ObservableCollection<BackgroundTaskItemViewModel> taskItemList = new();
         private readonly ICremaAppHost cremaAppHost;
         private string message;
         private ILineInfo lineInfo;

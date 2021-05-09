@@ -26,9 +26,9 @@ namespace JSSoft.Crema.Spreadsheet
 {
     public class SpreadsheetWriterSettings
     {
-        public static SpreadsheetWriterSettings Default = new SpreadsheetWriterSettings();
+        public static SpreadsheetWriterSettings Default = new();
 
-        private readonly Hashtable properties = new Hashtable();
+        private readonly Hashtable properties = new();
 
         public SpreadsheetWriterSettings()
         {

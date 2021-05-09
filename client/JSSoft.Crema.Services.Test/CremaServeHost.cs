@@ -28,7 +28,7 @@ namespace JSSoft.Crema.Services.Test
     class CremaServeHost
     {
         private const string filename = @"..\..\..\..\bin\Debug\cremaserver\cremaserver.exe";
-        private static readonly StringBuilder sb = new StringBuilder();
+        private static readonly StringBuilder sb = new();
 
         public static int ExitCode
         {

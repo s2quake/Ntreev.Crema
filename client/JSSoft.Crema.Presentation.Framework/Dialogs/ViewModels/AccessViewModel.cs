@@ -43,7 +43,7 @@ namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
         private AccessInfo accessInfo;
         private string comment;
 
-        private readonly ObservableCollection<AccessItemViewModel> itemsSource = new ObservableCollection<AccessItemViewModel>();
+        private readonly ObservableCollection<AccessItemViewModel> itemsSource = new();
         private AccessType accessType;
         private string path;
 

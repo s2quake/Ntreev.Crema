@@ -45,7 +45,7 @@ namespace JSSoft.Crema.Services.Users
         private ItemsEventHandler<IUserItem> itemsChanged;
         private TaskCompletedEventHandler taskCompleted;
 
-        private readonly Dictionary<string, Authentication> customAuthentications = new Dictionary<string, Authentication>();
+        private readonly Dictionary<string, Authentication> customAuthentications = new();
         private readonly TaskResetEvent<Guid> taskEvent;
         private readonly IndexedDispatcher callbackEvent;
 

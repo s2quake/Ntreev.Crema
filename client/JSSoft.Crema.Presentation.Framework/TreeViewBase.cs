@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Presentation.Framework
     public abstract class TreeViewBase : TreeViewViewModel
     {
         private const int defaultDelay = 100;
-        private readonly List<IPropertyService> propertyServiceList = new List<IPropertyService>();
+        private readonly List<IPropertyService> propertyServiceList = new();
         private readonly int delay = defaultDelay;
         private Task selectPropertyTask;
 

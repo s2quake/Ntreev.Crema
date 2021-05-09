@@ -22,10 +22,8 @@
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
 using JSSoft.Library.ObjectModel;
-using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel.Composition;
 using System.Linq;
 
 namespace JSSoft.Crema.Presentation.Framework
@@ -34,7 +32,7 @@ namespace JSSoft.Crema.Presentation.Framework
     {
         private IDomain domain;
         private readonly object owner;
-        private readonly ObservableCollection<DomainUserDescriptor> domainUsers = new ObservableCollection<DomainUserDescriptor>();
+        private readonly ObservableCollection<DomainUserDescriptor> domainUsers = new();
         private readonly ReadOnlyObservableCollection<DomainUserDescriptor> domainUsersReadonly;
 
         private DomainInfo domainInfo;

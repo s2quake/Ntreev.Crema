@@ -32,9 +32,9 @@ namespace JSSoft.Crema.Presentation.Framework
     {
         private ITypeCategory category;
         private readonly object owner;
-        private readonly ObservableCollection<TypeCategoryDescriptor> categories = new ObservableCollection<TypeCategoryDescriptor>();
+        private readonly ObservableCollection<TypeCategoryDescriptor> categories = new();
         private readonly ReadOnlyObservableCollection<TypeCategoryDescriptor> categoriesReadonly;
-        private readonly ObservableCollection<TypeDescriptor> types = new ObservableCollection<TypeDescriptor>();
+        private readonly ObservableCollection<TypeDescriptor> types = new();
         private readonly ReadOnlyObservableCollection<TypeDescriptor> typesReadonly;
 
         private string categoryName;

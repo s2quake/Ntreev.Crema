@@ -39,6 +39,6 @@ namespace JSSoft.Crema.ServiceModel
         [DataMember]
         public string Message { get; set; }
 
-        public readonly static RemoveInfo Empty = new RemoveInfo();
+        public readonly static RemoveInfo Empty = new();
     }
 }

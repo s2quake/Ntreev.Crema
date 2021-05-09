@@ -25,6 +25,6 @@ namespace JSSoft.Crema.Presentation.Controls
 {
     public static class DiffScrollBarCommands
     {
-        public static readonly RoutedCommand ScrollToPoint = new RoutedCommand(nameof(ScrollToPoint), typeof(DiffScrollBarCommands));
+        public static readonly RoutedCommand ScrollToPoint = new(nameof(ScrollToPoint), typeof(DiffScrollBarCommands));
     }
 }

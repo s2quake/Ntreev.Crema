@@ -59,7 +59,7 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
         public static readonly DependencyProperty IsClientAloneProperty =
             DependencyProperty.Register(nameof(IsClientAlone), typeof(bool), typeof(DomainDataCell));
 
-        private readonly DomainDataUserCollection users = new DomainDataUserCollection();
+        private readonly DomainDataUserCollection users = new();
 
         private DomainDataRow parentRow;
 

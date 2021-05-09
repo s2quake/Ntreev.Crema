@@ -37,7 +37,7 @@ namespace JSSoft.Crema.Presentation.Types.Documents.ViewModels
         private string findingText;
         private string[] findingTargets;
         private string findingTarget;
-        private readonly ObservableCollection<FindResultItemViewModel> itemsSource = new ObservableCollection<FindResultItemViewModel>();
+        private readonly ObservableCollection<FindResultItemViewModel> itemsSource = new();
         private FindResultItemViewModel selectedItem;
 
         [Import]

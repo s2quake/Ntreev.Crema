@@ -37,7 +37,7 @@ namespace JSSoft.Crema.Presentation.Users.PropertyItems.ViewModels
     [ParentType("JSSoft.Crema.Presentation.Home.IPropertyService, JSSoft.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class DomainsViewModel : PropertyItemBase
     {
-        private readonly ObservableCollection<DomainTreeItemBase> domains = new ObservableCollection<DomainTreeItemBase>();
+        private readonly ObservableCollection<DomainTreeItemBase> domains = new();
         private readonly ICremaAppHost cremaAppHost;
         private readonly Authenticator authenticator;
         private DomainTreeItemBase selectedDomain;

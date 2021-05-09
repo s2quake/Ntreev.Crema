@@ -36,7 +36,7 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly ITableRow row;
         private readonly ITableContent parentContent;
         private readonly TableInfo tableInfo;
-        private readonly ContentToStringConverter converter = new ContentToStringConverter();
+        private readonly ContentToStringConverter converter = new();
         private readonly List<RowItemByKey> itemList;
         private RowItemByKey value;
 

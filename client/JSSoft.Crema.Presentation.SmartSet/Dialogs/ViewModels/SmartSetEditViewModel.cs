@@ -34,7 +34,7 @@ namespace JSSoft.Crema.Presentation.SmartSet.Dialogs.ViewModels
     class SmartSetEditViewModel : ModalDialogBase
     {
         private readonly IEnumerable<IRule> rules;
-        private readonly ObservableCollection<RuleListItemViewModel> itemsSource = new ObservableCollection<RuleListItemViewModel>();
+        private readonly ObservableCollection<RuleListItemViewModel> itemsSource = new();
 
         private string smartSetName;
         private IRuleItem[] ruleItems;

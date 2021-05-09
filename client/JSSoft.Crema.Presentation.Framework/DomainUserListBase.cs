@@ -23,14 +23,13 @@ using JSSoft.Crema.Services;
 using JSSoft.ModernUI.Framework;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel.Composition;
 using System.Linq;
 
 namespace JSSoft.Crema.Presentation.Framework
 {
     public class DomainUserListBase : PropertyChangedBase
     {
-        private readonly ObservableCollection<DomainUserListItemBase> users = new ObservableCollection<DomainUserListItemBase>();
+        private readonly ObservableCollection<DomainUserListItemBase> users = new();
         private readonly ReadOnlyObservableCollection<DomainUserListItemBase> usersReadOnly;
         private readonly Authentication authentication;
         private readonly DomainDescriptor descriptor;

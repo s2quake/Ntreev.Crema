@@ -19,16 +19,16 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Crema.ServiceModel;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using JSSoft.Crema.ServiceModel;
 
 namespace JSSoft.Crema.Services
 {
     public class CloseRequestedEventArgs : EventArgs
     {
-        private readonly List<Task> taskList = new List<Task>();
+        private readonly List<Task> taskList = new();
 
         public CloseRequestedEventArgs(CloseReason closeReason)
         {

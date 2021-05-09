@@ -36,7 +36,7 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly ITableRow row;
         private readonly TableInfo tableInfo;
         private readonly Dictionary<string, TypeInfo> typeInfoByName;
-        private readonly List<object> items = new List<object>();
+        private readonly List<object> items = new();
         private readonly ITableContent parentContent;
         private object[] keys;
 

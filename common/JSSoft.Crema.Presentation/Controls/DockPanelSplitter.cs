@@ -312,7 +312,7 @@ namespace JSSoft.Crema.Presentation.Controls
             if (IsMouseCaptured)
             {
                 Point ptCurrent = e.GetPosition(Parent as IInputElement);
-                Point delta = new Point(ptCurrent.X - StartDragPoint.X, ptCurrent.Y - StartDragPoint.Y);
+                var delta = new Point(ptCurrent.X - StartDragPoint.X, ptCurrent.Y - StartDragPoint.Y);
                 Dock dock = DockPanel.GetDock(this);
 
                 if (IsHorizontal)

@@ -33,7 +33,7 @@ namespace JSSoft.Crema.Presentation.Framework
     {
         private readonly object target;
         private readonly Action<string> notifyAction;
-        private readonly List<string> notifyList = new List<string>();
+        private readonly List<string> notifyList = new();
         private Dictionary<string, object> properties;
         private Task refreshTask;
         private bool isDisposed;

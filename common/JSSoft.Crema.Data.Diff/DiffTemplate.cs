@@ -42,13 +42,13 @@ namespace JSSoft.Crema.Data.Diff
         private readonly DiffMergeTypes mergeType;
         private readonly bool dummy1;
         private readonly bool dummy2;
-        private readonly List<DiffTemplateColumn> itemList = new List<DiffTemplateColumn>();
+        private readonly List<DiffTemplateColumn> itemList = new();
         private DiffState diffState;
         private bool isResolved;
         private string header1;
         private string header2;
-        private readonly ObservableCollection<object> unresolvedItemList = new ObservableCollection<object>();
-        private readonly HashSet<object> itemSet = new HashSet<object>();
+        private readonly ObservableCollection<object> unresolvedItemList = new();
+        private readonly HashSet<object> itemSet = new();
 
         [Obsolete]
         public DiffTemplate(CremaDataTable table1, CremaDataTable table2, DiffMergeTypes mergeType)

@@ -19,8 +19,6 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using System;
-
 namespace JSSoft.Crema.Services
 {
     public enum ServiceState

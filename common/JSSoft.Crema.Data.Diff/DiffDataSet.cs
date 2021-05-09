@@ -39,7 +39,7 @@ namespace JSSoft.Crema.Data.Diff
         private readonly DiffMergeTypes mergeType;
         private DiffDataType[] types;
         private DiffDataTable[] tables;
-        private readonly DiffDataResolver resolver = new DiffDataResolver();
+        private readonly DiffDataResolver resolver = new();
         private string header1;
         private string header2;
 

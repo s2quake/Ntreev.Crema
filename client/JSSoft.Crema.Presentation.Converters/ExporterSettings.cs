@@ -26,7 +26,7 @@ namespace JSSoft.Crema.Presentation.Converters
 {
     public class ExporterSettings : PropertyChangedBase
     {
-        public readonly static ExporterSettings Default = new ExporterSettings();
+        public readonly static ExporterSettings Default = new();
 
         private bool omitAttribute;
         private bool omitSignatureDate;

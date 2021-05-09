@@ -81,7 +81,7 @@ namespace JSSoft.Crema.Presentation.Types.BrowserItems.Views
                     break;
                 case Key.Up:
                     {
-                        if (this.treeView.ItemContainerGenerator.ContainerFromIndex(0) is TreeViewItem item && 
+                        if (this.treeView.ItemContainerGenerator.ContainerFromIndex(0) is TreeViewItem item &&
                             item.IsSelected == true && item.IsFocused == true)
                         {
                             this.FilterBox.Focus();

@@ -32,7 +32,7 @@ namespace JSSoft.Crema.Presentation.Tables.Documents.Views
     /// </summary>
     public partial class TableViewerView : UserControl, IDisposable
     {
-        private readonly List<IDisposable> childViewList = new List<IDisposable>();
+        private readonly List<IDisposable> childViewList = new();
         //[Import]
         //private ICremaHost cremaHost = null;
 

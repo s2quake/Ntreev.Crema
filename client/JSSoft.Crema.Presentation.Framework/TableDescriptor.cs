@@ -35,7 +35,7 @@ namespace JSSoft.Crema.Presentation.Framework
     {
         private ITable table;
         private readonly object owner;
-        private readonly ObservableCollection<TableDescriptor> childs = new ObservableCollection<TableDescriptor>();
+        private readonly ObservableCollection<TableDescriptor> childs = new();
 
         public TableDescriptor(Authentication authentication, ITableDescriptor descriptor)
             : this(authentication, descriptor, false)

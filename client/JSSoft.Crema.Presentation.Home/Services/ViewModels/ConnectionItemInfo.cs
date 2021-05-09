@@ -57,7 +57,7 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
         [XmlElement]
         public DateTime LastConnectedDateTime { get; set; }
 
-        public static readonly ConnectionItemInfo Empty = new ConnectionItemInfo()
+        public static readonly ConnectionItemInfo Empty = new()
         {
             ThemeColor = FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor,
         };

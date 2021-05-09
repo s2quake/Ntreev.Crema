@@ -43,7 +43,7 @@ namespace JSSoft.Crema.ServiceModel
         [DataMember]
         public AccessInfo AccessInfo { get; set; }
 
-        public static readonly TypeMetaData Empty = new TypeMetaData()
+        public static readonly TypeMetaData Empty = new()
         {
             Path = string.Empty,
             TypeInfo = TypeInfo.Empty,

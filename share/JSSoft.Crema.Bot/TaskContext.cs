@@ -29,7 +29,7 @@ namespace JSSoft.Crema.Bot
 {
     public sealed class TaskContext
     {
-        private readonly Stack<TaskItem> stacks = new Stack<TaskItem>();
+        private readonly Stack<TaskItem> stacks = new();
 
         internal TaskContext()
         {

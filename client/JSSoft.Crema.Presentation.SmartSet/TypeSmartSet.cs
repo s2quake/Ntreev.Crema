@@ -36,7 +36,7 @@ namespace JSSoft.Crema.Presentation.SmartSet
         IXmlSerializable, ISmartSet
     {
         private IRuleItem[] ruleItems = new IRuleItem[] { };
-        private readonly ObservableCollection<ITypeDescriptor> items = new ObservableCollection<ITypeDescriptor>();
+        private readonly ObservableCollection<ITypeDescriptor> items = new();
 
         public TypeSmartSet()
         {

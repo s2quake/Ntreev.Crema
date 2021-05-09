@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Presentation.SmartSet.Dialogs.ViewModels
     class RuleListItemViewModel : PropertyChangedBase
     {
         private readonly ObservableCollection<RuleListItemViewModel> itemsSource;
-        private readonly Dictionary<IRule, IRuleItem> ruleToItem = new Dictionary<IRule, IRuleItem>();
+        private readonly Dictionary<IRule, IRuleItem> ruleToItem = new();
         private IRule rule;
 
         public RuleListItemViewModel(ObservableCollection<RuleListItemViewModel> ruleItems, IEnumerable<IRule> rules, IRuleItem ruleItem)

@@ -39,7 +39,7 @@ namespace JSSoft.Crema.Presentation.Tables.Documents.ViewModels
     {
         private readonly Authentication authentication;
         private readonly TableBrowserViewModel browser = null;
-        private readonly ObservableCollection<FindResultItemViewModel> items = new ObservableCollection<FindResultItemViewModel>();
+        private readonly ObservableCollection<FindResultItemViewModel> items = new();
         private FindResultItemViewModel selectedItem;
         private string findingText;
         private string findingTarget;

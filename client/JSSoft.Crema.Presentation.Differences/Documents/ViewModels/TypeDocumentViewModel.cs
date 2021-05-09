@@ -31,7 +31,7 @@ namespace JSSoft.Crema.Presentation.Differences.Documents.ViewModels
     class TypeDocumentViewModel : DifferenceDocumentBase
     {
         private readonly TypeTreeViewItemViewModel viewModel;
-        private readonly UndoService undoService = new UndoService();
+        private readonly UndoService undoService = new();
 
         public TypeDocumentViewModel(TypeTreeViewItemViewModel viewModel)
             : base(viewModel)

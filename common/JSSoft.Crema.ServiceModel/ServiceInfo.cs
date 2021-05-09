@@ -45,7 +45,7 @@ namespace JSSoft.Crema.ServiceModel
         [DataMember]
         public ServiceItemInfo[] ServiceItems { get; set; }
 
-        public readonly static ServiceInfo Empty = new ServiceInfo()
+        public readonly static ServiceInfo Empty = new()
         {
             PlatformID = string.Empty,
             Version = string.Empty,

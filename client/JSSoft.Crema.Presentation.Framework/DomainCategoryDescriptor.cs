@@ -31,9 +31,9 @@ namespace JSSoft.Crema.Presentation.Framework
     {
         private readonly IDomainCategory category;
         private readonly object owner;
-        private readonly ObservableCollection<DomainCategoryDescriptor> categories = new ObservableCollection<DomainCategoryDescriptor>();
+        private readonly ObservableCollection<DomainCategoryDescriptor> categories = new();
         private readonly ReadOnlyObservableCollection<DomainCategoryDescriptor> categoriesReadonly;
-        private readonly ObservableCollection<DomainDescriptor> domains = new ObservableCollection<DomainDescriptor>();
+        private readonly ObservableCollection<DomainDescriptor> domains = new();
         private readonly ReadOnlyObservableCollection<DomainDescriptor> domainsReadonly;
 
         private string categoryName;

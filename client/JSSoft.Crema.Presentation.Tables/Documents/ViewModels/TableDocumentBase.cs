@@ -25,13 +25,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel.Composition;
 
 namespace JSSoft.Crema.Presentation.Tables.Documents.ViewModels
 {
     abstract class TableDocumentBase : DocumentBase, ITableDocument
     {
-        private readonly ObservableCollection<TableItemViewModel> tables = new ObservableCollection<TableItemViewModel>();
+        private readonly ObservableCollection<TableItemViewModel> tables = new();
         private TableItemViewModel selectedTable;
 
         protected TableDocumentBase()
