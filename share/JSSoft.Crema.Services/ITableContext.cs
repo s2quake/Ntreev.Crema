@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 namespace JSSoft.Crema.Services
 {
-    public interface ITableContext : IEnumerable<ITableItem>, IServiceProvider
+    public interface ITableContext : IEnumerable<ITableItem>, IServiceProvider, IDispatcherObject
     {
         bool Contains(string itemPath);
 

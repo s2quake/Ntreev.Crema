@@ -20,4 +20,18 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 Forked from https://github.com/NtreevSoft/Crema
 Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
 <Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.1.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.1.0" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.ServiceModel\JSSoft.Crema.ServiceModel.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Services\JSSoft.Crema.Services.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Services.Random\JSSoft.Crema.Services.Random.csproj" />
+    <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj" />
+    <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library.Random\JSSoft.Library.Random.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.ObjectSerializer.Json\JSSoft.Crema.ObjectSerializer.Json.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.ObjectSerializer.Yaml\JSSoft.Crema.ObjectSerializer.Yaml.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Repository.Git\JSSoft.Crema.Repository.Git.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Repository.Svn\JSSoft.Crema.Repository.Svn.csproj" />
+  </ItemGroup>
 </Project>

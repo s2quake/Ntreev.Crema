@@ -23,13 +23,16 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Linq;
-using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
 using JSSoft.Library.Random;
 using System.Collections.Generic;
 using JSSoft.Library;
 using JSSoft.Library.IO;
 using JSSoft.Library.Linq;
 using JSSoft.Library.ObjectModel;
+using JSSoft.Crema.ServiceModel;
+using System.Threading.Tasks;
+using JSSoft.Crema.Services.Random;
 
 namespace JSSoft.Crema.ServerService.Test
 {
@@ -93,188 +96,188 @@ namespace JSSoft.Crema.ServerService.Test
         }
 
         [TestMethod]
-        public void TableFailTest()
+        public async Task TableFailTestAsaync()
         {
             var tableContext = this.dataBase.TableContext;
             var table = tableContext.Tables.RandomSample();
             var child = table.Childs.Random();
             var category = EnumerableUtility.Ancestors(table as IItem).Random(item => item.Parent != null) as ITableCategory;
 
-            this.InvokeFail<PermissionException>(() => table.SetPublic(this.guest));
-            this.InvokeFail<PermissionDeniedException>(() => table.SetPrivate(this.guest));
-            this.InvokeFail<PermissionException>(() => table.AddAccessMember(this.guest, this.someone.UserID, AccessType.ReadWrite));
-            this.InvokeFail<PermissionException>(() => table.RemoveAccessMember(this.guest, this.someone.UserID));
-            this.InvokeFail<PermissionException>(() => table.Lock(this.guest, RandomUtility.NextString()));
-            this.InvokeFail<PermissionException>(() => table.Unlock(this.guest));
-            this.InvokeFail<PermissionDeniedException>(() => table.RenameTest(this.guest));
-            this.InvokeFail<PermissionDeniedException>(() => table.MoveTest(this.guest));
-            this.InvokeFail<PermissionDeniedException>(() => table.Delete(this.guest));
-            this.InvokeFail<PermissionDeniedException>(() => table.NewTable(this.guest));
-            this.InvokeFail<PermissionDeniedException>(() => table.Revert(this.guest, 0));
+            await this.InvokeFailAsync<PermissionException>(table.SetPublicAsync(this.guest));
+            await this.InvokeFailAsync<PermissionDeniedException>(table.SetPrivateAsync(this.guest));
+            await this.InvokeFailAsync<PermissionException>(table.AddAccessMemberAsync(this.guest, this.someone.UserID, AccessType.ReadWrite));
+            await this.InvokeFailAsync<PermissionException>(table.RemoveAccessMemberAsync(this.guest, this.someone.UserID));
+            await this.InvokeFailAsync<PermissionException>(table.LockAsync(this.guest, RandomUtility.NextString()));
+            await this.InvokeFailAsync<PermissionException>(table.UnlockAsync(this.guest));
+            await this.InvokeFailAsync<PermissionDeniedException>(table.RenameTestAsync(this.guest));
+            await this.InvokeFailAsync<PermissionDeniedException>(table.MoveTestAsync(this.guest));
+            await this.InvokeFailAsync<PermissionDeniedException>(table.DeleteAsync(this.guest));
+            await this.InvokeFailAsync<PermissionDeniedException>(table.NewTableAsync(this.guest));
+            await this.InvokeFailAsync<PermissionDeniedException>(table.RevertAsync(this.guest, 0));
 
-            this.InvokeFail<CremaException>(() => category.SetPublic(this.guest));
-            this.InvokeFail<CremaException>(() => category.SetPrivate(this.guest));
-            this.InvokeFail<CremaException>(() => category.AddAccessMember(this.guest, this.someone.UserID, AccessType.ReadWrite));
-            this.InvokeFail<CremaException>(() => category.RemoveAccessMember(this.guest, this.someone.UserID));
-            this.InvokeFail<CremaException>(() => category.Lock(this.guest, RandomUtility.NextString()));
-            this.InvokeFail<CremaException>(() => category.Unlock(this.guest));
-            this.InvokeFail<CremaException>(() => category.RenameTest(this.guest));
-            this.InvokeFail<CremaException>(() => category.MoveTest(this.guest));
-            this.InvokeFail<CremaException>(() => category.Delete(this.guest));
+            await this.InvokeFailAsync<CremaException>(category.SetPublicAsync(this.guest));
+            await this.InvokeFailAsync<CremaException>(category.SetPrivateAsync(this.guest));
+            await this.InvokeFailAsync<CremaException>(category.AddAccessMemberAsync(this.guest, this.someone.UserID, AccessType.ReadWrite));
+            await this.InvokeFailAsync<CremaException>(category.RemoveAccessMemberAsync(this.guest, this.someone.UserID));
+            await this.InvokeFailAsync<CremaException>(category.LockAsync(this.guest, RandomUtility.NextString()));
+            await this.InvokeFailAsync<CremaException>(category.UnlockAsync(this.guest));
+            await this.InvokeFailAsync<CremaException>(category.RenameTestAsync(this.guest));
+            await this.InvokeFailAsync<CremaException>(category.MoveTestAsync(this.guest));
+            await this.InvokeFailAsync<CremaException>(category.DeleteAsync(this.guest));
 
-            this.InvokeFail<PermissionException>(() => child.SetPublic(this.guest));
-            this.InvokeFail<PermissionDeniedException>(() => child.SetPrivate(this.guest));
-            this.InvokeFail<PermissionException>(() => child.AddAccessMember(this.guest, this.someone.UserID, AccessType.ReadWrite));
-            this.InvokeFail<PermissionException>(() => child.RemoveAccessMember(this.guest, this.someone.UserID));
-            this.InvokeFail<PermissionException>(() => child.Lock(this.guest, RandomUtility.NextString()));
-            this.InvokeFail<PermissionException>(() => child.Unlock(this.guest));
-            this.InvokeFail<PermissionDeniedException>(() => child.RenameTest(this.guest));
-            this.InvokeFail<PermissionDeniedException>(() => child.MoveTest(this.guest));
-            this.InvokeFail<PermissionDeniedException>(() => child.Delete(this.guest));
+            await this.InvokeFailAsync<PermissionException>(child.SetPublicAsync(this.guest));
+            await this.InvokeFailAsync<PermissionDeniedException>(child.SetPrivateAsync(this.guest));
+            await this.InvokeFailAsync<PermissionException>(child.AddAccessMemberAsync(this.guest, this.someone.UserID, AccessType.ReadWrite));
+            await this.InvokeFailAsync<PermissionException>(child.RemoveAccessMemberAsync(this.guest, this.someone.UserID));
+            await this.InvokeFailAsync<PermissionException>(child.LockAsync(this.guest, RandomUtility.NextString()));
+            await this.InvokeFailAsync<PermissionException>(child.UnlockAsync(this.guest));
+            await this.InvokeFailAsync<PermissionDeniedException>(child.RenameTestAsync(this.guest));
+            await this.InvokeFailAsync<PermissionDeniedException>(child.MoveTestAsync(this.guest));
+            await this.InvokeFailAsync<PermissionDeniedException>(child.DeleteAsync(this.guest));
         }
 
         [TestMethod]
-        public void LockedTableFailTest()
+        public async Task LockedTableFailTestAsync()
         {
             var tableContext = this.dataBase.TableContext;
             var table = tableContext.Tables.RandomSample();
             var child = table.Childs.Random();
             var category = EnumerableUtility.Ancestors(table as IItem).Random(item => item.Parent != null) as ITableCategory;
 
-            table.Lock(this.admin, string.Empty);
+            await table.LockAsync(this.admin, string.Empty);
 
             try
             {
-                this.InvokeFail<PermissionException>(() => table.SetPublic(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.SetPrivate(this.member));
-                this.InvokeFail<PermissionException>(() => table.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionException>(() => table.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionException>(() => table.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionDeniedException>(() => table.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.Delete(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.NewTable(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.Revert(this.member, 0));
+                await this.InvokeFailAsync<PermissionException>(table.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(table.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionException>(table.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionException>(table.LockAsync(this.member, RandomUtility.NextString()));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.DeleteAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.NewTableAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.RevertAsync(this.member, 0));
 
-                this.InvokeFail<CremaException>(() => category.SetPublic(this.member));
-                this.InvokeFail<CremaException>(() => category.SetPrivate(this.member));
-                this.InvokeFail<CremaException>(() => category.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<CremaException>(() => category.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<CremaException>(() => category.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<CremaException>(() => category.Unlock(this.member));
-                this.InvokeFail<CremaException>(() => category.RenameTest(this.member));
-                this.InvokeFail<CremaException>(() => category.MoveTest(this.member));
-                this.InvokeFail<CremaException>(() => category.Delete(this.member));
+                await this.InvokeFailAsync<CremaException>(category.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<CremaException>(category.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<CremaException>(category.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<CremaException>(category.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<CremaException>(category.LockAsync(this.member, RandomUtility.NextString()));
+                await this.InvokeFailAsync<CremaException>(category.UnlockAsync(this.member));
+                await this.InvokeFailAsync<CremaException>(category.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<CremaException>(category.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<CremaException>(category.DeleteAsync(this.member));
 
-                this.InvokeFail<PermissionException>(() => child.SetPublic(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => child.SetPrivate(this.member));
-                this.InvokeFail<PermissionException>(() => child.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionException>(() => child.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionException>(() => child.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionException>(() => child.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => child.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => child.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => child.Delete(this.member));
+                await this.InvokeFailAsync<PermissionException>(child.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(child.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionException>(child.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionException>(child.LockAsync(this.member, RandomUtility.NextString()));
+                await this.InvokeFailAsync<PermissionException>(child.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.DeleteAsync(this.member));
             }
             finally
             {
-                table.Unlock(this.admin);
+                await table.UnlockAsync(this.admin);
             }
         }
 
         [TestMethod]
-        public void PrivateTableFailTest()
+        public async Task PrivateTableFailTestAsync()
         {
             var tableContext = this.dataBase.TableContext;
             var table = tableContext.Tables.RandomSample();
             var child = table.Childs.Random();
             var category = EnumerableUtility.Ancestors(table as IItem).Random(item => item.Parent != null) as ITableCategory;
 
-            table.SetPrivate(this.admin);
+            await table.SetPrivateAsync(this.admin);
 
             try
             {
-                this.InvokeFail<PermissionDeniedException>(() => table.SetPublic(this.member));
-                this.InvokeFail<PermissionException>(() => table.SetPrivate(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionDeniedException>(() => table.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionDeniedException>(() => table.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionException>(() => table.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.Delete(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.NewTable(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(table.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.LockAsync(this.member, RandomUtility.NextString()));
+                await this.InvokeFailAsync<PermissionException>(table.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.DeleteAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.NewTableAsync(this.member));
 
-                //this.InvokeFail<CremaException>(() => category.SetPublic(this.member));
-                //this.InvokeFail<CremaException>(() => category.SetPrivate(this.member));
-                //this.InvokeFail<CremaException>(() => category.AddAccessMember(this.member, this.someone.UserID, ItemAccess.ReadWrite));
-                //this.InvokeFail<CremaException>(() => category.RemoveAccessMember(this.member, this.someone.UserID));
-                //this.InvokeFail<CremaException>(() => category.Lock(this.member, RandomUtility.NextString()));
-                //this.InvokeFail<CremaException>(() => category.Unlock(this.member));
-                //this.InvokeFail<CremaException>(() => category.RenameTest(this.member));
-                //this.InvokeFail<CremaException>(() => category.MoveTest(this.member));
-                //this.InvokeFail<CremaException>(() => category.Delete(this.member));
+                //await this.InvokeFailAsync<CremaException>(category.SetPublicAsync(this.member));
+                //await this.InvokeFailAsync<CremaException>(category.SetPrivateAsync(this.member));
+                //await this.InvokeFailAsync<CremaException>(category.AddAccessMemberAsync(this.member, this.someone.UserID, ItemAccess.ReadWrite));
+                //await this.InvokeFailAsync<CremaException>(category.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                //await this.InvokeFailAsync<CremaException>(category.Lock(this.member, RandomUtility.NextStringAsync()));
+                //await this.InvokeFailAsync<CremaException>(category.UnlockAsync(this.member));
+                //await this.InvokeFailAsync<CremaException>(category.RenameTestAsync(this.member));
+                //await this.InvokeFailAsync<CremaException>(category.MoveTestAsync(this.member));
+                //await this.InvokeFailAsync<CremaException>(category.DeleteAsync(this.member));
 
-                //this.InvokeFail<PermissionException>(() => child.SetPublic(this.member));
-                //this.InvokeFail<PermissionDeniedException>(() => child.SetPrivate(this.member));
-                //this.InvokeFail<PermissionException>(() => child.AddAccessMember(this.member, this.someone.UserID, ItemAccess.ReadWrite));
-                //this.InvokeFail<PermissionException>(() => child.RemoveAccessMember(this.member, this.someone.UserID));
-                //this.InvokeFail<PermissionException>(() => child.Lock(this.member, RandomUtility.NextString()));
-                //this.InvokeFail<PermissionException>(() => child.Unlock(this.member));
-                //this.InvokeFail<PermissionDeniedException>(() => child.RenameTest(this.member));
-                //this.InvokeFail<PermissionDeniedException>(() => child.MoveTest(this.member));
-                //this.InvokeFail<PermissionDeniedException>(() => child.Delete(this.member));
+                //await this.InvokeFailAsync<PermissionException>(child.SetPublicAsync(this.member));
+                //await this.InvokeFailAsync<PermissionDeniedException>(child.SetPrivateAsync(this.member));
+                //await this.InvokeFailAsync<PermissionException>(child.AddAccessMemberAsync(this.member, this.someone.UserID, ItemAccess.ReadWrite));
+                //await this.InvokeFailAsync<PermissionException>(child.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                //await this.InvokeFailAsync<PermissionException>(child.Lock(this.member, RandomUtility.NextStringAsync()));
+                //await this.InvokeFailAsync<PermissionException>(child.UnlockAsync(this.member));
+                //await this.InvokeFailAsync<PermissionDeniedException>(child.RenameTestAsync(this.member));
+                //await this.InvokeFailAsync<PermissionDeniedException>(child.MoveTestAsync(this.member));
+                //await this.InvokeFailAsync<PermissionDeniedException>(child.DeleteAsync(this.member));
             }
             finally
             {
-                table.SetPublic(this.admin);
+                await table.SetPublicAsync(this.admin);
             }
         }
 
         [TestMethod]
-        public void LockedTableCategoryFailTest()
+        public async Task LockedTableCategoryFailTestAsync()
         {
             var tableContext = this.dataBase.TableContext;
             var category = tableContext.Categories.RandomSample();
             var table = category.Tables.Random(item => item.TemplatedParent == null && item.Childs.Any());
             var child = table.Childs.Random();
 
-            category.Lock(this.admin, string.Empty);
+            await category.LockAsync(this.admin, string.Empty);
 
             try
             {
-                this.InvokeFail<PermissionException>(() => category.SetPublic(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.SetPrivate(this.member));
-                this.InvokeFail<PermissionException>(() => category.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionException>(() => category.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionException>(() => category.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionDeniedException>(() => category.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.Delete(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.AddNewCategory(this.member));
+                await this.InvokeFailAsync<PermissionException>(category.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(category.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionException>(category.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionException>(category.LockAsync(this.member, RandomUtility.NextString()));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.DeleteAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.AddNewCategoryAsync(this.member));
 
-                this.InvokeFail<PermissionException>(() => table.SetPublic(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.SetPrivate(this.member));
-                this.InvokeFail<PermissionException>(() => table.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionException>(() => table.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionDeniedException>(() => table.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionException>(() => table.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.Delete(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.NewTable(this.member));
+                await this.InvokeFailAsync<PermissionException>(table.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(table.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionException>(table.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.LockAsync(this.member, RandomUtility.NextString()));
+                await this.InvokeFailAsync<PermissionException>(table.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.DeleteAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.NewTableAsync(this.member));
 
-                this.InvokeFail<PermissionException>(() => child.SetPublic(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => child.SetPrivate(this.member));
-                this.InvokeFail<PermissionException>(() => child.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionException>(() => child.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionDeniedException>(() => child.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionException>(() => child.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => child.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => child.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => child.Delete(this.member));
+                await this.InvokeFailAsync<PermissionException>(child.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(child.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionException>(child.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.LockAsync(this.member, RandomUtility.NextString()));
+                await this.InvokeFailAsync<PermissionException>(child.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.DeleteAsync(this.member));
             }
             finally
             {
@@ -283,48 +286,48 @@ namespace JSSoft.Crema.ServerService.Test
         }
 
         [TestMethod]
-        public void PrivateTableCategoryFailTest()
+        public async Task PrivateTableCategoryFailTestAsync()
         {
             var tableContext = this.dataBase.TableContext;
             var category = tableContext.Categories.RandomSample();
             var table = category.Tables.Random(item => item.TemplatedParent == null && item.Childs.Any());
             var child = table.Childs.Random();
 
-            category.SetPrivate(this.admin);
+            await category.SetPrivateAsync(this.admin);
 
             try
             {
-                this.InvokeFail<PermissionDeniedException>(() => category.SetPublic(this.member));
-                this.InvokeFail<PermissionException>(() => category.SetPrivate(this.member));
-                this.InvokeFail<PermissionException>(() => category.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionException>(() => category.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionDeniedException>(() => category.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionException>(() => category.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.Delete(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.AddNewCategory(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(category.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(category.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionException>(category.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.LockAsync(this.member, RandomUtility.NextString()));
+                await this.InvokeFailAsync<PermissionException>(category.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.DeleteAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.AddNewCategoryAsync(this.member));
 
-                this.InvokeFail<PermissionException>(() => table.SetPublic(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.SetPrivate(this.member));
-                this.InvokeFail<PermissionException>(() => table.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionException>(() => table.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionDeniedException>(() => table.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionException>(() => table.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.Delete(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => table.NewTable(this.member));
+                await this.InvokeFailAsync<PermissionException>(table.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(table.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionException>(table.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.LockAsync(this.member, RandomUtility.NextString()));
+                await this.InvokeFailAsync<PermissionException>(table.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.DeleteAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(table.NewTableAsync(this.member));
 
-                this.InvokeFail<PermissionException>(() => child.SetPublic(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => child.SetPrivate(this.member));
-                this.InvokeFail<PermissionException>(() => child.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionException>(() => child.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionDeniedException>(() => child.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionException>(() => child.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => child.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => child.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => child.Delete(this.member));
+                await this.InvokeFailAsync<PermissionException>(child.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(child.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionException>(child.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.Lock(this.member, RandomUtility.NextStringAsync()));
+                await this.InvokeFailAsync<PermissionException>(child.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(child.DeleteAsync(this.member));
             }
             finally
             {
@@ -333,39 +336,39 @@ namespace JSSoft.Crema.ServerService.Test
         }
 
         [TestMethod]
-        public void LockedTypeFailTest()
+        public async Task LockedTypeFailTestAsync()
         {
             var typeContext = this.dataBase.TypeContext;
             var type = typeContext.Types.RandomSample();
             var category = EnumerableUtility.Ancestors(type as IItem).Random(item => item.Parent != null) as ITypeCategory;
 
-            type.Lock(this.admin, string.Empty);
+            await type.LockAsync(this.admin, string.Empty);
 
             try
             {
-                this.InvokeFail<PermissionException>(() => type.SetPublic(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.SetPrivate(this.member));
-                this.InvokeFail<PermissionException>(() => type.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionException>(() => type.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionException>(() => type.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionDeniedException>(() => type.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.Delete(this.member));
+                await this.InvokeFailAsync<PermissionException>(type.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(type.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionException>(type.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionException>(type.LockAsync(this.member, RandomUtility.NextString()));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.DeleteAsync(this.member));
 
-                this.InvokeFail<CremaException>(() => category.SetPublic(this.member));
-                this.InvokeFail<CremaException>(() => category.SetPrivate(this.member));
-                this.InvokeFail<CremaException>(() => category.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<CremaException>(() => category.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<CremaException>(() => category.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<CremaException>(() => category.Unlock(this.member));
-                this.InvokeFail<CremaException>(() => category.RenameTest(this.member));
-                this.InvokeFail<CremaException>(() => category.MoveTest(this.member));
-                this.InvokeFail<CremaException>(() => category.Delete(this.member));
+                await this.InvokeFailAsync<CremaException>(category.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<CremaException>(category.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<CremaException>(category.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<CremaException>(category.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<CremaException>(category.LockAsync(this.member, RandomUtility.NextString()));
+                await this.InvokeFailAsync<CremaException>(category.UnlockAsync(this.member));
+                await this.InvokeFailAsync<CremaException>(category.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<CremaException>(category.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<CremaException>(category.DeleteAsync(this.member));
             }
             finally
             {
-                type.Unlock(this.admin);
+                await type.UnlockAsync(this.admin);
             }
         }
 
@@ -380,15 +383,15 @@ namespace JSSoft.Crema.ServerService.Test
 
             try
             {
-                this.InvokeFail<PermissionDeniedException>(() => type.SetPublic(this.member));
-                this.InvokeFail<PermissionException>(() => type.SetPrivate(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionDeniedException>(() => type.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionDeniedException>(() => type.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionException>(() => type.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.Delete(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(type.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.Lock(this.member, RandomUtility.NextStringAsync()));
+                await this.InvokeFailAsync<PermissionException>(type.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.DeleteAsync(this.member));
             }
             finally
             {
@@ -407,26 +410,26 @@ namespace JSSoft.Crema.ServerService.Test
 
             try
             {
-                this.InvokeFail<PermissionException>(() => category.SetPublic(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.SetPrivate(this.member));
-                this.InvokeFail<PermissionException>(() => category.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionException>(() => category.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionException>(() => category.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionDeniedException>(() => category.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.Delete(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.AddNewCategory(this.member));
+                await this.InvokeFailAsync<PermissionException>(category.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(category.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionException>(category.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionException>(category.Lock(this.member, RandomUtility.NextStringAsync()));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.DeleteAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.AddNewCategoryAsync(this.member));
 
-                this.InvokeFail<PermissionException>(() => type.SetPublic(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.SetPrivate(this.member));
-                this.InvokeFail<PermissionException>(() => type.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionException>(() => type.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionDeniedException>(() => type.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionException>(() => type.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.Delete(this.member));
+                await this.InvokeFailAsync<PermissionException>(type.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(type.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionException>(type.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.Lock(this.member, RandomUtility.NextStringAsync()));
+                await this.InvokeFailAsync<PermissionException>(type.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.DeleteAsync(this.member));
             }
             finally
             {
@@ -435,7 +438,7 @@ namespace JSSoft.Crema.ServerService.Test
         }
 
         [TestMethod]
-        public void PrivateTypeCategoryFailTest()
+        public async Task PrivateTypeCategoryFailTestAsync()
         {
             var typeContext = this.dataBase.TypeContext;
             var category = typeContext.Categories.RandomSample();
@@ -445,26 +448,26 @@ namespace JSSoft.Crema.ServerService.Test
 
             try
             {
-                this.InvokeFail<PermissionDeniedException>(() => category.SetPublic(this.member));
-                this.InvokeFail<PermissionException>(() => category.SetPrivate(this.member));
-                this.InvokeFail<PermissionException>(() => category.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionException>(() => category.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionDeniedException>(() => category.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionException>(() => category.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.Delete(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => category.AddNewCategory(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(category.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(category.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionException>(category.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.Lock(this.member, RandomUtility.NextStringAsync()));
+                await this.InvokeFailAsync<PermissionException>(category.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.DeleteAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(category.AddNewCategoryAsync(this.member));
 
-                this.InvokeFail<PermissionException>(() => type.SetPublic(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.SetPrivate(this.member));
-                this.InvokeFail<PermissionException>(() => type.AddAccessMember(this.member, this.someone.UserID, AccessType.ReadWrite));
-                this.InvokeFail<PermissionException>(() => type.RemoveAccessMember(this.member, this.someone.UserID));
-                this.InvokeFail<PermissionDeniedException>(() => type.Lock(this.member, RandomUtility.NextString()));
-                this.InvokeFail<PermissionException>(() => type.Unlock(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.RenameTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.MoveTest(this.member));
-                this.InvokeFail<PermissionDeniedException>(() => type.Delete(this.member));
+                await this.InvokeFailAsync<PermissionException>(type.SetPublicAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.SetPrivateAsync(this.member));
+                await this.InvokeFailAsync<PermissionException>(type.AddAccessMemberAsync(this.member, this.someone.UserID, AccessType.ReadWrite));
+                await this.InvokeFailAsync<PermissionException>(type.RemoveAccessMemberAsync(this.member, this.someone.UserID));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.Lock(this.member, RandomUtility.NextStringAsync()));
+                await this.InvokeFailAsync<PermissionException>(type.UnlockAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.RenameTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.MoveTestAsync(this.member));
+                await this.InvokeFailAsync<PermissionDeniedException>(type.DeleteAsync(this.member));
             }
             finally
             {
@@ -483,6 +486,19 @@ namespace JSSoft.Crema.ServerService.Test
             try
             {
                 action();
+                Assert.Fail();
+            }
+            catch (T)
+            {
+
+            }
+        }
+
+        private async Task InvokeFailAsync<T>(Task task) where T : Exception
+        {
+            try
+            {
+                await task
                 Assert.Fail();
             }
             catch (T)

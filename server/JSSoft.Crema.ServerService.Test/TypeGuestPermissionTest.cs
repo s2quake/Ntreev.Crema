@@ -23,7 +23,7 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Linq;
-using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
 using JSSoft.Library.Random;
 using System.Collections.Generic;
 using JSSoft.Library;

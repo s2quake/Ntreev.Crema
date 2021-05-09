@@ -54,6 +54,16 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "label": "build test-server",
+            "command": "dotnet build server/JSSoft.Crema.ServerService.Test --framework netcoreapp3.1",
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "clean",
             "command": "dotnet clean",
             "type": "shell",

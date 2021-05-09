@@ -25,7 +25,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using JSSoft.Library.Random;
-using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
 using JSSoft.Library.IO;
 
 namespace JSSoft.Crema.ServerService.Test

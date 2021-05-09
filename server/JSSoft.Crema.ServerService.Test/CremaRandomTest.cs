@@ -25,8 +25,10 @@ using System.IO;
 using JSSoft.Library.Random;
 using System.Reflection;
 using System.Linq;
-using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using JSSoft.Library;
 
 namespace JSSoft.Crema.ServerService.Test
 {
@@ -34,6 +36,7 @@ namespace JSSoft.Crema.ServerService.Test
     public class CremaRandomTest
     {
         private static ICremaHost cremaHost;
+        private static Guid token;
 
         [ClassInitialize()]
         public static void ClassInit(TestContext context)
@@ -44,86 +47,92 @@ namespace JSSoft.Crema.ServerService.Test
         }
 
         [TestInitialize()]
-        public void Initialize()
+        public async Task InitializeAsync()
         {
-            cremaHost.Open();
+            token = await cremaHost.OpenAsync();
         }
 
         [TestCleanup()]
-        public void Cleanup()
+        public async Task CleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() => cremaHost.Close());
+            await cremaHost.CloseAsync(token);
+            token = Guid.Empty;
         }
 
         [ClassCleanup()]
         public static void ClassCleanup()
         {
-            cremaHost.Dispose();
+            // cremaHost.Dispose();
         }
 
         [TestMethod]
-        public void TestTest()
+        public async Task TestTestAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            var password = StringUtility.ToSecureString("admin");
+            var token = await cremaHost.LoginAsync("Admin", password);
+            var authentication = await cremaHost.AuthenticateAsync(token);
+            var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+            var dataBase = await dataBaseContext.Dispatcher.InvokeAsync(dataBaseContext.First);
+            var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
+            var typeContext = dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
+            var tableRoot = await tableContext.Dispatcher.InvokeAsync(() => tableContext.Root);
+            var typeRoot = await typeContext.Dispatcher.InvokeAsync(() => typeContext.Root);
+
+            var category = await typeRoot.AddNewCategoryAsync(authentication, "sub");
+            var category1 = await typeRoot.AddNewCategoryAsync(authentication, "other");
+
+            var t_category_sub = await tableRoot.AddNewCategoryAsync(authentication, "sub");
+            var t_category_sub_wow = await t_category_sub.AddNewCategoryAsync(authentication, "wow");
+            var t_category_other = await tableRoot.AddNewCategoryAsync(authentication, "other");
+            var t_category_other_hehe = await tableRoot.AddNewCategoryAsync(authentication, "hehe");
+
+            var typeTemplate = await typeRoot.NewTypeAsync(authentication);
+            await typeTemplate.EndEditAsync(authentication);
+
+            var type = typeTemplate.Type;
+
+            var tableTemplate = await t_category_sub_wow.NewTableAsync(authentication);
+            await tableTemplate.AddKeyAsync(authentication, "key", "int");
+            await tableTemplate.AddColumnAsync(authentication, "value", type.Path);
+            await tableTemplate.EndEditAsync(authentication);
+
+            var table = tableTemplate.Target as ITable;
             {
-                var authentication = cremaHost.Login("Admin", "admin");
+                var childTemplate = await table.NewTableAsync(authentication);
+                await childTemplate.AddKeyAsync(authentication, "key", "int");
+                await childTemplate.AddColumnAsync(authentication, "value", type.Path);
+                await childTemplate.EndEditAsync(authentication);
+            }
 
-                var category = cremaHost.PrimaryDataBase.TypeContext.Root.AddNewCategory(authentication, "sub");
-                var category1 = cremaHost.PrimaryDataBase.TypeContext.Root.AddNewCategory(authentication, "other");
+            {
+                var childTemplate = await table.NewTableAsync(authentication);
+                await childTemplate.AddKeyAsync(authentication, "key", "int");
+                await childTemplate.AddColumnAsync(authentication, "value", type.Path);
+                await childTemplate.EndEditAsync(authentication);
+            }
 
-                var t_category_sub = cremaHost.PrimaryDataBase.TableContext.Root.AddNewCategory(authentication, "sub");
-                var t_category_sub_wow = t_category_sub.AddNewCategory(authentication, "wow");
-                var t_category_other = cremaHost.PrimaryDataBase.TableContext.Root.AddNewCategory(authentication, "other");
-                var t_category_other_hehe = cremaHost.PrimaryDataBase.TableContext.Root.AddNewCategory(authentication, "hehe");
+            await table.InheritAsync(authentication, "table2", t_category_other.Path, false);
 
-                var typeTemplate = cremaHost.PrimaryDataBase.TypeContext.Root.NewType(authentication);
-                typeTemplate.EndEdit(authentication);
-
-                var type = typeTemplate.Type;
-
-                var tableTemplate = t_category_sub_wow.NewTable(authentication);
-                tableTemplate.AddKey(authentication, "key", "int");
-                tableTemplate.AddColumn(authentication, "value", type.Path);
-                tableTemplate.EndEdit(authentication);
-
-                var table = tableTemplate.Table;
-                {
-                    var childTemplate = table.NewTable(authentication);
-                    childTemplate.AddKey(authentication, "key", "int");
-                    childTemplate.AddColumn(authentication, "value", type.Path);
-                    childTemplate.EndEdit(authentication);
-                }
-
-                {
-                    var childTemplate = table.NewTable(authentication);
-                    childTemplate.AddKey(authentication, "key", "int");
-                    childTemplate.AddColumn(authentication, "value", type.Path);
-                    childTemplate.EndEdit(authentication);
-                }
-
-                table.Inherit(authentication, "table2", t_category_other.Path, false);
-
-                for (int i = 0; i < 100; i++)
-                {
-                    CremaHostUtility.TableMoveTest(cremaHost, authentication);
-                    CremaHostUtility.TableRenameTest(cremaHost, authentication);
-                    CremaHostUtility.TableCategoryMoveTest(cremaHost, authentication);
-                    CremaHostUtility.TableCategoryRenameTest(cremaHost, authentication);
-                }
+            for (int i = 0; i < 100; i++)
+            {
+                CremaHostUtility.TableMoveTest(cremaHost, authentication);
+                CremaHostUtility.TableRenameTest(cremaHost, authentication);
+                CremaHostUtility.TableCategoryMoveTest(cremaHost, authentication);
+                CremaHostUtility.TableCategoryRenameTest(cremaHost, authentication);
+            }
 
 
-                //table.Childs.ToArray()[1].Delete(authentication);
-                //table.Childs.ToArray()[0].Delete(authentication);
+            //table.Childs.ToArray()[1].Delete(authentication);
+            //table.Childs.ToArray()[0].Delete(authentication);
 
-                //type.Rename(authentication, "wow");
-                //type.Move(authentication, category.Path);
-                //category.Rename(authentication, "sub1");
-                //category.Move(authentication, category1.Path);
-                //category.Rename(authentication, "sub");
-                //category1.Rename(authentication, "other1");
-                ////type.Move(authentication, cremaHost.PrimaryDataBase.TypeContext.Root.Path);
-                //type.Category.Delete(authentication);
-            });
+            //type.Rename(authentication, "wow");
+            //type.Move(authentication, category.Path);
+            //category.Rename(authentication, "sub1");
+            //category.Move(authentication, category1.Path);
+            //category.Rename(authentication, "sub");
+            //category1.Rename(authentication, "other1");
+            ////type.Move(authentication, cremaHost.PrimaryDataBase.TypeContext.Root.Path);
+            //type.Category.Delete(authentication);
         }
 
         [TestMethod]
@@ -152,9 +161,9 @@ namespace JSSoft.Crema.ServerService.Test
                 {
                     method.Invoke(null, new object[] { cremaHost, authentication, });
                 }
-                catch(PermissionDeniedException)
+                catch (PermissionDeniedException)
                 {
-                    
+
                 }
 
                 CremaHostUtility.TableContentEditTest(cremaHost, authentication);
@@ -174,7 +183,7 @@ namespace JSSoft.Crema.ServerService.Test
                 var authentication = cremaHost.Login("Admin", "admin");
                 var transaction = cremaHost.PrimaryDataBase.BeginTransaction(authentication);
 
-                 //Table_thorny.Child2
+                //Table_thorny.Child2
                 var table = cremaHost.PrimaryDataBase.TableContext.Tables["Table_thorny"];
                 var template = table.Childs["Child2"].Template;
                 template.BeginEdit(authentication);

@@ -19,7 +19,8 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Crema.ServiceModel.Data;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Services;
 using JSSoft.Library;
 using JSSoft.Library.Extensions;
 using JSSoft.Library.Linq;
@@ -29,142 +30,155 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JSSoft.Crema.Services.Random;
 
 namespace JSSoft.Crema.ServerService.Test
 {
     public static class CremaObjectGenerator
     {
-        public static void GenerateStandard(this IDataBase dataBase, Authentication authentication)
+        public static async Task GenerateStandardAsync(this IDataBase dataBase, Authentication authentication)
         {
-            dataBase.TypeContext.GenerateStandard(authentication);
-            dataBase.TableContext.GenerateStandard(authentication);
+            await dataBase.TypeContext.GenerateStandardAsync(authentication);
+            await dataBase.TableContext.GenerateStandardAsync(authentication);
         }
 
-        public static void GenerateStandard(this ITypeContext context, Authentication authentication)
+        public static async Task GenerateStandardAsync(this ITypeContext context, Authentication authentication)
         {
             var root = context.Root;
             {
-                root.GenerateStandardType(authentication);
-                root.GenerateStandardFlags(authentication);
+                await root.GenerateStandardTypeAsync(authentication);
+                await root.GenerateStandardFlagsAsync(authentication);
             }
 
-            var category = root.AddNewCategory(authentication);
+            var category = await root.AddNewCategoryAsync(authentication);
             {
-                category.GenerateStandardType(authentication);
-                category.GenerateStandardFlags(authentication);
+                await category.GenerateStandardTypeAsync(authentication);
+                await category.GenerateStandardFlagsAsync(authentication);
             }
 
-            var subCategory = category.AddNewCategory(authentication);
+            var subCategory = await category.AddNewCategoryAsync(authentication);
             {
-                subCategory.GenerateStandardType(authentication);
-                subCategory.GenerateStandardFlags(authentication);
+                await subCategory.GenerateStandardTypeAsync(authentication);
+                await subCategory.GenerateStandardFlagsAsync(authentication);
             }
         }
 
-        public static void GenerateStandard(this ITableContext context, Authentication authentication)
+        public static async Task GenerateStandardAsync(this ITableContext context, Authentication authentication)
         {
             var typeContext = context.GetService(typeof(ITypeContext)) as ITypeContext;
             var root = context.Root;
             var types1 = typeContext.Types.Select(item => item.Name).ToArray();
-            var types2 = CremaTypeUtility.GetBaseTypes();
+            var types2 = CremaDataTypeUtility.GetBaseTypeNames();
             var allTypes = types1.Concat(types2);
             var allKeyTypes = types1.Concat(types2).Where(item => item != typeof(bool).GetTypeName());
 
             {
-                var category = root.AddNewCategory(authentication, "SingleKey");
+                var category = await root.AddNewCategoryAsync(authentication, "SingleKey");
                 foreach (var item in allTypes)
                 {
-                    var table = category.GenerateStandardTable(authentication, "SingleKey", EnumerableUtility.AsEnumerable(item), allTypes.Where(i => i != item));
+                    var table = await category.GenerateStandardTableAsync(authentication, "SingleKey", EnumerableUtility.AsEnumerable(item), allTypes.Where(i => i != item));
                     if (table == null)
                         continue;
-                    table.GenerateStandardChild(authentication);
-                    table.GenerateStandardContent(authentication);
+                    await table.GenerateStandardChildAsync(authentication);
+                    await table.GenerateStandardContentAsync(authentication);
                 }
 
-                var category1 = root.AddNewCategory(authentication, "SingleKeyRefs");
+                var category1 = await root.AddNewCategoryAsync(authentication, "SingleKeyRefs");
                 {
                     foreach (var item in category.Tables)
                     {
-                        var table1 = item.Inherit(authentication, "Ref_" + item.Name, category1.Path, false);
-                        table1.GenerateStandardContent(authentication);
+                        var tables = await item.InheritAsync(authentication, "Ref_" + item.Name, category1.Path, false);
+                        foreach (var i in tables)
+                        {
+                            await i.GenerateStandardContentAsync(authentication);
+                        }
                     }
                 }
             }
 
             {
-                var category = root.AddNewCategory(authentication, "DoubleKey");
+                var category = await root.AddNewCategoryAsync(authentication, "DoubleKey");
                 var query = allKeyTypes.Permutations(2);
                 for (int i = 0; i < allTypes.Count(); i++)
                 {
                     var keys = query.Random();
                     var columns = allTypes.Except(keys);
-                    var table = category.GenerateStandardTable(authentication, "DoubleKey", keys, columns);
+                    var table = await category.GenerateStandardTableAsync(authentication, "DoubleKey", keys, columns);
                     if (table == null)
                         continue;
-                    table.GenerateStandardChild(authentication);
-                    table.GenerateStandardContent(authentication);
+                    await table.GenerateStandardChildAsync(authentication);
+                    await table.GenerateStandardContentAsync(authentication);
                 }
 
-                var category1 = root.AddNewCategory(authentication, "DoubleKeyRefs");
+                var category1 = await root.AddNewCategoryAsync(authentication, "DoubleKeyRefs");
                 {
                     foreach (var item in category.Tables)
                     {
-                        var table1 = item.Inherit(authentication, "Ref_" + item.Name, category1.Path, false);
-                        table1.GenerateStandardContent(authentication);
+                        var tables = await item.InheritAsync(authentication, "Ref_" + item.Name, category1.Path, false);
+                        foreach (var i in tables)
+                        {
+                            await i.GenerateStandardContentAsync(authentication);
+                        }
                     }
                 }
             }
 
             {
-                var category = root.AddNewCategory(authentication, "TripleKey");
+                var category = await root.AddNewCategoryAsync(authentication, "TripleKey");
                 var query = allKeyTypes.Permutations(3);
                 for (int i = 0; i < allTypes.Count(); i++)
                 {
                     var keys = query.Random();
                     var columns = allTypes.Except(keys);
-                    var table = category.GenerateStandardTable(authentication, "TripleKey", keys, columns);
+                    var table = await category.GenerateStandardTableAsync(authentication, "TripleKey", keys, columns);
                     if (table == null)
                         continue;
-                    table.GenerateStandardChild(authentication);
-                    table.GenerateStandardContent(authentication);
+                    await table.GenerateStandardChildAsync(authentication);
+                    await table.GenerateStandardContentAsync(authentication);
                 }
 
-                var category1 = root.AddNewCategory(authentication, "TripleKeyRefs");
+                var category1 = await root.AddNewCategoryAsync(authentication, "TripleKeyRefs");
                 {
                     foreach (var item in category.Tables)
                     {
-                        var table1 = item.Inherit(authentication, "Ref_" + item.Name, category1.Path, false);
-                        table1.GenerateStandardContent(authentication);
+                        var tables = await item.InheritAsync(authentication, "Ref_" + item.Name, category1.Path, false);
+                        foreach (var i in tables)
+                        {
+                            await i.GenerateStandardContentAsync(authentication);
+                        }
                     }
                 }
             }
 
             {
-                var category = root.AddNewCategory(authentication, "QuadraKey");
+                var category = await root.AddNewCategoryAsync(authentication, "QuadraKey");
                 var query = allKeyTypes.Permutations(4);
                 for (int i = 0; i < allTypes.Count(); i++)
                 {
                     var keys = query.Random();
                     var columns = allTypes.Except(keys);
-                    var table = category.GenerateStandardTable(authentication, "QuadraKey", keys, columns);
+                    var table = await category.GenerateStandardTableAsync(authentication, "QuadraKey", keys, columns);
                     if (table == null)
                         continue;
-                    table.GenerateStandardChild(authentication);
-                    table.GenerateStandardContent(authentication);
+                    await table.GenerateStandardChildAsync(authentication);
+                    await table.GenerateStandardContentAsync(authentication);
                 }
 
-                var category1 = root.AddNewCategory(authentication, "QuadraKeyRefs");
+                var category1 = await root.AddNewCategoryAsync(authentication, "QuadraKeyRefs");
                 {
                     foreach (var item in category.Tables)
                     {
-                        var table1 = item.Inherit(authentication, "Ref_" + item.Name, category1.Path, false);
-                        table1.GenerateStandardContent(authentication);
+                        var tables = await item.InheritAsync(authentication, "Ref_" + item.Name, category1.Path, false);
+                        foreach (var i in tables)
+                        {
+                            await i.GenerateStandardContentAsync(authentication);
+                        }
                     }
                 }
             }
         }
 
-        public static ITable GenerateStandardTable(this ITableCategory category, Authentication authentication, string prefix, IEnumerable<string> keyTypes, IEnumerable<string> columnTypes)
+        public static async Task<ITable> GenerateStandardTableAsync(this ITableCategory category, Authentication authentication, string prefix, IEnumerable<string> keyTypes, IEnumerable<string> columnTypes)
         {
             var tables = category.GetService<ITableCollection>();
             var tableName = string.Join("_", EnumerableUtility.Friends(prefix, keyTypes));
@@ -172,30 +186,30 @@ namespace JSSoft.Crema.ServerService.Test
             if (tables.Contains(tableName) == true)
                 return null;
 
-            var template = category.NewTable(authentication);
-            template.SetTableName(authentication, tableName);
+            var template = await category.NewTableAsync(authentication);
+            await template.SetTableNameAsync(authentication, tableName);
 
             foreach (var item in keyTypes)
             {
-                template.AddKey(authentication, item, item);
+                await template.AddKeyAsync(authentication, item, item);
             }
 
             foreach (var item in columnTypes)
             {
-                template.AddColumn(authentication, item, item);
+                await template.AddColumnAsync(authentication, item, item);
             }
 
             try
             {
-                template.EndEdit(authentication);
-                return template.Table;
+                await template.EndEditAsync(authentication);
+                return template.Target as ITable;
             }
             catch
             {
-                template.CancelEdit(authentication);
+                await template.CancelEditAsync(authentication);
                 return null;
             }
-            
+
             //var table = template.Table;
             //var content = table.Content;
 
@@ -203,7 +217,7 @@ namespace JSSoft.Crema.ServerService.Test
             //content.EnterEdit(authentication);
             //try
             //{
-            //    content.GenerateRows(authentication, RandomUtility.Next(10, 1000));
+            //    content.GenerateRowsAsync(authentication, RandomUtility.Next(10, 1000));
             //    content.LeaveEdit(authentication);
             //    content.EndEdit(authentication);
             //}
@@ -215,7 +229,7 @@ namespace JSSoft.Crema.ServerService.Test
             //return table;
         }
 
-        public static ITable GenerateStandardChild(this ITable table, Authentication authentication, string prefix, IEnumerable<string> keyTypes, IEnumerable<string> columnTypes)
+        public static async Task<ITable> GenerateStandardChildAsync(this ITable table, Authentication authentication, string prefix, IEnumerable<string> keyTypes, IEnumerable<string> columnTypes)
         {
             var typeCollection = table.GetService<ITypeCollection>();
             var tableName = string.Join("_", EnumerableUtility.Friends(prefix, keyTypes));
@@ -223,36 +237,36 @@ namespace JSSoft.Crema.ServerService.Test
             if (table.Childs.ContainsKey(tableName) == true)
                 return null;
 
-            var template = table.NewTable(authentication);
-            template.SetTableName(authentication, tableName);
+            var template = await table.NewTableAsync(authentication);
+            await template.SetTableNameAsync(authentication, tableName);
 
             foreach (var item in keyTypes)
             {
-                template.AddKey(authentication, item, item);
+                await template.AddKeyAsync(authentication, item, item);
             }
 
             foreach (var item in columnTypes)
             {
-                template.AddColumn(authentication, item, item);
+                await template.AddColumnAsync(authentication, item, item);
             }
 
             try
             {
-                template.EndEdit(authentication);
-                return template.Table;
+                await template.EndEditAsync(authentication);
+                return template.Target as ITable;
             }
             catch
             {
-                template.CancelEdit(authentication);
+                await template.CancelEditAsync(authentication);
                 return null;
             }
         }
 
-        public static void GenerateStandardChild(this ITable table, Authentication authentication)
+        public static async Task GenerateStandardChildAsync(this ITable table, Authentication authentication)
         {
             var typeCollection = table.GetService<ITypeCollection>();
             var types1 = typeCollection.Select(item => item.Name).ToArray();
-            var types2 = CremaTypeUtility.GetBaseTypes();
+            var types2 = CremaDataTypeUtility.GetBaseTypeNames();
             var allTypes = types1.Concat(types2);
             var allKeyTypes = types1.Concat(types2).Where(item => item != typeof(bool).GetTypeName());
 
@@ -263,7 +277,7 @@ namespace JSSoft.Crema.ServerService.Test
                 var query = allKeyTypes.Permutations(i + 1);
                 var keys = query.Random();
                 var columns = allTypes.Except(keys);
-                table.GenerateStandardChild(authentication, "Child_" + prefixes[i], keys, columns);
+                await table.GenerateStandardChildAsync(authentication, "Child_" + prefixes[i], keys, columns);
             }
         }
 
@@ -293,66 +307,68 @@ namespace JSSoft.Crema.ServerService.Test
         //    }
         //}
 
-        public static void GenerateStandardType(this ITypeCategory category, Authentication authentication)
+        public static async Task GenerateStandardTypeAsync(this ITypeCategory category, Authentication authentication)
         {
-            var template = category.NewType(authentication);
-            template.SetIsFlag(authentication, false);
-            template.SetComment(authentication, "Standard Type");
+            var template = await category.NewTypeAsync(authentication);
+            await template.SetIsFlagAsync(authentication, false);
+            await template.SetCommentAsync(authentication, "Standard Type");
 
             var az = Enumerable.Range('A', 'Z' - 'A' + 1).Select(i => (char)i).ToArray();
 
-            template.AddMember(authentication, "None", 0, "None Value");
+            await template.AddMemberAsync(authentication, "None", 0, "None Value");
             for (int i = 0; i < az.Length; i++)
             {
-                template.AddMember(authentication, az[i].ToString(), (long)i + 1, az[i] + " Value");
+                await template.AddMemberAsync(authentication, az[i].ToString(), (long)i + 1, az[i] + " Value");
             }
 
-            template.EndEdit(authentication);
+            await template.EndEditAsync(authentication);
         }
 
-        public static void GenerateStandardFlags(this ITypeCategory category, Authentication authentication)
+        public static async Task GenerateStandardFlagsAsync(this ITypeCategory category, Authentication authentication)
         {
-            var newName = NameUtility.GenerateNewName("Flag", category.DataBase.TypeContext.Types.Select(item => item.Name).ToArray());
-            var template = category.NewType(authentication);
-            template.SetTypeName(authentication, newName);
-            template.SetIsFlag(authentication, true);
-            template.SetComment(authentication, "Standard Flag");
+            var types = category.GetService(typeof(ITypeCollection)) as ITypeCollection;
+            var typeNames = await types.Dispatcher.InvokeAsync(() => types.Select(item => item.Name).ToArray());
+            var newName = NameUtility.GenerateNewName("Flag", typeNames);
+            var template = await category.NewTypeAsync(authentication);
+            await template.SetTypeNameAsync(authentication, newName);
+            await template.SetIsFlagAsync(authentication, true);
+            await template.SetCommentAsync(authentication, "Standard Flag");
 
-            template.AddMember(authentication, "None", 0, "None Value");
-            template.AddMember(authentication, "A", 1, "A Value");
-            template.AddMember(authentication, "B", 2, "B Value");
-            template.AddMember(authentication, "C", 4, "C Value");
-            template.AddMember(authentication, "D", 8, "D Value");
-            template.AddMember(authentication, "AC", 1 | 4, "AC Value");
-            template.AddMember(authentication, "ABC", 1 | 2 | 4, "AC Value");
-            template.AddMember(authentication, "BD", 2 | 8, "AC Value");
-            template.AddMember(authentication, "All", 1 | 2 | 4 | 8, "All Value");
+            await template.AddMemberAsync(authentication, "None", 0, "None Value");
+            await template.AddMemberAsync(authentication, "A", 1, "A Value");
+            await template.AddMemberAsync(authentication, "B", 2, "B Value");
+            await template.AddMemberAsync(authentication, "C", 4, "C Value");
+            await template.AddMemberAsync(authentication, "D", 8, "D Value");
+            await template.AddMemberAsync(authentication, "AC", 1 | 4, "AC Value");
+            await template.AddMemberAsync(authentication, "ABC", 1 | 2 | 4, "AC Value");
+            await template.AddMemberAsync(authentication, "BD", 2 | 8, "AC Value");
+            await template.AddMemberAsync(authentication, "All", 1 | 2 | 4 | 8, "All Value");
 
-            template.EndEdit(authentication);
+            await template.EndEditAsync(authentication);
         }
 
-        private static void GenerateStandardContent(this ITable table, Authentication authentication)
+        private static async Task GenerateStandardContentAsync(this ITable table, Authentication authentication)
         {
             var content = table.Content;
 
-            content.BeginEdit(authentication);
-            content.EnterEdit(authentication);
+            await content.BeginEditAsync(authentication);
+            await content.EnterEditAsync(authentication);
 
-            content.GenerateRows(authentication, RandomUtility.Next(10, 1000));
+            await content.GenerateRowsAsync(authentication, RandomUtility.Next(10, 1000));
 
-            foreach (var item in content.Childs)
+            foreach (var item in content.Tables)
             {
-                item.GenerateRows(authentication, RandomUtility.Next(10, 100));
+                await item.Content.GenerateRowsAsync(authentication, RandomUtility.Next(10, 100));
             }
 
             try
             {
-                content.LeaveEdit(authentication);
-                content.EndEdit(authentication);
+                await content.LeaveEditAsync(authentication);
+                await content.EndEditAsync(authentication);
             }
             catch
             {
-                content.CancelEdit(authentication);
+                await content.CancelEditAsync(authentication);
             }
         }
     }

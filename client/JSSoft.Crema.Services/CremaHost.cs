@@ -194,7 +194,7 @@ namespace JSSoft.Crema.Services
                 {
                     this.configs = new UserConfiguration(this.GetConfigPath(userID), this.propertiesProviders);
                 });
-                return this.token;
+                return this.AuthenticationToken;
             }
             catch (Exception e)
             {
@@ -210,9 +210,11 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        public Task<Authentication> AuthenticateAsync(Guid authenticationToken)
+        public async Task<Authentication> AuthenticateAsync(Guid authenticationToken)
         {
-            throw new NotImplementedException();
+            if (this.AuthenticationToken != authenticationToken)
+                throw new InvalidOperationException(Resources.Exception_InvalidToken);
+            return await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.CurrentUser.Authentication);
         }
 
         public async Task LogoutAsync(Authentication authentication)

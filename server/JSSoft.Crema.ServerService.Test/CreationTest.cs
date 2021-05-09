@@ -25,17 +25,20 @@ using System.IO;
 using JSSoft.Library.IO;
 using JSSoft.Library;
 using System.Linq;
-using JSSoft.Crema.SvnModule;
 using JSSoft.Library.Random;
+using JSSoft.Crema.Services;
 using JSSoft.Crema.ServiceModel;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ServerService.Test
 {
     [TestClass]
     public class CreationTest
     {
+        private static CremaBootstrapper app;
         private static ICremaHost cremaHost;
         private static string tempDir;
+        private static Guid token;
 
         private TestContext testContext;
 
@@ -44,80 +47,79 @@ namespace JSSoft.Crema.ServerService.Test
         {
             var solutionDir = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
             tempDir = Path.Combine(solutionDir, "crema_repo", "unit_test");
+            app = new();
+            CremaBootstrapper.CreateRepository(app, tempDir, "git", "xml");
         }
 
         [TestInitialize()]
-        public void Initialize()
+        public static async Task InitializeAsync()
         {
             cremaHost = TestCrema.CreateInstance(tempDir);
-            cremaHost.Open();
+            token = await cremaHost.OpenAsync();
         }
 
         [TestCleanup()]
-        public void Cleanup()
+        public async Task CleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() => cremaHost.Close());
-            cremaHost.Dispose();
+            await cremaHost.CloseAsync(token);
         }
 
         [ClassCleanup()]
         public static void ClassCleanup()
         {
-            
+            app.Dispose();
         }
 
         [TestMethod]
-        public void BaseTest()
+        public async Task BaseTestAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                var userContext = cremaHost.GetService<IUserContext>();
-                var user = userContext.Users.Random(item => item.Authority != Authority.Guest);
-                var authentication = cremaHost.Login(user.ID, user.Authority.ToString().ToLower());
-                var dataBase = cremaHost.PrimaryDataBase;
+            var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+            var user = userContext.Users.Random(item => item.Authority != Authority.Guest);
+            var password = StringUtility.ToSecureString(user.Authority.ToString().ToLower());
+            var authenticationToken = await cremaHost.LoginAsync(user.ID, password);
+            var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
+            var dataBase = await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.First());
+            var tableContext = dataBase.TableContext;
+            var category = await tableContext.Root.AddNewCategoryAsync(authentication, "Folder1");
+            var category1 = await category.AddNewCategoryAsync(authentication, "Folder1");
 
-                var tableContext = dataBase.TableContext;
+            var template = await category1.NewTableAsync(authentication);
+            await template.EndEditAsync(authentication);
 
-                var category = tableContext.Root.AddNewCategory(authentication, "Folder1");
+            var tableName = template.TableName;
+            var table = await category1.Dispatcher.InvokeAsync(() => category1.Tables[tableName]);
 
-                var category1 = category.AddNewCategory(authentication, "Folder1");
+            var childTemplate1 = await table.NewTableAsync(authentication);
+            await childTemplate1.EndEditAsync(authentication);
 
-                var template = category1.NewTable(authentication);
-                template.EndEdit(authentication);
+            var child = await category1.Dispatcher.InvokeAsync(() => table.Childs[childTemplate1.TableName]);
+            await child.RenameAsync(authentication, "Child_abc");
 
-                var table = template.Table;
-
-                var childTemplate1 = table.NewTable(authentication);
-                childTemplate1.EndEdit(authentication);
-
-                var child = childTemplate1.Table;
-                child.Rename(authentication, "Child_abc");
-
-                var childTemplate2 = table.NewTable(authentication);
-                childTemplate2.EndEdit(authentication);
-            });
+            var childTemplate2 = await table.NewTableAsync(authentication);
+            await childTemplate2.EndEditAsync(authentication);
         }
 
         [TestMethod]
-        public void GenerateStandardTest()
+        public async Task GenerateStandardTestAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                var userContext = cremaHost.GetService<IUserContext>();
-                var user = userContext.Users.Random(item => item.Authority != Authority.Guest);
-                var authentication = cremaHost.Login(user.ID, user.Authority.ToString().ToLower());
-                var dataBase = cremaHost.PrimaryDataBase;
-                var tableContext = dataBase.TableContext;
+            var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+            var user = userContext.Users.Random(item => item.Authority != Authority.Guest);
+            var password = StringUtility.ToSecureString(user.Authority.ToString().ToLower());
+            var authenticationToken = await cremaHost.LoginAsync(user.ID, password);
+            var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
+            var dataBase = await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.First());
+            var tableContext = dataBase.TableContext;
 
-                var time = DateTime.Now;
-                
-                var transaction = dataBase.BeginTransaction(authentication);
-                dataBase.GenerateStandard(authentication);
+            var time = DateTime.Now;
 
-                var diff = DateTime.Now - time;
+            var transaction = await dataBase.BeginTransactionAsync(authentication);
+            await dataBase.GenerateStandardAsync(authentication);
 
-                transaction.Commit();
-            });
+            var diff = DateTime.Now - time;
+
+            await transaction.CommitAsync(authentication);
         }
 
         public TestContext TestContext

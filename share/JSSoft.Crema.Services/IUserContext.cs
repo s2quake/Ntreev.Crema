@@ -56,13 +56,7 @@ namespace JSSoft.Crema.Services
         event TaskCompletedEventHandler TaskCompleted;
 
 #if SERVER
-        //Task<Authentication> LoginAsync(string userID, SecureString password);
-
-        //Task LogoutAsync(Authentication authentication);
-
         Task<Authentication> AuthenticateAsync(Guid authenticationToken);
-
-        Task<bool> IsAuthenticatedAsync(string userID);
 
         Task<bool> IsOnlineUserAsync(string userID, SecureString password);
 #endif

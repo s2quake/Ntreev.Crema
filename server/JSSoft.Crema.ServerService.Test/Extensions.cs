@@ -20,6 +20,7 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
 using JSSoft.Library;
 using JSSoft.Library.Random;
 using System;
@@ -32,53 +33,52 @@ namespace JSSoft.Crema.ServerService.Test
 {
     static class Extensions
     {
-        public static void AddMember(this ITypeTemplate template, Authentication authentication, string name, long value, string comment)
+        public static async Task AddMemberAsync(this ITypeTemplate template, Authentication authentication, string name, long value, string comment)
         {
-            var member = template.AddNew(authentication);
-            member.SetName(authentication, name);
-            member.SetValue(authentication, value);
-            member.SetComment(authentication, comment);
-            template.EndNew(authentication, member);
+            var member = await template.AddNewAsync(authentication);
+            await member.SetNameAsync(authentication, name);
+            await member.SetValueAsync(authentication, value);
+            await member.SetCommentAsync(authentication, comment);
+            await template.EndNewAsync(authentication, member);
         }
 
-        public static void AddKey(this ITableTemplate template, Authentication authentication, string name, string typeName)
+        public static async Task AddKeyAsync(this ITableTemplate template, Authentication authentication, string name, string typeName)
         {
-            var column = template.AddNew(authentication);
-            column.SetName(authentication, name);
-            column.SetIsKey(authentication, true);
-            column.SetDataType(authentication, typeName);
-            column.SetComment(authentication, string.Format("Key : {0}", typeName));
-            template.EndNew(authentication, column);
+            var column = await template.AddNewAsync(authentication);
+            await column.SetNameAsync(authentication, name);
+            await column.SetIsKeyAsync(authentication, true);
+            await column.SetDataTypeAsync(authentication, typeName);
+            await column.SetCommentAsync(authentication, string.Format("Key : {0}", typeName));
+            await template.EndNewAsync(authentication, column);
         }
 
-        public static void AddColumn(this ITableTemplate template, Authentication authentication, string name, string typeName)
+        public static async Task AddColumnAsync(this ITableTemplate template, Authentication authentication, string name, string typeName)
         {
-            var column = template.AddNew(authentication);
-            column.SetName(authentication, name);
-            column.SetDataType(authentication, typeName);
-            template.EndNew(authentication, column);
+            var column = await template.AddNewAsync(authentication);
+            await column.SetNameAsync(authentication, name);
+            await column.SetDataTypeAsync(authentication, typeName);
+            await template.EndNewAsync(authentication, column);
         }
 
-        public static ITypeCategory AddNewCategory(this ITypeCategory category, Authentication authentication)
+        public static async Task<ITypeCategory> AddNewCategoryAsync(this ITypeCategory category, Authentication authentication)
         {
             var newName = NameUtility.GenerateNewName("Folder", category.Categories.Select(item => item.Name));
-            return category.AddNewCategory(authentication, newName);
+            return await category.AddNewCategoryAsync(authentication, newName);
         }
 
-        public static ITableCategory AddNewCategory(this ITableCategory category, Authentication authentication)
+        public static async Task<ITableCategory> AddNewCategoryAsync(this ITableCategory category, Authentication authentication)
         {
             var newName = NameUtility.GenerateNewName("Folder", category.Categories.Select(item => item.Name));
-            return category.AddNewCategory(authentication, newName);
+            return await category.AddNewCategoryAsync(authentication, newName);
         }
 
-        public static Authentication LoginAdmin(this ICremaHost cremaHost)
+        public static async Task<Authentication> LoginAdminAsync(this ICremaHost cremaHost)
         {
-            return cremaHost.Dispatcher.Invoke(() =>
-            {
-                var userContext = cremaHost.GetService<IUserContext>();
-                var user = userContext.Users.Random(item => item.Authority == Authority.Admin);
-                return cremaHost.Login(user.ID, user.Authority.ToString().ToLower());
-            });
+            var users = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            var user = await users.Dispatcher.InvokeAsync(() => users.Random(item => item.Authority == Authority.Admin));
+            var password = StringUtility.ToSecureString(user.Authority.ToString().ToLower());
+            var token = await cremaHost.LoginAsync(user.ID, password);
+            return await cremaHost.AuthenticateAsync(token);
         }
     }
 }

@@ -20,6 +20,7 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using JSSoft.Crema.Services;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Library;
 using JSSoft.Library.Random;
@@ -33,200 +34,164 @@ namespace JSSoft.Crema.ServerService.Test
 {
     static class CremaChildTableTest
     {
-        public static void RenameFailTest<T>(ITable table, Authentication authentication) where T : Exception
+        public static async Task RenameFailTestAsync<T>(ITable table, Authentication authentication) where T : Exception
         {
             Assert.AreNotEqual(null, table.Parent);
-            table.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    var parent = table.Parent;
-                    var newName = NameUtility.GenerateNewName(RandomUtility.NextIdentifier(), parent.Childs.Select(item => item.Name));
-                    table.Rename(authentication, newName);
-                    Assert.Fail("RenameFailTest");
-                }
-                catch (T)
-                {
-                }
-            });
+                var parent = table.Parent;
+                var newName = NameUtility.GenerateNewName(RandomUtility.NextIdentifier(), parent.Childs.Select(item => item.Name));
+                await table.RenameAsync(authentication, newName);
+                Assert.Fail("RenameFailTest");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void MoveFailTest<T>(ITable table, Authentication authentication) where T : Exception
+        public static async Task MoveFailTestAsync<T>(ITable table, Authentication authentication) where T : Exception
         {
             Assert.AreNotEqual(null, table.Parent);
-            table.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    var categories = table.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
-                    var parent = categories.RandomOrDefault(item => item.VerifyWrite(authentication));
-                    table.Move(authentication, parent.Path);
-                    Assert.Fail("MoveFailTest");
-                }
-                catch (T)
-                {
-                }
-            });
+                var categories = table.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
+                var parent = categories.RandomOrDefault(item => item.VerifyAccessType(authentication, AccessType.Developer));
+                await table.MoveAsync(authentication, parent.Path);
+                Assert.Fail("MoveFailTest");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void DeleteFailTest<T>(ITable table, Authentication authentication) where T : Exception
+        public static async Task DeleteFailTestAsync<T>(ITable table, Authentication authentication) where T : Exception
         {
             Assert.AreNotEqual(null, table.Parent);
-            table.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    table.Delete(authentication);
-                    Assert.Fail("DeleteFailTest");
-                }
-                catch (T)
-                {
-                }
-            });
+                await table.DeleteAsync(authentication);
+                Assert.Fail("DeleteFailTest");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void NewChildFailTest<T>(ITable table, Authentication authentication) where T : Exception
+        public static async Task NewChildFailTestAsync<T>(ITable table, Authentication authentication) where T : Exception
         {
             Assert.AreNotEqual(null, table.Parent);
-            table.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    table.NewTable(authentication);
-                    Assert.Fail("NewChildFailTest");
-                }
-                catch (T)
-                {
-                }
-            });
+                await table.NewTableAsync(authentication);
+                Assert.Fail("NewChildFailTest");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void ContentEditFailTest<T>(ITable table, Authentication authentication) where T : Exception
+        public static async Task ContentEditFailTestAsync<T>(ITable table, Authentication authentication) where T : Exception
         {
             Assert.AreNotEqual(null, table.Parent);
-            table.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    table.Content.BeginEdit(authentication);
-                    Assert.Fail("Content.BeginEdit");
-                }
-                catch (T)
-                {
-                }
-            });
+                await table.Content.BeginEditAsync(authentication);
+                Assert.Fail("Content.BeginEdit");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void TemplateEditFailTest<T>(ITable table, Authentication authentication) where T : Exception
+        public static async Task TemplateEditFailTestAsync<T>(ITable table, Authentication authentication) where T : Exception
         {
             Assert.AreNotEqual(null, table.Parent);
-            table.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    table.Template.BeginEdit(authentication);
-                    Assert.Fail("Template.BeginEdit");
-                }
-                catch (T)
-                {
-                }
-            });
+                await table.Template.BeginEditAsync(authentication);
+                Assert.Fail("Template.BeginEdit");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void LockFailTest<T>(ITable table, Authentication authentication) where T : Exception
+        public static async Task LockFailTestAsync<T>(ITable table, Authentication authentication) where T : Exception
         {
             Assert.AreNotEqual(null, table.Parent);
-            table.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    table.Lock(authentication, string.Empty);
-                    Assert.Fail("Lock");
-                }
-                catch (T)
-                {
-                }
-            });
+                await table.LockAsync(authentication, string.Empty);
+                Assert.Fail("Lock");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void UnlockFailTest<T>(ITable table, Authentication authentication) where T : Exception
+        public static async Task UnlockFailTestAsync<T>(ITable table, Authentication authentication) where T : Exception
         {
             Assert.AreNotEqual(null, table.Parent);
-            table.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    table.Unlock(authentication);
-                    Assert.Fail("Unlock");
-                }
-                catch (T)
-                {
-                }
-            });
+                await table.UnlockAsync(authentication);
+                Assert.Fail("Unlock");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void SetPrivateFailTest<T>(ITable table, Authentication authentication) where T : Exception
+        public static async Task SetPrivateFailTestAsync<T>(ITable table, Authentication authentication) where T : Exception
         {
             Assert.AreNotEqual(null, table.Parent);
-            table.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    table.SetPrivate(authentication);
-                    Assert.Fail("SetPrivate");
-                }
-                catch (T)
-                {
-                }
-            });
+                await table.SetPrivateAsync(authentication);
+                Assert.Fail("SetPrivate");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void SetPublicFailTest<T>(ITable table, Authentication authentication) where T : Exception
+        public static async Task SetPublicFailTestTask<T>(ITable table, Authentication authentication) where T : Exception
         {
             Assert.AreNotEqual(null, table.Parent);
-            table.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    table.SetPublic(authentication);
-                    Assert.Fail("SetPublic");
-                }
-                catch (T)
-                {
-                }
-            });
+                await table.SetPublicAsync(authentication);
+                Assert.Fail("SetPublic");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void AddAccessMemberFailTest<T>(ITable table, Authentication authentication, string memberID) where T : Exception
+        public static async Task AddAccessMemberFailTestAsync<T>(ITable table, Authentication authentication, string memberID) where T : Exception
         {
             Assert.AreNotEqual(null, table.Parent);
-            table.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    table.AddAccessMember(authentication, memberID, AccessType.ReadWrite);
-                    Assert.Fail("AddAccessMember");
-                }
-                catch (T)
-                {
-                }
-            });
+                await table.AddAccessMemberAsync(authentication, memberID, AccessType.Developer);
+                Assert.Fail("AddAccessMember");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void RemoveAccessMemberFailTest<T>(ITable table, Authentication authentication, string memberID) where T : Exception
+        public static async Task RemoveAccessMemberFailTestAsync<T>(ITable table, Authentication authentication, string memberID) where T : Exception
         {
             Assert.AreNotEqual(null, table.Parent);
-            table.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    table.RemoveAccessMember(authentication, memberID);
-                    Assert.Fail("RemoveAccessMember");
-                }
-                catch (T)
-                {
-                }
-            });
+                await table.RemoveAccessMemberAsync(authentication, memberID);
+                Assert.Fail("RemoveAccessMember");
+            }
+            catch (T)
+            {
+            }
         }
     }
 }

@@ -191,22 +191,22 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        public async Task<bool> IsAuthenticatedAsync(string userID)
-        {
-            this.ValidateExpired();
-            return await this.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.Users.Contains(userID) == false)
-                    return false;
+        // public async Task<bool> IsAuthenticatedAsync(string userID)
+        // {
+        //     this.ValidateExpired();
+        //     return await this.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         if (this.Users.Contains(userID) == false)
+        //             return false;
 
-                var user = this.Users[userID];
+        //         var user = this.Users[userID];
 
-                if (user.IsOnline == false)
-                    return false;
+        //         if (user.IsOnline == false)
+        //             return false;
 
-                return user.Authentication != null;
-            });
-        }
+        //         return user.Authentication != null;
+        //     });
+        // }
 
         public Task<bool> IsOnlineUserAsync(string userID, SecureString password)
         {

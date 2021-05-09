@@ -20,318 +20,259 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
 using JSSoft.Library.Random;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JSSoft.Crema.ServiceModel;
 
 namespace JSSoft.Crema.ServerService.Test
 {
     static class CremaTableCategoryPermissionTest
     {
-        public static void RenameFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task RenameFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.Rename(authentication, RandomUtility.NextIdentifier());
-                    Assert.Fail("Rename");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.RenameAsync(authentication, RandomUtility.NextIdentifier());
+                Assert.Fail("Rename");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void RenameParentFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task RenameParentFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.Parent.Rename(authentication, RandomUtility.NextIdentifier());
-                    Assert.Fail("Rename");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.Parent.RenameAsync(authentication, RandomUtility.NextIdentifier());
+                Assert.Fail("Rename");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void MoveFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task MoveFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    var categories = category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
-                    category.Move(authentication, categories.Root.Path);
-                    Assert.Fail("Move");
-                }
-                catch (T)
-                {
-                }
-            });
+                var categories = await category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
+                await category.MoveAsync(authentication, categories.Root.Path);
+                Assert.Fail("Move");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void MoveParentFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task MoveParentFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    var categories = category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
-                    category.Parent.Move(authentication, categories.Root.Path);
-                    Assert.Fail("Move");
-                }
-                catch (T)
-                {
-                }
-            });
+                var categories = await category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
+                await category.Parent.MoveAsync(authentication, categories.Root.Path);
+                Assert.Fail("Move");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void DeleteFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task DeleteFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.Delete(authentication);
-                    Assert.Fail("Delete");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.DeleteAsync(authentication);
+                Assert.Fail("Delete");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void DeleteParentFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task DeleteParentFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.Parent.Delete(authentication);
-                    Assert.Fail("Delete");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.Parent.DeleteAsync(authentication);
+                Assert.Fail("Delete");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void NewCategoryFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task NewCategoryFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.AddNewCategory(authentication);
-                    Assert.Fail("NewCategory");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.AddNewCategoryAsync(authentication);
+                Assert.Fail("NewCategory");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void NewTableFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task NewTableFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.NewTable(authentication);
-                    Assert.Fail("NewTable");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.NewTableAsync(authentication);
+                Assert.Fail("NewTable");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void LockFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task LockFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.Lock(authentication, string.Empty);
-                    Assert.Fail("Lock");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.LockAsync(authentication, string.Empty);
+                Assert.Fail("Lock");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void LockParentFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task LockParentFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.Parent.Lock(authentication, string.Empty);
-                    Assert.Fail("Lock");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.Parent.LockAsync(authentication, string.Empty);
+                Assert.Fail("Lock");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void UnlockFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task UnlockFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.Unlock(authentication);
-                    Assert.Fail("Unlock");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.UnlockAsync(authentication);
+                Assert.Fail("Unlock");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void UnlockParentFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task UnlockParentFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.Parent.Unlock(authentication);
-                    Assert.Fail("Unlock");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.Parent.UnlockAsync(authentication);
+                Assert.Fail("Unlock");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void SetPrivateFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task SetPrivateFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.SetPrivate(authentication);
-                    Assert.Fail("SetPrivate");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.SetPrivateAsync(authentication);
+                Assert.Fail("SetPrivate");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void SetPrivateParentFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task SetPrivateParentFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.Parent.SetPrivate(authentication);
-                    Assert.Fail("SetPrivate");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.Parent.SetPrivateAsync(authentication);
+                Assert.Fail("SetPrivate");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void SetPublicFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task SetPublicFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.SetPublic(authentication);
-                    Assert.Fail("SetPublic");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.SetPublicAsync(authentication);
+                Assert.Fail("SetPublic");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void SetPublicParentFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
+        public static async Task SetPublicParentFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.Parent.SetPublic(authentication);
-                    Assert.Fail("SetPublic");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.Parent.SetPublicAsync(authentication);
+                Assert.Fail("SetPublic");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void AddAccessMemberFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication, string memberID) where T : Exception
+        public static async Task AddAccessMemberFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication, string memberID) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.AddAccessMember(authentication, memberID, AccessType.ReadWrite);
-                    Assert.Fail("AddAccessMember");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.AddAccessMemberAsync(authentication, memberID, AccessType.Editor);
+                Assert.Fail("AddAccessMember");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void AddAccessMemberParentFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication, string memberID) where T : Exception
+        public static async Task AddAccessMemberParentFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication, string memberID) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.Parent.AddAccessMember(authentication, memberID, AccessType.ReadWrite);
-                    Assert.Fail("AddAccessMember");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.Parent.AddAccessMemberAsync(authentication, memberID, AccessType.Editor);
+                Assert.Fail("AddAccessMember");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void RemoveAccessMemberFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication, string memberID) where T : Exception
+        public static async Task RemoveAccessMemberFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication, string memberID) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.RemoveAccessMember(authentication, memberID);
-                    Assert.Fail("RemoveAccessMember");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.RemoveAccessMemberAsync(authentication, memberID);
+                Assert.Fail("RemoveAccessMember");
+            }
+            catch (T)
+            {
+            }
         }
 
-        public static void RemoveAccessMemberParentFailTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication, string memberID) where T : Exception
+        public static async Task RemoveAccessMemberParentFailAsyncTest<T>(ICremaHost cremaHost, ITableCategory category, Authentication authentication, string memberID) where T : Exception
         {
-            cremaHost.Dispatcher.Invoke(() =>
+            try
             {
-                try
-                {
-                    category.Parent.RemoveAccessMember(authentication, memberID);
-                    Assert.Fail("RemoveAccessMember");
-                }
-                catch (T)
-                {
-                }
-            });
+                await category.Parent.RemoveAccessMemberAsync(authentication, memberID);
+                Assert.Fail("RemoveAccessMember");
+            }
+            catch (T)
+            {
+            }
         }
     }
 }

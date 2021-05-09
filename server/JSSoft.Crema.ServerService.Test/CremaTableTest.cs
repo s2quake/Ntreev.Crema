@@ -20,7 +20,7 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
 using JSSoft.Library;
 using JSSoft.Library.Linq;
 using JSSoft.Library.Random;

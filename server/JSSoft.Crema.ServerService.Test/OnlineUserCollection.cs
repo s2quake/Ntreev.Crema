@@ -24,8 +24,10 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JSSoft.Crema.Services;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Library.Random;
+using JSSoft.Library;
 
 namespace JSSoft.Crema.ServerService.Test
 {
@@ -33,16 +35,16 @@ namespace JSSoft.Crema.ServerService.Test
     {
         public void Initialize(ICremaHost cremaHost)
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                var userContext = cremaHost.GetService<IUserContext>();
+            var userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            var users = await userCollection.Dispatcher.InvokeAsync(() => userCollection.ToArray());
 
-                foreach (var item in userContext.Users)
-                {
-                    var authentication = cremaHost.Login(item.ID, item.Authority.ToString().ToLower());
-                    this.Add(item, authentication);
-                }
-            });
+            foreach (var item in users)
+            {
+                var password = StringUtility.ToSecureString(item.Authority.ToString().ToLower());
+                var token = await cremaHost.LoginAsync(item.ID, password);
+                var authentication = await cremaHost.AuthenticateAsync(token);
+                this.Add(item, authentication);
+            }
         }
 
         public Authentication RandomAuthentication(Authority authority)

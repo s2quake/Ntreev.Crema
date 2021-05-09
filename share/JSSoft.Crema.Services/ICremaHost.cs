@@ -35,13 +35,8 @@ namespace JSSoft.Crema.Services
 
         Task LogoutAsync(Authentication authentication);
 
-#if SERVER
-
         Task<Authentication> AuthenticateAsync(Guid authenticationToken);
 
-        // string GetPath(CremaPath pathType, params string[] paths);
-
-#endif
         event EventHandler Opening;
 
         event EventHandler Opened;

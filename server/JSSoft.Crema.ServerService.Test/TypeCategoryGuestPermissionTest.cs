@@ -23,7 +23,7 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Linq;
-using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
 using JSSoft.Library.Random;
 using System.Collections.Generic;
 using JSSoft.Library;
@@ -170,7 +170,7 @@ namespace JSSoft.Crema.ServerService.Test
             {
                 try
                 {
-                    this.category.AddNewCategory(this.guest);
+                    this.category.AddNewCategoryAsync(this.guest);
                     Assert.Fail("NewCategory");
                 }
                 catch (PermissionDeniedException)
