@@ -62,7 +62,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
             var result = new ResultBase<DataBaseMetaData>();
             try
             {
-                this.authentication = await this.UserContext.AuthenticateAsync(authenticationToken);
+                this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
                 this.OwnerID = this.authentication.ID;
                 await this.DataBasesContext.Dispatcher.InvokeAsync(() =>
                 {

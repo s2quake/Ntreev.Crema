@@ -52,7 +52,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
         {
             if (this.authentication != null)
                 throw new Exception("이미 로그인되어 있습니다.");
-            var token = await this.CremaHost.LoginAsync(userID, password);
+            var token = await this.CremaHost.LoginAsync(userID, password, false);
             this.authentication = await this.CremaHost.AuthenticateAsync(token);
             this.authentication.Expired += (s, e) => this.authentication = null;
             this.Initialize(authentication);

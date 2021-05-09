@@ -32,7 +32,7 @@ namespace JSSoft.Crema.ServiceHosts
         Task<ResultBase> SubscribeAsync(string version, string platformID, string culture);
 
         [OperationContract]
-        Task<ResultBase<Guid>> LoginAsync(string userID, byte[] password);
+        Task<ResultBase<Guid>> LoginAsync(string userID, byte[] password, bool force);
 
         [OperationContract]
         Task<ResultBase> LogoutAsync();

@@ -279,9 +279,9 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        public Task<Guid> LoginAsync(string userID, SecureString password)
+        public Task<Guid> LoginAsync(string userID, SecureString password, bool force)
         {
-            return this.UserContext.LoginAsync(userID, password);
+            return this.UserContext.LoginAsync(userID, password, force);
         }
 
         public Task<Authentication> AuthenticateAsync(Guid authenticationToken)

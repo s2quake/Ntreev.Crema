@@ -100,7 +100,7 @@ namespace JSSoft.Crema.Services.Users
             this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskID));
         }
 
-        public async Task<Guid> LoginAsync(string userID, SecureString password)
+        public async Task<Guid> LoginAsync(string userID, SecureString password, bool force)
         {
             try
             {
@@ -110,7 +110,7 @@ namespace JSSoft.Crema.Services.Users
                     this.ValidateLogin(userID, password);
                     return this.Users[userID];
                 });
-                return await user.LoginAsync(password);
+                return await user.LoginAsync(password, force);
             }
             catch (Exception e)
             {

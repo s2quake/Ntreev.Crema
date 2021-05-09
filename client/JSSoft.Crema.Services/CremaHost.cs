@@ -170,7 +170,7 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        public async Task<Guid> LoginAsync(string userID, SecureString password)
+        public async Task<Guid> LoginAsync(string userID, SecureString password, bool force)
         {
             try
             {
@@ -179,7 +179,7 @@ namespace JSSoft.Crema.Services
                     if (this.ServiceState != ServiceState.Open)
                         throw new InvalidOperationException(Resources.Exception_NotOpened);
                 });
-                this.AuthenticationToken = await this.Service.LoginAsync(userID, UserContext.Encrypt(userID, password));
+                this.AuthenticationToken = await this.Service.LoginAsync(userID, UserContext.Encrypt(userID, password), force);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.log = new LogService(this.Address.Replace(':', '_'), userID, AppUtility.UserAppDataPath)

@@ -31,7 +31,7 @@ namespace JSSoft.Crema.Services
     {
         Task<Guid> OpenAsync();
 
-        Task<Guid> LoginAsync(string userID, SecureString password);
+        Task<Guid> LoginAsync(string userID, SecureString password, bool force);
 
         Task LogoutAsync(Authentication authentication);
 

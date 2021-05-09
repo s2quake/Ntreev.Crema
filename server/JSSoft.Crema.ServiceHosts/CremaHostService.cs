@@ -67,9 +67,9 @@ namespace JSSoft.Crema.ServiceHosts
             };
         }
 
-        public async Task<ResultBase<Guid>> LoginAsync(string userID, byte[] password)
+        public async Task<ResultBase<Guid>> LoginAsync(string userID, byte[] password, bool force)
         {
-            this.authenticationToken = await this.CremaHost.LoginAsync(userID, ToSecureString(userID, password));
+            this.authenticationToken = await this.CremaHost.LoginAsync(userID, ToSecureString(userID, password), force);
             this.authentication = await this.CremaHost.AuthenticateAsync(this.authenticationToken);
             this.OwnerID = this.authentication.ID;
             this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(LoginAsync)}");
@@ -145,7 +145,11 @@ namespace JSSoft.Crema.ServiceHosts
             {
                 var userContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
                 var text = Encoding.UTF8.GetString(password);
-                result.Value = await userContext.IsOnlineUserAsync(userID, StringUtility.ToSecureString(StringUtility.Decrypt(text, userID)));
+                var pass = StringUtility.ToSecureString(StringUtility.Decrypt(text, userID));
+                var authenticationToken = await this.CremaHost.LoginAsync(userID, pass, false);
+                var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
+                await this.CremaHost.LogoutAsync(authentication);
+                result.Value = authenticationToken != Guid.Empty;
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
             }
             catch (Exception e)

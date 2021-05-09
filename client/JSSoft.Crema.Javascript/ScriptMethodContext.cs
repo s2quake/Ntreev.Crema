@@ -48,7 +48,7 @@ namespace JSSoft.Crema.Javascript
         {
             if (this.token != null)
                 throw new ArgumentException("이미 로그인되어 있습니다.");
-            var token = await this.cremaHost.LoginAsync(userID, StringUtility.ToSecureString(password));
+            var token = await this.cremaHost.LoginAsync(userID, StringUtility.ToSecureString(password), false);
             var authenticator = this.cremaHost.GetService(typeof(Authenticator)) as Authenticator;
             this.Initialize(authenticator);
             this.token = $"{token}";

@@ -57,7 +57,7 @@ namespace JSSoft.Crema.ServiceHosts.Domains
             var result = new ResultBase<DomainContextMetaData>();
             try
             {
-                this.authentication = await this.UserContext.AuthenticateAsync(authenticationToken);
+                this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
                 this.OwnerID = this.authentication.ID;
                 result.Value = await this.AttachEventHandlersAsync();
                 result.SignatureDate = this.authentication.SignatureDate;

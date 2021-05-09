@@ -122,7 +122,7 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        public async Task<Guid> LoginAsync(SecureString password)
+        public async Task<Guid> LoginAsync(SecureString password, bool force)
         {
             try
             {
@@ -136,9 +136,16 @@ namespace JSSoft.Crema.Services.Users
                     var taskID = GuidUtility.FromName(this.ID);
                     if (this.Authentication != null)
                     {
-                        var closeInfo = new CloseInfo(CloseReason.Reconnected, string.Empty);
-                        this.Authentication.InvokeExpiredEvent(this.ID, string.Empty);
-                        this.Container.InvokeUsersLoggedOutEvent(this.Authentication, users, closeInfo);
+                        if (force == true)
+                        {
+                            var closeInfo = new CloseInfo(CloseReason.Reconnected, string.Empty);
+                            this.Authentication.InvokeExpiredEvent(this.ID, string.Empty);
+                            this.Container.InvokeUsersLoggedOutEvent(this.Authentication, users, closeInfo);
+                        }
+                        else
+                        {
+                            throw new CremaException("b722d687-0a8d-4999-ad54-cf38c0c25d6f");
+                        }
                     }
                     this.Authentication = authentication;
                     this.IsOnline = true;

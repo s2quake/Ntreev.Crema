@@ -30,6 +30,15 @@ namespace JSSoft.Crema.ConsoleHost
     {
         static async Task Main(string[] args)
         {
+
+            for (var i = (long)0; i < long.MaxValue; i += 1000)
+            {
+                var j = (long)((double)i);
+                if (i != j)
+                {
+                    int qwqer = 0;
+                }
+            }
             try
             {
                 using var application = new CremaApplication();

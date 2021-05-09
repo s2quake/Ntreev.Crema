@@ -29,8 +29,8 @@ namespace JSSoft.Crema.Data.Test
     [TestClass]
     public class CremaDataColumn_ChangeSingleToOtherTypeTest : CremaDataColumn_ChangeTypeTestBase
     {
-        private const float minIntValue = -9999999.0f;
-        private const float maxIntValue = 9999999.0f;
+        private const float minIntValue = -16777216.0f;
+        private const float maxIntValue = 16777216.0f;
         private const float maxOADateValue = 2958465.0f;
 
         public CremaDataColumn_ChangeSingleToOtherTypeTest()
@@ -140,7 +140,15 @@ namespace JSSoft.Crema.Data.Test
 
         [TestMethod]
         [ExpectedException(typeof(FormatException))]
-        public void SingleToInt32Fail()
+        public void SingleToInt32_MinValue_Fail()
+        {
+            this.AddRows(minIntValue - 1.0f);
+            column.DataType = typeof(int);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void SingleToInt32_MaxValue_Fail()
         {
             this.AddRows(maxIntValue + 1.0f);
             column.DataType = typeof(int);
