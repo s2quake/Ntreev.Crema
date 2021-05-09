@@ -25,7 +25,6 @@ using JSSoft.Crema.Presentation.Differences.Documents.ViewModels;
 using JSSoft.ModernUI.Framework;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Composition;
 using System.Windows.Input;
 
 namespace JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels

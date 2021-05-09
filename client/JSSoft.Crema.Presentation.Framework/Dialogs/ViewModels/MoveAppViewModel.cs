@@ -21,7 +21,6 @@
 
 using JSSoft.ModernUI.Framework.Dialogs.ViewModels;
 using System;
-using System.ComponentModel.Composition;
 
 namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
 {

@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Services
             : this(reason, string.Empty)
         {
         }
-        
+
         public ClosedEventArgs(CloseReason reason, string message)
         {
             this.Reason = reason;

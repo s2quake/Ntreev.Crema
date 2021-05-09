@@ -19,11 +19,24 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using System;
-using System.Text;
 using System.IO;
-using System.Windows.Documents;
+using System.IO;
+
+/* 'JSSoft.Crema.Presentation.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
+using System.IO;
+이후:
+using System.Text;
+*/
 using System.Windows;
+using System.Windows;
+/* 'JSSoft.Crema.Presentation.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
+using System.Windows;
+이후:
+using System.Windows.Documents;
+*/
+
 
 namespace Microsoft.Windows.Controls
 {

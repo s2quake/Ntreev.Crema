@@ -19,7 +19,6 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using System;
 using System.Windows.Documents;
 
 namespace Microsoft.Windows.Controls

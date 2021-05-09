@@ -22,7 +22,6 @@
 using JSSoft.Crema.Commands.Consoles;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
-using JSSoft.Library;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
@@ -37,9 +36,9 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
         private readonly ConsoleTerminalCancellation cancellation;
 
         [ImportingConstructor]
-        public ConsoleTerminal(ICremaHost cremaHost, 
+        public ConsoleTerminal(ICremaHost cremaHost,
             CremaApplication application,
-            ConsoleCommandContext commandContext, 
+            ConsoleCommandContext commandContext,
             ConsoleTerminalCancellation cancellation)
             : base(commandContext)
         {

@@ -19,12 +19,12 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using Microsoft.WindowsAPICodePack.Dialogs;
 using JSSoft.Crema.Presentation.Converters.Properties;
 using JSSoft.Crema.Services;
 using JSSoft.Crema.Spreadsheet;
 using JSSoft.ModernUI.Framework;
 using JSSoft.ModernUI.Framework.ViewModels;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.ComponentModel.Composition;
 

@@ -30,7 +30,8 @@ namespace JSSoft.Crema.Presentation.Framework
 {
     public static class IDomainUserExtensions
     {
-        private static readonly List<Color> colors = new() {
+        private static readonly List<Color> colors = new()
+        {
             Color.FromRgb(0xa4, 0xc4, 0x00),   // lime
             Color.FromRgb(0x60, 0xa9, 0x17),   // green
             Color.FromRgb(0x00, 0x8a, 0x00),   // emerald

@@ -437,7 +437,7 @@ namespace JSSoft.Crema.Services.Data
         public UserContext UserContext => this.CremaHost.UserContext;
 
         public new int Count => base.Count;
-        
+
         public ManualResetEvent ReleaseHandle { get; } = new ManualResetEvent(false);
 
         public event ItemsCreatedEventHandler<IDataBase> ItemsCreated

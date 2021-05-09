@@ -22,12 +22,10 @@
 using JSSoft.Crema.Presentation.Framework;
 using JSSoft.Crema.Presentation.Users.Properties;
 using JSSoft.Crema.Services;
-using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel.Composition;
 using System.Linq;
 
 namespace JSSoft.Crema.Presentation.Users.PropertyItems.ViewModels

@@ -66,7 +66,7 @@ namespace JSSoft.Crema.ConsoleHost
         {
             return this.service.CloseAsync();
         }
-        
+
         public ServiceState ServiceState => this.service.ServiceState;
 
         public string Title

@@ -20,9 +20,15 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using System;
+
+/* 'JSSoft.Crema.Presentation.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
 using System.IO;
-using System.Diagnostics;
+이후:
 using System.Collections;
+*/
+using System.Diagnostics;
+using System.IO;
 using System.Text;
 
 namespace HTMLConverter
@@ -533,13 +539,13 @@ namespace HTMLConverter
         {
             // we are not concerned with escaped characters in names
             // we assume that character entities are allowed as part of a name
-            return 
-                this.IsGoodForNameStart(character) || 
-                character == '.' || 
-                character == '-' || 
+            return
+                this.IsGoodForNameStart(character) ||
+                character == '.' ||
+                character == '-' ||
                 character == ':' ||
-                Char.IsDigit(character) || 
-                IsCombiningCharacter(character) || 
+                Char.IsDigit(character) ||
+                IsCombiningCharacter(character) ||
                 IsExtender(character);
         }
 
@@ -592,7 +598,7 @@ namespace HTMLConverter
             // advance twice, once to get the lookahead character and then to reach the start of the cdata
             this.GetNextCharacter();
             this.GetNextCharacter();
-            
+
             // NOTE: 10/12/2004: modified this function to check when called if's reading CDATA or something else
             // some directives may start with a <![ and then have some data and they will just end with a ]>
             // this function is modified to stop at the sequence ]> and not ]]>
@@ -634,7 +640,7 @@ namespace HTMLConverter
             this.GetNextCharacter(); // get first '-'
             this.GetNextCharacter(); // get second '-'
             this.GetNextCharacter(); // get first character of comment content
- 
+
             while (true)
             {
                 // Read text until end of comment

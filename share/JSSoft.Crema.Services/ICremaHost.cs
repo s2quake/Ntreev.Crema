@@ -22,7 +22,6 @@
 using JSSoft.Crema.ServiceModel;
 using System;
 using System.Security;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services
