@@ -53,12 +53,6 @@ namespace JSSoft.Crema.Services
         event ItemsEventHandler<IUserItem> ItemsChanged;
 
         event TaskCompletedEventHandler TaskCompleted;
-
-// #if SERVER
-//         Task<Authentication> AuthenticateAsync(Guid authenticationToken);
-
-//         Task<bool> IsOnlineUserAsync(string userID, SecureString password);
-// #endif
     }
 
     public static class IUserContextExtensions
