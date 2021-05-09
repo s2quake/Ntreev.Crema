@@ -135,7 +135,7 @@ namespace JSSoft.Crema.Data
         {
             if (this.IsFlag == true)
             {
-                List<string> texts = new List<string>();
+                var texts = new List<string>();
 
                 if (value == 0)
                 {
@@ -180,7 +180,7 @@ namespace JSSoft.Crema.Data
 
         public static readonly TypeInfo Empty;
 
-        public static readonly TypeInfo Default = new TypeInfo()
+        public static readonly TypeInfo Default = new()
         {
             Name = string.Empty,
             CategoryPath = PathUtility.Separator,

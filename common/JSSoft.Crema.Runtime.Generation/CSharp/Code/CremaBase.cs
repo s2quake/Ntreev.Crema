@@ -145,7 +145,7 @@ namespace JSSoft.Crema.Code
             this.Name = table.Name;
             this.TableName = this.GetTableName(table.Name);
             this.keyToRow = new Dictionary<int, T>(table.Rows.Count);
-            List<T> rows = new List<T>(table.Rows.Count);
+            var rows = new List<T>(table.Rows.Count);
             foreach (var item in table.Rows)
             {
                 T row = this.CreateRowInstance(item, this);
@@ -251,7 +251,7 @@ namespace JSSoft.Crema.Code
 
         protected void SetRelations<U>(string childName, U[] childs, Action<T, string, U[]> setChildsAction) where U : CremaRow
         {
-            Dictionary<string, T> relationToRow = new Dictionary<string, T>(this.Rows.Length);
+            var relationToRow = new Dictionary<string, T>(this.Rows.Length);
 
             for (int i = 0; i < this.Rows.Length; i++)
             {
@@ -259,7 +259,7 @@ namespace JSSoft.Crema.Code
                 relationToRow.Add(item.GetRelationID(), item);
             }
 
-            Dictionary<T, List<U>> rowToChilds = new Dictionary<T, List<U>>(this.Rows.Length);
+            var rowToChilds = new Dictionary<T, List<U>>(this.Rows.Length);
 
             for (int i = 0; i < childs.Length; i++)
             {

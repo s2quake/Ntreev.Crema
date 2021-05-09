@@ -42,7 +42,7 @@ namespace JSSoft.Crema.Data
         internal readonly InternalAttribute attributeModifier;
         internal readonly InternalAttribute attributeModifiedDateTime;
         private string categoryPath;
-        private readonly FieldStack<bool> omitSignatureDate = new FieldStack<bool>();
+        private readonly FieldStack<bool> omitSignatureDate = new();
         private bool isDiffMode;
         private bool isLoading;
 
@@ -50,11 +50,11 @@ namespace JSSoft.Crema.Data
         private string templateNamespace;
         private InternalTableBase parent;
         private InternalTableBase templatedParent;
-        private readonly ObservableCollection<InternalTableBase> childItems = new ObservableCollection<InternalTableBase>();
-        private readonly ObservableCollection<InternalTableBase> derivedItems = new ObservableCollection<InternalTableBase>();
-        private readonly List<InternalAttribute> attributeList = new List<InternalAttribute>();
+        private readonly ObservableCollection<InternalTableBase> childItems = new();
+        private readonly ObservableCollection<InternalTableBase> derivedItems = new();
+        private readonly List<InternalAttribute> attributeList = new();
         private SignatureDateProvider signatureDateProvider;
-        private readonly FieldStack<bool> acceptChangesStack = new FieldStack<bool>();
+        private readonly FieldStack<bool> acceptChangesStack = new();
 
         protected InternalTableBase(string name, string categoryPath)
             : base(name)
@@ -1175,7 +1175,7 @@ namespace JSSoft.Crema.Data
         internal readonly InternalAttribute attributeIndex;
         private bool updateIndex;
 
-        private readonly List<RowBase> rowList = new List<RowBase>();
+        private readonly List<RowBase> rowList = new();
 
         protected InternalTableBase(string name, string categoryPath)
             : base(name, categoryPath)

@@ -76,7 +76,7 @@ namespace JSSoft.Crema.Data
 
         public TagInfo Tags
         {
-            get => new TagInfo(this.Field<string>(CremaSchema.Tags));
+            get => new(this.Field<string>(CremaSchema.Tags));
             set => this.SetField<string>(CremaSchema.Tags, value.ToString());
         }
 
@@ -106,7 +106,7 @@ namespace JSSoft.Crema.Data
             set => this.SetField(this.Table.columnComment, value);
         }
 
-        public TypeMemberInfo TypeMemberInfo => new TypeMemberInfo()
+        public TypeMemberInfo TypeMemberInfo => new()
         {
             ID = this.ID,
             Tags = this.Tags,

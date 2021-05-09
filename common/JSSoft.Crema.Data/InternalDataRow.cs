@@ -76,7 +76,7 @@ namespace JSSoft.Crema.Data
 
         public TagInfo Tags
         {
-            get => new TagInfo(this.Field<string>(this.table.attributeTag));
+            get => new(this.Field<string>(this.table.attributeTag));
             set => this.SetField(this.table.attributeTag, value.ToString());
         }
     }

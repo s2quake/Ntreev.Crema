@@ -35,9 +35,9 @@ namespace JSSoft.Crema.Data
     {
         private readonly InternalDataSet dataSet;
         private readonly DataTableCollection tables;
-        private readonly List<InternalDataTable> itemList = new List<InternalDataTable>();
-        private readonly Dictionary<string, InternalDataTable> itemsByName = new Dictionary<string, InternalDataTable>();
-        private readonly Dictionary<string, InternalDataTable> itemsByNamespace = new Dictionary<string, InternalDataTable>();
+        private readonly List<InternalDataTable> itemList = new();
+        private readonly Dictionary<string, InternalDataTable> itemsByName = new();
+        private readonly Dictionary<string, InternalDataTable> itemsByNamespace = new();
 
         internal CremaDataTableCollection(InternalDataSet dataSet)
         {

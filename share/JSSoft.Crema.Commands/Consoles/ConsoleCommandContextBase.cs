@@ -38,7 +38,7 @@ namespace JSSoft.Crema.Commands.Consoles
     {
         private Authentication authentication;
         private IConsoleDrive drive;
-        private readonly Dictionary<IConsoleDrive, string> drivePaths = new Dictionary<IConsoleDrive, string>();
+        private readonly Dictionary<IConsoleDrive, string> drivePaths = new();
         private string path;
         private Authentication commission;
 

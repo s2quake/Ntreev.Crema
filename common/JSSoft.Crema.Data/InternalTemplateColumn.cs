@@ -222,7 +222,7 @@ namespace JSSoft.Crema.Data
 
         public TagInfo InternalTags
         {
-            get => new TagInfo(this.Field<string>(this.table.columnTags));
+            get => new(this.Field<string>(this.table.columnTags));
             set => this.SetField(this.table.columnTags, value.ToString());
         }
 

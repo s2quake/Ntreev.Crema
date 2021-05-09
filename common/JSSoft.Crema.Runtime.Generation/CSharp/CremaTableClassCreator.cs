@@ -30,8 +30,8 @@ namespace JSSoft.Crema.Runtime.Generation.CSharp
 {
     static class CremaTableClassCreator
     {
-        private readonly static CodeThisReferenceExpression thisRef = new CodeThisReferenceExpression();
-        private readonly static CodeBaseReferenceExpression baseRef = new CodeBaseReferenceExpression();
+        private readonly static CodeThisReferenceExpression thisRef = new();
+        private readonly static CodeBaseReferenceExpression baseRef = new();
 
         public static void Create(CodeNamespace codeNamespace, CodeGenerationInfo generationInfo)
         {

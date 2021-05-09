@@ -40,9 +40,9 @@ namespace JSSoft.Crema.Data
 
         public readonly static TagInfo All = TagInfo.All;
 
-        public readonly static TagInfo Server = new TagInfo(serverString);
+        public readonly static TagInfo Server = new(serverString);
 
-        public readonly static TagInfo Client = new TagInfo(clientString);
+        public readonly static TagInfo Client = new(clientString);
 
         public readonly static TagInfo Unused = TagInfo.Unused;
 

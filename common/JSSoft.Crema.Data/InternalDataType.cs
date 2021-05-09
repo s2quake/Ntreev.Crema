@@ -49,7 +49,7 @@ namespace JSSoft.Crema.Data
         private KeyValuePair<string, long> deletedMember;
         private SignatureDate? modificationInfoCurrent;
 
-        private readonly ObservableCollection<InternalDataType> childList = new ObservableCollection<InternalDataType>();
+        private readonly ObservableCollection<InternalDataType> childList = new();
 
         public InternalDataType()
             : this(null, null, null)

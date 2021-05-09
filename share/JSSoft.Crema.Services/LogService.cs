@@ -43,7 +43,7 @@ namespace JSSoft.Crema.Services
         private Hierarchy hierarchy;
         //private TextWriter redirectionWriter;
         //private TextWriterAppender textAppender;
-        private readonly Dictionary<TextWriter, TextWriterAppender> appendersByWriter = new Dictionary<TextWriter, TextWriterAppender>();
+        private readonly Dictionary<TextWriter, TextWriterAppender> appendersByWriter = new();
 
         public LogService()
         {

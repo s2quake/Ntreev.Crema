@@ -31,7 +31,7 @@ namespace JSSoft.Crema.Javascript.Methods
     {
         private readonly ICremaHost cremaHost;
         private readonly IDictionary<DataBaseEvents, DataBaseEventListenerHost> listenerHosts;
-        private readonly Dictionary<DataBaseEvents, DataBaseEventListenerCollection> listeners = new Dictionary<DataBaseEvents, DataBaseEventListenerCollection>();
+        private readonly Dictionary<DataBaseEvents, DataBaseEventListenerCollection> listeners = new();
         private readonly CremaDispatcher dispatcher;
 
         public DataBaseEventListenerContext(ICremaHost cremaHost, DataBaseEventListenerHost[] eventListener)

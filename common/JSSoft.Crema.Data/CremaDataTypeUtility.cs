@@ -27,8 +27,8 @@ namespace JSSoft.Crema.Data
 {
     public static class CremaDataTypeUtility
     {
-        private static readonly Dictionary<string, Type> baseTypes = new Dictionary<string, Type>();
-        private static readonly Dictionary<Type, string> typeToName = new Dictionary<Type, string>();
+        private static readonly Dictionary<string, Type> baseTypes = new();
+        private static readonly Dictionary<Type, string> typeToName = new();
 
         public const string booleanType = "boolean";
         public const string stringType = "string";

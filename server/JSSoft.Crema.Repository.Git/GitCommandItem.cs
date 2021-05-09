@@ -79,12 +79,12 @@ namespace JSSoft.Crema.Repository.Git
             return new GitCommandItem($"max-count={count}");
         }
 
-        public static readonly GitCommandItem Separator = new GitCommandItem(string.Empty);
+        public static readonly GitCommandItem Separator = new(string.Empty);
 
-        public static readonly GitCommandItem Global = new GitCommandItem("global");
+        public static readonly GitCommandItem Global = new("global");
 
-        public static readonly GitCommandItem ShowNotes = new GitCommandItem("show-notes");
+        public static readonly GitCommandItem ShowNotes = new("show-notes");
 
-        public static readonly GitCommandItem NoPatch = new GitCommandItem("no-patch");
+        public static readonly GitCommandItem NoPatch = new("no-patch");
     }
 }

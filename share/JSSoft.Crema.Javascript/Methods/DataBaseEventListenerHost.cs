@@ -28,7 +28,7 @@ namespace JSSoft.Crema.Javascript.Methods
 {
     abstract class DataBaseEventListenerHost
     {
-        private readonly Dictionary<IDataBase, DataBaseEventListenerCollection> dataBaseToListeners = new Dictionary<IDataBase, DataBaseEventListenerCollection>();
+        private readonly Dictionary<IDataBase, DataBaseEventListenerCollection> dataBaseToListeners = new();
 
         protected DataBaseEventListenerHost(DataBaseEvents eventName)
         {

@@ -48,7 +48,7 @@ namespace JSSoft.Crema.ServiceModel
             set => this.Keys = value?.Select(item => item.ToValue()).ToArray();
         }
 
-        public static readonly DomainLocationInfo Empty = new DomainLocationInfo() { Keys = new object[] { } };
+        public static readonly DomainLocationInfo Empty = new() { Keys = new object[] { } };
 
         public static bool operator ==(DomainLocationInfo left, DomainLocationInfo right)
         {

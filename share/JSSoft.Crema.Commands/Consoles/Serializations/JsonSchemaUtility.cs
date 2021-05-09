@@ -33,7 +33,7 @@ namespace JSSoft.Crema.Commands.Consoles.Serializations
 {
     static class JsonSchemaUtility
     {
-        private static readonly Dictionary<Type, JSchema> schemas = new Dictionary<Type, JSchema>();
+        private static readonly Dictionary<Type, JSchema> schemas = new();
 
         static JsonSchemaUtility()
         {

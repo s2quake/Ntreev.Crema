@@ -35,7 +35,7 @@ namespace JSSoft.Crema.Data.Xml
 {
     public class CremaXmlReadInfo
     {
-        private readonly Version version = new Version(2, 0);
+        private readonly Version version = new(2, 0);
 
         public CremaXmlReadInfo(string xmlPath)
         {

@@ -46,8 +46,8 @@ namespace JSSoft.Crema.Data
 
         private TagInfo tags = TagInfo.All;
         private bool[] autoIncrements;
-        private readonly List<InternalDataColumn> columnList = new List<InternalDataColumn>();
-        private readonly ObservableCollection<InternalDataTable> childList = new ObservableCollection<InternalDataTable>();
+        private readonly List<InternalDataColumn> columnList = new();
+        private readonly ObservableCollection<InternalDataTable> childList = new();
 
         public InternalDataTable()
             : this(null, null, null)

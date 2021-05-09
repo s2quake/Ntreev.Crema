@@ -33,7 +33,7 @@ namespace JSSoft.Crema.Runtime.Generation
         private string postfix;
         private string basePath;
         private TagInfo tags;
-        private readonly Dictionary<string, object> arguments = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> arguments = new();
 
         public string ClassName
         {
@@ -83,7 +83,7 @@ namespace JSSoft.Crema.Runtime.Generation
 
         public IDictionary<string, object> Arguments => this.arguments;
 
-        public readonly static CodeGenerationSettings Default = new CodeGenerationSettings()
+        public readonly static CodeGenerationSettings Default = new()
         {
             ClassName = string.Empty,
             Namespace = string.Empty,

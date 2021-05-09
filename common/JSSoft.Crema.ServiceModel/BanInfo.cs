@@ -89,7 +89,7 @@ namespace JSSoft.Crema.ServiceModel
             return props;
         }
 
-        public static readonly BanInfo Empty = new BanInfo()
+        public static readonly BanInfo Empty = new()
         {
             Path = string.Empty,
             Comment = string.Empty,

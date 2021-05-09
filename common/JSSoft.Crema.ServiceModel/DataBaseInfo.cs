@@ -85,7 +85,7 @@ namespace JSSoft.Crema.ServiceModel
             return props;
         }
 
-        public readonly static DataBaseInfo Empty = new DataBaseInfo()
+        public readonly static DataBaseInfo Empty = new()
         {
             Name = string.Empty,
             Comment = string.Empty,

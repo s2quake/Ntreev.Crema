@@ -42,7 +42,7 @@ namespace JSSoft.Crema.Data.Xml.Schema
         private readonly CremaDataType dataType;
         private readonly ItemName itemName;
 
-        private static readonly XmlWriterSettings settings = new XmlWriterSettings()
+        private static readonly XmlWriterSettings settings = new()
         {
             Encoding = Encoding.UTF8,
             Indent = true,

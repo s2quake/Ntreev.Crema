@@ -40,8 +40,8 @@ namespace JSSoft.Crema.Data.Xml.Schema
         private readonly CremaDataTable dataTable;
         private readonly CremaDataType dataType;
         private readonly ItemName itemName;
-        private readonly Dictionary<string, CremaDataTable> tables = new Dictionary<string, CremaDataTable>();
-        private Version version = new Version();
+        private readonly Dictionary<string, CremaDataTable> tables = new();
+        private Version version = new();
         private string hashValue;
         private XmlSchema schema;
 

@@ -35,7 +35,7 @@ namespace JSSoft.Crema.ObjectSerializer.Yaml
 
         private static readonly ISerializer propertySerializer;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:읽지 않은 private 멤버 제거", Justification = "<보류 중>")]
-        private static readonly Deserializer propertyDeserializer = new Deserializer();
+        private static readonly Deserializer propertyDeserializer = new();
 
         static YamlObjectSerializer()
         {

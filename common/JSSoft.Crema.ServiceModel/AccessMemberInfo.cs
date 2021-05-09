@@ -80,7 +80,7 @@ namespace JSSoft.Crema.ServiceModel
             return props;
         }
 
-        public static readonly AccessMemberInfo Empty = new AccessMemberInfo()
+        public static readonly AccessMemberInfo Empty = new()
         {
             AccessType = AccessType.Owner,
             SignatureDate = SignatureDate.Empty

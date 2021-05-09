@@ -355,9 +355,9 @@ namespace JSSoft.Crema.Data
         /// </summary>
         public CremaDataSet Clone()
         {
-            string schema = this.GetXmlSchema();
+            var schema = this.GetXmlSchema();
 
-            CremaDataSet dataSet = new CremaDataSet();
+            var dataSet = new CremaDataSet();
             dataSet.ReadXmlSchemaString(schema);
 
             return dataSet;

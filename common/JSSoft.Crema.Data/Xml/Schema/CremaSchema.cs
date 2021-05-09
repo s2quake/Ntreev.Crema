@@ -92,7 +92,7 @@ namespace JSSoft.Crema.Data.Xml.Schema
 
         public const string ContentsModifiedDateTime = "ContentsModifiedDateTime";
         public const string ContentsModifier = "ContentsModifier";
-        internal readonly static object lockobj = new object();
+        internal readonly static object lockobj = new();
 
         internal const string DataTypePrefix = "dt";
         internal const string TableTypePrefix = "t";

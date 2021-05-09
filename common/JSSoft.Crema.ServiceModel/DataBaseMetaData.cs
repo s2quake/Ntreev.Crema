@@ -54,7 +54,7 @@ namespace JSSoft.Crema.ServiceModel
         [DataMember]
         public AuthenticationInfo[] Authentications { get; set; }
 
-        public readonly static DataBaseMetaData Empty = new DataBaseMetaData()
+        public readonly static DataBaseMetaData Empty = new()
         {
             DataBaseInfo = DataBaseInfo.Empty,
             AccessInfo = AccessInfo.Empty,

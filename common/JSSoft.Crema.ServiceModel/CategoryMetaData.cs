@@ -36,7 +36,7 @@ namespace JSSoft.Crema.ServiceModel
         [DataMember]
         public AccessInfo AccessInfo { get; set; }
 
-        public static readonly CategoryMetaData Empty = new CategoryMetaData()
+        public static readonly CategoryMetaData Empty = new()
         {
             Path = string.Empty,
             LockInfo = LockInfo.Empty,

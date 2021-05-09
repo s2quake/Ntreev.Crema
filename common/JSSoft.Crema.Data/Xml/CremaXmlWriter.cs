@@ -40,7 +40,7 @@ namespace JSSoft.Crema.Data.Xml
         private readonly CremaDataTable dataTable;
         private readonly string targetNamespace;
 
-        private static readonly XmlWriterSettings settings = new XmlWriterSettings()
+        private static readonly XmlWriterSettings settings = new()
         {
             Encoding = Encoding.UTF8,
             Indent = true,

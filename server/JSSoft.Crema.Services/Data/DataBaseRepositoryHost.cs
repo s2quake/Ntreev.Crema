@@ -38,8 +38,8 @@ namespace JSSoft.Crema.Services.Data
         private readonly CremaSettings settings;
         private Version version;
 
-        private readonly HashSet<string> types = new HashSet<string>();
-        private readonly HashSet<string> tables = new HashSet<string>();
+        private readonly HashSet<string> types = new();
+        private readonly HashSet<string> tables = new();
 
         public DataBaseRepositoryHost(DataBase dataBase, IRepository repository)
             : base(repository)

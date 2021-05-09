@@ -39,7 +39,7 @@ namespace JSSoft.Crema.Javascript
     {
         private readonly string name;
         private readonly ICremaHost cremaHost;
-        private readonly List<Engine> engineList = new List<Engine>();
+        private readonly List<Engine> engineList = new();
         private TextWriter writer;
 
         public ScriptContextBase(string name, ICremaHost cremaHost)

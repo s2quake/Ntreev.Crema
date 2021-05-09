@@ -35,9 +35,9 @@ namespace JSSoft.Crema.Services.Data
     class DataBaseSet : IDisposable
     {
         private readonly DataBase dataBase;
-        private readonly List<CremaDataType> types = new List<CremaDataType>();
-        private readonly List<CremaDataTable> tables = new List<CremaDataTable>();
-        private readonly Dictionary<string, string> hashByPath = new Dictionary<string, string>();
+        private readonly List<CremaDataType> types = new();
+        private readonly List<CremaDataTable> tables = new();
+        private readonly Dictionary<string, string> hashByPath = new();
         private readonly DataBaseSetOptions options;
 
         private DataBaseSet(DataBase dataBase, CremaDataSet dataSet, DataBaseSetOptions options)

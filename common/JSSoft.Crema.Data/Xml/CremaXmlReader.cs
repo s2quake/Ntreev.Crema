@@ -39,9 +39,9 @@ namespace JSSoft.Crema.Data.Xml
         private readonly CremaDataSet dataSet;
         private readonly CremaDataTable dataTable;
         private readonly ItemName itemName;
-        private readonly Version version40 = new Version(4, 0);
+        private readonly Version version40 = new(4, 0);
         private Dictionary<string, CremaDataTable> tables;
-        private Version version = new Version();
+        private Version version = new();
 
         public CremaXmlReader(CremaDataSet dataSet)
         {

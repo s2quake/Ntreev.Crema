@@ -27,7 +27,7 @@ namespace JSSoft.Crema.Javascript.Methods
 {
     abstract class CremaEventListenerHost
     {
-        private readonly CremaEventListenerCollection listeners = new CremaEventListenerCollection();
+        private readonly CremaEventListenerCollection listeners = new();
 
         protected CremaEventListenerHost(CremaEvents eventName)
         {

@@ -36,7 +36,7 @@ namespace JSSoft.Crema.ServiceModel
         [DataMember]
         public Authority Authority { get; set; }
 
-        public readonly static AuthenticationInfo Empty = new AuthenticationInfo()
+        public readonly static AuthenticationInfo Empty = new()
         {
             ID = string.Empty,
             Name = string.Empty,

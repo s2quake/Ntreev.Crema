@@ -40,7 +40,7 @@ namespace JSSoft.Crema.Data
 
         public SignatureDate CreationInfo
         {
-            get => new SignatureDate(this.Field<string>(this.table.attributeCreator) ?? string.Empty, this.Field<DateTime>(this.table.attributeCreatedDateTime));
+            get => new(this.Field<string>(this.table.attributeCreator) ?? string.Empty, this.Field<DateTime>(this.table.attributeCreatedDateTime));
             internal set
             {
                 if (this.table.attributeCreator.ReadOnly == false)
@@ -65,7 +65,7 @@ namespace JSSoft.Crema.Data
 
         public SignatureDate ModificationInfo
         {
-            get => new SignatureDate(this.Field<string>(this.table.attributeModifier) ?? string.Empty, this.Field<DateTime>(this.table.attributeModifiedDateTime));
+            get => new(this.Field<string>(this.table.attributeModifier) ?? string.Empty, this.Field<DateTime>(this.table.attributeModifiedDateTime));
             internal set
             {
                 if (this.table.attributeModifier.ReadOnly == false)

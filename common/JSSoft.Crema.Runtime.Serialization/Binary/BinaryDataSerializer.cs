@@ -36,9 +36,9 @@ namespace JSSoft.Crema.Runtime.Serialization.Binary
     {
         public const int formatterVersion = 0;
 
-        private BinaryTableHeader tableHeader = new BinaryTableHeader();
-        private BinaryTableInfo tableInfo = new BinaryTableInfo();
-        private readonly HashSet<string> strings = new HashSet<string>();
+        private BinaryTableHeader tableHeader = new();
+        private BinaryTableInfo tableInfo = new();
+        private readonly HashSet<string> strings = new();
         private List<BinaryColumnInfo> columns;
 
         [ImportingConstructor]

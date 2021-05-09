@@ -176,7 +176,7 @@ namespace JSSoft.Crema.Data
 
         public static readonly TableInfo Empty;
 
-        public static readonly TableInfo Default = new TableInfo()
+        public static readonly TableInfo Default = new()
         {
             Name = string.Empty,
             CategoryPath = PathUtility.Separator,

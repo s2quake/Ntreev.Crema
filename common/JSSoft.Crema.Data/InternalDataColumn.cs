@@ -537,7 +537,7 @@ namespace JSSoft.Crema.Data
             }
         }
 
-        public ColumnInfo ColumnInfo => new ColumnInfo()
+        public ColumnInfo ColumnInfo => new()
         {
             ID = this.ColumnID,
             IsKey = this.IsKey,
@@ -554,7 +554,7 @@ namespace JSSoft.Crema.Data
             ModificationInfo = this.ModificationInfo,
         };
 
-        public ColumnInfo DiffColumnInfo => new ColumnInfo()
+        public ColumnInfo DiffColumnInfo => new()
         {
             ID = this.ColumnID,
             IsKey = this.IsKey,

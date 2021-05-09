@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Runtime.Serialization
     [DataContract(Namespace = SchemaUtility.Namespace)]
     public struct SerializationField
     {
-        private static readonly CultureInfo cultureInfo = new CultureInfo("en-US");
+        private static readonly CultureInfo cultureInfo = new("en-US");
 
         public SerializationField(object field)
         {

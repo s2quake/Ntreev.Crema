@@ -29,7 +29,7 @@ namespace JSSoft.Crema.Data.Xml
 {
     public class CremaXmlResolver : XmlResolver
     {
-        public static CremaXmlResolver Default = new CremaXmlResolver();
+        public static CremaXmlResolver Default = new();
         private readonly string filename;
 
         public CremaXmlResolver()
@@ -72,7 +72,7 @@ namespace JSSoft.Crema.Data.Xml
                     if (this.schema != null)
                         return this.schema;
 
-                    using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
                         this.schema = XmlSchema.Read(stream, CremaSchema.SchemaValidationEventHandler);
                     }

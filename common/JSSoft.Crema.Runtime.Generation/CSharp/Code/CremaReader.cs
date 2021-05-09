@@ -1065,7 +1065,7 @@ namespace JSSoft.Crema.Reader
 
             private int SocketRead(long pos)
             {
-                BufferInfo bufferInfo = new BufferInfo(pos, SocketStream.bufferLength);
+                var bufferInfo = new BufferInfo(pos, SocketStream.bufferLength);
                 //bufferInfo.pos = pos;
                 //bufferInfo.size = SocketStream.bufferLength;
                 //bufferInfo.dummy = 0;
@@ -1109,7 +1109,7 @@ namespace JSSoft.Crema.Reader
         static class StringResource
         {
             private static int refCount = 0;
-            private static readonly Dictionary<int, string> strings = new Dictionary<int, string>();
+            private static readonly Dictionary<int, string> strings = new();
 
             public static void Read(BinaryReader reader)
             {

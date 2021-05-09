@@ -60,7 +60,7 @@ namespace JSSoft.Crema.Commands.Consoles.Serializations
             set => this.members = value;
         }
 
-        public static readonly JsonTableInfo Default = new JsonTableInfo()
+        public static readonly JsonTableInfo Default = new()
         {
             TableName = string.Empty,
             Tags = $"{TagInfoUtility.All}",

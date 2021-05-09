@@ -49,7 +49,7 @@ namespace JSSoft.Crema.Commands.Consoles.Serializations
 
         //public static string[] CategoryPaths { get; set; }
 
-        public static readonly JsonUserInfo Default = new JsonUserInfo()
+        public static readonly JsonUserInfo Default = new()
         {
             UserID = string.Empty,
             Password = string.Empty,
