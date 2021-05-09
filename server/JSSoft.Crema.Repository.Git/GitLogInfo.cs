@@ -46,7 +46,7 @@ namespace JSSoft.Crema.Repository.Git
 
         private static readonly int defaultMaxCount = 50;
 
-        private static readonly Deserializer propertyDeserializer = new Deserializer();
+        private static readonly Deserializer propertyDeserializer = new();
 
         public override string ToString()
         {

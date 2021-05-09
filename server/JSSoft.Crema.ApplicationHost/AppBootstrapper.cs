@@ -29,7 +29,7 @@ namespace JSSoft.Crema.ApplicationHost
 {
     class AppBootstrapper : AppBootstrapperBase
     {
-        private readonly static Dictionary<string, Uri> themes = new Dictionary<string, Uri>(StringComparer.CurrentCultureIgnoreCase);
+        private readonly static Dictionary<string, Uri> themes = new(StringComparer.CurrentCultureIgnoreCase);
 
         static AppBootstrapper()
         {

@@ -37,7 +37,7 @@ namespace JSSoft.Crema.Bot
         private const string masterBotID = "smith";
         private const string masterBotName = "Smith";
         private readonly ICremaHost cremaHost;
-        private readonly Dictionary<string, AutobotBase> botByID = new Dictionary<string, AutobotBase>();
+        private readonly Dictionary<string, AutobotBase> botByID = new();
 
         protected AutobotServiceBase(ICremaHost cremaHost, IEnumerable<ITaskProvider> taskProviders)
         {

@@ -35,7 +35,7 @@ namespace JSSoft.Crema.RuntimeService
 {
     class RuntimeServiceItem : DataServiceItemBase
     {
-        private readonly Dictionary<string, SerializationSet> caches = new Dictionary<string, SerializationSet>();
+        private readonly Dictionary<string, SerializationSet> caches = new();
         private readonly CremaDispatcher dispatcher;
         private readonly Authentication authentication;
 

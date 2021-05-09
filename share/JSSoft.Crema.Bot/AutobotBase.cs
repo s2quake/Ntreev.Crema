@@ -34,8 +34,8 @@ namespace JSSoft.Crema.Bot
 {
     public abstract class AutobotBase : IServiceProvider
     {
-        private readonly TaskContext taskContext = new TaskContext();
-        private readonly CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
+        private readonly TaskContext taskContext = new();
+        private readonly CancellationTokenSource cancelTokenSource = new();
         private IEnumerable<ITaskProvider> taskProviders;
         private CremaDispatcher dispatcher;
 

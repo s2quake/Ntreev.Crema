@@ -53,7 +53,7 @@ namespace JSSoft.Crema.Commands.Consoles.Serializations
             set => this.members = value;
         }
 
-        public static readonly JsonTypeInfo Default = new JsonTypeInfo()
+        public static readonly JsonTypeInfo Default = new()
         {
             TypeName = string.Empty,
             IsFlag = false,
