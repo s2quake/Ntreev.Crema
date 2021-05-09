@@ -36,9 +36,9 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
         private readonly ConsoleTerminalCancellation cancellation;
 
         [ImportingConstructor]
-        public ConsoleTerminal(ICremaHost cremaHost, 
+        public ConsoleTerminal(ICremaHost cremaHost,
             CremaApplication application,
-            ConsoleCommandContext commandContext, 
+            ConsoleCommandContext commandContext,
             ConsoleTerminalCancellation cancellation)
             : base(commandContext)
         {

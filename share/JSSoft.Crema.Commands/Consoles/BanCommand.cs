@@ -21,7 +21,6 @@
 
 using JSSoft.Library.Commands;
 using System;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.Threading;

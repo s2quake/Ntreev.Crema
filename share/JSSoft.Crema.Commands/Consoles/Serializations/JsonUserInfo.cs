@@ -19,9 +19,9 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using Newtonsoft.Json;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Library;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace JSSoft.Crema.Commands.Consoles.Serializations

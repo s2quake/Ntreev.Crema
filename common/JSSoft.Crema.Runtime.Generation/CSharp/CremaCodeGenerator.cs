@@ -19,9 +19,9 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using Microsoft.CSharp;
 using JSSoft.Crema.Data.Xml.Schema;
 using JSSoft.Library.IO;
+using Microsoft.CSharp;
 using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;

@@ -19,14 +19,14 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using Newtonsoft.Json.Schema;
-using Newtonsoft.Json.Schema.Generation;
 using JSSoft.Crema.Commands.Consoles.Properties;
 using JSSoft.Crema.Commands.Consoles.Serializations;
 using JSSoft.Crema.Services;
 using JSSoft.Library;
 using JSSoft.Library.Commands;
 using JSSoft.Library.ObjectModel;
+using Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Schema.Generation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;

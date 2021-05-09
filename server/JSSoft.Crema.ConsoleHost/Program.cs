@@ -19,10 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Crema.Commands;
 using System;
-using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost
