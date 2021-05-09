@@ -180,7 +180,7 @@ namespace JSSoft.Crema.ServerService.Test
 
         public static async Task<ITable> GenerateStandardTableAsync(this ITableCategory category, Authentication authentication, string prefix, IEnumerable<string> keyTypes, IEnumerable<string> columnTypes)
         {
-            var tables = category.GetService<ITableCollection>();
+            var tables = category.GetService(typeof(ITableCollection)) as ITableCollection;
             var tableName = string.Join("_", EnumerableUtility.Friends(prefix, keyTypes));
 
             if (tables.Contains(tableName) == true)
@@ -231,7 +231,7 @@ namespace JSSoft.Crema.ServerService.Test
 
         public static async Task<ITable> GenerateStandardChildAsync(this ITable table, Authentication authentication, string prefix, IEnumerable<string> keyTypes, IEnumerable<string> columnTypes)
         {
-            var typeCollection = table.GetService<ITypeCollection>();
+            var typeCollection = table.GetService(typeof(ITypeCollection)) as ITypeCollection;
             var tableName = string.Join("_", EnumerableUtility.Friends(prefix, keyTypes));
 
             if (table.Childs.ContainsKey(tableName) == true)
@@ -264,7 +264,7 @@ namespace JSSoft.Crema.ServerService.Test
 
         public static async Task GenerateStandardChildAsync(this ITable table, Authentication authentication)
         {
-            var typeCollection = table.GetService<ITypeCollection>();
+            var typeCollection = table.GetService(typeof(ITypeCollection)) as ITypeCollection;
             var types1 = typeCollection.Select(item => item.Name).ToArray();
             var types2 = CremaDataTypeUtility.GetBaseTypeNames();
             var allTypes = types1.Concat(types2);
@@ -290,7 +290,7 @@ namespace JSSoft.Crema.ServerService.Test
         //    foreach (var item in allTypes)
         //    {
         //        var tableName = string.Join("_", "SingleKey", item);
-        //        var template = category.NewTable(authentication);
+        //        var template = category.NewTableAsync(authentication);
         //        template.SetTableName(authentication, tableName);
         //        template.SetComment(authentication, string.Format("Single Key Table : {0}", item));
 

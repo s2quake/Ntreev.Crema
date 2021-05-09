@@ -241,14 +241,14 @@ namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
         [ExpectedException(typeof(InvalidOperationException))]
         public void Lock()
         {
-            category.Lock(authentication, RandomUtility.NextString());
+            category.LockAsync(authentication, RandomUtility.NextString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void Unlock()
         {
-            category.Unlock(authentication);
+            category.UnlockAsync(authentication);
         }
 
         [TestMethod]

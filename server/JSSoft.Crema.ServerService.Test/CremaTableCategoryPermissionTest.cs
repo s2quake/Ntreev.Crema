@@ -61,7 +61,7 @@ namespace JSSoft.Crema.ServerService.Test
         {
             try
             {
-                var categories = await category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
+                var categories = category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
                 await category.MoveAsync(authentication, categories.Root.Path);
                 Assert.Fail("Move");
             }
@@ -74,7 +74,7 @@ namespace JSSoft.Crema.ServerService.Test
         {
             try
             {
-                var categories = await category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
+                var categories = category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
                 await category.Parent.MoveAsync(authentication, categories.Root.Path);
                 Assert.Fail("Move");
             }

@@ -33,7 +33,7 @@ namespace JSSoft.Crema.ServerService.Test
 {
     class OnlineUserCollection : Dictionary<IUser, Authentication>
     {
-        public void Initialize(ICremaHost cremaHost)
+        public async Task InitializeAsync(ICremaHost cremaHost)
         {
             var userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
             var users = await userCollection.Dispatcher.InvokeAsync(() => userCollection.ToArray());

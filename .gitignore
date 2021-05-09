@@ -27,6 +27,7 @@ packages/
 .DS_Store
 .vs/
 .vscode/
+.test/
 *.user
 *.suo
 launchSettings.json

@@ -54,7 +54,7 @@ namespace JSSoft.Crema.Services
 
         public static void CreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType)
         {
-            CreateRepository(serviceProvider, basePath, repositoryModule, fileType, null);
+            CreateRepository(serviceProvider, basePath, repositoryModule, fileType, string.Empty);
         }
 
         public static void CreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, string dataBaseUrl)

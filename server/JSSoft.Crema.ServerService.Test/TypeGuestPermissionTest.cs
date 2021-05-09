@@ -28,256 +28,229 @@ using JSSoft.Library.Random;
 using System.Collections.Generic;
 using JSSoft.Library;
 using JSSoft.Library.IO;
+using System.Threading.Tasks;
+using JSSoft.Crema.ServiceModel;
 
-namespace JSSoft.Crema.ServerService.Test
-{
-    [TestClass]
-    public class TypeGuestPermissionTest
-    {
-        private static ICremaHost cremaHost;
+// namespace JSSoft.Crema.ServerService.Test
+// {
+//     [TestClass]
+//     public class TypeGuestPermissionTest
+//     {
+//         private static CremaBootstrapper app;
+//         private static ICremaHost cremaHost;
+//         private static Guid token;
 
-        private readonly static Dictionary<IUser, Authentication> users = new Dictionary<IUser, Authentication>();
 
-        private TestContext testContext;
+//         private readonly static Dictionary<IUser, Authentication> authenticationByUser = new Dictionary<IUser, Authentication>();
 
-        private Authentication guest;
-        private IType type;
+//         private TestContext testContext;
 
-        [ClassInitialize()]
-        public static void ClassInit(TestContext context)
-        {
-            var solutionDir = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
-            var tempDir = Path.Combine(solutionDir, "crema_repo", "permission_test", "type_guest");
-            var empty = DirectoryUtility.Exists(tempDir) == false || DirectoryUtility.IsEmpty(tempDir);
+//         private Authentication guest;
+//         private IType type;
 
-            cremaHost = TestCrema.GetInstance(tempDir);
-            cremaHost.Open();
+//         [ClassInitialize()]
+//         public static async Task ClassInit(TestContext context)
+//         {
+//             var solutionDir = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
+//             var tempDir = Path.Combine(solutionDir, "crema_repo", "permission_test", "type_guest");
+//             var empty = DirectoryUtility.Exists(tempDir) == false || DirectoryUtility.IsEmpty(tempDir);
 
-            if (empty == true)
-            {
-                CremaSimpleGenerator.Generate(cremaHost, 10);
-            }
+//             app = new();
+//             cremaHost = TestCrema.GetInstance(tempDir);
+//             token = await cremaHost.OpenAsync();
 
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                var userContext = cremaHost.GetService<IUserContext>();
+//             if (empty == true)
+//             {
+//                 CremaSimpleGenerator.Generate(cremaHost, 10);
+//             }
 
-                foreach (var item in userContext.Users)
-                {
-                    var authentication = cremaHost.Login(item.ID, item.Authority.ToString().ToLower());
-                    users.Add(item, authentication);
-                }
-            });
-        }
+//             var userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+//             var users = await userCollection.Dispatcher.InvokeAsync(() => userCollection.ToArray());
+//             foreach (var item in users)
+//             {
+//                 var password = StringUtility.ToSecureString($"{item.Authority}".ToLower());
+//                 var authenticationToken = await cremaHost.LoginAsync(item.ID, password);
+//                 var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
+//                 authenticationByUser.Add(item, authentication);
+//             }
+//         }
 
-        [TestInitialize()]
-        public void Initialize()
-        {
-            var dataBase = cremaHost.PrimaryDataBase;
-            var typeContext = dataBase.TypeContext;
-            this.guest = users.Where(item => item.Key.Authority == Authority.Guest).Random().Value;
-            this.type = typeContext.Types.RandomOrDefault(item => item.IsLocked == false);
-        }
+//         [TestInitialize()]
+//         public async Task InitializeAsync()
+//         {
+//             var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+//             var dataBase = await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.First());
+//             var typeContext = dataBase.TypeContext;
+//             this.guest = authenticationByUser.Where(item => item.Key.Authority == Authority.Guest).Random().Value;
+//             this.type = typeContext.Types.RandomOrDefault(item => item.IsLocked == false);
+//         }
 
-        [TestCleanup()]
-        public void Cleanup()
-        {
-            this.guest = null;
-            this.type = null;
-        }
+//         [TestCleanup()]
+//         public void Cleanup()
+//         {
+//             this.guest = null;
+//             this.type = null;
+//         }
 
-        [ClassCleanup()]
-        public static void ClassCleanup()
-        {
-            cremaHost.Dispatcher.Invoke(() => cremaHost.Close());
-            cremaHost.Dispose();
-        }
+//         [ClassCleanup()]
+//         public static async Task ClassCleanupAsync()
+//         {
+//             await cremaHost.CloseAsync(token);
+//             token = Guid.Empty;
+//         }
 
-        [TestMethod]
-        public void TypeFailTest()
-        {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    var types = this.type.GetService(typeof(ITypeCollection)) as ITypeCollection;
-                    var type = types.RandomOrDefault(item => item.VerifyWrite(this.guest));
-                    Assert.IsNull(type);
-                }
-                catch (PermissionDeniedException)
-                {
-                }
-            });
-        }
+//         [TestMethod]
+//         public async Task TypeFailTestAsync()
+//         {
+//             try
+//             {
+//                 var types = this.type.GetService(typeof(ITypeCollection)) as ITypeCollection;
+//                 var type = types.RandomOrDefault(item => item.VerifyAccessType(this.guest, AccessType.Editor));
+//                 Assert.IsNull(type);
+//             }
+//             catch (PermissionDeniedException)
+//             {
+//             }
+//         }
 
-        [TestMethod]
-        public void TypeRenameFailTest()
-        {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    var types = this.type.GetService(typeof(ITypeCollection)) as ITypeCollection;
-                    var newName = NameUtility.GenerateNewName(RandomUtility.NextIdentifier(), types.Select(item => item.Name));
-                    this.type.Rename(this.guest, newName);
-                    Assert.Fail("Rename");
-                }
-                catch (PermissionDeniedException)
-                {
-                }
-            });
-        }
+//         [TestMethod]
+//         public async Task TypeRenameFailTestAsync()
+//         {
+//             try
+//             {
+//                 var types = this.type.GetService(typeof(ITypeCollection)) as ITypeCollection;
+//                 var newName = NameUtility.GenerateNewName(RandomUtility.NextIdentifier(), types.Select(item => item.Name));
+//                 await this.type.RenameAsync(this.guest, newName);
+//                 Assert.Fail("Rename");
+//             }
+//             catch (PermissionDeniedException)
+//             {
+//             }
+//         }
 
-        [TestMethod]
-        public void TypeMoveFailTest()
-        {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    var categories = this.type.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
-                    var category = categories.RandomOrDefault(item => item != this.type.Category);
-                    this.type.Move(this.guest, category.Path);
-                    Assert.Fail("Move");
-                }
-                catch (PermissionDeniedException)
-                {
-                }
-            });
-        }
+//         [TestMethod]
+//         public async Task TypeMoveFailTestAsync()
+//         {
+//             try
+//             {
+//                 var categories = this.type.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
+//                 var category = categories.RandomOrDefault(item => item != this.type.Category);
+//                 await this.type.MoveAsync(this.guest, category.Path);
+//                 Assert.Fail("Move");
+//             }
+//             catch (PermissionDeniedException)
+//             {
+//             }
+//         }
 
-        [TestMethod]
-        public void TypeDeleteFailTest()
-        {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    this.type.Delete(this.guest);
-                    Assert.Fail("Delete");
-                }
-                catch (PermissionDeniedException)
-                {
-                }
-            });
-        }
+//         [TestMethod]
+//         public async Task TypeDeleteFailTestAsync()
+//         {
+//             try
+//             {
+//                 await this.type.DeleteAsync(this.guest);
+//                 Assert.Fail("Delete");
+//             }
+//             catch (PermissionDeniedException)
+//             {
+//             }
+//         }
 
-        [TestMethod]
-        public void TypeTemplateEditFailTest()
-        {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    this.type.Template.BeginEdit(this.guest);
-                    Assert.Fail("Template.BeginEdit");
-                }
-                catch (PermissionDeniedException)
-                {
-                }
-            });
-        }
+//         [TestMethod]
+//         public async Task TypeTemplateEditFailTestAsync()
+//         {
+//             try
+//             {
+//                 await this.type.Template.BeginEditAsync(this.guest);
+//                 Assert.Fail("Template.BeginEdit");
+//             }
+//             catch (PermissionDeniedException)
+//             {
+//             }
+//         }
 
-        [TestMethod]
-        public void TypeLockFailTest()
-        {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    this.type.Lock(this.guest, string.Empty);
-                    Assert.Fail("Lock");
-                }
-                catch (PermissionDeniedException)
-                {
-                }
-            });
-        }
+//         [TestMethod]
+//         public async Task TypeLockFailTestAsync()
+//         {
+//             try
+//             {
+//                 await this.type.LockAsync(this.guest, string.Empty);
+//                 Assert.Fail("Lock");
+//             }
+//             catch (PermissionDeniedException)
+//             {
+//             }
+//         }
 
-        [TestMethod]
-        public void TypeUnlockFailTest()
-        {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    this.type.Unlock(this.guest);
-                    Assert.Fail("Unlock");
-                }
-                catch (PermissionDeniedException)
-                {
-                }
-            });
-        }
+//         [TestMethod]
+//         public async Task TypeUnlockFailTestAsync()
+//         {
+//             try
+//             {
+//                 await this.type.UnlockAsync(this.guest);
+//                 Assert.Fail("Unlock");
+//             }
+//             catch (PermissionDeniedException)
+//             {
+//             }
+//         }
 
-        [TestMethod]
-        public void TypeSetPrivateFailTest()
-        {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    this.type.SetPrivate(this.guest);
-                    Assert.Fail("SetPrivate");
-                }
-                catch (PermissionDeniedException)
-                {
-                }
-            });
-        }
+//         [TestMethod]
+//         public async Task TypeSetPrivateFailTestAsync()
+//         {
+//             try
+//             {
+//                 await this.type.SetPrivateAsync(this.guest);
+//                 Assert.Fail("SetPrivate");
+//             }
+//             catch (PermissionDeniedException)
+//             {
+//             }
+//         }
 
-        [TestMethod]
-        public void TypeSetPublicFailTest()
-        {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    this.type.SetPublic(this.guest);
-                    Assert.Fail("SetPublic");
-                }
-                catch (PermissionDeniedException)
-                {
-                }
-            });
-        }
+//         [TestMethod]
+//         public async Task TypeSetPublicFailTestAsync()
+//         {
+//             try
+//             {
+//                 await this.type.SetPublicAsync(this.guest);
+//                 Assert.Fail("SetPublic");
+//             }
+//             catch (PermissionDeniedException)
+//             {
+//             }
+//         }
 
-        [TestMethod]
-        public void TypeAddAccessMemberFailTest()
-        {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    this.type.AddAccessMember(this.guest, users.Keys.Random().ID, AccessType.ReadWrite);
-                    Assert.Fail("AddAccessMember");
-                }
-                catch (PermissionDeniedException)
-                {
-                }
-            });
-        }
+//         [TestMethod]
+//         public async Task TypeAddAccessMemberFailTestAsync()
+//         {
+//             try
+//             {
+//                 await this.type.AddAccessMemberAsync(this.guest, authenticationByUser.Keys.Random().ID, AccessType.Editor);
+//                 Assert.Fail("AddAccessMember");
+//             }
+//             catch (PermissionDeniedException)
+//             {
+//             }
+//         }
 
-        [TestMethod]
-        public void TypeRemoveAccessMemberFailTest()
-        {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    this.type.RemoveAccessMember(this.guest, users.Keys.Random().ID);
-                    Assert.Fail("RemoveAccessMember");
-                }
-                catch (PermissionDeniedException)
-                {
-                }
-            });
-        }
+//         [TestMethod]
+//         public async Task TypeRemoveAccessMemberFailTestAsync()
+//         {
+//             try
+//             {
+//                 await this.type.RemoveAccessMemberAsync(this.guest, authenticationByUser.Keys.Random().ID);
+//                 Assert.Fail("RemoveAccessMember");
+//             }
+//             catch (PermissionDeniedException)
+//             {
+//             }
+//         }
 
-        public TestContext TestContext
-        {
-            get { return this.testContext; }
-            set { this.testContext = value; }
-        }
-    }
-}
+//         public TestContext TestContext
+//         {
+//             get { return this.testContext; }
+//             set { this.testContext = value; }
+//         }
+//     }
+// }

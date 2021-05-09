@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.ServiceModel;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Extensions
@@ -91,6 +92,15 @@ namespace JSSoft.Crema.Services.Extensions
             if (cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
             {
                 return await userContext.Categories.ContainsAsync(categoryPath);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<IDataBase[]> GetDataBasesAsync(this ICremaHost cremaHost)
+        {
+            if (cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
+            {
+                return dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.ToArray());
             }
             throw new NotImplementedException();
         }

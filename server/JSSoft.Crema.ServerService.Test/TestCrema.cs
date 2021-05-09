@@ -29,32 +29,32 @@ using JSSoft.Crema.Services;
 
 namespace JSSoft.Crema.ServerService.Test
 {
-    public static class TestCrema
-    {
-        public static ICremaHost CreateInstance(string tempPath)
-        {
-            var path = PathUtility.GetTempPath(tempPath, false);
-            DirectoryUtility.Prepare(path);
+    // public static class TestCrema
+    // {
+    //     public static ICremaHost CreateInstance(string tempPath)
+    //     {
+    //         var path = PathUtility.GetTempPath(tempPath, false);
+    //         DirectoryUtility.Prepare(path);
             
-            SvnCrema.CreateRepository(path);
-            //return SvnCrema.CreateInstance(path);
-            throw new Exception();
-        }
+    //         SvnCrema.CreateRepository(path);
+    //         //return SvnCrema.CreateInstance(path);
+    //         throw new Exception();
+    //     }
 
-        public static ICremaHost GetInstance(string path)
-        {
-            if (DirectoryUtility.Exists(path) == false)
-            {
-                DirectoryUtility.Prepare(path);
-                SvnCrema.CreateRepository(path);
-            }
-            else if (DirectoryUtility.IsEmpty(path) == true)
-            {
-                SvnCrema.CreateRepository(path);
-            }
+    //     public static ICremaHost GetInstance(string path)
+    //     {
+    //         if (DirectoryUtility.Exists(path) == false)
+    //         {
+    //             DirectoryUtility.Prepare(path);
+    //             SvnCrema.CreateRepository(path);
+    //         }
+    //         else if (DirectoryUtility.IsEmpty(path) == true)
+    //         {
+    //             SvnCrema.CreateRepository(path);
+    //         }
 
-            //return SvnCrema.CreateInstance(path);
-            throw new Exception();
-        }
-    }
+    //         //return SvnCrema.CreateInstance(path);
+    //         throw new Exception();
+    //     }
+    // }
 }

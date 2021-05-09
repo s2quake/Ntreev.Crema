@@ -49,7 +49,7 @@ namespace JSSoft.Crema.ServiceHosts
 
         public async Task DisposeAsync()
         {
-            await Task.CompletedTask;
+            await Task.Delay(1);
         }
 
         public async Task<ResultBase> SubscribeAsync(string version, string platformID, string culture)

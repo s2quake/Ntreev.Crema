@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JSSoft.Crema.ServiceModel;
 
 namespace JSSoft.Crema.ServerService.Test
 {
@@ -43,7 +44,7 @@ namespace JSSoft.Crema.ServerService.Test
                 {
                     var parent = category.Parent;
                     var newName = NameUtility.GenerateNewName(RandomUtility.NextIdentifier(), parent.Categories.Select(item => item.Name));
-                    category.Rename(authentication, newName);
+                    category.RenameAsync(authentication, newName);
                     Assert.Fail("RenameFailTest");
                 }
                 catch (T)
@@ -62,7 +63,7 @@ namespace JSSoft.Crema.ServerService.Test
                     var categories = category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
                     var descendants = EnumerableUtility.Descendants(category, item => item.Categories);
                     var target = categories.Random(item => descendants.Contains(item) == false && item != category.Parent);
-                    category.Move(authentication, target.Path);
+                    category.MoveAsync(authentication, target.Path);
                     Assert.Fail("MoveFailTest");
                 }
                 catch (T)
@@ -78,7 +79,7 @@ namespace JSSoft.Crema.ServerService.Test
             {
                 try
                 {
-                    category.Delete(authentication);
+                    category.DeleteAsync(authentication);
                     Assert.Fail("DeleteFailTest");
                 }
                 catch (T)
@@ -94,7 +95,7 @@ namespace JSSoft.Crema.ServerService.Test
             {
                 try
                 {
-                    category.Lock(authentication, RandomUtility.NextString());
+                    category.LockAsync(authentication, RandomUtility.NextString());
                     Assert.Fail("LockFailTest");
                 }
                 catch (T)
@@ -110,7 +111,7 @@ namespace JSSoft.Crema.ServerService.Test
             {
                 try
                 {
-                    category.Unlock(authentication);
+                    category.UnlockAsync(authentication);
                     Assert.Fail("UnlockFailTest");
                 }
                 catch (T)
@@ -126,7 +127,7 @@ namespace JSSoft.Crema.ServerService.Test
             {
                 try
                 {
-                    category.SetPrivate(authentication);
+                    category.SetPrivateAsync(authentication);
                     Assert.Fail("SetPrivateFailTest");
                 }
                 catch (T)
@@ -142,7 +143,7 @@ namespace JSSoft.Crema.ServerService.Test
             {
                 try
                 {
-                    category.SetPublic(authentication);
+                    category.SetPublicAsync(authentication);
                     Assert.Fail("SetPublicFailTest");
                 }
                 catch (T)
@@ -158,7 +159,7 @@ namespace JSSoft.Crema.ServerService.Test
             {
                 try
                 {
-                    category.AddAccessMember(authentication, memberID, AccessType.ReadWrite);
+                    category.AddAccessMemberAsync(authentication, memberID, AccessType.Editor);
                     Assert.Fail("AddAccessMemberFailTest");
                 }
                 catch (T)
@@ -174,7 +175,7 @@ namespace JSSoft.Crema.ServerService.Test
             {
                 try
                 {
-                    category.RemoveAccessMember(authentication, memberID);
+                    category.RemoveAccessMemberAsync(authentication, memberID);
                     Assert.Fail("RemoveAccessMemberFailTest");
                 }
                 catch (T)

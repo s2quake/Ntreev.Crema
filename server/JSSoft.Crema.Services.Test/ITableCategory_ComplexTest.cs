@@ -67,7 +67,7 @@ namespace JSSoft.Crema.Services.Test
             cremaHost.Dispatcher.Invoke(() =>
             {
                 var newName = RandomUtility.NextIdentifier();
-                category.Lock(authentication, string.Empty);
+                category.LockAsync(authentication, string.Empty);
                 category.Rename(authentication, newName);
 
                 Assert.AreEqual(category.Path, category.LockInfo.Path);

@@ -34,23 +34,23 @@ namespace JSSoft.Crema.ServerService.Test
 {
     static class CremaTableTest
     {
-        public static void RenameTest(this ITable table, Authentication authentication)
+        public static async Task RenameTestAsync(this ITable table, Authentication authentication)
         {
             if (table.Parent == null)
             {
                 var tables = table.GetService(typeof(ITableCollection)) as ITableCollection;
                 var newName = NameUtility.GenerateNewName(RandomUtility.NextIdentifier(), tables.Select(item => item.Name));
-                table.Rename(authentication, newName);
+                await table.RenameAsync(authentication, newName);
             }
             else
             {
                 var parent = table.Parent;
                 var newName = NameUtility.GenerateNewName(RandomUtility.NextIdentifier(), parent.Childs.Select(item => item.Name));
-                table.Rename(authentication, newName);
+                await table.RenameAsync(authentication, newName);
             }
         }
 
-        public static void MoveTest(this ITable table, Authentication authentication)
+        public static async Task MoveTestAsync(this ITable table, Authentication authentication)
         {
             var categories = table.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
             var category = categories.RandomOrDefault(item => item != table.Category);
@@ -58,18 +58,18 @@ namespace JSSoft.Crema.ServerService.Test
             {
                 Assert.Inconclusive();
             }
-            table.Move(authentication, category.Path);
+            await table.MoveAsync(authentication, category.Path);
         }
 
-        public static void RenameTest(this ITableCategory category, Authentication authentication)
+        public static async Task RenameTestAsync(this ITableCategory category, Authentication authentication)
         {
             Assert.AreNotEqual(null, category.Parent);
             var parent = category.Parent;
             var newName = NameUtility.GenerateNewName(RandomUtility.NextIdentifier(), parent.Categories.Select(item => item.Name));
-            category.Rename(authentication, newName);
+            await category.RenameAsync(authentication, newName);
         }
 
-        public static void MoveTest(this ITableCategory category, Authentication authentication)
+        public static async Task MoveTestAsync(this ITableCategory category, Authentication authentication)
         {
             Assert.AreNotEqual(null, category.Parent);
             var categories = category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
@@ -79,17 +79,17 @@ namespace JSSoft.Crema.ServerService.Test
             {
                 Assert.Inconclusive();
             }
-            category.Move(authentication, target.Path);
+            await category.MoveAsync(authentication, target.Path);
         }
 
-        public static void RenameTest(this IType type, Authentication authentication)
+        public static async Task RenameTestAsync(this IType type, Authentication authentication)
         {
             var types = type.GetService(typeof(ITypeCollection)) as ITypeCollection;
             var newName = NameUtility.GenerateNewName(RandomUtility.NextIdentifier(), types.Select(item => item.Name));
-            type.Rename(authentication, newName);
+            await type.RenameAsync(authentication, newName);
         }
 
-        public static void MoveTest(this IType type, Authentication authentication)
+        public static async Task MoveTestAsync(this IType type, Authentication authentication)
         {
             var categories = type.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
             var category = categories.RandomOrDefault(item => item != type.Category);
@@ -97,18 +97,18 @@ namespace JSSoft.Crema.ServerService.Test
             {
                 Assert.Inconclusive();
             }
-            type.Move(authentication, category.Path);
+            await type.MoveAsync(authentication, category.Path);
         }
 
-        public static void RenameTest(this ITypeCategory category, Authentication authentication)
+        public static async Task RenameTestAsync(this ITypeCategory category, Authentication authentication)
         {
             Assert.AreNotEqual(null, category.Parent);
             var parent = category.Parent;
             var newName = NameUtility.GenerateNewName(RandomUtility.NextIdentifier(), parent.Categories.Select(item => item.Name));
-            category.Rename(authentication, newName);
+            await category.RenameAsync(authentication, newName);
         }
 
-        public static void MoveTest(this ITypeCategory category, Authentication authentication)
+        public static async Task MoveTestAsync(this ITypeCategory category, Authentication authentication)
         {
             Assert.AreNotEqual(null, category.Parent);
             var categories = category.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
@@ -118,7 +118,7 @@ namespace JSSoft.Crema.ServerService.Test
             {
                 Assert.Inconclusive();
             }
-            category.Move(authentication, target.Path);
+            await category.MoveAsync(authentication, target.Path);
         }
     }
 }
