@@ -19,11 +19,9 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using JSSoft.Library.IO;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace JSSoft.Crema.Repository.Git
 {

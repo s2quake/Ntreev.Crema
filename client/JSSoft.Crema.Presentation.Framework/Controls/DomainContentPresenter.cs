@@ -30,13 +30,6 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
     {
         static DomainContentPresenter()
         {
-            //DomainContentPresenter.MinHeightProperty.OverrideMetadata(typeof(DomainContentPresenter), new FrameworkPropertyMetadata(null, new CoerceValueCallback(DomainContentPresenter.CoerceMinHeight)));
-            //TextElement.FontFamilyProperty.OverrideMetadata(typeof(DomainContentPresenter), new FrameworkPropertyMetadata(new PropertyChangedCallback(DomainContentPresenter.InvalidateMinHeight)));
-            //TextElement.FontSizeProperty.OverrideMetadata(typeof(DomainContentPresenter), new FrameworkPropertyMetadata(new PropertyChangedCallback(DomainContentPresenter.InvalidateMinHeight)));
-            //TextElement.FontStretchProperty.OverrideMetadata(typeof(DomainContentPresenter), new FrameworkPropertyMetadata(new PropertyChangedCallback(DomainContentPresenter.InvalidateMinHeight)));
-            //TextElement.FontStyleProperty.OverrideMetadata(typeof(DomainContentPresenter), new FrameworkPropertyMetadata(new PropertyChangedCallback(DomainContentPresenter.InvalidateMinHeight)));
-            //TextElement.FontWeightProperty.OverrideMetadata(typeof(DomainContentPresenter), new FrameworkPropertyMetadata(new PropertyChangedCallback(DomainContentPresenter.InvalidateMinHeight)));
-
             m_sContentBinding = new Binding
             {
                 RelativeSource = RelativeSource.TemplatedParent,
@@ -91,24 +84,6 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
 
             BindingOperations.SetBinding(this, DomainContentPresenter.ContentProperty, m_sContentBinding);
             BindingOperations.SetBinding(this, DomainContentPresenter.ContentTemplateProperty, m_sContentTemplateBinding);
-        }
-
-        //private static object CoerceMinHeight(DependencyObject sender, object value)
-        //{
-        //    var self = sender as DomainContentPresenter;
-        //    if (self == null)
-        //        return value;
-
-        //    return self.CoerceMinHeight(new Thickness(), value);
-        //}
-
-        private static void InvalidateMinHeight(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            var self = sender as DomainContentPresenter;
-            if (self == null)
-                return;
-
-            self.CoerceValue(DomainContentPresenter.MinHeightProperty);
         }
 
         private static readonly Binding m_sContentTemplateBinding;

@@ -30,20 +30,18 @@ namespace JSSoft.Crema.Presentation.Framework
     public class DomainUserListBase : PropertyChangedBase
     {
         private readonly ObservableCollection<DomainUserListItemBase> users = new();
-        private readonly ReadOnlyObservableCollection<DomainUserListItemBase> usersReadOnly;
         private readonly Authentication authentication;
         private readonly DomainDescriptor descriptor;
-        private readonly bool IsSubscriptable;
         private readonly object owner;
 
-        public DomainUserListBase(Authentication authentication, IDomain domain, bool IsSubscriptable, object owner)
+        public DomainUserListBase(Authentication authentication, IDomain domain, bool isSubscriptable, object owner)
             : base(domain)
         {
             this.authentication = authentication;
-            this.descriptor = new DomainDescriptor(authentication, domain, IsSubscriptable == true ? DescriptorTypes.All : DescriptorTypes.IsRecursive, owner);
-            this.IsSubscriptable = IsSubscriptable;
+            this.descriptor = new DomainDescriptor(authentication, domain, isSubscriptable == true ? DescriptorTypes.All : DescriptorTypes.IsRecursive, owner);
+            this.IsSubscriptable = isSubscriptable;
             this.owner = owner;
-            this.usersReadOnly = new ReadOnlyObservableCollection<DomainUserListItemBase>(this.users);
+            this.Users = new ReadOnlyObservableCollection<DomainUserListItemBase>(this.users);
             domain.ExtendedProperties[this.owner] = this;
 
             foreach (var item in this.descriptor.Users)
@@ -57,7 +55,9 @@ namespace JSSoft.Crema.Presentation.Framework
             }
         }
 
-        public ReadOnlyObservableCollection<DomainUserListItemBase> Users => this.usersReadOnly;
+        public ReadOnlyObservableCollection<DomainUserListItemBase> Users { get; private set; }
+
+        public bool IsSubscriptable { get; }
 
         protected virtual DomainUserListItemBase CreateInstance(Authentication authentication, DomainUserDescriptor descriptor, object owner)
         {

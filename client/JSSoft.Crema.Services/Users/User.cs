@@ -34,8 +34,6 @@ namespace JSSoft.Crema.Services.Users
     class User : UserBase<User, UserCategory, UserCollection, UserCategoryCollection, UserContext>,
         IUser, IUserItem, IInfoProvider, IStateProvider
     {
-        private Authentication authentication;
-
         public User()
         {
 
@@ -252,7 +250,7 @@ namespace JSSoft.Crema.Services.Users
 
         public bool IsBanned => this.BanInfo.Path != string.Empty;
 
-        public Authentication Authentication => authentication;
+        public Authentication Authentication { get; private set; }
 
         public IUserContextService Service => this.Context.Service;
 
@@ -347,7 +345,7 @@ namespace JSSoft.Crema.Services.Users
         protected override void OnAttached()
         {
             base.OnAttached();
-            this.authentication = new Authentication(new UserAuthenticationProvider(this));
+            this.Authentication = new Authentication(new UserAuthenticationProvider(this));
         }
 
         #region IUser

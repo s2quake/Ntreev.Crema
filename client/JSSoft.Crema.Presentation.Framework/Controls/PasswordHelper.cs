@@ -83,9 +83,7 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
 
         private static void Attach(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var passwordBox = sender as PasswordBox;
-
-            if (passwordBox == null)
+            if (sender is not PasswordBox passwordBox)
                 return;
 
             if ((bool)e.OldValue)

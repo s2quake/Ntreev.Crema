@@ -29,26 +29,21 @@ namespace JSSoft.Crema.Presentation.Framework
     public class DomainUserDescriptor : DescriptorBase, IDomainUserDescriptor
     {
         private readonly IDomainUser domainUser;
-        private readonly object owner;
 
         private DomainUserInfo domainUserInfo;
-        private DomainUserState domainUserState;
-
-        private readonly Action disposeAction;
 
         public DomainUserDescriptor(Authentication authentication, IDomainUserDescriptor descriptor, DescriptorTypes descriptorTypes, object owner)
             : base(authentication, descriptor.Target, descriptorTypes)
         {
             this.domainUser = descriptor.Target;
-            this.owner = owner ?? this;
+            this.Owner = owner ?? this;
             this.domainUser.Dispatcher.VerifyAccess();
             this.domainUserInfo = domainUser.DomainUserInfo;
-            this.domainUserState = domainUser.DomainUserState;
+            this.DomainUserState = domainUser.DomainUserState;
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true && descriptor is INotifyPropertyChanged obj)
             {
                 obj.PropertyChanged += Descriptor_PropertyChanged;
-                this.disposeAction = new Action(() => obj.PropertyChanged -= Descriptor_PropertyChanged);
             }
         }
 
@@ -56,10 +51,10 @@ namespace JSSoft.Crema.Presentation.Framework
             : base(authentication, domainUser, descriptorTypes)
         {
             this.domainUser = domainUser;
-            this.owner = owner ?? this;
+            this.Owner = owner ?? this;
             this.domainUser.Dispatcher.VerifyAccess();
             this.domainUserInfo = domainUser.DomainUserInfo;
-            this.domainUserState = domainUser.DomainUserState;
+            this.DomainUserState = domainUser.DomainUserState;
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
             {
@@ -77,8 +72,8 @@ namespace JSSoft.Crema.Presentation.Framework
         [DescriptorProperty(nameof(domainUserInfo))]
         public DomainUserInfo DomainUserInfo => this.domainUserInfo;
 
-        [DescriptorProperty(nameof(domainUserState))]
-        public DomainUserState DomainUserState => this.domainUserState;
+        [DescriptorProperty]
+        public DomainUserState DomainUserState { get; private set; }
 
         [DescriptorProperty]
         public bool IsOnline => DomainUserDescriptorUtility.IsOnline(this.authentication, this);
@@ -95,9 +90,11 @@ namespace JSSoft.Crema.Presentation.Framework
         [DescriptorProperty]
         public bool CanRead => DomainUserDescriptorUtility.CanRead(this.authentication, this);
 
+        protected object Owner { get; }
+
         private void DomainUser_DomainUserStateChanged(object sender, EventArgs e)
         {
-            this.domainUserState = this.domainUser.DomainUserState;
+            this.DomainUserState = this.domainUser.DomainUserState;
             this.Dispatcher.InvokeAsync(this.RefreshAsync);
         }
 
@@ -123,7 +120,7 @@ namespace JSSoft.Crema.Presentation.Framework
             else if (sender is IDomainUserDescriptor descriptor)
             {
                 this.domainUserInfo = descriptor.DomainUserInfo;
-                this.domainUserState = descriptor.DomainUserState;
+                this.DomainUserState = descriptor.DomainUserState;
             }
             this.NotifyOfPropertyChange(e.PropertyName);
         }

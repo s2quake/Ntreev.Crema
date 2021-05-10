@@ -29,20 +29,19 @@ namespace JSSoft.Crema.Presentation.Framework
     public class TypeDescriptor : DescriptorBase, ITypeItemDescriptor, ITypeDescriptor, IPermissionDescriptor, ILockableDescriptor, IAccessibleDescriptor
     {
         private IType type;
-        private readonly object owner;
 
         public TypeDescriptor(Authentication authentication, ITypeDescriptor descriptor, bool isSubscriptable, object owner)
             : base(authentication, descriptor.Target, descriptor, isSubscriptable)
         {
             this.type = descriptor.Target;
-            this.owner = owner ?? this;
+            this.Owner = owner ?? this;
         }
 
         public TypeDescriptor(Authentication authentication, IType type, DescriptorTypes descriptorTypes, object owner)
             : base(authentication, type, descriptorTypes)
         {
             this.type = type;
-            this.owner = owner ?? this;
+            this.Owner = owner ?? this;
             this.type.Dispatcher.VerifyAccess();
             this.TypeInfo = type.TypeInfo;
             this.TypeState = type.TypeState;
@@ -144,6 +143,8 @@ namespace JSSoft.Crema.Presentation.Framework
             }
             base.OnDisposed(e);
         }
+
+        protected object Owner { get; }
 
         private void Type_Deleted(object sender, EventArgs e)
         {

@@ -385,8 +385,7 @@ namespace JSSoft.Crema.Presentation.Controls
         private static void FixedColumnCountPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var gridContext = d as DataGridContext;
-            var gridControl = gridContext.DataGridControl as DiffDataGridControl;
-            if (gridControl == null)
+            if (gridContext.DataGridControl is not DiffDataGridControl gridControl)
                 return;
             var destControl = gridControl.DestControl;
             if (destControl == null)

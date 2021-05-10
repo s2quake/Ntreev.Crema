@@ -40,16 +40,15 @@ namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
         private readonly ICremaAppHost cremaAppHost;
         private readonly IAppConfiguration configs;
         private string outputPath;
-        private readonly ExporterSettings settings;
 
         [ImportingConstructor]
         public ExporterViewModel(ICremaAppHost cremaAppHost, IAppConfiguration configs)
         {
             this.cremaAppHost = cremaAppHost;
             this.configs = configs;
-            this.settings = new ExporterSettings();
-            this.settings.PropertyChanged += Settings_PropertyChanged;
-            this.configs.Update(this.settings);
+            this.Settings = new ExporterSettings();
+            this.Settings.PropertyChanged += Settings_PropertyChanged;
+            this.configs.Update(this.Settings);
         }
 
         private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -64,22 +63,22 @@ namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
 
             var spreadsheetWriterSettings = new SpreadsheetWriterSettings()
             {
-                OmitAttribute = this.settings.OmitAttribute,
-                OmitSignatureDate = this.settings.OmitSignatureDate,
+                OmitAttribute = this.Settings.OmitAttribute,
+                OmitSignatureDate = this.Settings.OmitSignatureDate,
             };
 
             var writer = new SpreadsheetWriter(dataSet, spreadsheetWriterSettings);
             var filename = this.OutputPath;
-            if (this.settings.IsSeparable == true)
+            if (this.Settings.IsSeparable == true)
             {
                 var outputPath = itemPath.Trim(PathUtility.SeparatorChar).Replace(PathUtility.SeparatorChar, '.');
                 if (outputPath == string.Empty)
                     outputPath = this.cremaAppHost.DataBaseName;
-                if (this.settings.IsIncludeDate)
+                if (this.Settings.IsIncludeDate)
                 {
                     //------------------------------------------------------
                     // TableName_2017-02-17_05_11.xlsx
-                    string szDate = DateTime.Now.ToString($"{this.settings.OutputDateFormat}");
+                    string szDate = DateTime.Now.ToString($"{this.Settings.OutputDateFormat}");
                     filename = FileUtility.Prepare(this.outputPath, $"{outputPath}_{szDate}.xlsx");
                 }
                 else
@@ -90,13 +89,13 @@ namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
             {
                 writer.Write(stream);
             }
-            this.configs.Commit(this.settings);
+            this.configs.Commit(this.Settings);
             this.configs.Commit(this);
         }
 
         public void SelectPath()
         {
-            if (this.settings.IsSeparable == true)
+            if (this.Settings.IsSeparable == true)
             {
                 var dialog = new CommonOpenFileDialog()
                 {
@@ -136,7 +135,7 @@ namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
         }
 
         [ConfigurationProperty("omitSignatureDate")]
-        public ExporterSettings Settings => this.settings;
+        public ExporterSettings Settings { get; private set; }
 
         public bool CanExport
         {
@@ -144,7 +143,7 @@ namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
             {
                 if (string.IsNullOrEmpty(this.OutputPath) == true)
                     return false;
-                if (this.settings.IsSeparable == true)
+                if (this.Settings.IsSeparable == true)
                     return Directory.Exists(this.OutputPath);
                 if (DirectoryUtility.IsDirectory(this.OutputPath) == true)
                     return false;

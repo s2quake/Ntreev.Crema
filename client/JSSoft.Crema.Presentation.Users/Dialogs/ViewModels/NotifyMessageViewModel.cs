@@ -34,14 +34,13 @@ namespace JSSoft.Crema.Presentation.Users.Dialogs.ViewModels
         private readonly Authentication authentication;
         private readonly IUserContext userContext;
         private string message;
-        private readonly string[] userIDs;
 
         private NotifyMessageViewModel(Authentication authentication, IUserContext userContext, string[] userIDs)
         {
             this.authentication = authentication;
             this.userContext = userContext;
             this.userContext.Dispatcher.VerifyAccess();
-            this.userIDs = userIDs;
+            this.TargetUserIDs = userIDs;
             this.DisplayName = Resources.Title_NotifyMessage;
         }
 
@@ -81,16 +80,16 @@ namespace JSSoft.Crema.Presentation.Users.Dialogs.ViewModels
             }
         }
 
-        public string[] TargetUserIDs => this.userIDs;
+        public string[] TargetUserIDs { get; private set; }
 
-        public string TargetUserID => this.userIDs.Any() == false ? "All Users" : string.Join(",", this.userIDs);
+        public string TargetUserID => this.TargetUserIDs.Any() == false ? "All Users" : string.Join(",", this.TargetUserIDs);
 
         public async Task NotifyAsync()
         {
             try
             {
                 this.BeginProgress(Resources.Message_SendMessage);
-                await this.userContext.NotifyMessageAsync(this.authentication, this.userIDs, this.Message);
+                await this.userContext.NotifyMessageAsync(this.authentication, this.TargetUserIDs, this.Message);
                 this.EndProgress();
                 await this.TryCloseAsync(true);
             }

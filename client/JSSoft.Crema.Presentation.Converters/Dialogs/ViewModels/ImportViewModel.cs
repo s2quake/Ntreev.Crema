@@ -43,7 +43,6 @@ namespace JSSoft.Crema.Presentation.Converters.Dialogs.ViewModels
         private readonly IImportService importService;
         private readonly Authentication authentication;
         private readonly IAppConfiguration configs;
-        private readonly ObservableCollection<IImporter> importers;
         private IImporter selectedImporter;
         private bool isImporting;
         private CancellationTokenSource cancelToken;
@@ -58,7 +57,7 @@ namespace JSSoft.Crema.Presentation.Converters.Dialogs.ViewModels
             this.dataBase.Dispatcher.VerifyAccess();
             this.importService = dataBase.GetService(typeof(IImportService)) as IImportService;
             this.configs = dataBase.GetService(typeof(IAppConfiguration)) as IAppConfiguration;
-            this.importers = new ObservableCollection<IImporter>(this.importService.Importers);
+            this.Importers = new ObservableCollection<IImporter>(this.importService.Importers);
             this.configs.Update(this);
         }
 
@@ -104,7 +103,7 @@ namespace JSSoft.Crema.Presentation.Converters.Dialogs.ViewModels
             this.cancelToken.Cancel();
         }
 
-        public ObservableCollection<IImporter> Importers => this.importers;
+        public ObservableCollection<IImporter> Importers { get; private set; }
 
         public IImporter SelectedImporter
         {
@@ -225,7 +224,7 @@ namespace JSSoft.Crema.Presentation.Converters.Dialogs.ViewModels
                 dataTable.Childs.Add(GetTableInfo(item));
             }
 
-            TableInfo GetTableInfo(ITable tableItem)
+            static TableInfo GetTableInfo(ITable tableItem)
             {
                 var tableInfo = tableItem.TableInfo;
                 if (tableInfo.TemplatedParent != string.Empty)
@@ -243,7 +242,7 @@ namespace JSSoft.Crema.Presentation.Converters.Dialogs.ViewModels
             {
                 if (value != null)
                 {
-                    this.SelectedImporter = this.importers.FirstOrDefault(item => item.Name == (string)value);
+                    this.SelectedImporter = this.Importers.FirstOrDefault(item => item.Name == (string)value);
                 }
             }
         }

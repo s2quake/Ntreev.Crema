@@ -20,13 +20,8 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Library.Commands;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands
 {
@@ -46,12 +41,6 @@ namespace JSSoft.Crema.Commands
             get; set;
         }
 
-        public static string FilterExpression
-        {
-            get
-            {
-                return FilterFile == true ? string.Join(";", File.ReadAllLines(Filter)) : Filter;
-            }
-        }
+        public static string FilterExpression => FilterFile == true ? string.Join(";", File.ReadAllLines(Filter)) : Filter;
     }
 }

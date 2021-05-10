@@ -34,7 +34,7 @@ namespace JSSoft.Crema.Services.Data
         private readonly ICremaHost cremaHost;
         private Authentication authentication;
 
-        private readonly Dictionary<Guid, DataFindServiceItem> items = new Dictionary<Guid, DataFindServiceItem>();
+        private readonly Dictionary<Guid, DataFindServiceItem> items = new();
 
         [ImportingConstructor]
         public DataFindService(ICremaHost cremaHost)

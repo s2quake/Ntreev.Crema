@@ -33,7 +33,6 @@ namespace JSSoft.Crema.ConsoleHost
     class ConfigurationProperties : IConfigurationProperties
     {
         private readonly ICremaHost cremaHost;
-        private readonly ConfigurationPropertyDescriptorCollection properties;
 
         [ImportingConstructor]
         public ConfigurationProperties(ICremaHost cremaHost, [ImportMany] IEnumerable<IConfigurationPropertyProvider> providers)
@@ -41,10 +40,10 @@ namespace JSSoft.Crema.ConsoleHost
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;
             this.cremaHost.Closed += CremaHost_Closed;
-            this.properties = new ConfigurationPropertyDescriptorCollection(providers);
+            this.Properties = new ConfigurationPropertyDescriptorCollection(providers);
         }
 
-        public ConfigurationPropertyDescriptorCollection Properties => this.properties;
+        public ConfigurationPropertyDescriptorCollection Properties { get; private set; }
 
         private void CremaHost_Closed(object sender, EventArgs e)
         {

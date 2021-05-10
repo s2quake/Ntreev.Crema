@@ -34,9 +34,9 @@ namespace JSSoft.Crema.Services.Users
 {
     class UserContextSet : IDisposable
     {
-        private readonly Dictionary<string, UserSerializationInfo> users = new Dictionary<string, UserSerializationInfo>();
-        private readonly Dictionary<string, UserSerializationInfo> usersToCreate = new Dictionary<string, UserSerializationInfo>();
-        private readonly Dictionary<string, UserSerializationInfo> usersToDelete = new Dictionary<string, UserSerializationInfo>();
+        private readonly Dictionary<string, UserSerializationInfo> users = new();
+        private readonly Dictionary<string, UserSerializationInfo> usersToCreate = new();
+        private readonly Dictionary<string, UserSerializationInfo> usersToDelete = new();
         private readonly SignatureDateProvider signatureDateProvider;
 
         private UserContextSet(UserContext userContext, UserSet userSet, bool userCreation)

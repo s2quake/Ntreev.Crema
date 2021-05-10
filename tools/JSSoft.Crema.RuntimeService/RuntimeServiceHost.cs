@@ -20,17 +20,6 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Communication;
-using JSSoft.Crema.Runtime.Generation;
-using JSSoft.Crema.Runtime.Serialization;
-using JSSoft.Crema.ServiceModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml;
 
 namespace JSSoft.Crema.RuntimeService
 {

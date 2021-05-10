@@ -37,7 +37,7 @@ namespace JSSoft.Crema.Services.Data
         private readonly CremaDispatcher dispatcher;
         private readonly Authentication authentication;
 
-        private readonly List<FindResultInfo> findResults = new List<FindResultInfo>();
+        private readonly List<FindResultInfo> findResults = new();
 
         public DataFindServiceItem(IDataBase dataBase, CremaDispatcher dispatcher, Authentication authentication)
             : base(dataBase)

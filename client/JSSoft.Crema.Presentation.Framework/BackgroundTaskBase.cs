@@ -32,7 +32,6 @@ namespace JSSoft.Crema.Presentation.Framework
     {
         private readonly CancellationTokenSource cancellation = new();
         private string displayName;
-        private bool isBusy;
         private bool isAlive = true;
 
         public BackgroundTaskBase()
@@ -50,7 +49,7 @@ namespace JSSoft.Crema.Presentation.Framework
             }
         }
 
-        public bool IsBusy => this.isBusy;
+        public bool IsBusy { get; private set; }
 
         public event ProgressChangedEventHandler ProgressChanged;
 
@@ -71,7 +70,7 @@ namespace JSSoft.Crema.Presentation.Framework
             progress.Changed += Progress_Changed;
             try
             {
-                this.isBusy = true;
+                this.IsBusy = true;
                 await this.OnRunAsync(progress, this.cancellation.Token);
                 await this.Dispatcher.InvokeAsync(() => progress.Complete());
             }
@@ -81,7 +80,7 @@ namespace JSSoft.Crema.Presentation.Framework
             }
             finally
             {
-                this.isBusy = false;
+                this.IsBusy = false;
             }
         }
 

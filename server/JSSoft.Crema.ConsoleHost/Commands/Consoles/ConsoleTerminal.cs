@@ -32,7 +32,6 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
     {
         private readonly ICremaHost cremaHost;
         private readonly CremaApplication application;
-        private readonly ConsoleCommandContext commandContext;
         private readonly ConsoleTerminalCancellation cancellation;
 
         [ImportingConstructor]
@@ -47,7 +46,6 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             this.cremaHost.Closing += (s, e) => this.IsEnabled = false;
             this.application = application;
             this.application.Closed += Application_Closed;
-            this.commandContext = commandContext;
             this.cancellation = cancellation;
         }
 

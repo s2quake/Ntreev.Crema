@@ -21,26 +21,14 @@
 
 using FirstFloor.ModernUI.Presentation;
 using FirstFloor.ModernUI.Windows.Controls;
-using FirstFloor.ModernUI.Windows.Navigation;
 using JSSoft.Crema.Tools.Framework;
-using JSSoft.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace JSSoft.Crema.ApplicationHost
 {
@@ -48,6 +36,7 @@ namespace JSSoft.Crema.ApplicationHost
     /// Interaction logic for ShellView.xaml
     /// </summary>
     [Export]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:읽기 전용 한정자 추가", Justification = "<보류 중>")]
     public partial class ShellView : ModernWindow, IPartImportsSatisfiedNotification
     {
         [Import]
@@ -94,8 +83,7 @@ namespace JSSoft.Crema.ApplicationHost
             if (this.contentService == null)
                 return;
 
-            var view = this.contentFrame.Content as FrameworkElement;
-            if (view == null)
+            if (this.contentFrame.Content is not FrameworkElement view)
                 return;
 
             if (this.contentService is INotifyPropertyChanged == true)

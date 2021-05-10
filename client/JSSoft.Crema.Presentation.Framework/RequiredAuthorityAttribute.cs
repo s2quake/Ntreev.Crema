@@ -26,13 +26,11 @@ namespace JSSoft.Crema.Presentation.Framework
 {
     public class RequiredAuthorityAttribute : Attribute
     {
-        private readonly Authority authority;
-
         public RequiredAuthorityAttribute(Authority authority)
         {
-            this.authority = authority;
+            this.Authority = authority;
         }
 
-        public Authority Authority => this.authority;
+        public Authority Authority { get; }
     }
 }

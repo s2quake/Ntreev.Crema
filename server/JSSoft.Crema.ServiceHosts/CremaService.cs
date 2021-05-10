@@ -40,7 +40,7 @@ namespace JSSoft.Crema.ServiceHosts
     {
         public const string Namespace = "http://www.ntreev.com";
         private const string cremaString = "Crema";
-        private readonly List<ServiceHostBase> hosts = new List<ServiceHostBase>();
+        private readonly List<ServiceHostBase> hosts = new();
         private readonly IServiceProvider serviceProvider;
         private IServiceHostProvider[] hostProviders;
         private ServerContext serverContext;

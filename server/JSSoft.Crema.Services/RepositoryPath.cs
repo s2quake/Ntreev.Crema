@@ -199,7 +199,7 @@ namespace JSSoft.Crema.Services
             return t1.Path != t2.Path;
         }
 
-        public static readonly RepositoryPath Empty = new RepositoryPath() { Path = string.Empty };
+        public static readonly RepositoryPath Empty = new() { Path = string.Empty };
 
         private static string GenerateCategoryPath(string basePath, string categoryPath)
         {

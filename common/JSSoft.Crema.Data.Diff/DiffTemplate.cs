@@ -19,7 +19,6 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Crema.Data.Properties;
 using JSSoft.Library;
 using System;
 using System.Collections.Generic;
@@ -32,31 +31,25 @@ namespace JSSoft.Crema.Data.Diff
 {
     public class DiffTemplate : INotifyPropertyChanged
     {
-        private readonly static DiffTemplateColumn[] emptyColumns = new DiffTemplateColumn[] { };
         private readonly CremaDataTable diffTable1;
         private readonly CremaDataTable diffTable2;
         private readonly CremaDataTable dataTable1;
         private readonly CremaDataTable dataTable2;
-        private readonly CremaTemplate diffSource1;
-        private readonly CremaTemplate diffSource2;
         private readonly DiffMergeTypes mergeType;
         private readonly bool dummy1;
         private readonly bool dummy2;
         private readonly List<DiffTemplateColumn> itemList = new();
-        private DiffState diffState;
-        private bool isResolved;
         private string header1;
         private string header2;
         private readonly ObservableCollection<object> unresolvedItemList = new();
-        private readonly HashSet<object> itemSet = new();
 
         [Obsolete]
         public DiffTemplate(CremaDataTable table1, CremaDataTable table2, DiffMergeTypes mergeType)
         {
             this.diffTable1 = table1;
             this.diffTable2 = table2;
-            this.diffSource1 = new CremaTemplate() { DataTable = table1 };
-            this.diffSource2 = new CremaTemplate() { DataTable = table2 };
+            this.SourceItem1 = new CremaTemplate() { DataTable = table1 };
+            this.SourceItem2 = new CremaTemplate() { DataTable = table2 };
             this.mergeType = mergeType;
         }
 
@@ -80,51 +73,51 @@ namespace JSSoft.Crema.Data.Diff
             this.dataTable1 = dataTable1;
             this.dataTable2 = dataTable2;
 
-            this.diffSource1 = Create(this.diffTable1);
-            this.diffSource2 = Create(this.diffTable2);
-            this.diffSource1.ExtendedProperties[typeof(DiffTemplate)] = this;
-            this.diffSource2.ExtendedProperties[typeof(DiffTemplate)] = this;
-            this.dummy1 = this.diffSource1.TableName.StartsWith(DiffUtility.DiffDummyKey);
-            this.dummy2 = this.diffSource2.TableName.StartsWith(DiffUtility.DiffDummyKey);
+            this.SourceItem1 = Create(this.diffTable1);
+            this.SourceItem2 = Create(this.diffTable2);
+            this.SourceItem1.ExtendedProperties[typeof(DiffTemplate)] = this;
+            this.SourceItem2.ExtendedProperties[typeof(DiffTemplate)] = this;
+            this.dummy1 = this.SourceItem1.TableName.StartsWith(DiffUtility.DiffDummyKey);
+            this.dummy2 = this.SourceItem2.TableName.StartsWith(DiffUtility.DiffDummyKey);
 
-            this.AttachEventHandler(this.diffSource1, diffTable1);
-            this.AttachEventHandler(this.diffSource2, diffTable2);
+            this.AttachEventHandler(this.SourceItem1, diffTable1);
+            this.AttachEventHandler(this.SourceItem2, diffTable2);
         }
 
         public override string ToString()
         {
-            if (this.diffSource1.TableName != this.diffSource2.TableName)
-                return $"{this.diffSource1.TableName.Replace(DiffUtility.DiffDummyKey, string.Empty)} => {this.diffSource2.TableName}";
-            return this.diffSource1.TableName;
+            if (this.SourceItem1.TableName != this.SourceItem2.TableName)
+                return $"{this.SourceItem1.TableName.Replace(DiffUtility.DiffDummyKey, string.Empty)} => {this.SourceItem2.TableName}";
+            return this.SourceItem1.TableName;
         }
 
         public void Resolve()
         {
             this.ValidateResolve();
 
-            if (this.diffState == DiffState.Modified)
+            if (this.DiffState == DiffState.Modified)
             {
-                this.diffSource1.ReadOnly = false;
-                this.diffSource2.ReadOnly = false;
-                this.diffSource1.DeleteItems();
-                this.diffSource2.DeleteItems();
-                this.diffSource1.ColumnChanged -= DiffSource1_ColumnChanged;
-                this.diffSource2.ColumnChanged -= DiffSource2_ColumnChanged;
-                this.diffSource1.ColumnDeleted -= DiffSource1_ColumnDeleted;
-                this.diffSource2.ColumnDeleted -= DiffSource2_ColumnDeleted;
-                this.diffSource1.IsDiffMode = false;
-                this.diffSource2.IsDiffMode = false;
-                this.diffSource1.AcceptChanges();
-                this.diffSource2.AcceptChanges();
-                this.diffSource1.ReadOnly = true;
-                this.diffSource2.ReadOnly = true;
-                this.isResolved = true;
+                this.SourceItem1.ReadOnly = false;
+                this.SourceItem2.ReadOnly = false;
+                this.SourceItem1.DeleteItems();
+                this.SourceItem2.DeleteItems();
+                this.SourceItem1.ColumnChanged -= DiffSource1_ColumnChanged;
+                this.SourceItem2.ColumnChanged -= DiffSource2_ColumnChanged;
+                this.SourceItem1.ColumnDeleted -= DiffSource1_ColumnDeleted;
+                this.SourceItem2.ColumnDeleted -= DiffSource2_ColumnDeleted;
+                this.SourceItem1.IsDiffMode = false;
+                this.SourceItem2.IsDiffMode = false;
+                this.SourceItem1.AcceptChanges();
+                this.SourceItem2.AcceptChanges();
+                this.SourceItem1.ReadOnly = true;
+                this.SourceItem2.ReadOnly = true;
+                this.IsResolved = true;
             }
-            else if (this.diffState == DiffState.Deleted)
+            else if (this.DiffState == DiffState.Deleted)
             {
                 this.MergeDelete();
             }
-            else if (this.diffState == DiffState.Inserted)
+            else if (this.DiffState == DiffState.Inserted)
             {
                 this.MergeInsert();
             }
@@ -148,15 +141,15 @@ namespace JSSoft.Crema.Data.Diff
 
         public void Merge()
         {
-            if (this.diffState == DiffState.Modified)
+            if (this.DiffState == DiffState.Modified)
             {
                 this.MergeModify();
             }
-            else if (this.diffState == DiffState.Deleted)
+            else if (this.DiffState == DiffState.Deleted)
             {
                 this.MergeDelete();
             }
-            else if (this.diffState == DiffState.Inserted)
+            else if (this.DiffState == DiffState.Inserted)
             {
                 this.MergeInsert();
             }
@@ -165,21 +158,21 @@ namespace JSSoft.Crema.Data.Diff
 
         public void Refresh()
         {
-            if (this.isResolved == true)
+            if (this.IsResolved == true)
                 return;
-            this.diffSource1.ColumnChanged -= DiffSource1_ColumnChanged;
-            this.diffSource2.ColumnChanged -= DiffSource2_ColumnChanged;
-            this.diffSource1.ColumnDeleted -= DiffSource1_ColumnDeleted;
-            this.diffSource2.ColumnDeleted -= DiffSource2_ColumnDeleted;
+            this.SourceItem1.ColumnChanged -= DiffSource1_ColumnChanged;
+            this.SourceItem2.ColumnChanged -= DiffSource2_ColumnChanged;
+            this.SourceItem1.ColumnDeleted -= DiffSource1_ColumnDeleted;
+            this.SourceItem2.ColumnDeleted -= DiffSource2_ColumnDeleted;
             for (var i = 0; i < this.itemList.Count; i++)
             {
                 var item = this.itemList[i];
                 item.Update();
             }
-            this.diffSource1.ColumnChanged += DiffSource1_ColumnChanged;
-            this.diffSource2.ColumnChanged += DiffSource2_ColumnChanged;
-            this.diffSource1.ColumnDeleted += DiffSource1_ColumnDeleted;
-            this.diffSource2.ColumnDeleted += DiffSource2_ColumnDeleted;
+            this.SourceItem1.ColumnChanged += DiffSource1_ColumnChanged;
+            this.SourceItem2.ColumnChanged += DiffSource2_ColumnChanged;
+            this.SourceItem1.ColumnDeleted += DiffSource1_ColumnDeleted;
+            this.SourceItem2.ColumnDeleted += DiffSource2_ColumnDeleted;
         }
 
         public void AcceptChanges()
@@ -195,43 +188,43 @@ namespace JSSoft.Crema.Data.Diff
 
         public bool HasChanges()
         {
-            if (this.diffSource1.HasChanges(true) == true)
+            if (this.SourceItem1.HasChanges(true) == true)
                 return true;
-            if (this.diffSource2.HasChanges(true) == true)
+            if (this.SourceItem2.HasChanges(true) == true)
                 return true;
-            if (this.diffSource1.TableName != this.diffTable1.TableName)
+            if (this.SourceItem1.TableName != this.diffTable1.TableName)
                 return true;
-            if (this.diffSource2.TableName != this.diffTable2.TableName)
+            if (this.SourceItem2.TableName != this.diffTable2.TableName)
                 return true;
-            if (this.diffSource1.Tags != this.diffTable1.Tags)
+            if (this.SourceItem1.Tags != this.diffTable1.Tags)
                 return true;
-            if (this.diffSource2.Tags != this.diffTable2.Tags)
+            if (this.SourceItem2.Tags != this.diffTable2.Tags)
                 return true;
-            if (this.diffSource1.Comment != this.diffTable1.Comment)
+            if (this.SourceItem1.Comment != this.diffTable1.Comment)
                 return true;
-            if (this.diffSource2.Comment != this.diffTable2.Comment)
+            if (this.SourceItem2.Comment != this.diffTable2.Comment)
                 return true;
             return false;
         }
 
-        public CremaTemplate SourceItem1 => this.diffSource1;
+        public CremaTemplate SourceItem1 { get; private set; }
 
-        public CremaTemplate SourceItem2 => this.diffSource2;
+        public CremaTemplate SourceItem2 { get; private set; }
 
         public string ItemName1
         {
             get
             {
                 if (this.dummy1 == true)
-                    return this.diffSource1.TableName.Replace(DiffUtility.DiffDummyKey, string.Empty);
-                return this.diffSource1.TableName;
+                    return this.SourceItem1.TableName.Replace(DiffUtility.DiffDummyKey, string.Empty);
+                return this.SourceItem1.TableName;
             }
             set
             {
-                if (this.dummy1 == true && this.diffSource2.TableName != value)
-                    this.diffSource1.TableName = DiffUtility.DiffDummyKey + value;
+                if (this.dummy1 == true && this.SourceItem2.TableName != value)
+                    this.SourceItem1.TableName = DiffUtility.DiffDummyKey + value;
                 else
-                    this.diffSource1.TableName = value;
+                    this.SourceItem1.TableName = value;
                 this.InvokePropertyChangedEvent(nameof(this.ItemName1));
             }
         }
@@ -241,55 +234,55 @@ namespace JSSoft.Crema.Data.Diff
             get
             {
                 if (this.dummy2 == true)
-                    return this.diffSource2.TableName.Replace(DiffUtility.DiffDummyKey, string.Empty);
-                return this.diffSource2.TableName;
+                    return this.SourceItem2.TableName.Replace(DiffUtility.DiffDummyKey, string.Empty);
+                return this.SourceItem2.TableName;
             }
             set
             {
-                if (this.dummy2 == true && this.diffSource1.TableName != value)
-                    this.diffSource2.TableName = DiffUtility.DiffDummyKey + value;
+                if (this.dummy2 == true && this.SourceItem1.TableName != value)
+                    this.SourceItem2.TableName = DiffUtility.DiffDummyKey + value;
                 else
-                    this.diffSource2.TableName = value;
+                    this.SourceItem2.TableName = value;
                 this.InvokePropertyChangedEvent(nameof(this.ItemName2));
             }
         }
 
         public TagInfo Tags1
         {
-            get => this.diffSource1.Tags;
+            get => this.SourceItem1.Tags;
             set
             {
-                this.diffSource1.Tags = value;
+                this.SourceItem1.Tags = value;
                 this.InvokePropertyChangedEvent(nameof(this.Tags1));
             }
         }
 
         public TagInfo Tags2
         {
-            get => this.diffSource2.Tags;
+            get => this.SourceItem2.Tags;
             set
             {
-                this.diffSource2.Tags = value;
+                this.SourceItem2.Tags = value;
                 this.InvokePropertyChangedEvent(nameof(this.Tags2));
             }
         }
 
         public string Comment1
         {
-            get => this.diffSource1.Comment;
+            get => this.SourceItem1.Comment;
             set
             {
-                this.diffSource1.Comment = value;
+                this.SourceItem1.Comment = value;
                 this.InvokePropertyChangedEvent(nameof(this.Comment1));
             }
         }
 
         public string Comment2
         {
-            get => this.diffSource2.Comment;
+            get => this.SourceItem2.Comment;
             set
             {
-                this.diffSource2.Comment = value;
+                this.SourceItem2.Comment = value;
                 this.InvokePropertyChangedEvent(nameof(this.Comment2));
             }
         }
@@ -334,9 +327,9 @@ namespace JSSoft.Crema.Data.Diff
 
         public IReadOnlyList<DiffTemplateColumn> Items => this.itemList;
 
-        public bool IsResolved => this.isResolved;
+        public bool IsResolved { get; private set; }
 
-        public DiffState DiffState => this.diffState;
+        public DiffState DiffState { get; private set; }
 
         public IEnumerable<object> UnresolvedItems => this.unresolvedItemList;
 
@@ -344,20 +337,20 @@ namespace JSSoft.Crema.Data.Diff
 
         private bool VerifyModified()
         {
-            if (this.diffSource1.TableName != this.diffSource2.TableName)
+            if (this.SourceItem1.TableName != this.SourceItem2.TableName)
                 return true;
-            if (this.diffSource1.Tags != this.diffSource2.Tags)
+            if (this.SourceItem1.Tags != this.SourceItem2.Tags)
                 return true;
-            if (this.diffSource1.Comment != this.diffSource2.Comment)
+            if (this.SourceItem1.Comment != this.SourceItem2.Comment)
                 return true;
 
-            foreach (var item in this.diffSource1.Items)
+            foreach (var item in this.SourceItem1.Items)
             {
                 if (DiffUtility.GetDiffState(item) != DiffState.Unchanged)
                     return true;
             }
 
-            foreach (var item in this.diffSource2.Items)
+            foreach (var item in this.SourceItem2.Items)
             {
                 if (DiffUtility.GetDiffState(item) != DiffState.Unchanged)
                     return true;
@@ -371,17 +364,17 @@ namespace JSSoft.Crema.Data.Diff
             {
                 throw new Exception();
             }
-            if (this.diffState == DiffState.Imaginary)
+            if (this.DiffState == DiffState.Imaginary)
             {
                 throw new Exception();
             }
-            if (this.diffState == DiffState.Modified)
+            if (this.DiffState == DiffState.Modified)
             {
-                if (this.diffSource1.TableName != this.diffSource2.TableName)
+                if (this.SourceItem1.TableName != this.SourceItem2.TableName)
                     throw new Exception();
-                if (this.diffSource1.Tags != this.diffSource2.Tags)
+                if (this.SourceItem1.Tags != this.SourceItem2.Tags)
                     throw new Exception();
-                if (this.diffSource1.Comment != this.diffSource2.Comment)
+                if (this.SourceItem1.Comment != this.SourceItem2.Comment)
                     throw new Exception();
                 foreach (var item in this.itemList)
                 {
@@ -395,129 +388,23 @@ namespace JSSoft.Crema.Data.Diff
             }
         }
 
-        private void ValidateAddToRightSide(object dataContext)
-        {
-            if (dataContext is DataRowView == false)
-                throw new ArgumentException(nameof(dataContext));
-
-            var dataRowView = dataContext as DataRowView;
-            var dataRow = dataRowView.Row as InternalRowBase;
-            if (dataRow.Table != this.diffSource1.InternalObject)
-                throw new ArgumentException(nameof(dataContext));
-
-            var item = this.itemList[dataRow.Index];
-            if (item.DiffState1 != DiffState.Deleted)
-                throw new ArgumentException(nameof(dataContext));
-            var item1 = item.Item1;
-            if (this.diffSource2.Items.Contains(item1.Name))
-                throw new ArgumentException(string.Format(Resources.Exception_AlreadyExistedItem_Format, item1.Name));
-        }
-
-        private void ValidateCopyToRightSide(object dataContext)
-        {
-            if (dataContext is DataRowView == false)
-                throw new ArgumentException(nameof(dataContext));
-
-            var dataRowView = dataContext as DataRowView;
-            var dataRow = dataRowView.Row as InternalRowBase;
-            if (dataRow.Table != this.diffSource1.InternalObject)
-                throw new ArgumentException(nameof(dataContext));
-
-            var item = this.itemList[dataRow.Index];
-            var diffState1 = item.DiffState1;
-            if (diffState1 != DiffState.Modified && diffState1 != DiffState.Deleted && diffState1 != DiffState.Imaginary)
-                throw new ArgumentException(nameof(dataContext));
-            if (diffState1 == DiffState.Imaginary && item.DiffState2 == DiffState.Modified)
-                throw new ArgumentException(nameof(dataContext));
-            if (diffState1 == DiffState.Deleted && item.DiffState2 == DiffState.Modified)
-                throw new ArgumentException(nameof(dataContext));
-        }
-
-        private void ValidateDeleteRightSide(object dataContext)
-        {
-            if (dataContext is DataRowView == false)
-                throw new ArgumentException(nameof(dataContext));
-
-            var dataRowView = dataContext as DataRowView;
-            var dataRow = dataRowView.Row as InternalRowBase;
-            if (dataRow.Table != this.diffSource2.InternalObject)
-                throw new ArgumentException(nameof(dataContext));
-
-            var item = this.itemList[dataRow.Index];
-            if (item.DiffState2 != DiffState.Inserted)
-                throw new ArgumentException(nameof(dataContext));
-        }
-
-        private void ValidateAddToLeftSide(object dataContext)
-        {
-            if (dataContext is DataRowView == false)
-                throw new ArgumentException(nameof(dataContext));
-
-            var dataRowView = dataContext as DataRowView;
-            var dataRow = dataRowView.Row as InternalRowBase;
-            if (dataRow.Table != this.diffSource2.InternalObject)
-                throw new ArgumentException(nameof(dataContext));
-
-            var item = this.itemList[dataRow.Index];
-            if (item.DiffState2 != DiffState.Inserted)
-                throw new ArgumentException(nameof(dataContext));
-            var item2 = item.Item2;
-            if (this.diffSource1.Items.Contains(item2.Name))
-                throw new ArgumentException(string.Format(Resources.Exception_AlreadyExistedItem_Format, item2.Name));
-        }
-
-        private void ValidateCopyToLeftSide(object dataContext)
-        {
-            if (dataContext is DataRowView == false)
-                throw new ArgumentException(nameof(dataContext));
-
-            var dataRowView = dataContext as DataRowView;
-            var dataRow = dataRowView.Row as InternalRowBase;
-            if (dataRow.Table != this.diffSource2.InternalObject)
-                throw new ArgumentException(nameof(dataContext));
-
-            var item = this.itemList[dataRow.Index];
-            var diffState2 = item.DiffState2;
-            if (diffState2 != DiffState.Modified && diffState2 != DiffState.Inserted && diffState2 != DiffState.Imaginary)
-                throw new ArgumentException(nameof(dataContext));
-            if (diffState2 == DiffState.Imaginary && item.DiffState1 == DiffState.Modified)
-                throw new ArgumentException(nameof(dataContext));
-            if (diffState2 == DiffState.Inserted && item.DiffState1 == DiffState.Modified)
-                throw new ArgumentException(nameof(dataContext));
-        }
-
-        private void ValidateDeleteLeftSide(object dataContext)
-        {
-            if (dataContext is DataRowView == false)
-                throw new ArgumentException(nameof(dataContext));
-
-            var dataRowView = dataContext as DataRowView;
-            var dataRow = dataRowView.Row as InternalRowBase;
-            if (dataRow.Table != this.diffSource1.InternalObject)
-                throw new ArgumentException(nameof(dataContext));
-
-            var item = this.itemList[dataRow.Index];
-            if (item.DiffState1 != DiffState.Deleted)
-                throw new ArgumentException(nameof(dataContext));
-        }
-
         private void MergeDelete()
         {
             Validate();
 
-            this.diffSource2.ReadOnly = false;
-            for (var i = 0; i < this.diffSource1.Items.Count; i++)
+            this.SourceItem2.ReadOnly = false;
+            for (var i = 0; i < this.SourceItem1.Items.Count; i++)
             {
-                var item1 = this.diffSource1.Items[i];
-                var item2 = this.diffSource2.Items[i];
+                var item1 = this.SourceItem1.Items[i];
+                var item2 = this.SourceItem2.Items[i];
                 item2.CopyFrom(item1);
             }
-            this.diffSource2.ReadOnly = true;
-            this.isResolved = true;
+            this.SourceItem2.ReadOnly = true;
+            this.IsResolved = true;
 
             void Validate()
             {
-                if (this.diffState != DiffState.Deleted)
+                if (this.DiffState != DiffState.Deleted)
                     throw new Exception();
             }
         }
@@ -526,21 +413,21 @@ namespace JSSoft.Crema.Data.Diff
         {
             Validate();
 
-            this.diffSource1.ReadOnly = false;
-            this.diffSource2.ReadOnly = false;
-            for (var i = 0; i < this.diffSource2.Items.Count; i++)
+            this.SourceItem1.ReadOnly = false;
+            this.SourceItem2.ReadOnly = false;
+            for (var i = 0; i < this.SourceItem2.Items.Count; i++)
             {
-                var item1 = this.diffSource1.Items[i];
-                var item2 = this.diffSource2.Items[i];
+                var item1 = this.SourceItem1.Items[i];
+                var item2 = this.SourceItem2.Items[i];
                 item1.CopyFrom(item2);
             }
-            this.diffSource1.ReadOnly = true;
-            this.diffSource2.ReadOnly = true;
-            this.isResolved = true;
+            this.SourceItem1.ReadOnly = true;
+            this.SourceItem2.ReadOnly = true;
+            this.IsResolved = true;
 
             void Validate()
             {
-                if (this.diffState != DiffState.Inserted)
+                if (this.DiffState != DiffState.Inserted)
                     throw new Exception();
             }
         }
@@ -589,49 +476,49 @@ namespace JSSoft.Crema.Data.Diff
                     return;
             }
 
-            this.diffSource1.ReadOnly = false;
-            this.diffSource2.ReadOnly = false;
-            this.diffSource1.DeleteItems();
-            this.diffSource2.DeleteItems();
-            this.diffSource1.AcceptChanges();
-            this.diffSource2.AcceptChanges();
-            this.diffSource1.IsDiffMode = false;
-            this.diffSource2.IsDiffMode = false;
-            this.diffSource1.ReadOnly = true;
-            this.diffSource2.ReadOnly = true;
-            this.isResolved = true;
+            this.SourceItem1.ReadOnly = false;
+            this.SourceItem2.ReadOnly = false;
+            this.SourceItem1.DeleteItems();
+            this.SourceItem2.DeleteItems();
+            this.SourceItem1.AcceptChanges();
+            this.SourceItem2.AcceptChanges();
+            this.SourceItem1.IsDiffMode = false;
+            this.SourceItem2.IsDiffMode = false;
+            this.SourceItem1.ReadOnly = true;
+            this.SourceItem2.ReadOnly = true;
+            this.IsResolved = true;
 
             void Validate()
             {
-                if (this.diffState != DiffState.Modified)
+                if (this.DiffState != DiffState.Modified)
                     throw new Exception();
             }
         }
 
         private void InitializeItems()
         {
-            this.diffSource1.ColumnChanged -= DiffSource1_ColumnChanged;
-            this.diffSource2.ColumnChanged -= DiffSource2_ColumnChanged;
-            this.diffSource1.ColumnDeleted -= DiffSource1_ColumnDeleted;
-            this.diffSource2.ColumnDeleted -= DiffSource2_ColumnDeleted;
+            this.SourceItem1.ColumnChanged -= DiffSource1_ColumnChanged;
+            this.SourceItem2.ColumnChanged -= DiffSource2_ColumnChanged;
+            this.SourceItem1.ColumnDeleted -= DiffSource1_ColumnDeleted;
+            this.SourceItem2.ColumnDeleted -= DiffSource2_ColumnDeleted;
 
-            this.diffSource1.ReadOnly = false;
-            this.diffSource2.ReadOnly = false;
+            this.SourceItem1.ReadOnly = false;
+            this.SourceItem2.ReadOnly = false;
 
             if (this.unresolvedItemList.Any() == false && (this.dataTable1 == null || this.dataTable2 == null))
             {
-                FillColumns(this.diffSource1, this.dataTable1 ?? this.dataTable2);
-                FillColumns(this.diffSource2, this.dataTable2 ?? this.dataTable1);
+                FillColumns(this.SourceItem1, this.dataTable1 ?? this.dataTable2);
+                FillColumns(this.SourceItem2, this.dataTable2 ?? this.dataTable1);
             }
             else
             {
-                FillColumns(this.diffSource1, this.diffTable1);
-                FillColumns(this.diffSource2, this.diffTable2);
+                FillColumns(this.SourceItem1, this.diffTable1);
+                FillColumns(this.SourceItem2, this.diffTable2);
             }
 
             this.itemList.Clear();
-            this.itemList.Capacity = this.diffSource1.Items.Count;
-            for (var i = 0; i < this.diffSource1.Items.Count; i++)
+            this.itemList.Capacity = this.SourceItem1.Items.Count;
+            for (var i = 0; i < this.SourceItem1.Items.Count; i++)
             {
                 var item = new DiffTemplateColumn(this, i);
                 this.itemList.Add(item);
@@ -643,15 +530,15 @@ namespace JSSoft.Crema.Data.Diff
                 item.Update();
             }
 
-            this.diffSource1.AcceptChanges();
-            this.diffSource2.AcceptChanges();
+            this.SourceItem1.AcceptChanges();
+            this.SourceItem2.AcceptChanges();
 
-            this.diffSource1.ColumnChanged += DiffSource1_ColumnChanged;
-            this.diffSource2.ColumnChanged += DiffSource2_ColumnChanged;
-            this.diffSource1.ColumnDeleted += DiffSource1_ColumnDeleted;
-            this.diffSource2.ColumnDeleted += DiffSource2_ColumnDeleted;
+            this.SourceItem1.ColumnChanged += DiffSource1_ColumnChanged;
+            this.SourceItem2.ColumnChanged += DiffSource2_ColumnChanged;
+            this.SourceItem1.ColumnDeleted += DiffSource1_ColumnDeleted;
+            this.SourceItem2.ColumnDeleted += DiffSource2_ColumnDeleted;
 
-            void FillColumns(CremaTemplate template, CremaDataTable diffTable)
+            static void FillColumns(CremaTemplate template, CremaDataTable diffTable)
             {
                 var index = 0;
                 template.Columns.Clear();
@@ -862,45 +749,45 @@ namespace JSSoft.Crema.Data.Diff
 
             if (this.dataTable1 == null)
             {
-                this.diffSource1.ReadOnly = true;
-                this.diffSource2.ReadOnly = true;
-                this.diffSource1.SetDiffState(DiffState.Imaginary);
-                this.diffSource2.SetDiffState(DiffState.Inserted);
-                this.diffState = DiffState.Inserted;
-                this.isResolved = this.unresolvedItemList.Any() == false;
+                this.SourceItem1.ReadOnly = true;
+                this.SourceItem2.ReadOnly = true;
+                this.SourceItem1.SetDiffState(DiffState.Imaginary);
+                this.SourceItem2.SetDiffState(DiffState.Inserted);
+                this.DiffState = DiffState.Inserted;
+                this.IsResolved = this.unresolvedItemList.Any() == false;
             }
             else if (this.dataTable2 == null)
             {
-                this.diffSource1.ReadOnly = true;
-                this.diffSource2.ReadOnly = true;
-                this.diffSource1.SetDiffState(DiffState.Deleted);
-                this.diffSource2.SetDiffState(DiffState.Imaginary);
-                this.diffState = DiffState.Deleted;
-                this.isResolved = this.unresolvedItemList.Any() == false;
+                this.SourceItem1.ReadOnly = true;
+                this.SourceItem2.ReadOnly = true;
+                this.SourceItem1.SetDiffState(DiffState.Deleted);
+                this.SourceItem2.SetDiffState(DiffState.Imaginary);
+                this.DiffState = DiffState.Deleted;
+                this.IsResolved = this.unresolvedItemList.Any() == false;
             }
             else if (this.VerifyModified() == true)
             {
-                this.diffSource1.ReadOnly = this.MergeType == DiffMergeTypes.ReadOnly1 || this.unresolvedItemList.Any();
-                this.diffSource2.ReadOnly = this.MergeType == DiffMergeTypes.ReadOnly2 || this.unresolvedItemList.Any();
-                this.diffSource1.SetDiffState(DiffState.Modified);
-                this.diffSource2.SetDiffState(DiffState.Modified);
-                this.diffState = DiffState.Modified;
-                this.isResolved = false;
+                this.SourceItem1.ReadOnly = this.MergeType == DiffMergeTypes.ReadOnly1 || this.unresolvedItemList.Any();
+                this.SourceItem2.ReadOnly = this.MergeType == DiffMergeTypes.ReadOnly2 || this.unresolvedItemList.Any();
+                this.SourceItem1.SetDiffState(DiffState.Modified);
+                this.SourceItem2.SetDiffState(DiffState.Modified);
+                this.DiffState = DiffState.Modified;
+                this.IsResolved = false;
             }
             else
             {
-                this.diffSource1.AcceptChanges();
-                this.diffSource2.AcceptChanges();
-                this.diffSource1.ReadOnly = true;
-                this.diffSource2.ReadOnly = true;
-                this.diffSource1.SetDiffState(DiffState.Unchanged);
-                this.diffSource2.SetDiffState(DiffState.Unchanged);
-                this.diffState = DiffState.Unchanged;
-                this.isResolved = this.unresolvedItemList.Any() == false;
+                this.SourceItem1.AcceptChanges();
+                this.SourceItem2.AcceptChanges();
+                this.SourceItem1.ReadOnly = true;
+                this.SourceItem2.ReadOnly = true;
+                this.SourceItem1.SetDiffState(DiffState.Unchanged);
+                this.SourceItem2.SetDiffState(DiffState.Unchanged);
+                this.DiffState = DiffState.Unchanged;
+                this.IsResolved = this.unresolvedItemList.Any() == false;
             }
             this.InvokePropertyChangedEvent(nameof(this.IsResolved), nameof(this.DiffState));
         }
 
-        internal HashSet<object> ItemSet => this.itemSet;
+        internal HashSet<object> ItemSet { get; } = new();
     }
 }

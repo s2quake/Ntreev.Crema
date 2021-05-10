@@ -53,13 +53,11 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
         private readonly Lazy<IShell> shell;
 
         private ConnectionItemViewModel connectionItem;
-        private readonly ICommand loginCommand;
         private SecureString securePassword;
 
         private bool hasError;
         private bool isOpened;
         private bool isLoaded;
-        private bool isEncrypted;
 
         private readonly Authenticator authenticator;
         private string dataBaseName;
@@ -67,7 +65,6 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
         private Color themeColor;
         private string theme;
         private string address;
-        private string userID = string.Empty;
         private IConfigurationCommitter userConfigCommitter;
 
         private IDataBase dataBase;
@@ -99,7 +96,6 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
             this.shell = shell;
             this.theme = Themes.Keys.FirstOrDefault();
             this.themeColor = FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor;
-            this.loginCommand = new DelegateCommand((p) => this.LoginAsync(), (p) => this.CanLogin);
             this.ConnectionItems = ConnectionItemCollection.Read(this, AppUtility.GetDocumentFilename("ConnectionList.xml"));
             this.buildUp.BuildUp(this.ConnectionItems);
             this.ConnectionItem = this.ConnectionItems.FirstOrDefault(item => item.IsDefault);
@@ -310,7 +306,6 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
                     return;
                 }
             }
-            this.isEncrypted = isEncrypted;
             this.NotifyOfPropertyChange(nameof(this.CanLogin));
         }
 
@@ -433,7 +428,7 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
 
         public string Address => this.address ?? string.Empty;
 
-        public string UserID => this.userID;
+        public string UserID { get; private set; } = string.Empty;
 
         public Color ThemeColor
         {
@@ -736,9 +731,9 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
         {
             this.settings.Address = address;
             await this.cremaHost.OpenAsync();
-            this.token = await this.cremaHost.LoginAsync(userID, password);
+            this.token = await this.cremaHost.LoginAsync(userID, password, false);
             this.address = address;
-            this.userID = userID;
+            this.UserID = userID;
             this.IsOpened = true;
             this.connectionItem.LastConnectedDateTime = DateTime.Now;
             this.ConnectionItems.Write();

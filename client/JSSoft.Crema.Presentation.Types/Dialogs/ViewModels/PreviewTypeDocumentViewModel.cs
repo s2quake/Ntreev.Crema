@@ -26,15 +26,14 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
 {
     class PreviewTypeDocumentViewModel : DocumentBase
     {
-        private readonly CremaDataType dataType;
         private CremaDataType selectedType;
 
         public PreviewTypeDocumentViewModel(CremaDataType dataType)
         {
-            this.dataType = dataType;
+            this.Source = dataType;
         }
 
-        public CremaDataType Source => this.dataType;
+        public CremaDataType Source { get; private set; }
 
         public CremaDataType SelectedType
         {

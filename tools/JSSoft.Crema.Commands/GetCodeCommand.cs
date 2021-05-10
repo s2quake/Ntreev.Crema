@@ -27,9 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,6 +37,7 @@ namespace JSSoft.Crema.Commands
     [CommandStaticProperty(typeof(CodeSettings))]
     [CommandStaticProperty(typeof(FilterSettings))]
     [CommandStaticProperty(typeof(DataBaseSettings))]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:읽기 전용 한정자 추가", Justification = "<보류 중>")]
     class GetCodeCommand : CommandAsyncBase
     {
         [Import]
@@ -47,8 +46,6 @@ namespace JSSoft.Crema.Commands
         private IEnumerable<ICodeGenerator> generators = null;
         [ImportMany]
         private IEnumerable<ICodeCompiler> compilers = null;
-        [Import]
-        private Lazy<CommandContext> commandContext = null;
 
         public GetCodeCommand()
             : base("get-code")

@@ -33,8 +33,6 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-#pragma warning disable 0612
-
 namespace JSSoft.Crema.Services.Data
 {
     class TableCollection : TableCollectionBase<Table, TableCategory, TableCollection, TableCategoryCollection, TableContext>,

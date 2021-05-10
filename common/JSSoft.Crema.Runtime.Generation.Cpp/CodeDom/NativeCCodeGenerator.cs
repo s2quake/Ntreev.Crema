@@ -34,6 +34,15 @@ using System.Globalization;
 
 namespace JSSoft.Crema.Runtime.Generation.Cpp.CodeDom
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:읽지 않은 private 멤버 제거", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:사용되지 않는 private 멤버 제거", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0038:패턴 일치 사용", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0019:패턴 일치 사용", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0090:'new(...)' 사용", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0032:auto 속성 사용", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0020:패턴 일치 사용", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0054:복합형 할당 사용", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:읽기 전용 한정자 추가", Justification = "<보류 중>")]
     class NativeCCodeGenerator : System.CodeDom.Compiler.ICodeGenerator
     {
         HashSet<string> preDefinedTypes = new HashSet<string>();
@@ -902,13 +911,7 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp.CodeDom
             }
         }
 
-        private string NullToken
-        {
-            get
-            {
-                return "nullptr";
-            }
-        }
+        private string NullToken => "nullptr";
 
         private string QuoteSnippetString(string value)
         {
@@ -2025,14 +2028,11 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp.CodeDom
 
         private bool CppMode
         {
-            get { return this.cppMode; }
-            set { this.cppMode = value; }
+            get => this.cppMode;
+            set => this.cppMode = value;
         }
 
-        private CodeGeneratorOptions Options
-        {
-            get { return this.options; }
-        }
+        private CodeGeneratorOptions Options => this.options;
 
         private void OutputTabs()
         {
@@ -3324,25 +3324,13 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp.CodeDom
                 }
             }
 
-            public CodeTypeMemberCollection PublicMembers
-            {
-                get { return this.publicMembers; }
-            }
+            public CodeTypeMemberCollection PublicMembers => this.publicMembers;
 
-            public CodeTypeMemberCollection PrivateMembers
-            {
-                get { return this.privateMembers; }
-            }
+            public CodeTypeMemberCollection PrivateMembers => this.privateMembers;
 
-            public CodeTypeMemberCollection ProtectedMembers
-            {
-                get { return this.protectedMembers; }
-            }
+            public CodeTypeMemberCollection ProtectedMembers => this.protectedMembers;
 
-            public CodeTypeMemberCollection InternalMembers
-            {
-                get { return this.internalMembers; }
-            }
+            public CodeTypeMemberCollection InternalMembers => this.internalMembers;
         }
 
         class Indentation
@@ -3350,7 +3338,7 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp.CodeDom
             private int indent;
             private string s;
             private IndentedTextWriter writer;
-            private string tabString;
+            private readonly string tabString;
 
             internal Indentation(IndentedTextWriter writer, int indent, string tabString)
             {
@@ -3379,50 +3367,17 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp.CodeDom
             }
         }
 
-        private CodeMemberProperty CurrentProperty
-        {
-            get { return this.currentProperty; }
-        }
+        private CodeMemberProperty CurrentProperty => this.currentProperty;
 
-        private bool IsCurrentClass
-        {
-            get
-            {
-                return (((this.currentClass != null) && !(this.currentClass is CodeTypeDelegate)) && this.currentClass.IsClass);
-            }
-        }
+        private bool IsCurrentClass => (((this.currentClass != null) && !(this.currentClass is CodeTypeDelegate)) && this.currentClass.IsClass);
 
-        private bool IsCurrentDelegate
-        {
-            get
-            {
-                return ((this.currentClass != null) && (this.currentClass is CodeTypeDelegate));
-            }
-        }
+        private bool IsCurrentDelegate => ((this.currentClass != null) && (this.currentClass is CodeTypeDelegate));
 
-        private bool IsCurrentEnum
-        {
-            get
-            {
-                return (((this.currentClass != null) && !(this.currentClass is CodeTypeDelegate)) && this.currentClass.IsEnum);
-            }
-        }
+        private bool IsCurrentEnum => (((this.currentClass != null) && !(this.currentClass is CodeTypeDelegate)) && this.currentClass.IsEnum);
 
-        private bool IsCurrentInterface
-        {
-            get
-            {
-                return (((this.currentClass != null) && !(this.currentClass is CodeTypeDelegate)) && this.currentClass.IsInterface);
-            }
-        }
+        private bool IsCurrentInterface => (((this.currentClass != null) && !(this.currentClass is CodeTypeDelegate)) && this.currentClass.IsInterface);
 
-        private bool IsCurrentStruct
-        {
-            get
-            {
-                return (((this.currentClass != null) && !(this.currentClass is CodeTypeDelegate)) && this.currentClass.IsStruct);
-            }
-        }
+        private bool IsCurrentStruct => (((this.currentClass != null) && !(this.currentClass is CodeTypeDelegate)) && this.currentClass.IsStruct);
 
         private string CurrentTypeName
         {

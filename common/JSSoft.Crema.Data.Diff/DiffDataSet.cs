@@ -32,13 +32,8 @@ namespace JSSoft.Crema.Data.Diff
 {
     public class DiffDataSet
     {
-        private readonly CremaDataSet diffSet1;
-        private readonly CremaDataSet diffSet2;
         private readonly CremaDataSet dataSet1;
         private readonly CremaDataSet dataSet2;
-        private readonly DiffMergeTypes mergeType;
-        private DiffDataType[] types;
-        private DiffDataTable[] tables;
         private readonly DiffDataResolver resolver = new();
         private string header1;
         private string header2;
@@ -57,11 +52,11 @@ namespace JSSoft.Crema.Data.Diff
 
         private DiffDataSet(CremaDataSet dataSet1, CremaDataSet dataSet2, DiffMergeTypes mergeType, IProgress progress)
         {
-            this.diffSet1 = new CremaDataSet();
-            this.diffSet2 = new CremaDataSet();
+            this.DataSet1 = new CremaDataSet();
+            this.DataSet2 = new CremaDataSet();
             this.dataSet1 = dataSet1;
             this.dataSet2 = dataSet2;
-            this.mergeType = mergeType;
+            this.MergeType = mergeType;
 
             this.InitializeTypes(progress);
             this.InitializeTables(progress);
@@ -76,13 +71,13 @@ namespace JSSoft.Crema.Data.Diff
             return Task.Run(() => new DiffDataSet(dataSet1, dataSet2, mergeType, progress));
         }
 
-        public DiffDataTable[] Tables => this.tables;
+        public DiffDataTable[] Tables { get; private set; }
 
-        public DiffDataType[] Types => this.types;
+        public DiffDataType[] Types { get; private set; }
 
-        public CremaDataSet DataSet1 => this.diffSet1;
+        public CremaDataSet DataSet1 { get; private set; }
 
-        public CremaDataSet DataSet2 => this.diffSet2;
+        public CremaDataSet DataSet2 { get; private set; }
 
         public string Header1
         {
@@ -96,7 +91,7 @@ namespace JSSoft.Crema.Data.Diff
             set => this.header2 = value;
         }
 
-        public DiffMergeTypes MergeType => this.mergeType;
+        public DiffMergeTypes MergeType { get; private set; }
 
         private void InitializeTables(IProgress progress)
         {
@@ -117,8 +112,8 @@ namespace JSSoft.Crema.Data.Diff
                     var dataTable2 = tables2.Single(i => i.TableID == item.TableID);
                     var tableName1 = dataTable1.TableName != dataTable2.TableName ? DiffUtility.DiffDummyKey + dataTable1.TableName : dataTable2.TableName;
                     var tableName2 = dataTable2.TableName;
-                    var diffTable1 = DiffDataTable.Create(this.diffSet1, tableName1);
-                    var diffTable2 = DiffDataTable.Create(this.diffSet2, tableName2);
+                    var diffTable1 = DiffDataTable.Create(this.DataSet1, tableName1);
+                    var diffTable2 = DiffDataTable.Create(this.DataSet2, tableName2);
                     DiffInternalUtility.SyncColumns(diffTable1, diffTable2, dataTable1, dataTable2);
                     var diffTable = new DiffDataTable(diffTable1, diffTable2, dataTable1, dataTable2, this);
                     var diffTemplate = new DiffTemplate(diffTable1, diffTable2, dataTable1, dataTable2) { DiffTable = diffTable };
@@ -136,8 +131,8 @@ namespace JSSoft.Crema.Data.Diff
                 if (this.dataSet2.Tables.Contains(dataTable1.TableName) == true)
                 {
                     var dataTable2 = this.dataSet2.Tables[dataTable1.TableName];
-                    var diffTable1 = DiffDataTable.Create(this.diffSet1, dataTable1.TableName);
-                    var diffTable2 = DiffDataTable.Create(this.diffSet2, dataTable2.TableName);
+                    var diffTable1 = DiffDataTable.Create(this.DataSet1, dataTable1.TableName);
+                    var diffTable2 = DiffDataTable.Create(this.DataSet2, dataTable2.TableName);
                     DiffInternalUtility.SyncColumns(diffTable1, diffTable2, dataTable1, dataTable2);
                     var diffTable = new DiffDataTable(diffTable1, diffTable2, dataTable1, dataTable2, this);
                     var diffTemplate = new DiffTemplate(diffTable1, diffTable2, dataTable1, dataTable2) { DiffTable = diffTable };
@@ -162,8 +157,8 @@ namespace JSSoft.Crema.Data.Diff
             foreach (var item in tables2)
             {
                 var dataTable2 = item;
-                var diffTable1 = DiffDataTable.Create(this.diffSet1, dataTable2.TableName);
-                var diffTable2 = DiffDataTable.Create(this.diffSet2, dataTable2.TableName);
+                var diffTable1 = DiffDataTable.Create(this.DataSet1, dataTable2.TableName);
+                var diffTable2 = DiffDataTable.Create(this.DataSet2, dataTable2.TableName);
                 DiffInternalUtility.SyncColumns(diffTable1, diffTable2, null, dataTable2);
                 var diffTable = new DiffDataTable(diffTable1, diffTable2, null, dataTable2, this);
                 var diffTemplate = new DiffTemplate(diffTable1, diffTable2, null, dataTable2) { DiffTable = diffTable };
@@ -185,7 +180,7 @@ namespace JSSoft.Crema.Data.Diff
             tableList.AsParallel().ForAll(item => item.DiffTemplate());
             tableList.AsParallel().ForAll(item => item.Diff());
 
-            this.tables = tableList.OrderBy(item => item.SourceItem1.TableName).ToArray();
+            this.Tables = tableList.OrderBy(item => item.SourceItem1.TableName).ToArray();
         }
 
         private void InitializeTypes(IProgress progress)
@@ -202,8 +197,8 @@ namespace JSSoft.Crema.Data.Diff
                     continue;
 
                 var dataType1 = item;
-                var diffType1 = DiffDataType.Create(this.diffSet1, dataType1.TypeName);
-                var diffType2 = DiffDataType.Create(this.diffSet2, dataType2.TypeName);
+                var diffType1 = DiffDataType.Create(this.DataSet1, dataType1.TypeName);
+                var diffType2 = DiffDataType.Create(this.DataSet2, dataType2.TypeName);
                 var diffType = new DiffDataType(diffType1, diffType2, dataType1, dataType2);
                 typeList.Add(diffType);
                 types1.Remove(dataType1);
@@ -216,8 +211,8 @@ namespace JSSoft.Crema.Data.Diff
                 if (this.dataSet2.Types.Contains(dataType1.TypeName) == true)
                 {
                     var dataType2 = this.dataSet2.Types[dataType1.TypeName];
-                    var diffType1 = DiffDataType.Create(this.diffSet1, dataType1.TypeName);
-                    var diffType2 = DiffDataType.Create(this.diffSet2, DiffUtility.DiffDummyKey + dataType2.TypeName);
+                    var diffType1 = DiffDataType.Create(this.DataSet1, dataType1.TypeName);
+                    var diffType2 = DiffDataType.Create(this.DataSet2, DiffUtility.DiffDummyKey + dataType2.TypeName);
                     var diffType = new DiffDataType(diffType1, diffType2, dataType1, dataType2);
                     typeList.Add(diffType);
                     types2.Remove(dataType2);
@@ -235,7 +230,7 @@ namespace JSSoft.Crema.Data.Diff
             {
                 var dataType2 = item;
                 var diffType1 = DiffDataType.Create(new CremaDataSet(), dataType2.TypeName);
-                var diffType2 = DiffDataType.Create(this.diffSet2, dataType2.TypeName);
+                var diffType2 = DiffDataType.Create(this.DataSet2, dataType2.TypeName);
                 var diffType = new DiffDataType(diffType1, diffType2, null, dataType2);
                 typeList.Add(diffType);
             }
@@ -257,7 +252,7 @@ namespace JSSoft.Crema.Data.Diff
             }
 #endif
 
-            this.types = typeList.OrderBy(item => item.SourceItem1.TypeName).ToArray();
+            this.Types = typeList.OrderBy(item => item.SourceItem1.TypeName).ToArray();
         }
     }
 }

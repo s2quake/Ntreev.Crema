@@ -20,11 +20,6 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Tools.Framework
 {
@@ -35,7 +30,14 @@ namespace JSSoft.Crema.Tools.Framework
 
         public string Comment
         {
+
+/* 'JSSoft.Crema.Tools.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return this.comment; }
+이후:
+            get => this.comment; }
+*/
+            get => this.comment;
             set
             {
                 this.comment = value;
@@ -45,7 +47,14 @@ namespace JSSoft.Crema.Tools.Framework
 
         public string GroupName
         {
+
+/* 'JSSoft.Crema.Tools.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return this.groupName; }
+이후:
+            get => this.groupName; }
+*/
+            get => this.groupName;
             set
             {
                 this.groupName = value;

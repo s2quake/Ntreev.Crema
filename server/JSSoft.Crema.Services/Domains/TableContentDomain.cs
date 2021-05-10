@@ -37,7 +37,7 @@ namespace JSSoft.Crema.Services.Domains
     class TableContentDomain : Domain
     {
         private readonly CremaDataSet dataSet;
-        private readonly Dictionary<string, DataView> views = new Dictionary<string, DataView>();
+        private readonly Dictionary<string, DataView> views = new();
         private byte[] data;
 
         public TableContentDomain(DomainSerializationInfo serializationInfo, object source)

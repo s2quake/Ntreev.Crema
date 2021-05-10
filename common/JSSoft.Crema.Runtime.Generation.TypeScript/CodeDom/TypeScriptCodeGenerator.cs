@@ -30,11 +30,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Runtime.Generation.TypeScript.CodeDom
 {
-    static class wow
+    static class TypeScriptCodeGeneratorExtensions
     {
         public static void InternalOutputTabs(this IndentedTextWriter writer)
         {
@@ -45,13 +44,19 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.CodeDom
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:읽지 않은 private 멤버 제거", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:사용되지 않는 private 멤버 제거", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0038:패턴 일치 사용", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0029:COALESCE 식 사용", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0019:패턴 일치 사용", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:간단한 'using' 문 사용", Justification = "<보류 중>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0032:auto 속성 사용", Justification = "<보류 중>")]
     class TypeScriptCodeGenerator : System.CodeDom.Compiler.ICodeCompiler, System.CodeDom.Compiler.ICodeGenerator
     {
         //private string regexPattern = "(^[a-zA-Z])|(^_[a-zA-Z])[^A-Z]";
         //private string regexPattern = "(^[A-Z])[^A-Z]";
 
         private IndentedTextWriter output;
-
         private CodeGeneratorOptions options;
 
         private CodeTypeDeclaration currentClass;
@@ -150,21 +155,9 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.CodeDom
 
         private bool generatingForLoop;
 
-        private string FileExtension
-        {
-            get
-            {
-                return ".ts";
-            }
-        }
+        private string FileExtension => ".ts";
 
-        private string CompilerName
-        {
-            get
-            {
-                return "tsc.exe";
-            }
-        }
+        private string CompilerName => "tsc.exe";
 
         private string CurrentTypeName
         {
@@ -180,79 +173,25 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.CodeDom
 
         private int Indent
         {
-            get
-            {
-                return this.output.Indent;
-            }
-            set
-            {
-                this.output.Indent = value;
-            }
+            get => this.output.Indent;
+            set => this.output.Indent = value;
         }
 
-        private bool IsCurrentInterface
-        {
-            get
-            {
-                return this.currentClass != null && !(this.currentClass is CodeTypeDelegate) && this.currentClass.IsInterface;
-            }
-        }
+        private bool IsCurrentInterface => this.currentClass != null && !(this.currentClass is CodeTypeDelegate) && this.currentClass.IsInterface;
 
-        private bool IsCurrentClass
-        {
-            get
-            {
-                return this.currentClass != null && !(this.currentClass is CodeTypeDelegate) && this.currentClass.IsClass;
-            }
-        }
+        private bool IsCurrentClass => this.currentClass != null && !(this.currentClass is CodeTypeDelegate) && this.currentClass.IsClass;
 
-        private bool IsCurrentStruct
-        {
-            get
-            {
-                return this.currentClass != null && !(this.currentClass is CodeTypeDelegate) && this.currentClass.IsStruct;
-            }
-        }
+        private bool IsCurrentStruct => this.currentClass != null && !(this.currentClass is CodeTypeDelegate) && this.currentClass.IsStruct;
 
-        private bool IsCurrentEnum
-        {
-            get
-            {
-                return this.currentClass != null && !(this.currentClass is CodeTypeDelegate) && this.currentClass.IsEnum;
-            }
-        }
+        private bool IsCurrentEnum => this.currentClass != null && !(this.currentClass is CodeTypeDelegate) && this.currentClass.IsEnum;
 
-        private bool IsCurrentDelegate
-        {
-            get
-            {
-                return this.currentClass != null && this.currentClass is CodeTypeDelegate;
-            }
-        }
+        private bool IsCurrentDelegate => this.currentClass != null && this.currentClass is CodeTypeDelegate;
 
-        private string NullToken
-        {
-            get
-            {
-                return "null";
-            }
-        }
+        private string NullToken => "null";
 
-        private CodeGeneratorOptions Options
-        {
-            get
-            {
-                return this.options;
-            }
-        }
+        private CodeGeneratorOptions Options => this.options;
 
-        private TextWriter Output
-        {
-            get
-            {
-                return this.output;
-            }
-        }
+        private TextWriter Output => this.output;
 
         internal TypeScriptCodeGenerator()
         {
@@ -3313,120 +3252,6 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.CodeDom
                 return;
             }
             this.Output.WriteLine(" {");
-        }
-
-        //private CompilerResults FromFileBatch(CompilerParameters options, string[] fileNames)
-        //{
-        //    if (options == null)
-        //    {
-        //        throw new ArgumentNullException("options");
-        //    }
-        //    if (fileNames == null)
-        //    {
-        //        throw new ArgumentNullException("fileNames");
-        //    }
-        //    new SecurityPermission(SecurityPermissionFlag.UnmanagedCode).Demand();
-        //    string file = null;
-        //    int num = 0;
-        //    CompilerResults compilerResults = new CompilerResults(options.TempFiles);
-        //    new SecurityPermission(SecurityPermissionFlag.ControlEvidence).Assert();
-        //    try
-        //    {
-        //        compilerResults.Evidence = options.Evidence;
-        //    }
-        //    finally
-        //    {
-        //        CodeAccessPermission.RevertAssert();
-        //    }
-        //    bool flag = false;
-        //    if (options.OutputAssembly == null || options.OutputAssembly.Length == 0)
-        //    {
-        //        string fileExtension = options.GenerateExecutable ? "exe" : "dll";
-        //        options.OutputAssembly = compilerResults.TempFiles.AddExtension(fileExtension, !options.GenerateInMemory);
-        //        new FileStream(options.OutputAssembly, FileMode.Create, FileAccess.ReadWrite).Close();
-        //        flag = true;
-        //    }
-        //    string text = "pdb";
-        //    if (options.CompilerOptions != null && -1 != CultureInfo.InvariantCulture.CompareInfo.IndexOf(options.CompilerOptions, "/debug:pdbonly", CompareOptions.IgnoreCase))
-        //    {
-        //        compilerResults.TempFiles.AddExtension(text, true);
-        //    }
-        //    else
-        //    {
-        //        compilerResults.TempFiles.AddExtension(text);
-        //    }
-        //    string text2 = this.CmdArgsFromParameters(options) + " " + TypeScriptCodeGenerator.JoinStringArray(fileNames, " ");
-        //    string responseFileCmdArgs = this.GetResponseFileCmdArgs(options, text2);
-        //    string trueArgs = null;
-        //    if (responseFileCmdArgs != null)
-        //    {
-        //        trueArgs = text2;
-        //        text2 = responseFileCmdArgs;
-        //    }
-        //    this.Compile(options, RedistVersionInfo.GetCompilerPath(this.provOptions, this.CompilerName), this.CompilerName, text2, ref file, ref num, trueArgs);
-        //    compilerResults.NativeCompilerReturnValue = num;
-        //    if (num != 0 || options.WarningLevel > 0)
-        //    {
-        //        string[] array = TypeScriptCodeGenerator.ReadAllLines(file, Encoding.UTF8, FileShare.ReadWrite);
-        //        for (int i = 0; i < array.Length; i++)
-        //        {
-        //            string text3 = array[i];
-        //            compilerResults.Output.Add(text3);
-        //            this.ProcessCompilerOutputLine(compilerResults, text3);
-        //        }
-        //        if (num != 0 & flag)
-        //        {
-        //            File.Delete(options.OutputAssembly);
-        //        }
-        //    }
-        //    if (compilerResults.Errors.HasErrors || !options.GenerateInMemory)
-        //    {
-        //        compilerResults.PathToAssembly = options.OutputAssembly;
-        //        return compilerResults;
-        //    }
-        //    byte[] rawAssembly = File.ReadAllBytes(options.OutputAssembly);
-        //    byte[] rawSymbolStore = null;
-        //    try
-        //    {
-        //        string path = options.TempFiles.BasePath + "." + text;
-        //        if (File.Exists(path))
-        //        {
-        //            rawSymbolStore = File.ReadAllBytes(path);
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        rawSymbolStore = null;
-        //    }
-        //    new SecurityPermission(SecurityPermissionFlag.ControlEvidence).Assert();
-        //    try
-        //    {
-        //        compilerResults.CompiledAssembly = Assembly.Load(rawAssembly, rawSymbolStore, options.Evidence);
-        //    }
-        //    finally
-        //    {
-        //        CodeAccessPermission.RevertAssert();
-        //    }
-        //    return compilerResults;
-        //}
-
-        private static string[] ReadAllLines(string file, Encoding encoding, FileShare share)
-        {
-            string[] result;
-            using (FileStream fileStream = File.Open(file, FileMode.Open, FileAccess.Read, share))
-            {
-                List<string> list = new List<string>();
-                using (StreamReader streamReader = new StreamReader(fileStream, encoding))
-                {
-                    string item;
-                    while ((item = streamReader.ReadLine()) != null)
-                    {
-                        list.Add(item);
-                    }
-                }
-                result = list.ToArray();
-            }
-            return result;
         }
 
         CompilerResults System.CodeDom.Compiler.ICodeCompiler.CompileAssemblyFromDom(CompilerParameters options, CodeCompileUnit e)

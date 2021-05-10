@@ -34,7 +34,7 @@ namespace JSSoft.Crema.Services
 {
     abstract class RepositoryHost
     {
-        private readonly HashSet<string> paths = new HashSet<string>();
+        private readonly HashSet<string> paths = new();
 
         public RepositoryHost(IRepository repository)
         {

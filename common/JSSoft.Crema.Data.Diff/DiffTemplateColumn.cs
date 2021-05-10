@@ -30,16 +30,13 @@ namespace JSSoft.Crema.Data.Diff
     public class DiffTemplateColumn
     {
         private readonly DiffTemplate diffTemplate;
-        private readonly int index;
-        private CremaTemplateColumn item1;
-        private CremaTemplateColumn item2;
 
         internal DiffTemplateColumn(DiffTemplate diffTemplate, int index)
         {
             this.diffTemplate = diffTemplate;
-            this.index = index;
-            this.item1 = index < diffTemplate.SourceItem1.Items.Count ? diffTemplate.SourceItem1.Items[index] : null;
-            this.item2 = index < diffTemplate.SourceItem2.Items.Count ? diffTemplate.SourceItem2.Items[index] : null;
+            this.Index = index;
+            this.Item1 = index < diffTemplate.SourceItem1.Items.Count ? diffTemplate.SourceItem1.Items[index] : null;
+            this.Item2 = index < diffTemplate.SourceItem2.Items.Count ? diffTemplate.SourceItem2.Items[index] : null;
         }
 
         /// <summary>
@@ -58,12 +55,12 @@ namespace JSSoft.Crema.Data.Diff
                 return null;
             }
 
-            if (diffSource1.Items.Contains(this.item2.ColumnID) == false)
+            if (diffSource1.Items.Contains(this.Item2.ColumnID) == false)
             {
                 return diffSource1.Items[item2.Index];
             }
 
-            return diffSource1.Items[this.item2.ColumnID];
+            return diffSource1.Items[this.Item2.ColumnID];
         }
 
         public CremaTemplateColumn GetTarget2()
@@ -87,19 +84,11 @@ namespace JSSoft.Crema.Data.Diff
 
         }
 
-        public CremaTemplateColumn Item1
-        {
-            get => this.item1;
-            internal set => this.item1 = value;
-        }
+        public CremaTemplateColumn Item1 { get; internal set; }
 
-        public CremaTemplateColumn Item2
-        {
-            get => this.item2;
-            internal set => this.item2 = value;
-        }
+        public CremaTemplateColumn Item2 { get; internal set; }
 
-        public int Index => this.index;
+        public int Index { get; private set; }
 
         public DiffState DiffState1 => DiffUtility.GetDiffState(this.Item1);
 

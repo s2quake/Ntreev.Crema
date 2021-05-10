@@ -37,7 +37,7 @@ namespace JSSoft.Crema.Services.Domains
         private const string dataKey = "Data";
         private const string usersKey = "Users";
         private Func<DateTime> dateTimeProvider;
-        private readonly HashSet<string> modifiedTableList = new HashSet<string>();
+        private readonly HashSet<string> modifiedTableList = new();
         private DomainMetaData metaData;
 
         private EventHandler<DomainUserEventArgs> userAdded;

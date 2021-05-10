@@ -35,9 +35,7 @@ namespace JSSoft.Crema.Presentation.Types.Documents.ViewModels
         private readonly Authentication authentication;
         private readonly IDataBase dataBase;
         private string findingText;
-        private string[] findingTargets;
         private string findingTarget;
-        private readonly ObservableCollection<FindResultItemViewModel> itemsSource = new();
         private FindResultItemViewModel selectedItem;
 
         [Import]
@@ -72,7 +70,7 @@ namespace JSSoft.Crema.Presentation.Types.Documents.ViewModels
             }
         }
 
-        public string[] FindingTargets => this.findingTargets;
+        public string[] FindingTargets { get; private set; }
 
         public string FindingTarget
         {
@@ -87,7 +85,7 @@ namespace JSSoft.Crema.Presentation.Types.Documents.ViewModels
         public async void Find()
         {
             this.BeginProgress();
-            this.itemsSource.Clear();
+            this.ItemsSource.Clear();
 
             try
             {
@@ -96,7 +94,7 @@ namespace JSSoft.Crema.Presentation.Types.Documents.ViewModels
 
                 foreach (var item in results)
                 {
-                    this.itemsSource.Add(new FindResultItemViewModel(item));
+                    this.ItemsSource.Add(new FindResultItemViewModel(item));
                 }
 
                 this.DisplayName = $"{Resources.Title_Find} - {this.findingText}";
@@ -110,7 +108,7 @@ namespace JSSoft.Crema.Presentation.Types.Documents.ViewModels
             this.EndProgress();
         }
 
-        public ObservableCollection<FindResultItemViewModel> ItemsSource => this.itemsSource;
+        public ObservableCollection<FindResultItemViewModel> ItemsSource { get; } = new();
 
         public FindResultItemViewModel SelectedItem
         {
@@ -130,12 +128,12 @@ namespace JSSoft.Crema.Presentation.Types.Documents.ViewModels
 
             try
             {
-                this.findingTargets = await this.dataBase.Dispatcher.InvokeAsync(() =>
+                this.FindingTargets = await this.dataBase.Dispatcher.InvokeAsync(() =>
                 {
                     return this.dataBase.TypeContext.Where(item => item.VerifyAccessType(this.authentication, AccessType.Guest)).Select(item => item.Path).ToArray();
                 });
                 if (this.findingTarget == null)
-                    this.findingTarget = this.findingTargets.First(item => item == this.findingTarget);
+                    this.findingTarget = this.FindingTargets.First(item => item == this.findingTarget);
                 this.EndProgress();
             }
             catch (Exception e)

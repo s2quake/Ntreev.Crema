@@ -39,7 +39,6 @@ namespace JSSoft.Crema.Presentation.Tables.Documents.ViewModels
     {
         private readonly Authentication authentication;
         private readonly TableBrowserViewModel browser = null;
-        private readonly ObservableCollection<FindResultItemViewModel> items = new();
         private FindResultItemViewModel selectedItem;
         private string findingText;
         private string findingTarget;
@@ -108,14 +107,14 @@ namespace JSSoft.Crema.Presentation.Tables.Documents.ViewModels
         public async Task FindAsync()
         {
             this.BeginProgress();
-            this.items.Clear();
+            this.Items.Clear();
 
             try
             {
                 var results = await TableItemDescriptorUtility.FindAsync(this.authentication, this.descriptor, this.findingText, FindOptions.None);
                 foreach (var item in results)
                 {
-                    this.items.Add(new FindResultItemViewModel(item));
+                    this.Items.Add(new FindResultItemViewModel(item));
                 }
 
                 this.DisplayName = $"{Resources.Title_Find} - {this.findingText}";
@@ -129,7 +128,7 @@ namespace JSSoft.Crema.Presentation.Tables.Documents.ViewModels
             this.EndProgress();
         }
 
-        public ObservableCollection<FindResultItemViewModel> Items => this.items;
+        public ObservableCollection<FindResultItemViewModel> Items { get; } = new();
 
         public FindResultItemViewModel SelectedItem
         {

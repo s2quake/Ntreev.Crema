@@ -676,7 +676,7 @@ namespace JSSoft.Crema.Data.Xml.Schema
                     }
                     else
                     {
-                        if (!(simpleType.Content is XmlSchemaSimpleTypeRestriction xmlRestriction))
+                        if (simpleType.Content is not XmlSchemaSimpleTypeRestriction xmlRestriction)
                         {
                             if (simpleType.Content is XmlSchemaSimpleTypeList == true)
                             {

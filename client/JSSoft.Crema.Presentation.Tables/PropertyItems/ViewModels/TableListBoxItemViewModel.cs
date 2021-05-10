@@ -31,8 +31,6 @@ namespace JSSoft.Crema.Presentation.Tables.PropertyItems.ViewModels
 {
     public class TableListBoxItemViewModel : TableListItemBase
     {
-        private readonly ICommand selectInBrowserCommand;
-
         [Import]
         private readonly TableBrowserViewModel browser = null;
         [Import]
@@ -43,13 +41,13 @@ namespace JSSoft.Crema.Presentation.Tables.PropertyItems.ViewModels
         public TableListBoxItemViewModel(Authentication authentication, ITable table, object owner)
             : base(authentication, table, owner)
         {
-            this.selectInBrowserCommand = new DelegateCommand(async item => await this.SelectInBrowserAsync());
+            this.SelectInBrowserCommand = new DelegateCommand(async item => await this.SelectInBrowserAsync());
         }
 
         public TableListBoxItemViewModel(Authentication authentication, ITableDescriptor descriptor, object owner)
             : base(authentication, descriptor, owner)
         {
-            this.selectInBrowserCommand = new DelegateCommand(async item => await this.SelectInBrowserAsync());
+            this.SelectInBrowserCommand = new DelegateCommand(async item => await this.SelectInBrowserAsync());
         }
 
         public async Task SelectInBrowserAsync()
@@ -61,6 +59,6 @@ namespace JSSoft.Crema.Presentation.Tables.PropertyItems.ViewModels
             }
         }
 
-        public ICommand SelectInBrowserCommand => this.selectInBrowserCommand;
+        public ICommand SelectInBrowserCommand { get; private set; }
     }
 }

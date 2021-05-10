@@ -30,14 +30,13 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
     class PreviewTypeTreeViewItemViewModel : ItemTreeViewItemViewModel
     {
         private readonly Action<PreviewTypeTreeViewItemViewModel> viewAction;
-        private readonly ICommand viewCommand;
 
         public PreviewTypeTreeViewItemViewModel(string path, Action<PreviewTypeTreeViewItemViewModel> viewAction)
             : base(path)
         {
             this.IsExpanded = true;
             this.viewAction = viewAction;
-            this.viewCommand = new DelegateCommand(this.View);
+            this.ViewCommand = new DelegateCommand(this.View);
         }
 
         public void View()
@@ -45,7 +44,7 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
             this.viewAction(this);
         }
 
-        public ICommand ViewCommand => this.viewCommand;
+        public ICommand ViewCommand { get; private set; }
 
         public override string DisplayName => NameUtility.GetName(base.DisplayName);
     }

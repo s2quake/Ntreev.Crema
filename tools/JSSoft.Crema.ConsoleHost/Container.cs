@@ -22,15 +22,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost
 {
     static class Container
     {
-        static CompositionContainer container;
+        static readonly CompositionContainer container;
 
         static Container()
         {

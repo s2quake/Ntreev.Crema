@@ -35,14 +35,16 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 {
     static class CremaRowClassCreator
     {
-        private static readonly CodeThisReferenceExpression thisRef = new CodeThisReferenceExpression();
+        private static readonly CodeThisReferenceExpression thisRef = new();
 
         public static void Create(CodeNamespace codeNamespace, TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var classType = new CodeTypeDeclaration();
-            classType.Attributes = MemberAttributes.Public;
-            classType.Name = tableInfo.GetRowClassName();
-            classType.IsClass = true;
+            var classType = new CodeTypeDeclaration
+            {
+                Attributes = MemberAttributes.Public,
+                Name = tableInfo.GetRowClassName(),
+                IsClass = true
+            };
             classType.TypeAttributes |= TypeAttributes.Sealed;
             classType.BaseTypes.Add("base", "CremaRow");
 
@@ -64,8 +66,10 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateConstructor(CodeTypeDeclaration classType, TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var cc = new CodeConstructor();
-            cc.Attributes = MemberAttributes.Public;
+            var cc = new CodeConstructor
+            {
+                Attributes = MemberAttributes.Public
+            };
             cc.Parameters.Add("reader", "IRow", "row");
             cc.Parameters.Add(tableInfo.GetCodeType(), "table");
             cc.BaseConstructorArgs.AddVariableReference("row");
@@ -82,9 +86,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
                 var index = 0;
                 foreach (var item in tableInfo.Columns)
                 {
-                    var cas = new CodeAssignStatement();
-                    cas.Left = item.GetFieldExpression();
-                    cas.Right = item.GetGetValueMethodExpression(index, false);
+                    var cas = new CodeAssignStatement
+                    {
+                        Left = item.GetFieldExpression(),
+                        Right = item.GetGetValueMethodExpression(index, false)
+                    };
 
                     if (item.IsKey == false)
                     {
@@ -121,10 +127,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateTableField(CodeTypeDeclaration classType, TableInfo tableInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = tableInfo.GetFieldName();
-            cmf.Type = tableInfo.GetCodeType();
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = tableInfo.GetFieldName(),
+                Type = tableInfo.GetCodeType()
+            };
 
             classType.Members.Add(cmf);
         }
@@ -133,9 +141,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
         {
             foreach (var item in generationInfo.GetChilds(tableInfo))
             {
-                var cmm = new CodeMemberMethod();
-                cmm.Attributes = MemberAttributes.FamilyAndAssembly | MemberAttributes.Static;
-                cmm.Name = "set" + item.TableName;
+                var cmm = new CodeMemberMethod
+                {
+                    Attributes = MemberAttributes.FamilyAndAssembly | MemberAttributes.Static,
+                    Name = "set" + item.TableName
+                };
                 cmm.Parameters.Add(tableInfo.GetRowCodeType(), "target");
                 cmm.Parameters.Add(typeof(string), "childName");
                 cmm.Parameters.Add(item.GetRowCodeType(), 1, "childs");
@@ -172,10 +182,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
         {
             foreach (var item in tableInfo.Columns)
             {
-                var cmf = new CodeMemberField();
-                cmf.Attributes = MemberAttributes.Private;
-                cmf.Name = item.GetFieldName();
-                cmf.Type = item.GetCodeType();
+                var cmf = new CodeMemberField
+                {
+                    Attributes = MemberAttributes.Private,
+                    Name = item.GetFieldName(),
+                    Type = item.GetCodeType()
+                };
 
                 classType.Members.Add(cmf);
             }
@@ -185,10 +197,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
         {
             foreach (var item in generationInfo.GetChilds(tableInfo))
             {
-                var cmf = new CodeMemberField();
-                cmf.Attributes = MemberAttributes.Private;
-                cmf.Name = item.GetFieldName();
-                cmf.Type = item.GetCodeType();
+                var cmf = new CodeMemberField
+                {
+                    Attributes = MemberAttributes.Private,
+                    Name = item.GetFieldName(),
+                    Type = item.GetCodeType()
+                };
 
                 classType.Members.Add(cmf);
             }
@@ -198,12 +212,14 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
         {
             foreach (var item in generationInfo.GetChilds(tableInfo))
             {
-                var cmf = new CodeMemberField();
-                cmf.Attributes = MemberAttributes.Private | MemberAttributes.Static;
-                cmf.Name = item.GetFieldName() + "Empty";
-                cmf.Type = item.GetCodeType();
-                cmf.InitExpression = new CodeObjectCreateExpression(item.GetCodeType());
-                
+                var cmf = new CodeMemberField
+                {
+                    Attributes = MemberAttributes.Private | MemberAttributes.Static,
+                    Name = item.GetFieldName() + "Empty",
+                    Type = item.GetCodeType(),
+                    InitExpression = new CodeObjectCreateExpression(item.GetCodeType())
+                };
+
                 classType.Members.Add(cmf);
             }
         }
@@ -212,11 +228,13 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
         {
             foreach (var item in tableInfo.Columns)
             {
-                var cmp = new CodeMemberProperty();
-                cmp.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-                cmp.Name = item.Name;
-                cmp.Type = item.GetCodeType();
-               
+                var cmp = new CodeMemberProperty
+                {
+                    Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                    Name = item.Name,
+                    Type = item.GetCodeType()
+                };
+
                 if (generationInfo.OmitComment == false)
                 {
                     cmp.Comments.AddSummary(item.Comment);
@@ -245,12 +263,14 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
         {
             foreach (var item in generationInfo.GetChilds(tableInfo))
             {
-                var cmp = new CodeMemberProperty();
-                cmp.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-                cmp.Name = item.GetPropertyName();
-                cmp.Type = item.GetCodeType();
-                cmp.HasGet = true;
-                cmp.HasSet = false;
+                var cmp = new CodeMemberProperty
+                {
+                    Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                    Name = item.GetPropertyName(),
+                    Type = item.GetCodeType(),
+                    HasGet = true,
+                    HasSet = false
+                };
 
                 // check null and return defaultField
                 {
@@ -279,12 +299,14 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
             if (string.IsNullOrEmpty(tableInfo.ParentName) == true)
                 return;
 
-            var cmp = new CodeMemberProperty();
-            cmp.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmp.Name = "parent";
-            cmp.Type = tableInfo.GetParentRowCodeType();
-            cmp.HasGet = true;
-            cmp.HasSet = false;
+            var cmp = new CodeMemberProperty
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "parent",
+                Type = tableInfo.GetParentRowCodeType(),
+                HasGet = true,
+                HasSet = false
+            };
 
             // return super.parentInternal;
             {
@@ -298,12 +320,14 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateTableProperty(CodeTypeDeclaration classType, TableInfo tableInfo)
         {
-            var cmp = new CodeMemberProperty();
-            cmp.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmp.Name = "table";
-            cmp.Type = tableInfo.GetCodeType();
-            cmp.HasGet = true;
-            cmp.HasSet = false;
+            var cmp = new CodeMemberProperty
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "table",
+                Type = tableInfo.GetCodeType(),
+                HasGet = true,
+                HasSet = false
+            };
 
             // return field
             {

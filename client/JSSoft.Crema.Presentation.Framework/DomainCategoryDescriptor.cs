@@ -32,13 +32,7 @@ namespace JSSoft.Crema.Presentation.Framework
         private readonly IDomainCategory category;
         private readonly object owner;
         private readonly ObservableCollection<DomainCategoryDescriptor> categories = new();
-        private readonly ReadOnlyObservableCollection<DomainCategoryDescriptor> categoriesReadonly;
         private readonly ObservableCollection<DomainDescriptor> domains = new();
-        private readonly ReadOnlyObservableCollection<DomainDescriptor> domainsReadonly;
-
-        private string categoryName;
-        private string categoryPath;
-        private bool isActivated;
 
         public DomainCategoryDescriptor(Authentication authentication, IDomainCategory category, DescriptorTypes descriptorTypes, object owner)
             : base(authentication, category, descriptorTypes)
@@ -46,11 +40,11 @@ namespace JSSoft.Crema.Presentation.Framework
             this.category = category;
             this.owner = owner ?? this;
             this.category.Dispatcher.VerifyAccess();
-            this.categoryName = category.Name;
-            this.categoryPath = category.Path;
+            this.Name = category.Name;
+            this.Path = category.Path;
 
-            this.domainsReadonly = new ReadOnlyObservableCollection<DomainDescriptor>(this.domains);
-            this.categoriesReadonly = new ReadOnlyObservableCollection<DomainCategoryDescriptor>(this.categories);
+            this.Domains = new ReadOnlyObservableCollection<DomainDescriptor>(this.domains);
+            this.Categories = new ReadOnlyObservableCollection<DomainCategoryDescriptor>(this.categories);
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
             {
@@ -82,7 +76,7 @@ namespace JSSoft.Crema.Presentation.Framework
 
             if (this.category.GetService(typeof(IDataBase)) is IDataBase dataBase)
             {
-                this.isActivated = dataBase.IsLoaded;
+                this.IsActivated = dataBase.IsLoaded;
                 if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
                 {
                     dataBase.Dispatcher.InvokeAsync(() =>
@@ -95,17 +89,17 @@ namespace JSSoft.Crema.Presentation.Framework
         }
 
         [DescriptorProperty]
-        public string Name => this.categoryName;
+        public string Name { get; private set; }
 
         [DescriptorProperty]
-        public string Path => this.categoryPath;
+        public string Path { get; private set; }
 
         [DescriptorProperty]
-        public bool IsActivated => this.isActivated;
+        public bool IsActivated { get; private set; }
 
-        public ReadOnlyObservableCollection<DomainCategoryDescriptor> Categories => this.categoriesReadonly;
+        public ReadOnlyObservableCollection<DomainCategoryDescriptor> Categories { get; private set; }
 
-        public ReadOnlyObservableCollection<DomainDescriptor> Domains => this.domainsReadonly;
+        public ReadOnlyObservableCollection<DomainDescriptor> Domains { get; private set; }
 
         protected async override void OnDisposed(EventArgs e)
         {
@@ -141,8 +135,8 @@ namespace JSSoft.Crema.Presentation.Framework
 
         private async void Category_Renamed(object sender, EventArgs e)
         {
-            this.categoryName = this.category.Name;
-            this.categoryPath = this.category.Path;
+            this.Name = this.category.Name;
+            this.Path = this.category.Path;
             await this.RefreshAsync();
         }
 
@@ -276,13 +270,13 @@ namespace JSSoft.Crema.Presentation.Framework
 
         private async void DataBase_Loaded(object sender, EventArgs e)
         {
-            this.isActivated = true;
+            this.IsActivated = true;
             await this.RefreshAsync();
         }
 
         private async void DataBase_Unloaded(object sender, EventArgs e)
         {
-            this.isActivated = false;
+            this.IsActivated = false;
             await this.RefreshAsync();
         }
 

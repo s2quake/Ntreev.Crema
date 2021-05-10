@@ -30,9 +30,6 @@ namespace JSSoft.Crema.Presentation.Types.BrowserItems.ViewModels
 {
     public class TypeCategoryTreeViewItemViewModel : TypeCategoryTreeItemBase
     {
-        private readonly ICommand renameCommand;
-        private readonly ICommand deleteCommand;
-
         public TypeCategoryTreeViewItemViewModel(Authentication authentication, ITypeCategory category)
             : this(authentication, category, null)
         {
@@ -54,8 +51,8 @@ namespace JSSoft.Crema.Presentation.Types.BrowserItems.ViewModels
         public TypeCategoryTreeViewItemViewModel(Authentication authentication, TypeCategoryDescriptor descriptor, object owner)
             : base(authentication, descriptor, owner)
         {
-            this.renameCommand = new DelegateCommand(async item => await this.RenameAsync(), item => this.CanRename);
-            this.deleteCommand = new DelegateCommand(async item => await this.DeleteAsync(), item => this.CanDelete);
+            this.RenameCommand = new DelegateCommand(async item => await this.RenameAsync(), item => this.CanRename);
+            this.DeleteCommand = new DelegateCommand(async item => await this.DeleteAsync(), item => this.CanDelete);
             this.Owner = owner;
         }
 
@@ -135,9 +132,9 @@ namespace JSSoft.Crema.Presentation.Types.BrowserItems.ViewModels
         [DescriptorProperty]
         public bool CanViewLog => TypeCategoryUtility.CanViewLog(this.authentication, this.descriptor);
 
-        public ICommand RenameCommand => this.renameCommand;
+        public ICommand RenameCommand { get; private set; }
 
-        public ICommand DeleteCommand => this.deleteCommand;
+        public ICommand DeleteCommand { get; private set; }
 
         public override int Order => 1;
 

@@ -33,10 +33,7 @@ namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
     {
         private readonly AccessViewModel viewMdoel;
         private readonly IAccessible accessible;
-        private readonly Dispatcher dispatcher;
         private readonly Authentication authentication;
-
-        private readonly string memberID;
         private AccessType accessType;
         private bool canChange = true;
 
@@ -44,9 +41,8 @@ namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
         {
             this.viewMdoel = viewMdoel;
             this.accessible = viewMdoel.Accessible;
-            this.dispatcher = viewMdoel.Dispatcher;
             this.authentication = viewMdoel.Authentication;
-            this.memberID = memberID;
+            this.MemberID = memberID;
             this.accessType = accessType;
         }
 
@@ -67,7 +63,7 @@ namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
 
         public IEnumerable UserItems => this.viewMdoel.UserItems;
 
-        public string MemberID => this.memberID;
+        public string MemberID { get; private set; }
 
         public IEnumerable AccessTypes
         {

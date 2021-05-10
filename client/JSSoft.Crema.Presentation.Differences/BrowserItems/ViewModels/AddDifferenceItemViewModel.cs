@@ -100,7 +100,6 @@ namespace JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels
             private readonly ICremaHost cremaHost;
             private readonly string dataBaseName1;
             private readonly string dataBaseName2;
-            private DiffDataSet dataSet;
 
             public BackgroundViewModel(Authentication authentication, ICremaHost cremaHost, string dataBaseName1, string dataBaseName2)
             {
@@ -110,7 +109,7 @@ namespace JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels
                 this.dataBaseName2 = dataBaseName2;
             }
 
-            public DiffDataSet Result => this.dataSet;
+            public DiffDataSet Result { get; private set; }
 
             protected override async Task OnRunAsync(IProgress progress, CancellationToken cancellation)
             {
@@ -125,7 +124,7 @@ namespace JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels
                 };
                 await Task.WhenAll(tasks);
                 progress.Report(0.5, "비교하는중");
-                this.dataSet = new DiffDataSet(tasks[1].Result, tasks[0].Result, DiffMergeTypes.ReadOnly2)
+                this.Result = new DiffDataSet(tasks[1].Result, tasks[0].Result, DiffMergeTypes.ReadOnly2)
                 {
                     Header1 = this.dataBaseName2,
                     Header2 = this.dataBaseName1

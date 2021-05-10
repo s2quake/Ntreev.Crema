@@ -39,6 +39,6 @@ namespace JSSoft.Crema.Services.Data.Serializations
         [DataMember]
         public TableInfo[] TableInfos { get; set; }
 
-        public static readonly ObjectSerializerSettings Settings = new ObjectSerializerSettings() { Extension = Extension };
+        public static readonly ObjectSerializerSettings Settings = new() { Extension = Extension };
     }
 }

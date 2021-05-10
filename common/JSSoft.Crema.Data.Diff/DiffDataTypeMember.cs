@@ -30,16 +30,13 @@ namespace JSSoft.Crema.Data.Diff
     public class DiffDataTypeMember
     {
         private readonly DiffDataType diffType;
-        private readonly int index;
-        private CremaDataTypeMember item1;
-        private CremaDataTypeMember item2;
 
         internal DiffDataTypeMember(DiffDataType diffType, int index)
         {
             this.diffType = diffType;
-            this.index = index;
-            this.item1 = index < diffType.SourceItem1.Items.Count ? diffType.SourceItem1.Items[index] : null;
-            this.item2 = index < diffType.SourceItem2.Items.Count ? diffType.SourceItem2.Items[index] : null;
+            this.Index = index;
+            this.Item1 = index < diffType.SourceItem1.Items.Count ? diffType.SourceItem1.Items[index] : null;
+            this.Item2 = index < diffType.SourceItem2.Items.Count ? diffType.SourceItem2.Items[index] : null;
         }
 
         /// <summary>
@@ -86,19 +83,11 @@ namespace JSSoft.Crema.Data.Diff
             return diffSource2.Items[item1.MemberID];
         }
 
-        public CremaDataTypeMember Item1
-        {
-            get => this.item1;
-            internal set => this.item1 = value;
-        }
+        public CremaDataTypeMember Item1 { get; internal set; }
 
-        public CremaDataTypeMember Item2
-        {
-            get => this.item2;
-            internal set => this.item2 = value;
-        }
+        public CremaDataTypeMember Item2 { get; internal set; }
 
-        public int Index => this.index;
+        public int Index { get; private set; }
 
         public DiffState DiffState1 => DiffUtility.GetDiffState(this.Item1);
 

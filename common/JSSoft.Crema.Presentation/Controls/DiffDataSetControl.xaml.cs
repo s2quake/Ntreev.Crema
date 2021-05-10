@@ -57,14 +57,12 @@ namespace JSSoft.Crema.Presentation.Controls
 
         private static void SelectedItemPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var oldDependency = e.OldValue as DependencyObject;
-            var newDependency = e.NewValue as DependencyObject;
-            if (oldDependency != null)
+            if (e.OldValue is DependencyObject oldDependency)
             {
                 oldDependency.SetValue(ItemViewModel.IsVisibleProperty, false);
             }
 
-            if (newDependency != null)
+            if (e.NewValue is DependencyObject newDependency)
             {
                 newDependency.SetValue(ItemViewModel.IsVisibleProperty, true);
             }
@@ -72,9 +70,7 @@ namespace JSSoft.Crema.Presentation.Controls
 
         private static void SourcePropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var dataSet = e.NewValue as DiffDataSet;
-
-            if (dataSet != null)
+            if (e.NewValue is DiffDataSet dataSet)
             {
                 var query = from item in dataSet.Tables
                                 //where DiffDataSet.GetDiffState(item.DiffTable1) != DiffState.Unchanged
@@ -90,13 +86,13 @@ namespace JSSoft.Crema.Presentation.Controls
             }
         }
 
-        private IEnumerable ItemsSource
+        protected IEnumerable ItemsSource
         {
             get => (IEnumerable)this.GetValue(ItemsSourceProperty);
             set => this.SetValue(ItemsSourceProperty, value);
         }
 
-        private object SelectedItem
+        protected object SelectedItem
         {
             get => (object)this.GetValue(SelectedItemProperty);
             set => this.SetValue(SelectedItemProperty, value);
@@ -112,26 +108,22 @@ namespace JSSoft.Crema.Presentation.Controls
             public readonly static DependencyProperty IsVisibleProperty =
                 DependencyProperty.Register("IsVisible", typeof(bool), typeof(ItemViewModel));
 
-            private readonly DiffDataTable diffTable;
-            private readonly DependencyObject parent;
-            private readonly DiffState diffState;
-
             public ItemViewModel(DiffDataTable diffTable, DependencyObject parent)
             {
-                this.diffTable = diffTable;
-                this.parent = parent;
-                this.diffState = DiffUtility.GetDiffState(this.diffTable.SourceItem1) == DiffState.Imaginary ? DiffState.Inserted : DiffUtility.GetDiffState(this.diffTable.SourceItem1);
+                this.Source = diffTable;
+                this.Parent = parent;
+                this.DiffState = DiffUtility.GetDiffState(this.Source.SourceItem1) == DiffState.Imaginary ? DiffState.Inserted : DiffUtility.GetDiffState(this.Source.SourceItem1);
                 BindingOperations.SetBinding(this, ReadOnlyProperty, new Binding("ReadOnly") { Source = parent, });
             }
 
             public override string ToString()
             {
-                return this.diffTable.ToString();
+                return this.Source.ToString();
             }
 
-            public DiffState DiffState => this.diffState;
+            public DiffState DiffState { get; private set; }
 
-            public DiffDataTable Source => this.diffTable;
+            public DiffDataTable Source { get; private set; }
 
             public bool ReadOnly
             {
@@ -144,6 +136,8 @@ namespace JSSoft.Crema.Presentation.Controls
                 get => (bool)this.GetValue(IsVisibleProperty);
                 set => this.SetValue(IsVisibleProperty, value);
             }
+
+            protected DependencyObject Parent { get; }
         }
 
         #endregion

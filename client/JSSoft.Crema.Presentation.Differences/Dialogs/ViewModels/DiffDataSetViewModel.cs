@@ -28,14 +28,12 @@ namespace JSSoft.Crema.Presentation.Differences.Dialogs.ViewModels
     [Obsolete]
     public class DiffDataSetViewModel : ModalDialogBase
     {
-        private readonly DiffDataSet diffSet;
-
         public DiffDataSetViewModel(DiffDataSet diffSet)
         {
-            this.diffSet = diffSet;
+            this.Source = diffSet;
         }
 
-        public DiffDataSet Source => this.diffSet;
+        public DiffDataSet Source { get; private set; }
     }
 }
 

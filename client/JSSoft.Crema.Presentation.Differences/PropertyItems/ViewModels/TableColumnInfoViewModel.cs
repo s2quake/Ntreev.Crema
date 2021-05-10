@@ -32,16 +32,15 @@ namespace JSSoft.Crema.Presentation.Differences.PropertyItems.ViewModels
     {
         private TableTreeViewItemViewModel viewModel;
         private TableInfo? tableInfo;
-        private TableColumnInfoItemViewModel[] columns = new TableColumnInfoItemViewModel[] { };
 
         public TableColumnInfoViewModel()
         {
             this.DisplayName = Resources.Title_ColumnInfo;
         }
 
-        public TableColumnInfoItemViewModel[] Columns => this.columns;
+        public TableColumnInfoItemViewModel[] Columns { get; private set; } = new TableColumnInfoItemViewModel[] { };
 
-        public override bool IsVisible => this.columns.Any();
+        public override bool IsVisible => this.Columns.Any();
 
         public override object SelectedObject => this.viewModel;
 
@@ -69,9 +68,9 @@ namespace JSSoft.Crema.Presentation.Differences.PropertyItems.ViewModels
             }
 
             if (this.tableInfo != null)
-                this.columns = this.tableInfo.Value.Columns.Select(item => new TableColumnInfoItemViewModel(item)).ToArray();
+                this.Columns = this.tableInfo.Value.Columns.Select(item => new TableColumnInfoItemViewModel(item)).ToArray();
             else
-                this.columns = new TableColumnInfoItemViewModel[] { };
+                this.Columns = new TableColumnInfoItemViewModel[] { };
 
             this.NotifyOfPropertyChange(nameof(this.Columns));
             this.NotifyOfPropertyChange(nameof(this.IsVisible));

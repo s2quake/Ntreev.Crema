@@ -33,10 +33,7 @@ namespace JSSoft.Crema.Presentation.Framework
         private IDomain domain;
         private readonly object owner;
         private readonly ObservableCollection<DomainUserDescriptor> domainUsers = new();
-        private readonly ReadOnlyObservableCollection<DomainUserDescriptor> domainUsersReadonly;
-
         private DomainInfo domainInfo;
-        private DomainState domainState;
 
         public DomainDescriptor(Authentication authentication, IDomainDescriptor descriptor, bool isSubscriptable, object owner)
             : base(authentication, descriptor.Target, descriptor, isSubscriptable)
@@ -52,9 +49,9 @@ namespace JSSoft.Crema.Presentation.Framework
             this.owner = owner ?? this;
             this.domain.Dispatcher.VerifyAccess();
             this.domainInfo = domain.DomainInfo;
-            this.domainState = domain.DomainState;
+            this.DomainState = domain.DomainState;
 
-            this.domainUsersReadonly = new ReadOnlyObservableCollection<DomainUserDescriptor>(this.domainUsers);
+            this.Users = new ReadOnlyObservableCollection<DomainUserDescriptor>(this.domainUsers);
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
             {
@@ -94,8 +91,8 @@ namespace JSSoft.Crema.Presentation.Framework
         [DescriptorProperty(nameof(domainInfo))]
         public DomainInfo DomainInfo => this.domainInfo;
 
-        [DescriptorProperty(nameof(domainState))]
-        public DomainState DomainState => this.domainState;
+        [DescriptorProperty]
+        public DomainState DomainState { get; private set; }
 
         [DescriptorProperty]
         public bool IsActivated => DomainDescriptorUtility.IsActivated(this.authentication, this);
@@ -103,7 +100,7 @@ namespace JSSoft.Crema.Presentation.Framework
         [DescriptorProperty]
         public bool IsModified => DomainDescriptorUtility.IsModified(this.authentication, this);
 
-        public ReadOnlyObservableCollection<DomainUserDescriptor> Users => this.domainUsersReadonly;
+        public ReadOnlyObservableCollection<DomainUserDescriptor> Users { get; private set; }
 
         protected async override void OnDisposed(EventArgs e)
         {
@@ -174,28 +171,28 @@ namespace JSSoft.Crema.Presentation.Framework
         private async void Domain_RowAdded(object sender, DomainRowEventArgs e)
         {
             this.domainInfo = this.domain.DomainInfo;
-            this.domainState = this.domain.DomainState;
+            this.DomainState = this.domain.DomainState;
             await this.RefreshAsync();
         }
 
         private async void Domain_RowChanged(object sender, DomainRowEventArgs e)
         {
             this.domainInfo = this.domain.DomainInfo;
-            this.domainState = this.domain.DomainState;
+            this.DomainState = this.domain.DomainState;
             await this.RefreshAsync();
         }
 
         private async void Domain_RowRemoved(object sender, DomainRowEventArgs e)
         {
             this.domainInfo = this.domain.DomainInfo;
-            this.domainState = this.domain.DomainState;
+            this.DomainState = this.domain.DomainState;
             await this.RefreshAsync();
         }
 
         private async void Domain_PropertyChanged(object sender, DomainPropertyEventArgs e)
         {
             this.domainInfo = this.domain.DomainInfo;
-            this.domainState = this.domain.DomainState;
+            this.DomainState = this.domain.DomainState;
             await this.RefreshAsync();
         }
 
@@ -207,7 +204,7 @@ namespace JSSoft.Crema.Presentation.Framework
 
         private async void Domain_DomainStateChanged(object sender, EventArgs e)
         {
-            this.domainState = this.domain.DomainState;
+            this.DomainState = this.domain.DomainState;
             await this.RefreshAsync();
         }
 

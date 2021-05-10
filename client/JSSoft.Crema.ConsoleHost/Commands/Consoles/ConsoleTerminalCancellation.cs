@@ -28,11 +28,10 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
     class ConsoleTerminalCancellation
     {
         private readonly CancellationTokenSource cancellation = new();
-        private bool isRunning;
 
         public CancellationToken Run()
         {
-            this.isRunning = true;
+            this.IsRunning = true;
             return this.cancellation.Token;
         }
 
@@ -41,6 +40,6 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             this.cancellation.Cancel();
         }
 
-        public bool IsRunning => this.isRunning;
+        public bool IsRunning { get; private set; }
     }
 }

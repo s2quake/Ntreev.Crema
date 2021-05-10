@@ -38,11 +38,8 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly ITableCollection tables;
         private readonly ITableCategoryCollection categories;
         private string categoryPath;
-        private readonly string[] categoryPaths;
-
         private bool useTemplate;
         private bool copyData = true;
-        private readonly string tableName;
         private string newName;
         private bool isVerify;
 
@@ -55,8 +52,8 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
             this.tables = table.GetService(typeof(ITableCollection)) as ITableCollection;
             this.categories = table.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
             this.categoryPath = this.table.Category.Path;
-            this.categoryPaths = this.categories.Select(item => item.Path).OrderBy(item => item).ToArray();
-            this.tableName = table.Name;
+            this.Categories = this.categories.Select(item => item.Path).OrderBy(item => item).ToArray();
+            this.TableName = table.Name;
             this.newName = table.Name;
             this.DisplayName = Resources.Title_CopyTable;
         }
@@ -86,9 +83,9 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
             }
         }
 
-        public string[] Categories => this.categoryPaths;
+        public string[] Categories { get; private set; }
 
-        public string TableName => this.tableName;
+        public string TableName { get; private set; }
 
         public string NewName
         {

@@ -21,13 +21,10 @@
 
 using JSSoft.Crema.ApplicationHost.ViewModels;
 using JSSoft.Crema.Tools.Framework;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ApplicationHost
 {
@@ -36,38 +33,35 @@ namespace JSSoft.Crema.ApplicationHost
     [InheritedExport(typeof(ShellViewModel))]
     class ShellViewModel : Caliburn.Micro.PropertyChangedBase, IShell, IContentService
     {
-        private readonly ObservableCollection<object> contents;
-
         private object selectedContent;
 
         [ImportingConstructor]
         public ShellViewModel([ImportMany]IEnumerable<IContent> contents)
         {
-            this.contents = new ObservableCollection<object>();
-            this.contents.Add(new ConsoleViewModel());
+            this.Contents = new ObservableCollection<object>
+            {
+                new ConsoleViewModel()
+            };
             foreach (var item in contents)
             {
-                this.contents.Add(item);
+                this.Contents.Add(item);
             }
 
-            this.selectedContent = this.contents.First();
+            this.selectedContent = this.Contents.First();
         }
 
         public object SelectedContent
         {
-            get { return this.selectedContent; }
+            get => this.selectedContent;
             set
             {
                 if (this.selectedContent == value)
                     return;
-                this.selectedContent = this.contents.SingleOrDefault(item => item == value);
+                this.selectedContent = this.Contents.SingleOrDefault(item => item == value);
                 this.NotifyOfPropertyChange(() => this.SelectedContent);
             }
         }
 
-        public ObservableCollection<object> Contents
-        {
-            get { return this.contents; }
-        }
+        public ObservableCollection<object> Contents { get; private set; }
     }
 }

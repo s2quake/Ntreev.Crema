@@ -70,7 +70,7 @@ namespace JSSoft.Crema.Services.Users.Serializations
             return obj;
         }
 
-        public static readonly BanSerializationInfo Empty = new BanSerializationInfo()
+        public static readonly BanSerializationInfo Empty = new()
         {
             Path = string.Empty,
             Comment = string.Empty,

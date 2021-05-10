@@ -28,41 +28,36 @@ namespace JSSoft.Crema.Presentation.Framework
     public class DataBaseDescriptor : DescriptorBase, IDataBaseDescriptor, IPermissionDescriptor, ILockableDescriptor, IAccessibleDescriptor
     {
         private IDataBase dataBase;
-        private readonly object owner;
-
         private DataBaseInfo dataBaseInfo = DataBaseInfo.Empty;
-        private DataBaseState dataBaseState;
-        private AuthenticationInfo[] authenticationInfos;
         private LockInfo lockInfo = LockInfo.Empty;
         private AccessInfo accessInfo = AccessInfo.Empty;
-        private AccessType accessType;
 
         public DataBaseDescriptor(Authentication authentication, DataBaseInfo dataBaseInfo)
             : base(authentication, null, DescriptorTypes.None)
         {
             this.dataBaseInfo = dataBaseInfo;
-            this.owner = this;
+            this.Owner = this;
         }
 
         public DataBaseDescriptor(Authentication authentication, IDataBaseDescriptor descriptor, bool isSubscriptable, object owner)
             : base(authentication, descriptor.Target, descriptor, isSubscriptable)
         {
             this.dataBase = descriptor.Target;
-            this.owner = owner ?? this;
+            this.Owner = owner ?? this;
         }
 
         public DataBaseDescriptor(Authentication authentication, IDataBase dataBase, DescriptorTypes descriptorTypes, object owner)
             : base(authentication, dataBase, descriptorTypes)
         {
             this.dataBase = dataBase;
-            this.owner = owner ?? this;
+            this.Owner = owner ?? this;
             this.dataBase.Dispatcher.VerifyAccess();
             this.dataBaseInfo = dataBase.DataBaseInfo;
-            this.dataBaseState = dataBase.DataBaseState;
-            this.authenticationInfos = dataBase.AuthenticationInfos;
+            this.DataBaseState = dataBase.DataBaseState;
+            this.AuthenticationInfos = dataBase.AuthenticationInfos;
             this.lockInfo = dataBase.LockInfo;
             this.accessInfo = dataBase.AccessInfo;
-            this.accessType = dataBase.GetAccessType(authentication);
+            this.AccessType = dataBase.GetAccessType(authentication);
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
             {
@@ -91,11 +86,11 @@ namespace JSSoft.Crema.Presentation.Framework
         [DescriptorProperty(nameof(dataBaseInfo))]
         public DataBaseInfo DataBaseInfo => this.dataBaseInfo;
 
-        [DescriptorProperty(nameof(dataBaseState))]
-        public DataBaseState DataBaseState => this.dataBaseState;
+        [DescriptorProperty]
+        public DataBaseState DataBaseState { get; private set; }
 
-        [DescriptorProperty(nameof(authenticationInfos))]
-        public AuthenticationInfo[] AuthenticationInfos => this.authenticationInfos;
+        [DescriptorProperty]
+        public AuthenticationInfo[] AuthenticationInfos { get; private set; }
 
         [DescriptorProperty(nameof(lockInfo))]
         public LockInfo LockInfo => this.lockInfo;
@@ -103,8 +98,8 @@ namespace JSSoft.Crema.Presentation.Framework
         [DescriptorProperty(nameof(accessInfo))]
         public AccessInfo AccessInfo => this.accessInfo;
 
-        [DescriptorProperty(nameof(accessType))]
-        public AccessType AccessType => this.accessType;
+        [DescriptorProperty]
+        public AccessType AccessType { get; private set; }
 
         [DescriptorProperty]
         public bool IsLoaded => DataBaseDescriptorUtility.IsLoaded(Authenticator.Current, this);
@@ -154,6 +149,8 @@ namespace JSSoft.Crema.Presentation.Framework
             base.OnDisposed(e);
         }
 
+        protected object Owner { get; }
+
         private async void DataBase_Renamed(object sender, EventArgs e)
         {
             this.dataBaseInfo = this.dataBase.DataBaseInfo;
@@ -171,26 +168,26 @@ namespace JSSoft.Crema.Presentation.Framework
 
         private async void DataBase_Loaded(object sender, EventArgs e)
         {
-            this.dataBaseState = this.dataBase.DataBaseState;
+            this.DataBaseState = this.dataBase.DataBaseState;
             await this.RefreshAsync();
         }
 
         private async void DataBase_Unloaded(object sender, EventArgs e)
         {
-            this.dataBaseState = this.dataBase.DataBaseState;
-            this.authenticationInfos = this.dataBase.AuthenticationInfos;
+            this.DataBaseState = this.dataBase.DataBaseState;
+            this.AuthenticationInfos = this.dataBase.AuthenticationInfos;
             await this.RefreshAsync();
         }
 
         private async void DataBase_AuthenticationEntered(object sender, AuthenticationEventArgs e)
         {
-            this.authenticationInfos = this.dataBase.AuthenticationInfos;
+            this.AuthenticationInfos = this.dataBase.AuthenticationInfos;
             await this.RefreshAsync();
         }
 
         private async void DataBase_AuthenticationLeft(object sender, AuthenticationEventArgs e)
         {
-            this.authenticationInfos = this.dataBase.AuthenticationInfos;
+            this.AuthenticationInfos = this.dataBase.AuthenticationInfos;
             await this.RefreshAsync();
         }
 
@@ -202,21 +199,21 @@ namespace JSSoft.Crema.Presentation.Framework
 
         private async void DataBase_DataBaseStateChanged(object sender, EventArgs e)
         {
-            this.dataBaseState = this.dataBase.DataBaseState;
+            this.DataBaseState = this.dataBase.DataBaseState;
             await this.RefreshAsync();
         }
 
         private async void DataBase_LockChanged(object sender, EventArgs e)
         {
             this.lockInfo = this.dataBase.LockInfo;
-            this.accessType = this.dataBase.GetAccessType(this.authentication);
+            this.AccessType = this.dataBase.GetAccessType(this.authentication);
             await this.RefreshAsync();
         }
 
         private async void DataBase_AccessChanged(object sender, EventArgs e)
         {
             this.accessInfo = this.dataBase.AccessInfo;
-            this.accessType = this.dataBase.GetAccessType(this.authentication);
+            this.AccessType = this.dataBase.GetAccessType(this.authentication);
             await this.RefreshAsync();
         }
 

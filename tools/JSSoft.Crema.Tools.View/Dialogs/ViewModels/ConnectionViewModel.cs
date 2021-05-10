@@ -24,9 +24,6 @@ using JSSoft.Library;
 using JSSoft.ModernUI.Framework;
 using JSSoft.ModernUI.Framework.Dialogs.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Tools.View.Dialogs.ViewModels
@@ -73,7 +70,7 @@ namespace JSSoft.Crema.Tools.View.Dialogs.ViewModels
         [ConfigurationProperty("address")]
         public string Address
         {
-            get { return this.address; }
+            get => this.address;
             set
             {
                 this.address = value;
@@ -85,7 +82,7 @@ namespace JSSoft.Crema.Tools.View.Dialogs.ViewModels
         [ConfigurationProperty("database")]
         public string DataBase
         {
-            get { return this.dataBase; }
+            get => this.dataBase;
             set
             {
                 this.dataBase = value;
@@ -97,7 +94,14 @@ namespace JSSoft.Crema.Tools.View.Dialogs.ViewModels
         [ConfigurationProperty("tags")]
         public string Tags
         {
+
+/* 'JSSoft.Crema.Tools.View (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return this.tags; }
+이후:
+            get => this.tags; }
+*/
+            get => this.tags;
             set
             {
                 this.tags = value;
@@ -126,7 +130,14 @@ namespace JSSoft.Crema.Tools.View.Dialogs.ViewModels
         [Obsolete]
         public bool IsDevmode
         {
+
+/* 'JSSoft.Crema.Tools.View (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return this.isDevmode; }
+이후:
+            get => this.isDevmode; }
+*/
+            get => this.isDevmode;
             set
             {
                 this.isDevmode = value;
@@ -137,7 +148,7 @@ namespace JSSoft.Crema.Tools.View.Dialogs.ViewModels
         [ConfigurationProperty("filter")]
         public string FilterExpression
         {
-            get { return this.filterExpression ?? string.Empty; }
+            get => this.filterExpression ?? string.Empty;
             set
             {
                 this.filterExpression = value;

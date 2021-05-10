@@ -38,7 +38,7 @@ namespace JSSoft.Crema.Services.Data
     class TypeCategory : TypeCategoryBase<Type, TypeCategory, TypeCollection, TypeCategoryCollection, TypeContext>,
         ITypeCategory, ITypeItem
     {
-        private readonly List<NewTypeTemplate> templateList = new List<NewTypeTemplate>();
+        private readonly List<NewTypeTemplate> templateList = new();
 
         public TypeCategory()
         {

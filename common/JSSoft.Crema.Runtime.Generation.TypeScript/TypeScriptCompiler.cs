@@ -108,10 +108,8 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
             foreach (var item in query)
             {
                 var path = Path.Combine(tempPath, item.Key);
-                using (var sw = new StreamWriter(path, false, Encoding.UTF8))
-                {
-                    sw.WriteLine(item.Value);
-                }
+                using var sw = new StreamWriter(path, false, Encoding.UTF8);
+                sw.WriteLine(item.Value);
             }
         }
 

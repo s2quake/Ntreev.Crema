@@ -29,20 +29,18 @@ namespace JSSoft.Crema.Presentation.Types.Documents.ViewModels
     class FindResultItemViewModel : PropertyChangedBase
     {
         private readonly FindResultInfo resultInfo;
-        private readonly string categoryName;
-        private readonly string typeName;
 
         public FindResultItemViewModel(FindResultInfo resultInfo)
         {
             this.resultInfo = resultInfo;
             var itemName = new ItemName(resultInfo.Path);
-            this.categoryName = itemName.CategoryPath.Trim(PathUtility.SeparatorChar);
-            this.typeName = itemName.Name;
+            this.CategoryName = itemName.CategoryPath.Trim(PathUtility.SeparatorChar);
+            this.TypeName = itemName.Name;
         }
 
-        public string CategoryName => this.categoryName;
+        public string CategoryName { get; private set; }
 
-        public string TypeName => this.typeName;
+        public string TypeName { get; private set; }
 
         public string ColumnName => this.resultInfo.ColumnName;
 

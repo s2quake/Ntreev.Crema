@@ -41,8 +41,6 @@ namespace JSSoft.Crema.Services.Domains
         private ItemsDeletedEventHandler<IDomainItem> itemsDeleted;
         private TaskCompletedEventHandler taskCompleted;
 
-        private DomainContextMetaData metaData;
-
         public readonly TaskResetEvent<Guid> creationEvent;
         public readonly TaskResetEvent<Guid> deletionEvent;
         public readonly IndexedDispatcher callbackEvent;
@@ -68,9 +66,7 @@ namespace JSSoft.Crema.Services.Domains
             var result = await this.Service.SubscribeAsync(authenticationToken);
             await this.Dispatcher.InvokeAsync(() =>
             {
-                var metaData = result.Value;
-                this.metaData = metaData;
-                this.Initialize(metaData);
+                this.Initialize(result.Value);
             });
             //  TODO: 데이터 베이스 변경은 서버에서 내용을 받아 갱신하는것으로 개선하는것이 좋을것 같음
             await this.CremaHost.DataBaseContext.Dispatcher.InvokeAsync(() =>
@@ -344,16 +340,6 @@ namespace JSSoft.Crema.Services.Domains
                 var domainInfo = item.DomainInfo;
                 var authentication = this.UserContext.Authenticate(domainInfo.CreationInfo);
                 var domain = this.Domains.AddDomain(authentication, domainInfo);
-                domain.Initialize(authentication, item);
-            }
-        }
-
-        private void Restore(Authentication authentication, DomainMetaData[] metaDatas)
-        {
-            foreach (var item in metaDatas)
-            {
-                var domainInfo = item.DomainInfo;
-                var domain = this.Domains[item.DomainID];
                 domain.Initialize(authentication, item);
             }
         }

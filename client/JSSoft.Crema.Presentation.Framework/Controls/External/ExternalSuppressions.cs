@@ -58,6 +58,8 @@ using System.Diagnostics.CodeAnalysis;
     Scope = "namespaceanddescendants", Target = "~N:HTMLConverter")]
 [assembly: SuppressMessage("Style", "IDE0090:'new(...)' 사용", Justification = "<보류 중>",
     Scope = "namespaceanddescendants", Target = "~N:HTMLConverter")]
+[assembly: SuppressMessage("Style", "IDE0032:auto 속성 사용", Justification = "<보류 중>",
+    Scope = "namespaceanddescendants", Target = "~N:HTMLConverter")]
 
 [assembly: SuppressMessage("Style", "IDE0063:간단한 'using' 문 사용", Justification = "<보류 중>",
     Scope = "namespaceanddescendants", Target = "~N:Microsoft.Windows.Controls")]

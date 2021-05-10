@@ -42,32 +42,30 @@ namespace JSSoft.Crema.Presentation.SmartSet
     class TableSmartSetContext : ItemContext<TableSmartSet, TableSmartSetCategory, TableSmartSetCollection, TableSmartSetCategoryCollection, TableSmartSetContext>,
         IServiceProvider, IXmlSerializable
     {
-        private readonly ICremaAppHost cremaAppHost;
         private readonly ITableBrowser tableBrowser;
-        private readonly IRule[] rules;
         private readonly HashSet<string> bookmarks = new();
         private bool isModified;
 
         [ImportingConstructor]
         public TableSmartSetContext(ICremaAppHost cremaAppHost, ITableBrowser tableBrowser, [ImportMany] IEnumerable<IRule> rules)
         {
-            this.cremaAppHost = cremaAppHost;
-            this.cremaAppHost.Loaded += CremaAppHost_Loaded;
-            this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
-            this.cremaAppHost.Resetting += CremaAppHost_Resetting;
-            this.cremaAppHost.Reset += CremaAppHost_Reset;
+            this.CremaAppHost = cremaAppHost;
+            this.CremaAppHost.Loaded += CremaAppHost_Loaded;
+            this.CremaAppHost.Unloaded += CremaAppHost_Unloaded;
+            this.CremaAppHost.Resetting += CremaAppHost_Resetting;
+            this.CremaAppHost.Reset += CremaAppHost_Reset;
             this.tableBrowser = tableBrowser;
-            this.rules = rules.Where(item => item.SupportType == typeof(ITableDescriptor)).ToArray();
+            this.Rules = rules.Where(item => item.SupportType == typeof(ITableDescriptor)).ToArray();
         }
 
         public object GetService(Type serviceType)
         {
-            return this.cremaAppHost.GetService(serviceType);
+            return this.CremaAppHost.GetService(serviceType);
         }
 
         public bool Verify(ITableDescriptor descriptor, IRuleItem ruleItem)
         {
-            var rule = this.rules.FirstOrDefault(item => item.Name == ruleItem.RuleName);
+            var rule = this.Rules.FirstOrDefault(item => item.Name == ruleItem.RuleName);
             if (rule == null)
                 return false;
             return rule.Verify(descriptor, ruleItem);
@@ -95,9 +93,9 @@ namespace JSSoft.Crema.Presentation.SmartSet
             this.OnBookmarkChanged(EventArgs.Empty);
         }
 
-        public ICremaAppHost CremaAppHost => this.cremaAppHost;
+        public ICremaAppHost CremaAppHost { get; private set; }
 
-        public IRule[] Rules => this.rules;
+        public IRule[] Rules { get; private set; }
 
         [ConfigurationProperty("bookmarkItems")]
         public string[] BookmarkItems
@@ -140,14 +138,14 @@ namespace JSSoft.Crema.Presentation.SmartSet
         {
             try
             {
-                this.cremaAppHost.UserConfigs.Update(this);
+                this.CremaAppHost.UserConfigs.Update(this);
             }
             catch
             {
 
             }
 
-            if (this.cremaAppHost.GetService(typeof(IDataBase)) is IDataBase dataBase)
+            if (this.CremaAppHost.GetService(typeof(IDataBase)) is IDataBase dataBase)
             {
                 await dataBase.Dispatcher.InvokeAsync(() =>
                 {
@@ -170,7 +168,7 @@ namespace JSSoft.Crema.Presentation.SmartSet
         {
             try
             {
-                this.cremaAppHost.UserConfigs?.Commit(this);
+                this.CremaAppHost.UserConfigs?.Commit(this);
             }
             catch (Exception ex)
             {
@@ -182,7 +180,7 @@ namespace JSSoft.Crema.Presentation.SmartSet
         {
             try
             {
-                this.cremaAppHost.UserConfigs?.Commit(this);
+                this.CremaAppHost.UserConfigs?.Commit(this);
             }
             catch (Exception ex)
             {
@@ -192,7 +190,7 @@ namespace JSSoft.Crema.Presentation.SmartSet
 
         private async void CremaAppHost_Reset(object sender, EventArgs e)
         {
-            if (this.cremaAppHost.GetService(typeof(IDataBase)) is IDataBase dataBase)
+            if (this.CremaAppHost.GetService(typeof(IDataBase)) is IDataBase dataBase)
             {
                 await dataBase.Dispatcher.InvokeAsync(() =>
                 {

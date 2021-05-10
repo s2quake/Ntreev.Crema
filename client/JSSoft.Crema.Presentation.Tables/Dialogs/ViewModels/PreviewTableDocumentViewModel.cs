@@ -26,15 +26,14 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
 {
     class PreviewTableDocumentViewModel : DocumentBase
     {
-        private readonly CremaDataTable dataTable;
         private CremaDataTable selectedTable;
 
         public PreviewTableDocumentViewModel(CremaDataTable dataTable)
         {
-            this.dataTable = dataTable;
+            this.Source = dataTable;
         }
 
-        public CremaDataTable Source => this.dataTable;
+        public CremaDataTable Source { get; private set; }
 
         public CremaDataTable SelectedTable
         {

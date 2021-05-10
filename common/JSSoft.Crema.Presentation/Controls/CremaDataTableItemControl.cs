@@ -204,7 +204,7 @@ namespace JSSoft.Crema.Presentation.Controls
 
         public new bool Focus()
         {
-            if (!(this.dataGridControl.Template.FindName("PART_ScrollViewer", this.dataGridControl) is ScrollViewer viewer))
+            if (this.dataGridControl.Template.FindName("PART_ScrollViewer", this.dataGridControl) is not ScrollViewer viewer)
                 return false;
             return viewer.Focus();
         }

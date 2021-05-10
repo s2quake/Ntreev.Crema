@@ -57,7 +57,7 @@ namespace JSSoft.Crema.Javascript
 
             foreach (var item in items)
             {
-                if (!(Attribute.GetCustomAttribute(item.GetType(), typeof(PartCreationPolicyAttribute)) is PartCreationPolicyAttribute attr))
+                if (Attribute.GetCustomAttribute(item.GetType(), typeof(PartCreationPolicyAttribute)) is not PartCreationPolicyAttribute attr)
                     throw new NotSupportedException();
                 if (attr.CreationPolicy != CreationPolicy.NonShared)
                     throw new NotSupportedException();

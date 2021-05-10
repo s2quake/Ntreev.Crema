@@ -20,16 +20,10 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Data;
-using JSSoft.Crema.Runtime.Generation;
 using JSSoft.Library;
 using JSSoft.Library.IO;
-using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Runtime.Generation.TypeScript
 {
@@ -106,20 +100,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
             }
         }
 
-        public string Revision
-        {
-            get { return this.metaData.Revision; }
-        }
+        public string Revision => this.metaData.Revision;
 
-        public string RequestedRevision
-        {
-            get { return this.settings.Revision; }
-        }
+        public string RequestedRevision => this.settings.Revision;
 
-        public string DataBaseName
-        {
-            get { return this.metaData.Name; }
-        }
+        public string DataBaseName => this.metaData.Name;
 
         public string ClassName
         {
@@ -159,31 +144,22 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
         //    }
         //}
 
-        public string Prefix
-        {
-            get { return this.settings.Prefix; }
-        }
+        public string Prefix => this.settings.Prefix;
 
+
+/* 'JSSoft.Crema.Runtime.Generation.TypeScript (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
         public string Postfix
         {
             get { return this.settings.Postfix; }
-        }
+이후:
+        public string Postfix => this.settings.Postfix; }
+*/
+        public string Postfix => this.settings.Postfix;
 
-        public bool OmitComment
-        {
-            get
-            {
-                return this.settings.Options.HasFlag(CodeGenerationOptions.OmitComments);
-            }
-        }
+        public bool OmitComment => this.settings.Options.HasFlag(CodeGenerationOptions.OmitComments);
 
-        public bool OmitSignatureDate
-        {
-            get
-            {
-                return this.settings.Options.HasFlag(CodeGenerationOptions.OmitSignatureDate);
-            }
-        }
+        public bool OmitSignatureDate => this.settings.Options.HasFlag(CodeGenerationOptions.OmitSignatureDate);
 
         public bool OmitDeclaration
         {
@@ -217,19 +193,10 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         public string RelativePath { get; private set; }
 
-        public string TypesHashValue
-        {
-            get { return this.metaData.TypesHashValue; }
-        }
+        public string TypesHashValue => this.metaData.TypesHashValue;
 
-        public string TablesHashValue
-        {
-            get { return this.metaData.TablesHashValue; }
-        }
+        public string TablesHashValue => this.metaData.TablesHashValue;
 
-        public TagInfo Tags
-        {
-            get { return (TagInfo)this.metaData.Tags; }
-        }
+        public TagInfo Tags => (TagInfo)this.metaData.Tags;
     }
 }

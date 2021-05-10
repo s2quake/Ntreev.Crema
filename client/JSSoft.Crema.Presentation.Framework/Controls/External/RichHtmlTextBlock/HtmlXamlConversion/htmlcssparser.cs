@@ -22,41 +22,16 @@
 namespace HTMLConverter
 {
     using System;
-
-/* 'JSSoft.Crema.Presentation.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
-이전:
     using System.Xml;
     using System.Diagnostics;
-    using System.Collections;
-이후:
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics;
-*/
-    using System.Collections;
-    using System.IO;
-    using System.Diagnostics;
-
-/* 'JSSoft.Crema.Presentation.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
-이전:
-    using System.IO;
-
-    using System.Windows; // DependencyProperty
-이후:
-    using System.Windows; // DependencyProperty
-*/
     using System.Text;
-    using System.Xml;
-/* 'JSSoft.Crema.Presentation.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
-이전:
-    internal static class HtmlCssParser
-이후:
-    using System.Xml;
+    using System.IO;
 
-    internal static class HtmlCssParser
-*/
-
-
+    using System.Windows; // DependencyProperty
+    using System.Windows.Documents; // TextElement
+  
     internal static class HtmlCssParser
     {
         // .................................................................
@@ -354,7 +329,7 @@ namespace HTMLConverter
                 "ghostwhite", "gold", "goldenrod", "gray", "green", "greenyellow", "honeydew", "hotpink", "indianred",
                 "indigo", "ivory", "khaki", "lavender", "lavenderblush", "lawngreen", "lemonchiffon", "lightblue", "lightcoral",
                 "lightcyan", "lightgoldenrodyellow", "lightgreen", "lightgrey", "lightpink", "lightsalmon", "lightseagreen",
-                "lightskyblue", "lightslategray", "lightsteelblue", "lightyellow", "lime", "limegreen", "linen", "magenta",
+                "lightskyblue", "lightslategray", "lightsteelblue", "lightyellow", "lime", "limegreen", "linen", "magenta", 
                 "maroon", "mediumaquamarine", "mediumblue", "mediumorchid", "mediumpurple", "mediumseagreen", "mediumslateblue",
                 "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue", "mintcream", "mistyrose", "moccasin",
                 "navajowhite", "navy", "oldlace", "olive", "olivedrab", "orange", "orangered", "orchid", "palegoldenrod",
@@ -1008,7 +983,7 @@ namespace HTMLConverter
             //  Add id processing for style selectors
             if (_styleDefinitions != null)
             {
-                for (int i = _styleDefinitions.Count - 1; i >= 0; i--)
+                for (int i = _styleDefinitions.Count - 1; i >= 0;  i--)
                 {
                     string selector = _styleDefinitions[i].Selector;
 

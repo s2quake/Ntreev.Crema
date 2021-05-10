@@ -32,13 +32,12 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
     {
         private readonly Authentication authentication;
         private readonly ITableItem tableItem;
-        private readonly LogInfo logInfo;
 
         public LogInfoViewModel(Authentication authentication, ITableItem tableItem, LogInfo logInfo)
         {
             this.authentication = authentication;
             this.tableItem = tableItem;
-            this.logInfo = logInfo;
+            this.LogInfo = logInfo;
             this.Target = tableItem;
         }
 
@@ -46,25 +45,25 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
         {
             if (this.tableItem is ITable table)
             {
-                var dialog = new PreviewTableViewModel(this.authentication, table, this.logInfo.Revision);
+                var dialog = new PreviewTableViewModel(this.authentication, table, this.LogInfo.Revision);
                 await dialog.ShowDialogAsync();
             }
             else if (this.tableItem is ITableCategory category)
             {
-                var dialog = new PreviewTableCategoryViewModel(this.authentication, category, this.logInfo.Revision);
+                var dialog = new PreviewTableCategoryViewModel(this.authentication, category, this.LogInfo.Revision);
                 await dialog.ShowDialogAsync();
             }
         }
 
-        public LogInfo LogInfo => this.logInfo;
+        public LogInfo LogInfo { get; private set; }
 
-        public string UserID => this.logInfo.UserID;
+        public string UserID => this.LogInfo.UserID;
 
-        public string Revision => this.logInfo.Revision;
+        public string Revision => this.LogInfo.Revision;
 
-        public string Message => this.logInfo.Comment;
+        public string Message => this.LogInfo.Comment;
 
-        public DateTime DateTime => this.logInfo.DateTime;
+        public DateTime DateTime => this.LogInfo.DateTime;
 
         #region IInfoProvider
 

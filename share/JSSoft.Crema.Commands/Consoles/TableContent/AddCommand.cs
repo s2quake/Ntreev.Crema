@@ -19,7 +19,6 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-#pragma warning disable 0618
 using JSSoft.Crema.Commands.Consoles.Serializations;
 using JSSoft.Crema.Services;
 using JSSoft.Library.Commands;

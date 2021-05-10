@@ -35,15 +35,13 @@ namespace JSSoft.Crema.ConsoleHost.Commands
     class RunCommand : CommandAsyncBase
     {
         private readonly CremaApplication application;
-        // private readonly ICremaHost cremaHost;
-        private readonly ScriptContext scriptContext;
 
         [ImportingConstructor]
         public RunCommand(CremaApplication application, ScriptContext scriptContext)
         {
             this.application = application;
             // this.cremaHost = cremaHost;
-            this.scriptContext = scriptContext;
+            this.ScriptContext = scriptContext;
         }
 
         [CommandProperty(InitValue = "localhost")]
@@ -139,6 +137,8 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             //     this.scriptContext.RunFromFile(this.ScriptPath, this.ScriptEntry, this.GetProperties(), null);
             // }
         }
+
+        protected ScriptContext ScriptContext { get; }
 
         private async Task WaitAsync()
         {

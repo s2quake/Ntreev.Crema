@@ -37,18 +37,13 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
     public abstract class TemplateViewModel : ModalDialogAppBase, INotifyDataErrorInfo
     {
         private readonly Authentication authentication;
-        private ITypeTemplate template;
-        private IDomain domain;
-        private readonly bool isNew;
         private bool isReadOnly;
         private bool isModified;
         private bool isValid;
+        private bool isFlag;
         private string typeName;
         private string comment;
-        private bool isFlag;
         private int count;
-        private object source;
-
         [Import]
         private readonly IFlashService flashService = null;
 
@@ -64,11 +59,11 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
         protected TemplateViewModel(Authentication authentication, ITypeTemplate template, bool isNew)
         {
             this.authentication = authentication;
-            this.isNew = isNew;
-            this.template = template;
-            this.template.EditEnded += Template_EditEnded;
-            this.template.EditCanceled += Template_EditCanceled;
-            this.template.Changed += Template_Changed;
+            this.IsNew = isNew;
+            this.Template = template;
+            this.Template.EditEnded += Template_EditEnded;
+            this.Template.EditCanceled += Template_EditCanceled;
+            this.Template.Changed += Template_Changed;
             this.DisplayName = Resources.Title_EditTypeTemplate;
         }
 
@@ -77,15 +72,15 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
             try
             {
                 this.BeginProgress(this.IsNew ? Resources.Message_Creating : Resources.Message_Changing);
-                await this.template.EndEditAsync(this.authentication);
-                await this.template.Dispatcher.InvokeAsync(() =>
+                await this.Template.EndEditAsync(this.authentication);
+                await this.Template.Dispatcher.InvokeAsync(() =>
                 {
-                    this.template.EditEnded -= Template_EditEnded;
-                    this.template.EditCanceled -= Template_EditCanceled;
-                    this.template.Changed -= Template_Changed;
+                    this.Template.EditEnded -= Template_EditEnded;
+                    this.Template.EditCanceled -= Template_EditCanceled;
+                    this.Template.Changed -= Template_Changed;
                 });
-                this.domain = null;
-                this.template = null;
+                this.Domain = null;
+                this.Template = null;
                 this.isModified = false;
                 this.EndProgress();
                 await this.TryCloseAsync(true);
@@ -99,7 +94,7 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
 
         public async Task NewMemberAsync()
         {
-            var items = await this.template.Dispatcher.InvokeAsync(() => this.template.Select(item => item.Name).ToArray());
+            var items = await this.Template.Dispatcher.InvokeAsync(() => this.Template.Select(item => item.Name).ToArray());
             var name = NameUtility.GenerateNewName("Member", items);
             var dialog = new NewMemberViewModel()
             {
@@ -108,11 +103,11 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
             };
             if (await dialog.ShowDialogAsync() == true)
             {
-                var member = await this.template.AddNewAsync(this.authentication);
+                var member = await this.Template.AddNewAsync(this.authentication);
                 await member.SetNameAsync(this.authentication, dialog.Name);
                 await member.SetValueAsync(this.authentication, dialog.Value);
                 await member.SetCommentAsync(this.authentication, dialog.Comment);
-                await this.template.EndNewAsync(this.authentication, member);
+                await this.Template.EndNewAsync(this.authentication, member);
             }
         }
 
@@ -126,13 +121,13 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
             }
         }
 
-        public bool IsNew => this.isNew;
+        public bool IsNew { get; private set; }
 
-        public ITypeTemplate Template => this.template;
+        public ITypeTemplate Template { get; private set; }
 
-        public object Source => this.source;
+        public object Source { get; private set; }
 
-        public IDomain Domain => this.domain;
+        public IDomain Domain { get; private set; }
 
         public string TypeName
         {
@@ -146,7 +141,7 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
                 {
                     try
                     {
-                        await this.template.SetTypeNameAsync(this.authentication, value);
+                        await this.Template.SetTypeNameAsync(this.authentication, value);
                         this.typeNameError = null;
                     }
                     catch (Exception e)
@@ -178,7 +173,7 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
             {
                 if (this.IsProgressing == true || this.isReadOnly == true)
                     return false;
-                if (this.template == null)
+                if (this.Template == null)
                     return false;
                 if (this.count == 0)
                     return false;
@@ -209,7 +204,7 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
                 InvokeAsync();
                 async void InvokeAsync()
                 {
-                    await this.template.SetIsFlagAsync(this.authentication, value);
+                    await this.Template.SetIsFlagAsync(this.authentication, value);
                     this.isFlag = value;
                     this.NotifyOfPropertyChange(nameof(this.IsFlag));
                 }
@@ -218,7 +213,7 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
 
         public async override Task<bool> CanCloseAsync(CancellationToken cancellationToken)
         {
-            if (this.template == null || this.IsModified == false)
+            if (this.Template == null || this.IsModified == false)
             {
                 return true;
             }
@@ -228,7 +223,7 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
             if (result == null)
                 return false;
 
-            if (this.template != null && result == true)
+            if (this.Template != null && result == true)
             {
                 if (this.typeNameError != null)
                 {
@@ -238,14 +233,14 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
                 this.BeginProgress(this.IsNew ? Resources.Message_Creating : Resources.Message_Changing);
                 try
                 {
-                    await this.template.EndEditAsync(this.authentication);
-                    await this.template.Dispatcher.InvokeAsync(() =>
+                    await this.Template.EndEditAsync(this.authentication);
+                    await this.Template.Dispatcher.InvokeAsync(() =>
                     {
-                        this.template.EditEnded -= Template_EditEnded;
-                        this.template.EditCanceled -= Template_EditCanceled;
-                        this.template.Changed -= Template_Changed;
+                        this.Template.EditEnded -= Template_EditEnded;
+                        this.Template.EditCanceled -= Template_EditCanceled;
+                        this.Template.Changed -= Template_Changed;
                     });
-                    this.template = null;
+                    this.Template = null;
                     this.EndProgress();
                 }
                 catch (Exception e)
@@ -264,16 +259,16 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
             await base.OnInitializeAsync(cancellationToken);
-            await this.template.Dispatcher.InvokeAsync(() =>
+            await this.Template.Dispatcher.InvokeAsync((Action)(() =>
             {
-                this.domain = this.template.Domain;
-                this.typeName = this.template.TypeName;
-                this.comment = this.template.Comment;
-                this.isFlag = this.template.IsFlag;
-                this.count = this.template.Count;
-                this.source = this.domain.Source;
-                this.isModified = this.template.IsModified;
-            });
+                this.Domain = this.Template.Domain;
+                this.typeName = this.Template.TypeName;
+                this.comment = this.Template.Comment;
+                this.isFlag = this.Template.IsFlag;
+                this.count = this.Template.Count;
+                this.Source = this.Domain.Source;
+                this.isModified = this.Template.IsModified;
+            }));
             this.Refresh();
             this.Verify(this.VerifyAction);
         }
@@ -281,22 +276,22 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
         protected async override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
             await base.OnDeactivateAsync(close, cancellationToken);
-            if (this.template != null)
+            if (this.Template != null)
             {
-                await this.template.CancelEditAsync(this.authentication);
-                await this.template.Dispatcher.InvokeAsync(() =>
+                await this.Template.CancelEditAsync(this.authentication);
+                await this.Template.Dispatcher.InvokeAsync(() =>
                 {
-                    this.template.EditEnded -= Template_EditEnded;
-                    this.template.EditCanceled -= Template_EditCanceled;
-                    this.template.Changed -= Template_Changed;
+                    this.Template.EditEnded -= Template_EditEnded;
+                    this.Template.EditCanceled -= Template_EditCanceled;
+                    this.Template.Changed -= Template_Changed;
                 });
             }
-            this.template = null;
+            this.Template = null;
         }
 
         protected override void OnCancel()
         {
-            this.template = null;
+            this.Template = null;
             base.OnCancel();
         }
 
@@ -304,10 +299,10 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
         {
             if (e is DomainDeletedEventArgs ex)
             {
-                this.template.EditEnded -= Template_EditEnded;
-                this.template.EditCanceled -= Template_EditCanceled;
-                this.template.Changed -= Template_Changed;
-                this.template = null;
+                this.Template.EditEnded -= Template_EditEnded;
+                this.Template.EditCanceled -= Template_EditCanceled;
+                this.Template.Changed -= Template_Changed;
+                this.Template = null;
 
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -322,10 +317,10 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
         {
             if (e is DomainDeletedEventArgs ex)
             {
-                this.template.EditEnded -= Template_EditEnded;
-                this.template.EditCanceled -= Template_EditCanceled;
-                this.template.Changed -= Template_Changed;
-                this.template = null;
+                this.Template.EditEnded -= Template_EditEnded;
+                this.Template.EditCanceled -= Template_EditCanceled;
+                this.Template.Changed -= Template_Changed;
+                this.Template = null;
 
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -338,8 +333,8 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
 
         private void Template_Changed(object sender, EventArgs e)
         {
-            this.isModified = this.template.IsModified;
-            this.count = this.template.Count;
+            this.isModified = this.Template.IsModified;
+            this.count = this.Template.Count;
             this.Dispatcher.InvokeAsync(() =>
             {
                 this.Verify(this.VerifyAction);

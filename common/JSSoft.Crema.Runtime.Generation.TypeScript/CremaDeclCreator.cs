@@ -19,15 +19,26 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+
+/* 'JSSoft.Crema.Runtime.Generation.TypeScript (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
 using JSSoft.Crema.Runtime.Generation.TypeScript.Properties;
-using JSSoft.Crema.Data.Xml.Schema;
-using System;
+이후:
+using JSSoft.Crema.Data;
+*/
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Runtime.Generation.TypeScript.Properties;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+/* 'JSSoft.Crema.Runtime.Generation.TypeScript (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
 using System.Threading.Tasks;
 using JSSoft.Crema.Data;
+이후:
+using System.Threading.Tasks;
+*/
+
 
 namespace JSSoft.Crema.Runtime.Generation.TypeScript.TypeScript
 {
@@ -51,35 +62,43 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.TypeScript
 
         private static void CreateCremaData(CodeNamespace codeNamespace)
         {
-            var classType = new CodeTypeDeclaration();
-            classType.Attributes = MemberAttributes.Private;
-            classType.Name = "CremaData";
-            classType.IsClass = true;
+            var classType = new CodeTypeDeclaration
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "CremaData",
+                IsClass = true
+            };
             codeNamespace.Types.Add(classType);
         }
 
         private static void CreateCremaRow(CodeNamespace codeNamespace)
         {
-            var classType = new CodeTypeDeclaration();
-            classType.Attributes = MemberAttributes.Private;
-            classType.Name = "CremaRow";
-            classType.IsClass = true;
+            var classType = new CodeTypeDeclaration
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "CremaRow",
+                IsClass = true
+            };
             codeNamespace.Types.Add(classType);
         }
 
         private static void CreateCremaTable(CodeNamespace codeNamespace)
         {
-            var classType = new CodeTypeDeclaration();
-            classType.Attributes = MemberAttributes.Private;
-            classType.Name = "CremaTable";
-            classType.IsClass = true;
+            var classType = new CodeTypeDeclaration
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "CremaTable",
+                IsClass = true
+            };
             classType.TypeParameters.Add(new CodeTypeParameter("T extends CremaRow"));
             codeNamespace.Types.Add(classType);
 
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Public;
-            cmf.Name = "rows";
-            cmf.Type = new CodeTypeReference(new CodeTypeReference("T"), 1);
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Public,
+                Name = "rows",
+                Type = new CodeTypeReference(new CodeTypeReference("T"), 1)
+            };
             classType.Members.Add(cmf);
         }
 
@@ -136,10 +155,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.TypeScript
 
         public static void CreateRowDecl(CodeNamespace codeNamespace, TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var classType = new CodeTypeDeclaration();
-            classType.Attributes = MemberAttributes.Public | MemberAttributes.Abstract;
-            classType.Name = tableInfo.GetRowClassName();
-            classType.IsClass = true;
+            var classType = new CodeTypeDeclaration
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Abstract,
+                Name = tableInfo.GetRowClassName(),
+                IsClass = true
+            };
             classType.TypeAttributes |= System.Reflection.TypeAttributes.Sealed;
             classType.BaseTypes.Add("CremaRow");
 
@@ -155,20 +176,24 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.TypeScript
         {
             foreach (var item in tableInfo.Columns)
             {
-                var cmf = new CodeMemberField();
-                cmf.Attributes = MemberAttributes.Public;
-                cmf.Name = item.GetPropertyName();
-                cmf.Type = item.GetCodeType();
+                var cmf = new CodeMemberField
+                {
+                    Attributes = MemberAttributes.Public,
+                    Name = item.GetPropertyName(),
+                    Type = item.GetCodeType()
+                };
                 classType.Members.Add(cmf);
             }
         }
 
         private static void CreateTableField(CodeTypeDeclaration classType, TableInfo tableInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Public;
-            cmf.Name = "Table";
-            cmf.Type = tableInfo.GetCodeType();
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Public,
+                Name = "Table",
+                Type = tableInfo.GetCodeType()
+            };
             classType.Members.Add(cmf);
         }
 
@@ -176,10 +201,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.TypeScript
         {
             foreach (var item in generationInfo.GetChilds(tableInfo))
             {
-                var cmf = new CodeMemberField();
-                cmf.Attributes = MemberAttributes.Public;
-                cmf.Name = item.GetPropertyName();
-                cmf.Type = item.GetCodeType();
+                var cmf = new CodeMemberField
+                {
+                    Attributes = MemberAttributes.Public,
+                    Name = item.GetPropertyName(),
+                    Type = item.GetCodeType()
+                };
                 classType.Members.Add(cmf);
             }
         }
@@ -189,10 +216,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.TypeScript
             if (string.IsNullOrEmpty(tableInfo.ParentName) == true)
                 return;
 
-            var cmp = new CodeMemberField();
-            cmp.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmp.Name = "parent";
-            cmp.Type = tableInfo.GetParentRowCodeType();
+            var cmp = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "parent",
+                Type = tableInfo.GetParentRowCodeType()
+            };
 
             classType.Members.Add(cmp);
         }
@@ -219,20 +248,24 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.TypeScript
         {
             foreach (var item in generationInfo.GetChilds(tableInfo))
             {
-                var cmf = new CodeMemberField();
-                cmf.Attributes = MemberAttributes.Public;
-                cmf.Name = item.GetPropertyName();
-                cmf.Type = item.GetCodeType();
+                var cmf = new CodeMemberField
+                {
+                    Attributes = MemberAttributes.Public,
+                    Name = item.GetPropertyName(),
+                    Type = item.GetCodeType()
+                };
                 classType.Members.Add(cmf);
             }
         }
 
         private static void CreateTableFindMethodDecl(CodeTypeDeclaration classType, TableInfo tableInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public;
-            cmm.Name = "find";
-            cmm.ReturnType = tableInfo.GetRowCodeType();
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public,
+                Name = "find",
+                ReturnType = tableInfo.GetRowCodeType()
+            };
             cmm.Parameters.Add(tableInfo.Columns.Where(item => item.IsKey));
 
             classType.Members.Add(cmm);
@@ -240,20 +273,24 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.TypeScript
 
         private static void CreateDataSetNameField(CodeTypeDeclaration classType)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Public;
-            cmf.Name = "name";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Public,
+                Name = "name",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateDataSetRevisionField(CodeTypeDeclaration classType)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Public;
-            cmf.Name = "revision";
-            cmf.Type = new CodeTypeReference(typeof(long));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Public,
+                Name = "revision",
+                Type = new CodeTypeReference(typeof(long))
+            };
 
             classType.Members.Add(cmf);
         }
@@ -262,10 +299,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.TypeScript
         {
             foreach (var item in tables)
             {
-                var cmf = new CodeMemberField();
-                cmf.Attributes = MemberAttributes.Public;
-                cmf.Name = item.GetPropertyName();
-                cmf.Type = item.GetCodeType();
+                var cmf = new CodeMemberField
+                {
+                    Attributes = MemberAttributes.Public,
+                    Name = item.GetPropertyName(),
+                    Type = item.GetCodeType()
+                };
 
                 classType.Members.Add(cmf);
             }
@@ -273,22 +312,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.TypeScript
 
         private static void CreateDataSetMethodCreateFromFile(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-            cmm.Name = "createFromFile";
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Static,
+                Name = "createFromFile"
+            };
             cmm.Parameters.Add(typeof(string), "filename");
-            cmm.Parameters.Add(typeof(bool), "verifyRevision");
-            cmm.ReturnType = new CodeTypeReference(generationInfo.ClassName);
-
-            classType.Members.Add(cmm);
-        }
-
-        private static void CreateDataSetMethodCreateFromDataSet(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
-        {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-            cmm.Name = "createFromDataSet";
-            cmm.Parameters.Add("reader", "IDataSet", "dataSet");
             cmm.Parameters.Add(typeof(bool), "verifyRevision");
             cmm.ReturnType = new CodeTypeReference(generationInfo.ClassName);
 
@@ -297,9 +326,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript.TypeScript
 
         private static void CreateDataSetMethodReadFromFile(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Family;
-            cmm.Name = "readFromFile";
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Family,
+                Name = "readFromFile"
+            };
             cmm.Parameters.Add(typeof(string), "filename");
             cmm.Parameters.Add(typeof(bool), "verifyRevision");
 

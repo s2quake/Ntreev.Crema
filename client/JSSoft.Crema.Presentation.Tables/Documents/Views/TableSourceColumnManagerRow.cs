@@ -33,8 +33,7 @@ namespace JSSoft.Crema.Presentation.Tables.Documents.Views
         {
             base.PrepareContainer(dataGridContext, item);
 
-            var typedList = dataGridContext.Items.SourceCollection as ITypedList;
-            if (typedList == null)
+            if (dataGridContext.Items.SourceCollection is not ITypedList typedList)
             {
                 var source = (dataGridContext.Items.SourceCollection as CollectionView).SourceCollection;
                 typedList = source as ITypedList;

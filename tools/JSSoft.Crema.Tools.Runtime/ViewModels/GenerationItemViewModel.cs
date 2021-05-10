@@ -19,23 +19,15 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Crema.Runtime.Generation;
 using JSSoft.Library;
 using JSSoft.ModernUI.Framework;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace JSSoft.Crema.Tools.Runtime.ViewModels
 {
     public class GenerationItemViewModel : PropertyChangedBase
     {
-        private GenerationItemCollection owner;
-
         private string name;
         private string address;
         private string outputPath;
@@ -49,7 +41,7 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
         [XmlElement]
         public string Name
         {
-            get { return this.name ?? string.Empty; }
+            get => this.name ?? string.Empty;
             set
             {
                 this.name = value;
@@ -60,7 +52,14 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
         [XmlElement]
         public string Address
         {
+
+/* 'JSSoft.Crema.Tools.Runtime (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return this.address ?? string.Empty; }
+이후:
+            get => this.address ?? string.Empty; }
+*/
+            get => this.address ?? string.Empty;
             set
             {
                 this.address = value;
@@ -71,7 +70,7 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
         [XmlElement]
         public string OutputPath
         {
-            get { return this.outputPath ?? string.Empty; }
+            get => this.outputPath ?? string.Empty;
             set
             {
                 this.outputPath = value;
@@ -82,7 +81,7 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
         [XmlElement]
         public string DataBase
         {
-            get { return this.database ?? string.Empty; }
+            get => this.database ?? string.Empty;
             set
             {
                 this.database = value;
@@ -93,7 +92,14 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
         [XmlElement]
         public string LanguageType
         {
+
+/* 'JSSoft.Crema.Tools.Runtime (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return this.languageType ?? string.Empty; }
+이후:
+            get => this.languageType ?? string.Empty; }
+*/
+            get => this.languageType ?? string.Empty;
             set
             {
                 this.languageType = value;
@@ -104,7 +110,14 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
         [XmlElement]
         public string FilterExpression
         {
+
+/* 'JSSoft.Crema.Tools.Runtime (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return this.filterExpression ?? string.Empty; }
+이후:
+            get => this.filterExpression ?? string.Empty; }
+*/
+            get => this.filterExpression ?? string.Empty;
             set
             {
                 this.filterExpression = value;
@@ -115,7 +128,14 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
         [XmlElement]
         public string Tags
         {
+
+/* 'JSSoft.Crema.Tools.Runtime (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return this.tags ?? string.Empty; }
+이후:
+            get => this.tags ?? string.Empty; }
+*/
+            get => this.tags ?? string.Empty;
             set
             {
                 this.tags = value;
@@ -126,7 +146,7 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
         [XmlElement]
         public bool IsDevmode
         {
-            get { return this.isDevmode; }
+            get => this.isDevmode;
             set
             {
                 this.isDevmode = value;
@@ -137,7 +157,7 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
         [XmlElement]
         public string Options
         {
-            get { return this.options ?? string.Empty; }
+            get => this.options ?? string.Empty;
             set
             {
                 this.options = value;
@@ -150,13 +170,9 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
             get; set;
         }
 
-        public GenerationItemCollection Owner
-        {
-            get { return this.owner; }
-            set { this.owner = value; }
-        }
+        public GenerationItemCollection Owner { get; set; }
 
-        public static readonly GenerationItemViewModel Empty = new GenerationItemViewModel()
+        public static readonly GenerationItemViewModel Empty = new()
         {
             Tags = (string)TagInfo.All,
             LanguageType = "cs",

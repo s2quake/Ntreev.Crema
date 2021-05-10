@@ -19,14 +19,28 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+
+/* 'JSSoft.Crema.Runtime.Generation.TypeScript (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
 using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+이후:
+using JSSoft.Crema.Data;
+using JSSoft.Library.ObjectModel;
+using System;
+*/
+using JSSoft.Crema.Data;
+using JSSoft.Library.ObjectModel;
+using System;
+using System.
+/* 'JSSoft.Crema.Runtime.Generation.TypeScript (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
 using System.Threading.Tasks;
 using JSSoft.Library.ObjectModel;
 using JSSoft.Crema.Data;
+이후:
+using System.Threading.Tasks;
+*/
+CodeDom;
 
 namespace JSSoft.Crema.Runtime.Generation.TypeScript
 {

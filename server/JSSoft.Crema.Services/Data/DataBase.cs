@@ -53,7 +53,7 @@ namespace JSSoft.Crema.Services.Data
         private EventHandler<AuthenticationEventArgs> authenticationLeft;
         private TaskCompletedEventHandler taskCompleted;
 
-        private readonly HashSet<AuthenticationToken> authentications = new HashSet<AuthenticationToken>();
+        private readonly HashSet<AuthenticationToken> authentications = new();
 
         public DataBase(DataBaseContext dataBaseContext, string name)
         {

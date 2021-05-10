@@ -169,12 +169,13 @@ namespace JSSoft.Crema.Reader
                 throw new ArgumentNullException("tags");
             if (filterExpression == null)
                 throw new ArgumentNullException("filterExpression");
-            var dic = new Dictionary<string, object>();
-
-            dic.Add("type", "bin");
-            dic.Add("tags", tags);
-            dic.Add("database", dataBase);
-            dic.Add("devmode", isDevmode);
+            var dic = new Dictionary<string, object>
+            {
+                { "type", "bin" },
+                { "tags", tags },
+                { "database", dataBase },
+                { "devmode", isDevmode }
+            };
 
             if (filterExpression != string.Empty)
                 dic.Add("filter", filterExpression);
@@ -182,10 +183,8 @@ namespace JSSoft.Crema.Reader
             var items = dic.Select(i => string.Format("{0}=\"{1}\"", i.Key, i.Value)).ToArray();
             var name = string.Join(";", items);
 
-            using (var stream = new RemoteStream(ipAddress, port + 1, name))
-            {
-                return CremaReader.Read(stream);
-            }
+            using var stream = new RemoteStream(ipAddress, port + 1, name);
+            return CremaReader.Read(stream);
         }
 
         public static IDataSet Read(string filename)
@@ -612,11 +611,10 @@ namespace JSSoft.Crema.Reader
             public static T[] ReadValues<T>(this BinaryReader reader, int count)
                 where T : struct
             {
-                List<T> list = new List<T>(count);
-                for (int i = 0; i < count; i++)
+                var list = new List<T>(count);
+                for (var i = 0; i < count; i++)
                 {
-                    T value;
-                    reader.ReadValue(out value);
+                    reader.ReadValue(out T value);
                     list.Add(value);
                 }
                 return list.ToArray();
@@ -817,20 +815,11 @@ namespace JSSoft.Crema.Reader
                 this.Position = 0;
             }
 
-            public override bool CanRead
-            {
-                get { return true; }
-            }
+            public override bool CanRead => true;
 
-            public override bool CanSeek
-            {
-                get { return true; }
-            }
+            public override bool CanSeek => true;
 
-            public override bool CanWrite
-            {
-                get { return true; }
-            }
+            public override bool CanWrite => true;
 
             public override void Flush()
             {
@@ -967,13 +956,13 @@ namespace JSSoft.Crema.Reader
             private const int bufferLength = 1024 * 5000;
             private readonly TcpClient client;
             private long position;
-            private long length;
+            private readonly long length;
             private byte[] buffer;
             private long bufferpos;
 
             private NetworkStream stream;
-            private BinaryWriter bw;
-            private BinaryReader br;
+            private readonly BinaryWriter bw;
+            private readonly BinaryReader br;
 
             public SocketStream(string ipAddress, int port, string name)
             {
@@ -990,41 +979,23 @@ namespace JSSoft.Crema.Reader
                 this.length = br.ReadInt64();
             }
 
-            public override bool CanRead
-            {
-                get { return true; }
-            }
+            public override bool CanRead => true;
 
-            public override bool CanSeek
-            {
-                get { return true; }
-            }
+            public override bool CanSeek => true;
 
-            public override bool CanWrite
-            {
-                get { return false; }
-            }
+            public override bool CanWrite => false;
 
             public override void Flush()
             {
                 throw new NotImplementedException();
             }
 
-            public override long Length
-            {
-                get { return this.length; }
-            }
+            public override long Length => this.length;
 
             public override long Position
             {
-                get
-                {
-                    return this.position;
-                }
-                set
-                {
-                    this.position = value;
-                }
+                get => this.position;
+                set => this.position = value;
             }
 
             public override int Read(byte[] buffer, int offset, int count)
@@ -1094,10 +1065,7 @@ namespace JSSoft.Crema.Reader
 
             private int SocketRead(long pos)
             {
-                BufferInfo bufferInfo = new BufferInfo(pos, SocketStream.bufferLength);
-                //bufferInfo.pos = pos;
-                //bufferInfo.size = SocketStream.bufferLength;
-                //bufferInfo.dummy = 0;
+                var bufferInfo = new BufferInfo(pos, SocketStream.bufferLength);
 
                 this.bw.Write((int)HeaderType.Buffer);
                 this.bw.WriteValue(bufferInfo);
@@ -1138,7 +1106,7 @@ namespace JSSoft.Crema.Reader
         static class StringResource
         {
             private static int refCount = 0;
-            private static Dictionary<int, string> strings = new Dictionary<int, string>();
+            private static readonly Dictionary<int, string> strings = new();
 
             public static void Read(BinaryReader reader)
             {
@@ -1193,7 +1161,7 @@ namespace JSSoft.Crema.Reader
 
             public static int Ref
             {
-                get { return StringResource.refCount; }
+                get => StringResource.refCount;
                 set
                 {
                     StringResource.refCount = value;
@@ -1247,38 +1215,20 @@ namespace JSSoft.Crema.Reader
     {
         class CremaBinaryColumn : IColumn
         {
-            private string columnName;
-            private Type type;
-            private bool isKey;
-            private int index;
-
             public CremaBinaryColumn(string columnName, Type type, bool isKey)
             {
-                this.columnName = columnName;
-                this.type = type;
-                this.isKey = isKey;
+                this.Name = columnName;
+                this.DataType = type;
+                this.IsKey = isKey;
             }
 
-            public string Name
-            {
-                get { return this.columnName; }
-            }
+            public string Name { get; }
 
-            public Type DataType
-            {
-                get { return this.type; }
-            }
+            public Type DataType { get; }
 
-            public bool IsKey
-            {
-                get { return this.isKey; }
-            }
+            public bool IsKey { get; }
 
-            public int Index
-            {
-                get { return this.index; }
-                internal set { this.index = value; }
-            }
+            public int Index { get; internal set; }
 
             public CremaBinaryTable Table
             {
@@ -1288,10 +1238,7 @@ namespace JSSoft.Crema.Reader
 
             #region IColumn
 
-            ITable IColumn.Table
-            {
-                get { return this.Table; }
-            }
+            ITable IColumn.Table => this.Table;
 
             #endregion
         }
@@ -1299,7 +1246,7 @@ namespace JSSoft.Crema.Reader
         class CremaBinaryColumnCollection : IColumnCollection
         {
             private readonly CremaBinaryTable table;
-            private OrderedDictionary columns;
+            private readonly OrderedDictionary columns;
 
             public CremaBinaryColumnCollection(CremaBinaryTable table, int capacity, bool caseSensitive)
             {
@@ -1313,37 +1260,19 @@ namespace JSSoft.Crema.Reader
                 this.columns.Add(item.Name, item);
             }
 
-            public CremaBinaryColumn this[int index]
-            {
-                get { return this.columns[index] as CremaBinaryColumn; }
-            }
+            public CremaBinaryColumn this[int index] => this.columns[index] as CremaBinaryColumn;
 
-            public CremaBinaryColumn this[string columnName]
-            {
-                get { return this.columns[columnName] as CremaBinaryColumn; }
-            }
+            public CremaBinaryColumn this[string columnName] => this.columns[columnName] as CremaBinaryColumn;
 
-            private ICollection Collection
-            {
-                get { return this.columns.Values as ICollection; }
-            }
+            private ICollection Collection => columns.Values;
 
             #region IColumnCollection
 
-            IColumn IColumnCollection.this[int index]
-            {
-                get { return this[index]; }
-            }
+            IColumn IColumnCollection.this[int index] => this[index];
 
-            IColumn IColumnCollection.this[string columnName]
-            {
-                get { return this[columnName]; }
-            }
+            IColumn IColumnCollection.this[string columnName] => this[columnName];
 
-            ITable IColumnCollection.Table
-            {
-                get { return this.table; }
-            }
+            ITable IColumnCollection.Table => this.table;
 
             #endregion
 
@@ -1354,20 +1283,11 @@ namespace JSSoft.Crema.Reader
                 this.Collection.CopyTo(array, index);
             }
 
-            int ICollection.Count
-            {
-                get { return this.Collection.Count; }
-            }
+            int ICollection.Count => this.Collection.Count;
 
-            bool ICollection.IsSynchronized
-            {
-                get { return this.Collection.IsSynchronized; }
-            }
+            bool ICollection.IsSynchronized => this.Collection.IsSynchronized;
 
-            object ICollection.SyncRoot
-            {
-                get { return this.Collection.SyncRoot; }
-            }
+            object ICollection.SyncRoot => this.Collection.SyncRoot;
 
             IEnumerator IEnumerable.GetEnumerator()
             {
@@ -1386,64 +1306,30 @@ namespace JSSoft.Crema.Reader
         {
             private Stream stream;
             private TableIndex[] tableIndexes;
-            private ReadOptions options;
             private CremaBinaryTableCollection tables;
-            private int version;
-            private string revision;
-            private string name;
-            private string typesHashValue;
-            private string tablesHashValue;
-            private string tags;
 
             public CremaBinaryReader()
             {
 
             }
 
-            public ITableCollection Tables
-            {
-                get { return this.tables; }
-            }
+            public ITableCollection Tables => this.tables;
 
-            public ReadOptions Options
-            {
-                get { return this.options; }
-            }
+            public ReadOptions Options { get; private set; }
 
-            public bool CaseSensitive
-            {
-                get { return (this.options & ReadOptions.CaseSensitive) == ReadOptions.CaseSensitive; }
-            }
+            public bool CaseSensitive => (this.Options & ReadOptions.CaseSensitive) == ReadOptions.CaseSensitive;
 
-            public string Revision
-            {
-                get { return this.revision; }
-            }
+            public string Revision { get; private set; }
 
-            public int Version
-            {
-                get { return this.version; }
-            }
+            public int Version { get; private set; }
 
-            public string TypesHashValue
-            {
-                get { return this.typesHashValue; }
-            }
+            public string TypesHashValue { get; private set; }
 
-            public string TablesHashValue
-            {
-                get { return this.tablesHashValue; }
-            }
+            public string TablesHashValue { get; private set; }
 
-            public string Tags
-            {
-                get { return this.tags; }
-            }
+            public string Tags { get; private set; }
 
-            public string Name
-            {
-                get { return this.name; }
-            }
+            public string Name { get; private set; }
 
             public CremaBinaryTable ReadTable(string tableName)
             {
@@ -1484,23 +1370,23 @@ namespace JSSoft.Crema.Reader
             protected void ReadCore(Stream stream, ReadOptions options)
             {
                 this.stream = stream;
-                this.options = options;
+                this.Options = options;
 
                 var reader = new BinaryReader(stream);
 
                 stream.Seek(0, SeekOrigin.Begin);
                 var fileHeader = reader.ReadValue<FileHeader>();
                 this.tableIndexes = reader.ReadValues<TableIndex>(fileHeader.TableCount);
-                this.version = fileHeader.MagicValue;
+                this.Version = fileHeader.MagicValue;
 
                 stream.Seek(fileHeader.StringResourcesOffset, SeekOrigin.Begin);
                 StringResource.Read(reader);
-                this.revision = StringResource.GetString(fileHeader.Revision);
-                this.name = StringResource.GetString(fileHeader.Name);
+                this.Revision = StringResource.GetString(fileHeader.Revision);
+                this.Name = StringResource.GetString(fileHeader.Name);
                 this.tables = new CremaBinaryTableCollection(this, this.tableIndexes);
-                this.typesHashValue = StringResource.GetString(fileHeader.TypesHashValue);
-                this.tablesHashValue = StringResource.GetString(fileHeader.TablesHashValue);
-                this.tags = StringResource.GetString(fileHeader.Tags);
+                this.TypesHashValue = StringResource.GetString(fileHeader.TypesHashValue);
+                this.TablesHashValue = StringResource.GetString(fileHeader.TablesHashValue);
+                this.Tags = StringResource.GetString(fileHeader.Tags);
 
                 for (var i = 0; i < this.tableIndexes.Length; i++)
                 {
@@ -1512,16 +1398,14 @@ namespace JSSoft.Crema.Reader
 
             private CremaBinaryTable ReadTable(BinaryReader reader, long offset)
             {
-                TableHeader tableHeader;
-                TableInfo tableInfo;
 
                 reader.Seek(offset, SeekOrigin.Begin);
-                reader.ReadValue(out tableHeader);
+                reader.ReadValue(out TableHeader tableHeader);
 
                 reader.Seek(tableHeader.TableInfoOffset + offset, SeekOrigin.Begin);
-                reader.ReadValue(out tableInfo);
+                reader.ReadValue(out TableInfo tableInfo);
 
-                var table = new CremaBinaryTable(this, tableInfo.RowCount, this.options);
+                var table = new CremaBinaryTable(this, tableInfo.RowCount, this.Options);
 
                 reader.Seek(tableHeader.StringResourcesOffset + offset, SeekOrigin.Begin);
                 StringResource.Read(reader);
@@ -1559,7 +1443,7 @@ namespace JSSoft.Crema.Reader
                     var columninfo = reader.ReadValue<ColumnInfo>();
                     var columnName = StringResource.GetString(columninfo.ColumnName);
                     var typeName = StringResource.GetString(columninfo.DataType);
-                    var isKey = columninfo.Iskey == 0 ? false : true;
+                    var isKey = columninfo.Iskey != 0;
 
                     var column = new CremaBinaryColumn(columnName, Utility.NameToType(typeName), isKey);
                     columns.Add(column);
@@ -1635,10 +1519,7 @@ namespace JSSoft.Crema.Reader
                     }
                     throw new Exception();
                 }
-                set
-                {
-                    throw new NotImplementedException();
-                }
+                set => throw new NotImplementedException();
             }
 
             public bool HasValue(IColumn column)
@@ -1649,26 +1530,11 @@ namespace JSSoft.Crema.Reader
 
             #region IRow
 
-            ITable IRow.Table
-            {
-                get { return this.Table; }
-            }
+            ITable IRow.Table => this.Table;
 
-            object IRow.this[string columnName]
-            {
-                get
-                {
-                    return this[this.Table.Columns[columnName]];
-                }
-            }
+            object IRow.this[string columnName] => this[this.Table.Columns[columnName]];
 
-            object IRow.this[int columnIndex]
-            {
-                get
-                {
-                    return this[this.Table.Columns[columnIndex]];
-                }
-            }
+            object IRow.this[int columnIndex] => this[this.Table.Columns[columnIndex]];
 
             bool IRow.HasValue(string columnName)
             {
@@ -1704,22 +1570,13 @@ namespace JSSoft.Crema.Reader
                 }
             }
 
-            public CremaBinaryRow this[int index]
-            {
-                get { return this.rows[index]; }
-            }
+            public CremaBinaryRow this[int index] => this.rows[index];
 
             #region IRowCollection
 
-            IRow IRowCollection.this[int index]
-            {
-                get { return this.rows[index]; }
-            }
+            IRow IRowCollection.this[int index] => this.rows[index];
 
-            ITable IRowCollection.Table
-            {
-                get { return this.table; }
-            }
+            ITable IRowCollection.Table => this.table;
 
             #endregion
 
@@ -1730,20 +1587,11 @@ namespace JSSoft.Crema.Reader
                 throw new NotImplementedException();
             }
 
-            int ICollection.Count
-            {
-                get { return this.rows.Count; }
-            }
+            int ICollection.Count => this.rows.Count;
 
-            bool ICollection.IsSynchronized
-            {
-                get { return (this.rows as ICollection).IsSynchronized; }
-            }
+            bool ICollection.IsSynchronized => (this.rows as ICollection).IsSynchronized;
 
-            object ICollection.SyncRoot
-            {
-                get { return (this.rows as ICollection).SyncRoot; }
-            }
+            object ICollection.SyncRoot => (this.rows as ICollection).SyncRoot;
 
             IEnumerator IEnumerable.GetEnumerator()
             {
@@ -1760,102 +1608,50 @@ namespace JSSoft.Crema.Reader
 
         class CremaBinaryTable : ITable
         {
-            private string tableName;
-            private string categoryName;
-            private int index;
-            private string hashValue;
-
-            private CremaBinaryColumnCollection columns;
-            private readonly CremaBinaryRowCollection rows;
-            private IColumn[] keys;
-            private readonly CremaBinaryReader reader;
-
             public CremaBinaryTable(CremaBinaryReader reader, int rowCount, ReadOptions options)
             {
-                this.reader = reader;
-                this.rows = new CremaBinaryRowCollection(this, rowCount);
+                this.Reader = reader;
+                this.Rows = new CremaBinaryRowCollection(this, rowCount);
             }
 
             public override string ToString()
             {
-                return this.tableName ?? base.ToString();
+                return this.Name ?? base.ToString();
             }
 
-            public string Category
-            {
-                get { return this.categoryName; }
-                set { this.categoryName = value; }
-            }
+            public string Category { get; set; }
 
-            public string Name
-            {
-                get { return this.tableName; }
-                set { this.tableName = value; }
-            }
+            public string Name { get; set; }
 
-            public int Index
-            {
-                get { return this.index; }
-                internal set { this.index = value; }
-            }
+            public int Index { get; internal set; }
 
-            public string HashValue
-            {
-                get { return this.hashValue; }
-                set { this.hashValue = value; }
-            }
+            public string HashValue { get; set; }
 
-            public CremaBinaryColumnCollection Columns
-            {
-                get { return this.columns; }
-                set { this.columns = value; }
-            }
+            public CremaBinaryColumnCollection Columns { get; set; }
 
-            public CremaBinaryRowCollection Rows
-            {
-                get { return this.rows; }
-            }
+            public CremaBinaryRowCollection Rows { get; private set; }
 
-            public CremaBinaryReader Reader
-            {
-                get { return this.reader; }
-            }
+            public CremaBinaryReader Reader { get; private set; }
 
-            public IColumn[] Keys
-            {
-                get { return this.keys; }
-                set { this.keys = value; }
-            }
+            public IColumn[] Keys { get; set; }
 
             #region ITable
 
-            IColumn[] ITable.Keys
-            {
-                get { return this.keys; }
-            }
+            IColumn[] ITable.Keys => this.Keys;
 
-            IRowCollection ITable.Rows
-            {
-                get { return this.rows; }
-            }
+            IRowCollection ITable.Rows => this.Rows;
 
-            IColumnCollection ITable.Columns
-            {
-                get { return this.columns; }
-            }
+            IColumnCollection ITable.Columns => this.Columns;
 
-            IDataSet ITable.DataSet
-            {
-                get { return this.reader; }
-            }
+            IDataSet ITable.DataSet => this.Reader;
 
             #endregion
         }
 
         class CremaBinaryTableCollection : ITableCollection
         {
-            private OrderedDictionary tables;
-            private string[] tableNames;
+            private readonly OrderedDictionary tables;
+            private readonly string[] tableNames;
 
             private readonly CremaBinaryReader reader;
 
@@ -1910,10 +1706,7 @@ namespace JSSoft.Crema.Reader
                 }
             }
 
-            private ICollection Collection
-            {
-                get { return this.tables.Values as ICollection; }
-            }
+            private ICollection Collection => tables.Values;
 
             #region ITableCollection
 
@@ -1927,20 +1720,11 @@ namespace JSSoft.Crema.Reader
                 return true;
             }
 
-            ITable ITableCollection.this[int index]
-            {
-                get { return this[index] as ITable; }
-            }
+            ITable ITableCollection.this[int index] => this[index];
 
-            ITable ITableCollection.this[string tableName]
-            {
-                get { return this[tableName] as ITable; }
-            }
+            ITable ITableCollection.this[string tableName] => this[tableName];
 
-            string[] ITableCollection.TableNames
-            {
-                get { return this.tableNames; }
-            }
+            string[] ITableCollection.TableNames => this.tableNames;
 
             #endregion
 
@@ -1951,20 +1735,11 @@ namespace JSSoft.Crema.Reader
                 this.Collection.CopyTo(array, index);
             }
 
-            int ICollection.Count
-            {
-                get { return this.tables.Count; }
-            }
+            int ICollection.Count => this.tables.Count;
 
-            bool ICollection.IsSynchronized
-            {
-                get { return this.Collection.IsSynchronized; }
-            }
+            bool ICollection.IsSynchronized => this.Collection.IsSynchronized;
 
-            object ICollection.SyncRoot
-            {
-                get { return this.Collection.SyncRoot; }
-            }
+            object ICollection.SyncRoot => this.Collection.SyncRoot;
 
             IEnumerator IEnumerable.GetEnumerator()
             {

@@ -33,7 +33,6 @@ namespace JSSoft.Crema.Presentation.Types.Documents.ViewModels
     class TypeViewModel : DocumentBase, ITypeDocument
     {
         private readonly Authentication authentication;
-        private readonly IType type;
         private CremaDataType dataType;
         private object selectedItem;
         private string selectedColumn;
@@ -41,11 +40,11 @@ namespace JSSoft.Crema.Presentation.Types.Documents.ViewModels
         public TypeViewModel(Authentication authentication, IType type)
         {
             this.authentication = authentication;
-            this.type = type;
+            this.Target = type;
             this.Initialize();
         }
 
-        public IType Target => this.type;
+        public IType Target { get; private set; }
 
         public CremaDataType Source
         {
@@ -107,19 +106,19 @@ namespace JSSoft.Crema.Presentation.Types.Documents.ViewModels
         protected override async void OnDisposed(EventArgs e)
         {
             base.OnDisposed(e);
-            await this.type.Dispatcher.InvokeAsync(() =>
+            await this.Target.Dispatcher.InvokeAsync(() =>
             {
-                this.type.TypeInfoChanged -= Type_TypeInfoChanged;
+                this.Target.TypeInfoChanged -= Type_TypeInfoChanged;
             });
         }
 
         private async void Initialize()
         {
             this.BeginProgress();
-            var dataSet = await this.type.GetDataSetAsync(this.authentication, null);
-            var itemsSource = await this.type.Dispatcher.InvokeAsync(() =>
+            var dataSet = await this.Target.GetDataSetAsync(this.authentication, null);
+            var itemsSource = await this.Target.Dispatcher.InvokeAsync(() =>
              {
-                 this.type.TypeInfoChanged += Type_TypeInfoChanged;
+                 this.Target.TypeInfoChanged += Type_TypeInfoChanged;
                  return dataSet.Types.FirstOrDefault();
              });
             this.Source = itemsSource;
@@ -134,7 +133,7 @@ namespace JSSoft.Crema.Presentation.Types.Documents.ViewModels
                 this.BeginProgress();
             });
 
-            var dataSet = await this.type.GetDataSetAsync(this.authentication, null);
+            var dataSet = await this.Target.GetDataSetAsync(this.authentication, null);
 
             await this.Dispatcher.InvokeAsync(() =>
             {

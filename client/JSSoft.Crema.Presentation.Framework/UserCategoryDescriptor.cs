@@ -32,20 +32,15 @@ namespace JSSoft.Crema.Presentation.Framework
         private IUserCategory category;
         private readonly object owner;
         private readonly ObservableCollection<UserCategoryDescriptor> categories = new();
-        private readonly ReadOnlyObservableCollection<UserCategoryDescriptor> categoriesReadonly;
         private readonly ObservableCollection<UserDescriptor> users = new();
-        private readonly ReadOnlyObservableCollection<UserDescriptor> usersReadonly;
-
-        private string categoryName;
-        private string categoryPath;
 
         public UserCategoryDescriptor(Authentication authentication, IUserCategoryDescriptor descriptor, bool isSubscriptable, object owner)
             : base(authentication, descriptor.Target, descriptor, isSubscriptable)
         {
             this.category = descriptor.Target;
             this.owner = owner ?? this;
-            this.usersReadonly = new ReadOnlyObservableCollection<UserDescriptor>(this.users);
-            this.categoriesReadonly = new ReadOnlyObservableCollection<UserCategoryDescriptor>(this.categories);
+            this.Users = new ReadOnlyObservableCollection<UserDescriptor>(this.users);
+            this.Categories = new ReadOnlyObservableCollection<UserCategoryDescriptor>(this.categories);
         }
 
         public UserCategoryDescriptor(Authentication authentication, IUserCategory category, DescriptorTypes descriptorTypes, object owner)
@@ -54,11 +49,11 @@ namespace JSSoft.Crema.Presentation.Framework
             this.category = category;
             this.owner = owner ?? this;
             this.category.Dispatcher.VerifyAccess();
-            this.categoryName = category.Name;
-            this.categoryPath = category.Path;
+            this.Name = category.Name;
+            this.Path = category.Path;
 
-            this.usersReadonly = new ReadOnlyObservableCollection<UserDescriptor>(this.users);
-            this.categoriesReadonly = new ReadOnlyObservableCollection<UserCategoryDescriptor>(this.categories);
+            this.Users = new ReadOnlyObservableCollection<UserDescriptor>(this.users);
+            this.Categories = new ReadOnlyObservableCollection<UserCategoryDescriptor>(this.categories);
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
             {
@@ -91,18 +86,18 @@ namespace JSSoft.Crema.Presentation.Framework
             }
         }
 
-        [DescriptorProperty(nameof(categoryName))]
-        public string Name => this.categoryName;
-
-        [DescriptorProperty(nameof(categoryPath))]
-        public string Path => this.categoryPath;
+        [DescriptorProperty]
+        public string Name { get; private set; }
 
         [DescriptorProperty]
-        public string DisplayName => this.categoryName;
+        public string Path { get; private set; }
 
-        public ReadOnlyObservableCollection<UserCategoryDescriptor> Categories => this.categoriesReadonly;
+        [DescriptorProperty]
+        public string DisplayName => this.Name;
 
-        public ReadOnlyObservableCollection<UserDescriptor> Users => this.usersReadonly;
+        public ReadOnlyObservableCollection<UserCategoryDescriptor> Categories { get; private set; }
+
+        public ReadOnlyObservableCollection<UserDescriptor> Users { get; private set; }
 
         protected async override void OnDisposed(EventArgs e)
         {
@@ -131,15 +126,15 @@ namespace JSSoft.Crema.Presentation.Framework
 
         private async void Category_Renamed(object sender, EventArgs e)
         {
-            this.categoryName = this.category.Name;
-            this.categoryPath = this.category.Path;
+            this.Name = this.category.Name;
+            this.Path = this.category.Path;
             await this.RefreshAsync();
         }
 
         private async void Category_Moved(object sender, EventArgs e)
         {
-            this.categoryName = this.category.Name;
-            this.categoryPath = this.category.Path;
+            this.Name = this.category.Name;
+            this.Path = this.category.Path;
             await this.RefreshAsync();
         }
 

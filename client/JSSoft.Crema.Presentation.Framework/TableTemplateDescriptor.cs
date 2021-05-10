@@ -28,12 +28,7 @@ namespace JSSoft.Crema.Presentation.Framework
     public class TableTemplateDescriptor : DescriptorBase, ITableTemplateDescriptor
     {
         private readonly ITableTemplate template;
-        private readonly object owner;
-
-        private IDomain domain;
         private TableInfo tableInfo = TableInfo.Default;
-        private bool isModified;
-        private string editor = string.Empty;
 
         public TableTemplateDescriptor(Authentication authentication, ITableTemplate table)
             : this(authentication, table, DescriptorTypes.All)
@@ -51,10 +46,10 @@ namespace JSSoft.Crema.Presentation.Framework
             : base(authentication, template, descriptorTypes)
         {
             this.template = template;
-            this.owner = owner ?? this;
+            this.Owner = owner ?? this;
             this.template.Dispatcher.VerifyAccess();
-            this.domain = this.template.Domain;
-            this.editor = this.template.Editor;
+            this.TargetDomain = this.template.Domain;
+            this.Editor = this.template.Editor;
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
             {
@@ -82,13 +77,13 @@ namespace JSSoft.Crema.Presentation.Framework
         public string DisplayName => this.tableInfo.Name;
 
         [DescriptorProperty]
-        public bool IsModified => this.isModified;
+        public bool IsModified { get; private set; }
 
         [DescriptorProperty]
-        public IDomain TargetDomain => this.domain;
+        public IDomain TargetDomain { get; private set; }
 
         [DescriptorProperty]
-        public string Editor => this.editor;
+        public string Editor { get; private set; } = string.Empty;
 
         public event EventHandler EditBegun;
 
@@ -111,10 +106,12 @@ namespace JSSoft.Crema.Presentation.Framework
             this.EditCanceled?.Invoke(this, e);
         }
 
+        protected object Owner { get; }
+
         private void Template_EditBegun(object sender, EventArgs e)
         {
-            this.domain = this.template.Domain;
-            this.editor = this.template.Editor;
+            this.TargetDomain = this.template.Domain;
+            this.Editor = this.template.Editor;
             this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();
@@ -124,8 +121,8 @@ namespace JSSoft.Crema.Presentation.Framework
 
         private void Template_EditEnded(object sender, EventArgs e)
         {
-            this.domain = null;
-            this.editor = string.Empty;
+            this.TargetDomain = null;
+            this.Editor = string.Empty;
             this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();
@@ -135,8 +132,8 @@ namespace JSSoft.Crema.Presentation.Framework
 
         private void Template_EditCanceled(object sender, EventArgs e)
         {
-            this.domain = null;
-            this.editor = string.Empty;
+            this.TargetDomain = null;
+            this.Editor = string.Empty;
             this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();
@@ -146,7 +143,7 @@ namespace JSSoft.Crema.Presentation.Framework
 
         private async void Template_Changed(object sender, EventArgs e)
         {
-            this.isModified = this.template.IsModified;
+            this.IsModified = this.template.IsModified;
             await this.RefreshAsync();
         }
 

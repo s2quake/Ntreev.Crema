@@ -31,13 +31,12 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
     {
         private readonly Authentication authentication;
         private readonly ITypeItem typeItem;
-        private readonly LogInfo logInfo;
 
         public LogInfoViewModel(Authentication authentication, ITypeItem typeItem, LogInfo logInfo)
         {
             this.authentication = authentication;
             this.typeItem = typeItem;
-            this.logInfo = logInfo;
+            this.LogInfo = logInfo;
             this.Target = typeItem;
         }
 
@@ -45,24 +44,24 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
         {
             if (this.typeItem is IType type)
             {
-                var dialog = new PreviewTypeViewModel(this.authentication, type, this.logInfo.Revision);
+                var dialog = new PreviewTypeViewModel(this.authentication, type, this.LogInfo.Revision);
                 await dialog.ShowDialogAsync();
             }
             else if (this.typeItem is ITypeCategory category)
             {
-                var dialog = new PreviewTypeCategoryViewModel(this.authentication, category, this.logInfo.Revision);
+                var dialog = new PreviewTypeCategoryViewModel(this.authentication, category, this.LogInfo.Revision);
                 await dialog.ShowDialogAsync();
             }
         }
 
-        public LogInfo LogInfo => this.logInfo;
+        public LogInfo LogInfo { get; private set; }
 
-        public string UserID => this.logInfo.UserID;
+        public string UserID => this.LogInfo.UserID;
 
-        public string Revision => this.logInfo.Revision;
+        public string Revision => this.LogInfo.Revision;
 
-        public string Message => this.logInfo.Comment;
+        public string Message => this.LogInfo.Comment;
 
-        public DateTime DateTime => this.logInfo.DateTime;
+        public DateTime DateTime => this.LogInfo.DateTime;
     }
 }

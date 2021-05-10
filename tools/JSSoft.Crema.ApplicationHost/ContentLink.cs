@@ -20,11 +20,6 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using FirstFloor.ModernUI.Presentation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ApplicationHost
 {
@@ -36,7 +31,14 @@ namespace JSSoft.Crema.ApplicationHost
 
         public string Comment
         {
+
+/* 'JSSoft.Crema.ApplicationHost (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return this.comment; }
+이후:
+            get => this.comment; }
+*/
+            get => this.comment;
             set
             {
                 this.comment = value;

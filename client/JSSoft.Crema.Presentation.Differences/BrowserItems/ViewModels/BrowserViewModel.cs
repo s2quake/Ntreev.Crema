@@ -43,9 +43,8 @@ namespace JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels
         private readonly PropertyService propertyService;
         private readonly BrowserService browserService;
         private readonly DocumentServiceViewModel documentService;
-        private readonly Lazy<IServiceProvider> serviceProvider;
 
-        public BrowserViewModel(Authenticator authenticator, ICremaHost cremaHost, ICremaAppHost cremaAppHost, PropertyService propertyService, BrowserService browserService, DocumentServiceViewModel documentService, Lazy<IServiceProvider> serviceProvider)
+        public BrowserViewModel(Authenticator authenticator, ICremaHost cremaHost, ICremaAppHost cremaAppHost, PropertyService propertyService, BrowserService browserService, DocumentServiceViewModel documentService)
         {
             this.authenticator = authenticator;
             this.cremaHost = cremaHost;
@@ -53,7 +52,6 @@ namespace JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels
             this.propertyService = propertyService;
             this.browserService = browserService;
             this.documentService = documentService;
-            this.serviceProvider = serviceProvider;
         }
 
         private TableTreeViewItemViewModel selectedTable;
@@ -236,10 +234,6 @@ namespace JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels
                 return dialog.Comment;
             return null;
         }
-
-#pragma warning disable CS0108 // 'BrowserViewModel.ServiceProvider'은(는) 상속된 'ViewModelBase.ServiceProvider' 멤버를 숨깁니다. 숨기려면 new 키워드를 사용하세요.
-        private IServiceProvider ServiceProvider => this.serviceProvider.Value;
-#pragma warning restore CS0108 // 'BrowserViewModel.ServiceProvider'은(는) 상속된 'ViewModelBase.ServiceProvider' 멤버를 숨깁니다. 숨기려면 new 키워드를 사용하세요.
 
         private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }

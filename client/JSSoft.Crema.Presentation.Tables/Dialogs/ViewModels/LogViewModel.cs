@@ -37,14 +37,13 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly ITableItem tableItem;
         private LogInfoViewModel[] itemsSource;
         private LogInfoViewModel selectedItem;
-        private readonly ICommand previewCommand;
 
         private LogViewModel(Authentication authentication, ITableItem tableItem)
         {
             this.authentication = authentication;
             this.tableItem = tableItem;
             this.DisplayName = Resources.Title_ViewLog;
-            this.previewCommand = new DelegateCommand((p) => this.PreviewAsync(), (p) => this.CanPreview);
+            this.PreviewCommand = new DelegateCommand((p) => this.PreviewAsync(), (p) => this.CanPreview);
         }
 
         public static async Task<LogViewModel> ShowDialogAsync(Authentication authentication, ITableItemDescriptor descriptor)
@@ -105,7 +104,7 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
 
         public IEnumerable<LogInfoViewModel> Items => this.itemsSource;
 
-        public ICommand PreviewCommand => this.previewCommand;
+        public ICommand PreviewCommand { get; private set; }
 
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {

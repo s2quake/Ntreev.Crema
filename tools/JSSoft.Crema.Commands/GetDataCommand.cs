@@ -22,15 +22,11 @@
 using JSSoft.Crema.Runtime.Serialization;
 using JSSoft.Crema.RuntimeService;
 using JSSoft.Library.Commands;
-using JSSoft.Library.IO;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,14 +35,13 @@ namespace JSSoft.Crema.Commands
     [Export(typeof(ICommand))]
     [CommandStaticProperty(typeof(FilterSettings))]
     [CommandStaticProperty(typeof(DataBaseSettings))]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:읽기 전용 한정자 추가", Justification = "<보류 중>")]
     class GetDataCommand : CommandAsyncBase
     {
         [Import]
         private IRuntimeService service = null;
         [ImportMany]
         private IEnumerable<IDataSerializer> serializers = null;
-        [Import]
-        private Lazy<CommandContext> commandContext = null;
 
         public GetDataCommand()
             : base("get-data")

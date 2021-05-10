@@ -19,22 +19,18 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using System;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Crema.Runtime.Generation.Cpp.CodeDom;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.Specialized;
-using JSSoft.Crema.Data.Xml.Schema;
-using JSSoft.Crema.Runtime.Generation.Cpp.CodeDom;
-using JSSoft.Crema.Data;
 
 namespace JSSoft.Crema.Runtime.Generation.Cpp
 {
     static class CremaTableClassCreator
     {
-        private readonly static CodeThisReferenceExpression thisRef = new CodeThisReferenceExpression();
+        private readonly static CodeThisReferenceExpression thisRef = new();
 
         public static void Create(CodeNamespace codeNamespace, CodeGenerationInfo generationInfo)
         {
@@ -61,10 +57,11 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static CodeTypeDeclaration CreateCore(TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var classType = new CodeTypeDeclaration();
-
-            classType.Name = tableInfo.GetClassName();
-            classType.IsClass = true;
+            var classType = new CodeTypeDeclaration
+            {
+                Name = tableInfo.GetClassName(),
+                IsClass = true
+            };
             classType.BaseTypes.Add(generationInfo.BaseNamespace, "CremaTable", tableInfo.GetRowCodeType(CodeType.None));
             if (generationInfo.NoComment == false)
             {
@@ -96,26 +93,32 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
         {
             foreach (var item in generationInfo.GetChilds(tableInfo))
             {
-                var cmf = new CodeMemberField();
-                cmf.Attributes = MemberAttributes.Public;
-                cmf.Name = item.TableName;
-                cmf.Type = item.GetCodeType(CodeType.Pointer | CodeType.Const);
+                var cmf = new CodeMemberField
+                {
+                    Attributes = MemberAttributes.Public,
+                    Name = item.TableName,
+                    Type = item.GetCodeType(CodeType.Pointer | CodeType.Const)
+                };
                 classType.Members.Add(cmf);
             }
         }
 
         private static void CreateConstructor(CodeTypeDeclaration classType, TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var cc = new CodeConstructor();
-            cc.Attributes = MemberAttributes.Public;
+            var cc = new CodeConstructor
+            {
+                Attributes = MemberAttributes.Public
+            };
             classType.Members.Add(cc);
         }
 
         private static void CreateConstructorFromTable(CodeTypeDeclaration classType, TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var cc = new CodeConstructor();
-            cc.Attributes = MemberAttributes.Public;
-            cc.Name = tableInfo.TableName;
+            var cc = new CodeConstructor
+            {
+                Attributes = MemberAttributes.Public,
+                Name = tableInfo.TableName
+            };
             cc.Parameters.Add(generationInfo.ReaderNamespace, "itable&", "table");
             //cc.BaseConstructorArgs.Add("table");
 
@@ -182,8 +185,10 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
             if (string.IsNullOrEmpty(tableInfo.ParentName) == true)
                 return;
 
-            var cc = new CodeConstructor();
-            cc.Attributes = MemberAttributes.Public;
+            var cc = new CodeConstructor
+            {
+                Attributes = MemberAttributes.Public
+            };
 
             var codeTypeRef = tableInfo.GetRowCodeType(CodeType.Pointer);
             var arrayTypeRef = new CodeTypeReference(codeTypeRef, 1);
@@ -206,8 +211,10 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static void CreateDestructor(CodeTypeDeclaration classType, TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var cc = new CodeDestructor();
-            cc.Attributes = MemberAttributes.Public | MemberAttributes.Override;
+            var cc = new CodeDestructor
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Override
+            };
 
             foreach (var item in generationInfo.GetChilds(tableInfo))
             {
@@ -222,10 +229,12 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static void CreateFindMethod(CodeTypeDeclaration classType, TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "Find";
-            cmm.ReturnType = tableInfo.GetRowCodeType(CodeType.Pointer | CodeType.Const);
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "Find",
+                ReturnType = tableInfo.GetRowCodeType(CodeType.Pointer | CodeType.Const)
+            };
             cmm.Parameters.Add(tableInfo.Columns.Where(item => item.IsKey));
             cmm.IsConst(true);
 
@@ -257,10 +266,12 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static void CreateCreateRowInstanceMethod(CodeTypeDeclaration classType, TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Family | MemberAttributes.Override;
-            cmm.Name = "CreateRow";
-            cmm.ReturnType = new CodeTypeReference(typeof(object));
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Family | MemberAttributes.Override,
+                Name = "CreateRow",
+                ReturnType = new CodeTypeReference(typeof(object))
+            };
             cmm.Parameters.Add(generationInfo.ReaderNamespace, "irow&", "row");
             cmm.Parameters.Add(typeof(object), "table");
 
@@ -282,8 +293,10 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
             var table = new CodeVariableReferenceExpression("table");
             var version = new CodeMethodInvokeExpression(table, "hash_value");
 
-            var state = new CodeConditionStatement();
-            state.Condition = new CodeBinaryOperatorExpression(version, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(tableInfo.HashValue));
+            var state = new CodeConditionStatement
+            {
+                Condition = new CodeBinaryOperatorExpression(version, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(tableInfo.HashValue))
+            };
 
             var message = string.Format("{0} 테이블과 데이터의 형식이 맞지 않습니다.", tableInfo.Name);
             var exception = new CodeObjectCreateExpression("std::logic_error", new CodePrimitiveExpression(message));

@@ -19,25 +19,12 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using System;
 using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Runtime.Generation.Cpp.CodeDom
 {
     class CodeDestructor : CodeTypeMember
     {
-        private readonly CodeStatementCollection statements = new CodeStatementCollection();
-
-        public CodeStatementCollection Statements
-        {
-            get
-            {
-                return this.statements;
-            }
-        }
+        public CodeStatementCollection Statements { get; } = new();
     }
 }

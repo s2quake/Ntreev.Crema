@@ -57,17 +57,14 @@ namespace JSSoft.Crema.Presentation.Controls.Actions
 
         class ItemInfo
         {
-            private readonly object dataItem;
             private readonly object destItem;
-            private object[] fields;
-
             private readonly List<ItemInfo> childList = new();
 
             public ItemInfo(object dataItem, object destItem)
             {
-                this.dataItem = dataItem;
+                this.Item = dataItem;
                 this.destItem = destItem;
-                this.fields = DiffUtility.GetFields(destItem);
+                this.Fields = DiffUtility.GetFields(destItem);
 
                 var dataChildItems = new List<object>();
                 var destChildItems = new List<object>();
@@ -92,13 +89,13 @@ namespace JSSoft.Crema.Presentation.Controls.Actions
                 }
             }
 
-            public object Item => this.dataItem;
+            public object Item { get; private set; }
 
-            public object[] Fields => this.fields;
+            public object[] Fields { get; private set; }
 
             public void Redo()
             {
-                DiffUtility.Copy(this.dataItem, this.destItem);
+                DiffUtility.Copy(this.Item, this.destItem);
                 foreach (var item in this.childList)
                 {
                     item.Redo();
@@ -107,7 +104,7 @@ namespace JSSoft.Crema.Presentation.Controls.Actions
 
             public void Undo()
             {
-                DiffUtility.Copy(this.destItem, this.fields);
+                DiffUtility.Copy(this.destItem, this.Fields);
                 foreach (var item in this.childList)
                 {
                     item.Undo();
@@ -118,7 +115,7 @@ namespace JSSoft.Crema.Presentation.Controls.Actions
             {
                 if (e.PropertyName == string.Empty)
                 {
-                    this.fields = DiffUtility.GetFields(this.dataItem);
+                    this.Fields = DiffUtility.GetFields(this.Item);
                 }
             }
         }

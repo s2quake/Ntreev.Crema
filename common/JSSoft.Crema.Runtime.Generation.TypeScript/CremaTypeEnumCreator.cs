@@ -20,13 +20,8 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Data;
-using JSSoft.Crema.Data.Xml.Schema;
 using System;
 using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Runtime.Generation.TypeScript
 {
@@ -50,9 +45,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         public static void CreateType(CodeNamespace codeNamespace, TypeInfo typeInfo, CodeGenerationInfo generationInfo)
         {
-            var classType = new CodeTypeDeclaration(typeInfo.Name);
-            classType.Attributes = MemberAttributes.Public;
-            classType.IsEnum = true;
+            var classType = new CodeTypeDeclaration(typeInfo.Name)
+            {
+                Attributes = MemberAttributes.Public,
+                IsEnum = true
+            };
 
             if (typeInfo.IsFlag == true)
             {
@@ -82,9 +79,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         public static void CreateTypeMember(CodeTypeDeclaration classType, TypeMemberInfo typeMemberInfo, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberField();
-            cmm.Name = typeMemberInfo.Name;
-            cmm.InitExpression = new CodePrimitiveExpression(typeMemberInfo.Value);
+            var cmm = new CodeMemberField
+            {
+                Name = typeMemberInfo.Name,
+                InitExpression = new CodePrimitiveExpression(typeMemberInfo.Value)
+            };
             if (generationInfo.OmitComment == false)
             {
                 cmm.Comments.AddSummary(typeMemberInfo.Comment);

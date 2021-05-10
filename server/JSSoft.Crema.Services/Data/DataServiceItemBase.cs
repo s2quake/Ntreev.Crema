@@ -39,10 +39,10 @@ namespace JSSoft.Crema.Services.Data
         private readonly ILogService logService;
         private bool initialized;
         private string workingPath;
-        private Dictionary<string, TableInfo> tableInfos = new Dictionary<string, TableInfo>();
-        private Dictionary<string, TypeInfo> typeInfos = new Dictionary<string, TypeInfo>();
-        private Dictionary<string, object> tableDatas = new Dictionary<string, object>();
-        private Dictionary<string, object> typeDatas = new Dictionary<string, object>();
+        private Dictionary<string, TableInfo> tableInfos = new();
+        private Dictionary<string, TypeInfo> typeInfos = new();
+        private Dictionary<string, object> tableDatas = new();
+        private Dictionary<string, object> typeDatas = new();
         private DataServiceItemInfo info;
 
         protected DataServiceItemBase(IDataBase dataBase)

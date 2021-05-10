@@ -38,27 +38,22 @@ namespace JSSoft.Crema.Presentation.Tables.Documents.ViewModels
     class TableItemViewModel : TableListItemBase, ITableDocumentItem, ITableContentDescriptor
     {
         private readonly TableContentDescriptor contentDescriptor;
-        private readonly ICommand insertCommand;
         private CremaDataTable dataTable;
         private IDomain domain;
         private object selectedItem;
         private int selectedIndex;
         private string selectedColumn;
-#pragma warning disable CS0169 // TableItemViewModel.currentContext' 필드가 사용되지 않았습니다.
-        private readonly DataGridContext currentContext;
-#pragma warning restore CS0169 // TableItemViewModel.currentContext' 필드가 사용되지 않았습니다.
 
-#pragma warning disable IDE0044 // 읽기 전용 한정자 추가
         [Import]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:읽기 전용 한정자 추가", Justification = "<보류 중>")]
         private IServiceProvider serviceProvider = null;
-#pragma warning restore IDE0044 // 읽기 전용 한정자 추가
 
         public TableItemViewModel(Authentication authentication, TableDescriptor descriptor, object owner)
             : base(authentication, descriptor, owner)
         {
             this.contentDescriptor = descriptor.ContentDescriptor;
 
-            this.insertCommand = new DelegateCommand(async (p) => await this.NewRowAsync());
+            this.InsertCommand = new DelegateCommand(async (p) => await this.NewRowAsync());
 
         }
 
@@ -259,7 +254,7 @@ namespace JSSoft.Crema.Presentation.Tables.Documents.ViewModels
 
         #region Commands
 
-        public ICommand InsertCommand => this.insertCommand;
+        public ICommand InsertCommand { get; private set; }
 
         #endregion
     }

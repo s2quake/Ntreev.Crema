@@ -44,7 +44,6 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
 
         private object[] selectedItems;
         private ColumnBase[] selectedColumns;
-        private DomainRowInfo[] domainRows;
 
         public DomainTextClipboardPaster(DataGridContext gridContext)
         {
@@ -52,8 +51,7 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
             this.columns = gridContext.GetSelectedColumns().ToArray();
             this.items = gridContext.GetSelectedItems().ToArray();
 
-            var typedList = gridContext.Items.SourceCollection as ITypedList;
-            if (typedList == null)
+            if (gridContext.Items.SourceCollection is not ITypedList typedList)
             {
                 var source = (gridContext.Items.SourceCollection as CollectionView).SourceCollection;
                 typedList = source as ITypedList;
@@ -89,12 +87,12 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
                 rowInfos.Add(rowInfo);
             }
 
-            this.domainRows = rowInfos.ToArray();
+            this.DomainRows = rowInfos.ToArray();
             this.selectedItems = targetItems;
             this.selectedColumns = targetColumns;
         }
 
-        public DomainRowInfo[] DomainRows => this.domainRows;
+        public DomainRowInfo[] DomainRows { get; private set; }
 
         public void SelectRange()
         {
