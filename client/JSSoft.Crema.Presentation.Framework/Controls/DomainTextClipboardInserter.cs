@@ -40,15 +40,11 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
         private readonly string[] columnNames;
         private readonly PropertyDescriptorCollection props;
 
-        private ColumnBase[] selectedColumns;
-        private DomainRowInfo[] domainRows;
-
         public DomainTextClipboardInserter(DataGridContext gridContext)
         {
             this.gridContext = gridContext;
 
-            var typedList = gridContext.Items.SourceCollection as ITypedList;
-            if (typedList == null)
+            if (gridContext.Items.SourceCollection is not ITypedList typedList)
             {
                 var source = (gridContext.Items.SourceCollection as CollectionView).SourceCollection;
                 typedList = source as ITypedList;
@@ -81,11 +77,10 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
                 rowInfos.Add(rowInfo);
             }
 
-            this.domainRows = rowInfos.ToArray();
-            this.selectedColumns = targetColumns;
+            this.DomainRows = rowInfos.ToArray();
         }
 
-        public DomainRowInfo[] DomainRows => this.domainRows;
+        public DomainRowInfo[] DomainRows { get; private set; }
 
         private bool ExistsHeader(string[] textFields)
         {

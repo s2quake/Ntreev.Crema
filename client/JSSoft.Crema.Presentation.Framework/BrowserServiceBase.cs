@@ -32,8 +32,6 @@ namespace JSSoft.Crema.Presentation.Framework
         private readonly ICremaAppHost cremaAppHost;
         private readonly IBrowserItem[] browserItems;
 
-        private readonly ObservableCollection<IBrowserItem> itemsSource = new();
-
         protected BrowserServiceBase(ICremaAppHost cremaAppHost, IEnumerable<IBrowserItem> browserItems)
         {
             this.cremaAppHost = cremaAppHost;
@@ -41,9 +39,9 @@ namespace JSSoft.Crema.Presentation.Framework
             this.browserItems = ParentItemUtility.GetItems(this, browserItems).ToArray();
         }
 
-        public IEnumerable<IBrowserItem> Browsers => this.itemsSource;
+        public IEnumerable<IBrowserItem> Browsers => this.ItemsSource;
 
-        public ObservableCollection<IBrowserItem> ItemsSource => this.itemsSource;
+        public ObservableCollection<IBrowserItem> ItemsSource { get; } = new();
 
         private async void CremaAppHost_Opened(object sender, EventArgs e)
         {
@@ -54,10 +52,10 @@ namespace JSSoft.Crema.Presentation.Framework
                             where attr == null || this.cremaAppHost.Authority >= attr.Authority
                             select item;
 
-                this.itemsSource.Clear();
+                this.ItemsSource.Clear();
                 foreach (var item in query)
                 {
-                    this.itemsSource.Add(item);
+                    this.ItemsSource.Add(item);
                 }
                 this.NotifyOfPropertyChange(nameof(this.ItemsSource));
             });

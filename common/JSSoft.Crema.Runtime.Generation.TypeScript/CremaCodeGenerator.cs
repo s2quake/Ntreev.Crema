@@ -48,7 +48,7 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
         public const string ContentsModifiedDateTime = "contentsModifiedDateTime";
         public const string ContentsModifier = "contentsModifier";
 
-        private readonly CodeGeneratorOptions options = new CodeGeneratorOptions();
+        private readonly CodeGeneratorOptions options = new();
 
         public CremaCodeGenerator()
         {
@@ -103,23 +103,33 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
             {
                 string codePath = Path.Combine(path, item.Key);
 
-                using (StreamWriter sw = new StreamWriter(codePath, false, Encoding.UTF8))
-                {
-                    sw.WriteLine(item.Value);
-                    this.PrintResult(codePath);
-                }
+                using var sw = new StreamWriter(codePath, false, Encoding.UTF8);
+                sw.WriteLine(item.Value);
+                this.PrintResult(codePath);
             }
         }
 
+
+/* 'JSSoft.Crema.Runtime.Generation.TypeScript (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
         public string[] SupportedTargets
         {
             get { return new string[] { "ES5", }; }
-        }
+이후:
+        public string[] SupportedTargets => new string[] { "ES5", }; }
+*/
+        public string[] SupportedTargets => new string[] { "ES5", };
 
+
+/* 'JSSoft.Crema.Runtime.Generation.TypeScript (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
         public virtual string Name
         {
             get { return "ts"; }
-        }
+이후:
+        public virtual string Name => "ts"; }
+*/
+        public virtual string Name => "ts";
 
         public string Lint
         {
@@ -199,7 +209,7 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
             ColumnInfoExtensions.TypeNamespace = string.Empty;
             var sb = new StringBuilder();
             this.AppendLint(sb, generationInfo);
-            using (StringWriter sw = new StringWriter(sb))
+            using (var sw = new StringWriter(sb))
             {
                 var codeGenerator = codeDomProvider.CreateGenerator(sw);
                 var compileUnit = new CodeCompileUnit();
@@ -217,7 +227,7 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private void PrintResult(string path)
         {
-            FileInfo fileInfo = new FileInfo(path);
+            var fileInfo = new FileInfo(path);
             Console.WriteLine("created: {0}", fileInfo.FullName);
         }
 
@@ -225,10 +235,8 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var fullname = string.Join(".", assembly.GetName().Name, name);
-            using (var stream = new StreamReader(assembly.GetManifestResourceStream(fullname)))
-            {
-                return stream.ReadToEnd();
-            }
+            using var stream = new StreamReader(assembly.GetManifestResourceStream(fullname));
+            return stream.ReadToEnd();
         }
 
         private IDictionary<string, string> GenerateCodes(CodeGenerationInfo generationInfo)
@@ -275,16 +283,10 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         #region ICodePropertyProvider
 
-        PropertyInfo[] ICodePropertyProvider.Properties
-        {
-            get
-            {
-                return new PropertyInfo[]
+        PropertyInfo[] ICodePropertyProvider.Properties => new PropertyInfo[]
                 {
                     typeof(CremaCodeGenerator).GetProperty(nameof(Lint)),
                 };
-            }
-        }
 
         object ICodePropertyProvider.Target => this;
 

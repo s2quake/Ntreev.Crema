@@ -31,12 +31,11 @@ namespace JSSoft.Crema.Services.Data
 {
     class NewTableTemplate : TableTemplateBase
     {
-        private object parent;
         private Table[] tables;
 
         public NewTableTemplate(TableCategory category)
         {
-            this.parent = category ?? throw new ArgumentNullException(nameof(category));
+            this.Parent = category ?? throw new ArgumentNullException(nameof(category));
             this.DispatcherObject = category;
             this.DomainContext = category.GetService(typeof(DomainContext)) as DomainContext;
             this.ItemPath = category.Path;
@@ -50,7 +49,7 @@ namespace JSSoft.Crema.Services.Data
 
         public NewTableTemplate(Table parent)
         {
-            this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            this.Parent = parent ?? throw new ArgumentNullException(nameof(parent));
             this.DispatcherObject = parent;
             this.DomainContext = parent.GetService(typeof(DomainContext)) as DomainContext;
             this.ItemPath = parent.Path;
@@ -96,13 +95,13 @@ namespace JSSoft.Crema.Services.Data
             await this.DataBase.WaitAsync(taskID);
             var tableInfos = domain.Result as TableInfo[];
             this.tables = await this.Dispatcher.InvokeAsync(() => tableInfos.Select(item => this.Container[item.Name]).ToArray());
-            this.parent = null;
+            this.Parent = null;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
             await base.OnCancelEditAsync(authentication);
-            this.parent = null;
+            this.Parent = null;
         }
 
         protected override Task<ResultBase<DomainMetaData>> OnBeginDomainAsync(Authentication authentication)
@@ -119,6 +118,8 @@ namespace JSSoft.Crema.Services.Data
         {
             return await this.Service.CancelTableTemplateEditAsync(this.Domain.ID);
         }
+
+        protected object Parent { get; private set; }
 
         private TableCollection Container { get; }
     }

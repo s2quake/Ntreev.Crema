@@ -31,41 +31,35 @@ namespace JSSoft.Crema.Data.Diff
 {
     public sealed class DiffDataType : INotifyPropertyChanged
     {
-        private readonly CremaDataType diffSource1;
-        private readonly CremaDataType diffSource2;
         private readonly CremaDataType dataType1;
         private readonly CremaDataType dataType2;
         private readonly DiffMergeTypes mergeType;
         private readonly bool dummy1;
         private readonly bool dummy2;
         private readonly List<DiffDataTypeMember> itemList = new();
-        private DiffState diffState;
-        private bool isResolved;
         private string header1;
         private string header2;
-        private readonly HashSet<object> itemSet = new();
-        //private bool isSame;
 
         [Obsolete]
         public DiffDataType(CremaDataType dataType1, CremaDataType dataType2, DiffMergeTypes mergeType)
         {
-            this.diffSource1 = dataType1 == null ? new CremaDataType() : new CremaDataType(dataType1.TypeName, dataType1.CategoryPath);
-            this.diffSource2 = dataType2 == null ? new CremaDataType() : new CremaDataType(dataType2.TypeName, dataType2.CategoryPath);
+            this.SourceItem1 = dataType1 == null ? new CremaDataType() : new CremaDataType(dataType1.TypeName, dataType1.CategoryPath);
+            this.SourceItem2 = dataType2 == null ? new CremaDataType() : new CremaDataType(dataType2.TypeName, dataType2.CategoryPath);
             this.mergeType = mergeType;
-            this.diffSource1.ExtendedProperties[typeof(DiffDataType)] = this;
-            this.diffSource2.ExtendedProperties[typeof(DiffDataType)] = this;
-            this.diffSource1.InternalIsFlag = dataType1.IsFlag;
-            this.diffSource1.InternalComment = dataType1.Comment;
-            this.diffSource1.InternalTypeID = dataType1.TypeID;
-            this.diffSource1.Tags = dataType1.Tags;
-            this.diffSource1.InternalCreationInfo = dataType1.CreationInfo;
-            this.diffSource1.InternalModificationInfo = dataType1.ModificationInfo;
-            this.diffSource2.InternalIsFlag = dataType2.IsFlag;
-            this.diffSource2.InternalComment = dataType2.Comment;
-            this.diffSource2.InternalTypeID = dataType2.TypeID;
-            this.diffSource2.Tags = dataType2.Tags;
-            this.diffSource2.InternalCreationInfo = dataType2.CreationInfo;
-            this.diffSource2.InternalModificationInfo = dataType2.ModificationInfo;
+            this.SourceItem1.ExtendedProperties[typeof(DiffDataType)] = this;
+            this.SourceItem2.ExtendedProperties[typeof(DiffDataType)] = this;
+            this.SourceItem1.InternalIsFlag = dataType1.IsFlag;
+            this.SourceItem1.InternalComment = dataType1.Comment;
+            this.SourceItem1.InternalTypeID = dataType1.TypeID;
+            this.SourceItem1.Tags = dataType1.Tags;
+            this.SourceItem1.InternalCreationInfo = dataType1.CreationInfo;
+            this.SourceItem1.InternalModificationInfo = dataType1.ModificationInfo;
+            this.SourceItem2.InternalIsFlag = dataType2.IsFlag;
+            this.SourceItem2.InternalComment = dataType2.Comment;
+            this.SourceItem2.InternalTypeID = dataType2.TypeID;
+            this.SourceItem2.Tags = dataType2.Tags;
+            this.SourceItem2.InternalCreationInfo = dataType2.CreationInfo;
+            this.SourceItem2.InternalModificationInfo = dataType2.ModificationInfo;
 
             this.dataType1 = dataType1;
             this.dataType2 = dataType2;
@@ -74,22 +68,22 @@ namespace JSSoft.Crema.Data.Diff
 
         internal DiffDataType(CremaDataType diffType1, CremaDataType diffType2, CremaDataType dataType1, CremaDataType dataType2)
         {
-            this.diffSource1 = diffType1;
-            this.diffSource2 = diffType2;
-            this.diffSource1.ExtendedProperties[typeof(DiffDataType)] = this;
-            this.diffSource2.ExtendedProperties[typeof(DiffDataType)] = this;
-            this.diffSource1.InternalIsFlag = dataType1 == null ? dataType2.IsFlag : dataType1.IsFlag;
-            this.diffSource1.InternalComment = dataType1 == null ? dataType2.Comment : dataType1.Comment;
-            this.diffSource1.InternalTypeID = dataType1 == null ? dataType2.TypeID : dataType1.TypeID;
-            this.diffSource1.InternalCreationInfo = dataType1 == null ? dataType2.CreationInfo : dataType1.CreationInfo;
-            this.diffSource1.InternalModificationInfo = dataType1 == null ? dataType2.ModificationInfo : dataType1.ModificationInfo;
-            this.diffSource2.InternalIsFlag = dataType2 == null ? dataType1.IsFlag : dataType2.IsFlag;
-            this.diffSource2.InternalComment = dataType2 == null ? dataType1.Comment : dataType2.Comment;
-            this.diffSource2.InternalTypeID = dataType2 == null ? dataType1.TypeID : dataType2.TypeID;
-            this.diffSource2.InternalCreationInfo = dataType2 == null ? dataType1.CreationInfo : dataType2.CreationInfo;
-            this.diffSource2.InternalModificationInfo = dataType2 == null ? dataType1.ModificationInfo : dataType2.ModificationInfo;
-            this.dummy1 = this.diffSource1.TypeName.StartsWith(DiffUtility.DiffDummyKey);
-            this.dummy2 = this.diffSource2.TypeName.StartsWith(DiffUtility.DiffDummyKey);
+            this.SourceItem1 = diffType1;
+            this.SourceItem2 = diffType2;
+            this.SourceItem1.ExtendedProperties[typeof(DiffDataType)] = this;
+            this.SourceItem2.ExtendedProperties[typeof(DiffDataType)] = this;
+            this.SourceItem1.InternalIsFlag = dataType1 == null ? dataType2.IsFlag : dataType1.IsFlag;
+            this.SourceItem1.InternalComment = dataType1 == null ? dataType2.Comment : dataType1.Comment;
+            this.SourceItem1.InternalTypeID = dataType1 == null ? dataType2.TypeID : dataType1.TypeID;
+            this.SourceItem1.InternalCreationInfo = dataType1 == null ? dataType2.CreationInfo : dataType1.CreationInfo;
+            this.SourceItem1.InternalModificationInfo = dataType1 == null ? dataType2.ModificationInfo : dataType1.ModificationInfo;
+            this.SourceItem2.InternalIsFlag = dataType2 == null ? dataType1.IsFlag : dataType2.IsFlag;
+            this.SourceItem2.InternalComment = dataType2 == null ? dataType1.Comment : dataType2.Comment;
+            this.SourceItem2.InternalTypeID = dataType2 == null ? dataType1.TypeID : dataType2.TypeID;
+            this.SourceItem2.InternalCreationInfo = dataType2 == null ? dataType1.CreationInfo : dataType2.CreationInfo;
+            this.SourceItem2.InternalModificationInfo = dataType2 == null ? dataType1.ModificationInfo : dataType2.ModificationInfo;
+            this.dummy1 = this.SourceItem1.TypeName.StartsWith(DiffUtility.DiffDummyKey);
+            this.dummy2 = this.SourceItem2.TypeName.StartsWith(DiffUtility.DiffDummyKey);
 
             this.dataType1 = dataType1;
             this.dataType2 = dataType2;
@@ -98,9 +92,9 @@ namespace JSSoft.Crema.Data.Diff
 
         public override string ToString()
         {
-            if (this.diffSource1.TypeName != this.diffSource2.TypeName)
-                return $"{this.diffSource1.TypeName} => {this.diffSource2.TypeName}";
-            return this.diffSource1.TypeName;
+            if (this.SourceItem1.TypeName != this.SourceItem2.TypeName)
+                return $"{this.SourceItem1.TypeName} => {this.SourceItem2.TypeName}";
+            return this.SourceItem1.TypeName;
         }
 
         public void AcceptChanges()
@@ -110,31 +104,31 @@ namespace JSSoft.Crema.Data.Diff
 
         public void RejectChanges()
         {
-            this.diffSource1.RejectChanges();
-            this.diffSource2.RejectChanges();
+            this.SourceItem1.RejectChanges();
+            this.SourceItem2.RejectChanges();
         }
 
         public bool HasChanges()
         {
-            if (this.diffSource1.HasChanges(true) == true)
+            if (this.SourceItem1.HasChanges(true) == true)
                 return true;
-            if (this.diffSource2.HasChanges(true) == true)
+            if (this.SourceItem2.HasChanges(true) == true)
                 return true;
-            if (this.diffSource1.TypeName != this.dataType1.TypeName)
+            if (this.SourceItem1.TypeName != this.dataType1.TypeName)
                 return true;
-            if (this.diffSource2.TypeName != this.dataType2.TypeName)
+            if (this.SourceItem2.TypeName != this.dataType2.TypeName)
                 return true;
-            if (this.diffSource1.Tags != this.dataType1.Tags)
+            if (this.SourceItem1.Tags != this.dataType1.Tags)
                 return true;
-            if (this.diffSource2.Tags != this.dataType2.Tags)
+            if (this.SourceItem2.Tags != this.dataType2.Tags)
                 return true;
-            if (this.diffSource1.IsFlag != this.dataType1.IsFlag)
+            if (this.SourceItem1.IsFlag != this.dataType1.IsFlag)
                 return true;
-            if (this.diffSource2.IsFlag != this.dataType2.IsFlag)
+            if (this.SourceItem2.IsFlag != this.dataType2.IsFlag)
                 return true;
-            if (this.diffSource1.Comment != this.dataType1.Comment)
+            if (this.SourceItem1.Comment != this.dataType1.Comment)
                 return true;
-            if (this.diffSource2.Comment != this.dataType2.Comment)
+            if (this.SourceItem2.Comment != this.dataType2.Comment)
                 return true;
             return false;
         }
@@ -143,29 +137,29 @@ namespace JSSoft.Crema.Data.Diff
         {
             this.ValidateResolve();
 
-            if (this.diffState == DiffState.Modified)
+            if (this.DiffState == DiffState.Modified)
             {
-                this.diffSource1.ReadOnly = false;
-                this.diffSource2.ReadOnly = false;
-                this.diffSource1.DeleteItems();
-                this.diffSource2.DeleteItems();
-                this.diffSource1.MemberChanged -= DiffSource1_MemberChanged;
-                this.diffSource2.MemberChanged -= DiffSource2_MemberChanged;
-                this.diffSource1.MemberDeleted -= DiffSource1_MemberDeleted;
-                this.diffSource2.MemberDeleted -= DiffSource2_MemberDeleted;
-                this.diffSource1.IsDiffMode = false;
-                this.diffSource2.IsDiffMode = false;
-                this.diffSource1.AcceptChanges();
-                this.diffSource2.AcceptChanges();
-                this.diffSource1.ReadOnly = true;
-                this.diffSource2.ReadOnly = true;
-                this.isResolved = true;
+                this.SourceItem1.ReadOnly = false;
+                this.SourceItem2.ReadOnly = false;
+                this.SourceItem1.DeleteItems();
+                this.SourceItem2.DeleteItems();
+                this.SourceItem1.MemberChanged -= DiffSource1_MemberChanged;
+                this.SourceItem2.MemberChanged -= DiffSource2_MemberChanged;
+                this.SourceItem1.MemberDeleted -= DiffSource1_MemberDeleted;
+                this.SourceItem2.MemberDeleted -= DiffSource2_MemberDeleted;
+                this.SourceItem1.IsDiffMode = false;
+                this.SourceItem2.IsDiffMode = false;
+                this.SourceItem1.AcceptChanges();
+                this.SourceItem2.AcceptChanges();
+                this.SourceItem1.ReadOnly = true;
+                this.SourceItem2.ReadOnly = true;
+                this.IsResolved = true;
             }
-            else if (this.diffState == DiffState.Deleted)
+            else if (this.DiffState == DiffState.Deleted)
             {
                 this.MergeDelete();
             }
-            else if (this.diffState == DiffState.Inserted)
+            else if (this.DiffState == DiffState.Inserted)
             {
                 this.MergeInsert();
             }
@@ -175,15 +169,15 @@ namespace JSSoft.Crema.Data.Diff
 
         public void Merge()
         {
-            if (this.diffState == DiffState.Modified)
+            if (this.DiffState == DiffState.Modified)
             {
                 this.MergeModify();
             }
-            else if (this.diffState == DiffState.Deleted)
+            else if (this.DiffState == DiffState.Deleted)
             {
                 this.MergeDelete();
             }
-            else if (this.diffState == DiffState.Inserted)
+            else if (this.DiffState == DiffState.Inserted)
             {
                 this.MergeInsert();
             }
@@ -192,41 +186,41 @@ namespace JSSoft.Crema.Data.Diff
 
         public void Refresh()
         {
-            if (this.isResolved == true)
+            if (this.IsResolved == true)
                 return;
-            this.diffSource1.MemberChanged -= DiffSource1_MemberChanged;
-            this.diffSource2.MemberChanged -= DiffSource2_MemberChanged;
-            this.diffSource1.MemberDeleted -= DiffSource1_MemberDeleted;
-            this.diffSource2.MemberDeleted -= DiffSource2_MemberDeleted;
+            this.SourceItem1.MemberChanged -= DiffSource1_MemberChanged;
+            this.SourceItem2.MemberChanged -= DiffSource2_MemberChanged;
+            this.SourceItem1.MemberDeleted -= DiffSource1_MemberDeleted;
+            this.SourceItem2.MemberDeleted -= DiffSource2_MemberDeleted;
             for (var i = 0; i < this.itemList.Count; i++)
             {
                 var item = this.itemList[i];
                 item.Update();
             }
-            this.diffSource1.MemberChanged += DiffSource1_MemberChanged;
-            this.diffSource2.MemberChanged += DiffSource2_MemberChanged;
-            this.diffSource1.MemberDeleted += DiffSource1_MemberDeleted;
-            this.diffSource2.MemberDeleted += DiffSource2_MemberDeleted;
+            this.SourceItem1.MemberChanged += DiffSource1_MemberChanged;
+            this.SourceItem2.MemberChanged += DiffSource2_MemberChanged;
+            this.SourceItem1.MemberDeleted += DiffSource1_MemberDeleted;
+            this.SourceItem2.MemberDeleted += DiffSource2_MemberDeleted;
         }
 
-        public CremaDataType SourceItem1 => this.diffSource1;
+        public CremaDataType SourceItem1 { get; private set; }
 
-        public CremaDataType SourceItem2 => this.diffSource2;
+        public CremaDataType SourceItem2 { get; private set; }
 
         public string ItemName1
         {
             get
             {
                 if (this.dummy1 == true)
-                    return this.diffSource1.TypeName.Replace(DiffUtility.DiffDummyKey, string.Empty);
-                return this.diffSource1.TypeName;
+                    return this.SourceItem1.TypeName.Replace(DiffUtility.DiffDummyKey, string.Empty);
+                return this.SourceItem1.TypeName;
             }
             set
             {
-                if (this.dummy1 == true && this.diffSource2.TypeName != value)
-                    this.diffSource1.TypeName = DiffUtility.DiffDummyKey + value;
+                if (this.dummy1 == true && this.SourceItem2.TypeName != value)
+                    this.SourceItem1.TypeName = DiffUtility.DiffDummyKey + value;
                 else
-                    this.diffSource1.TypeName = value;
+                    this.SourceItem1.TypeName = value;
                 this.InvokePropertyChangedEvent(nameof(this.ItemName1));
             }
         }
@@ -236,15 +230,15 @@ namespace JSSoft.Crema.Data.Diff
             get
             {
                 if (this.dummy2 == true)
-                    return this.diffSource2.TypeName.Replace(DiffUtility.DiffDummyKey, string.Empty);
-                return this.diffSource2.TypeName;
+                    return this.SourceItem2.TypeName.Replace(DiffUtility.DiffDummyKey, string.Empty);
+                return this.SourceItem2.TypeName;
             }
             set
             {
-                if (this.dummy2 == true && this.diffSource1.TypeName != value)
-                    this.diffSource2.TypeName = DiffUtility.DiffDummyKey + value;
+                if (this.dummy2 == true && this.SourceItem1.TypeName != value)
+                    this.SourceItem2.TypeName = DiffUtility.DiffDummyKey + value;
                 else
-                    this.diffSource2.TypeName = value;
+                    this.SourceItem2.TypeName = value;
                 this.InvokePropertyChangedEvent(nameof(this.ItemName2));
             }
         }
@@ -273,60 +267,60 @@ namespace JSSoft.Crema.Data.Diff
 
         public bool IsFlag1
         {
-            get => this.diffSource1.IsFlag;
+            get => this.SourceItem1.IsFlag;
             set
             {
-                this.diffSource1.IsFlag = value;
+                this.SourceItem1.IsFlag = value;
                 this.InvokePropertyChangedEvent(nameof(this.IsFlag1));
             }
         }
 
         public bool IsFlag2
         {
-            get => this.diffSource2.IsFlag;
+            get => this.SourceItem2.IsFlag;
             set
             {
-                this.diffSource2.IsFlag = value;
+                this.SourceItem2.IsFlag = value;
                 this.InvokePropertyChangedEvent(nameof(this.IsFlag2));
             }
         }
 
         public TagInfo Tags1
         {
-            get => this.diffSource1.Tags;
+            get => this.SourceItem1.Tags;
             set
             {
-                this.diffSource1.Tags = value;
+                this.SourceItem1.Tags = value;
                 this.InvokePropertyChangedEvent(nameof(this.Tags1));
             }
         }
 
         public TagInfo Tags2
         {
-            get => this.diffSource2.Tags;
+            get => this.SourceItem2.Tags;
             set
             {
-                this.diffSource2.Tags = value;
+                this.SourceItem2.Tags = value;
                 this.InvokePropertyChangedEvent(nameof(this.Tags2));
             }
         }
 
         public string Comment1
         {
-            get => this.diffSource1.Comment;
+            get => this.SourceItem1.Comment;
             set
             {
-                this.diffSource1.Comment = value;
+                this.SourceItem1.Comment = value;
                 this.InvokePropertyChangedEvent(nameof(this.Comment1));
             }
         }
 
         public string Comment2
         {
-            get => this.diffSource2.Comment;
+            get => this.SourceItem2.Comment;
             set
             {
-                this.diffSource2.Comment = value;
+                this.SourceItem2.Comment = value;
                 this.InvokePropertyChangedEvent(nameof(this.Comment2));
             }
         }
@@ -339,9 +333,9 @@ namespace JSSoft.Crema.Data.Diff
 
         public IReadOnlyList<DiffDataTypeMember> Items => this.itemList;
 
-        public bool IsResolved => this.isResolved;
+        public bool IsResolved { get; private set; }
 
-        public DiffState DiffState => this.diffState;
+        public DiffState DiffState { get; private set; }
 
         public DiffMergeTypes MergeType
         {
@@ -357,20 +351,20 @@ namespace JSSoft.Crema.Data.Diff
 
         private bool VerifyModified()
         {
-            if (this.diffSource1.TypeName != this.diffSource2.TypeName)
+            if (this.SourceItem1.TypeName != this.SourceItem2.TypeName)
                 return true;
-            if (this.diffSource1.IsFlag != this.diffSource2.IsFlag)
+            if (this.SourceItem1.IsFlag != this.SourceItem2.IsFlag)
                 return true;
-            if (this.diffSource1.Comment != this.diffSource2.Comment)
+            if (this.SourceItem1.Comment != this.SourceItem2.Comment)
                 return true;
 
-            foreach (var item in this.diffSource1.Items)
+            foreach (var item in this.SourceItem1.Items)
             {
                 if (DiffUtility.GetDiffState(item) != DiffState.Unchanged)
                     return true;
             }
 
-            foreach (var item in this.diffSource2.Items)
+            foreach (var item in this.SourceItem2.Items)
             {
                 if (DiffUtility.GetDiffState(item) != DiffState.Unchanged)
                     return true;
@@ -380,13 +374,13 @@ namespace JSSoft.Crema.Data.Diff
 
         private void ValidateResolve()
         {
-            if (this.diffState == DiffState.Modified)
+            if (this.DiffState == DiffState.Modified)
             {
-                if (this.diffSource1.TypeName != this.diffSource2.TypeName)
+                if (this.SourceItem1.TypeName != this.SourceItem2.TypeName)
                     throw new Exception();
-                if (this.diffSource1.IsFlag != this.diffSource2.IsFlag)
+                if (this.SourceItem1.IsFlag != this.SourceItem2.IsFlag)
                     throw new Exception();
-                if (this.diffSource1.Comment != this.diffSource2.Comment)
+                if (this.SourceItem1.Comment != this.SourceItem2.Comment)
                     throw new Exception();
                 foreach (var item in this.itemList)
                 {
@@ -404,28 +398,28 @@ namespace JSSoft.Crema.Data.Diff
         {
             Validate();
 
-            var dataSet = this.diffSource1.DataSet;
-            foreach (var item in this.diffSource1.ReferencedColumns.ToArray())
+            var dataSet = this.SourceItem1.DataSet;
+            foreach (var item in this.SourceItem1.ReferencedColumns.ToArray())
             {
                 item.CremaType = null;
             }
 
-            this.diffSource2.ReadOnly = false;
-            for (var i = 0; i < this.diffSource1.Items.Count; i++)
+            this.SourceItem2.ReadOnly = false;
+            for (var i = 0; i < this.SourceItem1.Items.Count; i++)
             {
-                var item1 = this.diffSource1.Items[i];
-                var item2 = this.diffSource2.Items[i];
+                var item1 = this.SourceItem1.Items[i];
+                var item2 = this.SourceItem2.Items[i];
                 item2.CopyFrom(item1);
             }
-            this.diffSource2.ReadOnly = true;
-            this.isResolved = true;
+            this.SourceItem2.ReadOnly = true;
+            this.IsResolved = true;
 
-            if (this.DiffSet != null && this.DiffSet.DataSet1.Types.Contains(this.diffSource1))
-                this.DiffSet.DataSet1.Types.Remove(this.diffSource1);
+            if (this.DiffSet != null && this.DiffSet.DataSet1.Types.Contains(this.SourceItem1))
+                this.DiffSet.DataSet1.Types.Remove(this.SourceItem1);
 
             void Validate()
             {
-                if (this.diffState != DiffState.Deleted)
+                if (this.DiffState != DiffState.Deleted)
                     throw new Exception();
             }
         }
@@ -434,28 +428,28 @@ namespace JSSoft.Crema.Data.Diff
         {
             Validate();
 
-            this.diffSource1.ReadOnly = false;
-            this.diffSource2.ReadOnly = false;
-            for (var i = 0; i < this.diffSource2.Items.Count; i++)
+            this.SourceItem1.ReadOnly = false;
+            this.SourceItem2.ReadOnly = false;
+            for (var i = 0; i < this.SourceItem2.Items.Count; i++)
             {
-                var item1 = this.diffSource1.Items[i];
-                var item2 = this.diffSource2.Items[i];
+                var item1 = this.SourceItem1.Items[i];
+                var item2 = this.SourceItem2.Items[i];
                 item1.CopyFrom(item2);
             }
-            this.diffSource1.ReadOnly = true;
-            this.diffSource2.ReadOnly = true;
+            this.SourceItem1.ReadOnly = true;
+            this.SourceItem2.ReadOnly = true;
 
             if (this.DiffSet != null)
             {
                 var dataSet = this.DiffSet.DataSet1;
-                this.diffSource1.CopyTo(this.DiffSet.DataSet1);
+                this.SourceItem1.CopyTo(this.DiffSet.DataSet1);
             }
 
-            this.isResolved = true;
+            this.IsResolved = true;
 
             void Validate()
             {
-                if (this.diffState != DiffState.Inserted)
+                if (this.DiffState != DiffState.Inserted)
                     throw new Exception();
             }
         }
@@ -504,36 +498,36 @@ namespace JSSoft.Crema.Data.Diff
                     return;
             }
 
-            this.diffSource1.ReadOnly = false;
-            this.diffSource2.ReadOnly = false;
-            this.diffSource1.DeleteItems();
-            this.diffSource2.DeleteItems();
-            this.diffSource1.AcceptChanges();
-            this.diffSource2.AcceptChanges();
-            this.diffSource1.IsDiffMode = false;
-            this.diffSource2.IsDiffMode = false;
-            this.diffSource1.ReadOnly = true;
-            this.diffSource2.ReadOnly = true;
-            this.isResolved = true;
+            this.SourceItem1.ReadOnly = false;
+            this.SourceItem2.ReadOnly = false;
+            this.SourceItem1.DeleteItems();
+            this.SourceItem2.DeleteItems();
+            this.SourceItem1.AcceptChanges();
+            this.SourceItem2.AcceptChanges();
+            this.SourceItem1.IsDiffMode = false;
+            this.SourceItem2.IsDiffMode = false;
+            this.SourceItem1.ReadOnly = true;
+            this.SourceItem2.ReadOnly = true;
+            this.IsResolved = true;
 
             void Validate()
             {
-                if (this.diffState != DiffState.Modified)
+                if (this.DiffState != DiffState.Modified)
                     throw new Exception();
             }
         }
 
         private void InitializeItems()
         {
-            this.diffSource1.MemberChanged -= DiffSource1_MemberChanged;
-            this.diffSource2.MemberChanged -= DiffSource2_MemberChanged;
-            this.diffSource1.MemberDeleted -= DiffSource1_MemberDeleted;
-            this.diffSource2.MemberDeleted -= DiffSource2_MemberDeleted;
-            DiffInternalUtility.InitializeMembers(this.diffSource1, this.diffSource2, this.dataType1, this.dataType2);
+            this.SourceItem1.MemberChanged -= DiffSource1_MemberChanged;
+            this.SourceItem2.MemberChanged -= DiffSource2_MemberChanged;
+            this.SourceItem1.MemberDeleted -= DiffSource1_MemberDeleted;
+            this.SourceItem2.MemberDeleted -= DiffSource2_MemberDeleted;
+            DiffInternalUtility.InitializeMembers(this.SourceItem1, this.SourceItem2, this.dataType1, this.dataType2);
             {
                 this.itemList.Clear();
-                this.itemList.Capacity = this.diffSource1.Items.Count;
-                for (var i = 0; i < this.diffSource1.Items.Count; i++)
+                this.itemList.Capacity = this.SourceItem1.Items.Count;
+                for (var i = 0; i < this.SourceItem1.Items.Count; i++)
                 {
                     var item = new DiffDataTypeMember(this, i);
                     this.itemList.Add(item);
@@ -545,13 +539,13 @@ namespace JSSoft.Crema.Data.Diff
                     item.Update();
                 }
 
-                this.diffSource1.AcceptChanges();
-                this.diffSource2.AcceptChanges();
+                this.SourceItem1.AcceptChanges();
+                this.SourceItem2.AcceptChanges();
             }
-            this.diffSource1.MemberChanged += DiffSource1_MemberChanged;
-            this.diffSource2.MemberChanged += DiffSource2_MemberChanged;
-            this.diffSource1.MemberDeleted += DiffSource1_MemberDeleted;
-            this.diffSource2.MemberDeleted += DiffSource2_MemberDeleted;
+            this.SourceItem1.MemberChanged += DiffSource1_MemberChanged;
+            this.SourceItem2.MemberChanged += DiffSource2_MemberChanged;
+            this.SourceItem1.MemberDeleted += DiffSource1_MemberDeleted;
+            this.SourceItem2.MemberDeleted += DiffSource2_MemberDeleted;
         }
 
         private void DiffSource1_MemberChanged(object sender, CremaDataTypeMemberChangeEventArgs e)
@@ -646,49 +640,49 @@ namespace JSSoft.Crema.Data.Diff
 
             if (this.dataType1 == null)
             {
-                this.diffSource1.IsDiffMode = false;
-                this.diffSource2.IsDiffMode = false;
-                this.diffSource1.ReadOnly = true;
-                this.diffSource2.ReadOnly = true;
-                this.diffSource1.SetDiffState(DiffState.Imaginary);
-                this.diffSource2.SetDiffState(DiffState.Inserted);
-                this.diffState = DiffState.Inserted;
-                this.isResolved = true;
+                this.SourceItem1.IsDiffMode = false;
+                this.SourceItem2.IsDiffMode = false;
+                this.SourceItem1.ReadOnly = true;
+                this.SourceItem2.ReadOnly = true;
+                this.SourceItem1.SetDiffState(DiffState.Imaginary);
+                this.SourceItem2.SetDiffState(DiffState.Inserted);
+                this.DiffState = DiffState.Inserted;
+                this.IsResolved = true;
             }
             else if (this.dataType2 == null)
             {
-                this.diffSource1.IsDiffMode = false;
-                this.diffSource2.IsDiffMode = false;
-                this.diffSource1.ReadOnly = true;
-                this.diffSource2.ReadOnly = true;
-                this.diffSource1.SetDiffState(DiffState.Deleted);
-                this.diffSource2.SetDiffState(DiffState.Imaginary);
-                this.diffState = DiffState.Deleted;
-                this.isResolved = true;
+                this.SourceItem1.IsDiffMode = false;
+                this.SourceItem2.IsDiffMode = false;
+                this.SourceItem1.ReadOnly = true;
+                this.SourceItem2.ReadOnly = true;
+                this.SourceItem1.SetDiffState(DiffState.Deleted);
+                this.SourceItem2.SetDiffState(DiffState.Imaginary);
+                this.DiffState = DiffState.Deleted;
+                this.IsResolved = true;
             }
             else if (this.VerifyModified() == true)
             {
-                this.diffSource1.ReadOnly = this.MergeType == DiffMergeTypes.ReadOnly1;
-                this.diffSource2.ReadOnly = this.MergeType == DiffMergeTypes.ReadOnly2;
-                this.diffSource1.SetDiffState(DiffState.Modified);
-                this.diffSource2.SetDiffState(DiffState.Modified);
-                this.diffState = DiffState.Modified;
-                this.isResolved = false;
+                this.SourceItem1.ReadOnly = this.MergeType == DiffMergeTypes.ReadOnly1;
+                this.SourceItem2.ReadOnly = this.MergeType == DiffMergeTypes.ReadOnly2;
+                this.SourceItem1.SetDiffState(DiffState.Modified);
+                this.SourceItem2.SetDiffState(DiffState.Modified);
+                this.DiffState = DiffState.Modified;
+                this.IsResolved = false;
             }
             else
             {
-                this.diffSource1.IsDiffMode = false;
-                this.diffSource2.IsDiffMode = false;
-                this.diffSource1.ReadOnly = true;
-                this.diffSource2.ReadOnly = true;
-                this.diffSource1.SetDiffState(DiffState.Unchanged);
-                this.diffSource2.SetDiffState(DiffState.Unchanged);
-                this.diffState = DiffState.Unchanged;
-                this.isResolved = true;
+                this.SourceItem1.IsDiffMode = false;
+                this.SourceItem2.IsDiffMode = false;
+                this.SourceItem1.ReadOnly = true;
+                this.SourceItem2.ReadOnly = true;
+                this.SourceItem1.SetDiffState(DiffState.Unchanged);
+                this.SourceItem2.SetDiffState(DiffState.Unchanged);
+                this.DiffState = DiffState.Unchanged;
+                this.IsResolved = true;
             }
             this.InvokePropertyChangedEvent(nameof(this.IsResolved), nameof(this.DiffState));
         }
 
-        internal HashSet<object> ItemSet => this.itemSet;
+        internal HashSet<object> ItemSet { get; } = new();
     }
 }

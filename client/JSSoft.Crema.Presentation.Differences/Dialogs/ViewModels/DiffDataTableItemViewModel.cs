@@ -27,24 +27,23 @@ namespace JSSoft.Crema.Presentation.Differences.Dialogs.ViewModels
     class DiffDataTableItemViewModel : PropertyChangedBase
     {
         private readonly DiffDataTableViewModel viewModel;
-        private readonly DiffDataTable source;
 
         public DiffDataTableItemViewModel(DiffDataTableViewModel viewModel, DiffDataTable source)
         {
             this.viewModel = viewModel;
-            this.source = source;
+            this.Source = source;
         }
 
         public override string ToString()
         {
-            return this.source.ToString();
+            return this.Source.ToString();
         }
 
         public string DisplayName => this.Source.ToString();
 
-        public bool IsResolved => this.source.IsResolved;
+        public bool IsResolved => this.Source.IsResolved;
 
-        public DiffDataTable Source => this.source;
+        public DiffDataTable Source { get; private set; }
 
         public string Header1 => this.viewModel.Header1;
 

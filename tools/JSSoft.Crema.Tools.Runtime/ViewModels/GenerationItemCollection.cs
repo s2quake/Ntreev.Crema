@@ -19,23 +19,16 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Library.IO;
 using JSSoft.ModernUI.Framework;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 
 namespace JSSoft.Crema.Tools.Runtime.ViewModels
 {
     public class GenerationItemCollection : ObservableCollection<GenerationItemViewModel>
     {
-        private IAppConfiguration configs;
+        private readonly IAppConfiguration configs;
         private IEnumerable<IMenuItem> contextMenus;
 
         public GenerationItemCollection(IAppConfiguration configs)
@@ -110,7 +103,14 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
 
         public IEnumerable<IMenuItem> ContextMenus
         {
+
+/* 'JSSoft.Crema.Tools.Runtime (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return this.contextMenus; }
+이후:
+            get => this.contextMenus; }
+*/
+            get => this.contextMenus;
             set
             {
                 this.contextMenus = value;

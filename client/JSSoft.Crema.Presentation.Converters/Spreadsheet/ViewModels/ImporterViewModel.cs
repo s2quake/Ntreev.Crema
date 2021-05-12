@@ -255,7 +255,7 @@ namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
         }
 
         [ConfigurationProperty]
-        private string[] ImportedItems
+        protected string[] ImportedItems
         {
             get => this.importedItems;
             set => this.importedItems = value ?? new string[] { };

@@ -59,10 +59,25 @@ namespace JSSoft.Crema.Data.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FormatException))]
-        public void DoubleToBoolean_Fail()
+        public void DoubleToBoolean()
         {
-            this.AddRows(0.0);
+            this.AddRows(0.0, 1.0);
+            column.DataType = typeof(bool);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void DoubleToBoolean_Fail1()
+        {
+            this.AddRows(2.0);
+            column.DataType = typeof(bool);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void DoubleToBoolean_Fail2()
+        {
+            this.AddRows(2.1);
             column.DataType = typeof(bool);
         }
 
@@ -177,7 +192,7 @@ namespace JSSoft.Crema.Data.Test
         [ExpectedException(typeof(FormatException))]
         public void DoubleToInt64_Fail()
         {
-            this.AddRows(maxLongValue + 1.0);
+            this.AddRows(1.1);
             column.DataType = typeof(long);
         }
 
@@ -207,7 +222,7 @@ namespace JSSoft.Crema.Data.Test
         [ExpectedException(typeof(FormatException))]
         public void DoubleToDateTime_Fail()
         {
-            this.AddRows(maxLongValue + 1.0);
+            this.AddRows(maxOADateValue + 1.0);
             column.DataType = typeof(DateTime);
         }
 

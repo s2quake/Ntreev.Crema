@@ -52,7 +52,6 @@ namespace JSSoft.Crema.Services.Data
             this.dataBase = null;
         }
 
-#pragma warning disable IDE0060 // 사용하지 않는 매개 변수를 제거하세요.
         public void InvokeTypeItemLock(Authentication authentication, ITypeItem typeItem, string comment)
         {
 
@@ -87,7 +86,6 @@ namespace JSSoft.Crema.Services.Data
         {
 
         }
-#pragma warning restore IDE0060 // 사용하지 않는 매개 변수를 제거하세요.
 
         public void InvokeItemsSetPublicEvent(Authentication authentication, ITypeItem[] items)
         {

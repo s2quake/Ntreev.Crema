@@ -68,6 +68,7 @@ namespace JSSoft.Crema.Presentation.Controls
     ///
     /// </summary>
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0019:패턴 일치 사용", Justification = "<보류 중>")]
     public class DockPanelSplitter : Control
     {
         static DockPanelSplitter()

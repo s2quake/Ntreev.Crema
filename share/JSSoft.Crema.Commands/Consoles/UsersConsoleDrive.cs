@@ -66,7 +66,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         protected override async Task OnCreateAsync(Authentication authentication, string path, string name)
         {
-            if (!(await this.GetObjectAsync(path) is IUserCategory category))
+            if (await this.GetObjectAsync(path) is not IUserCategory category)
                 throw new CategoryNotFoundException(path);
             await category.AddNewCategoryAsync(authentication, name);
         }
@@ -91,7 +91,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         protected override async Task OnDeleteAsync(Authentication authentication, string path)
         {
-            if (!(await this.GetObjectAsync(path) is IUserItem userItem))
+            if (await this.GetObjectAsync(path) is not IUserItem userItem)
                 throw new ItemNotFoundException(path);
             await userItem.DeleteAsync(authentication);
         }

@@ -1068,19 +1068,17 @@ namespace JSSoft.Crema.Services.Domains
 
         protected class InternalSignatureDateProvider : SignatureDateProvider
         {
-            private readonly DateTime dateTime;
-
             public InternalSignatureDateProvider(SignatureDate signatureDate)
                 : base(signatureDate.ID)
             {
-                this.dateTime = signatureDate.DateTime;
+                this.DateTime = signatureDate.DateTime;
             }
 
-            public DateTime DateTime => this.dateTime;
+            public DateTime DateTime { get; private set; }
 
             protected override DateTime GetTime()
             {
-                return this.dateTime;
+                return this.DateTime;
             }
         }
 

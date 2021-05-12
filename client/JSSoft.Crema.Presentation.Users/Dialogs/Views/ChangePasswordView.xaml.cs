@@ -52,6 +52,10 @@ namespace JSSoft.Crema.Presentation.Users.Dialogs.Views
             });
         }
 
+        protected SecureString Password => (SecureString)this.GetValue(PasswordProperty);
+
+        protected SecureString NewPassword => (SecureString)this.GetValue(NewPasswordProperty);
+
         private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             this.passwordBox.Focus();
@@ -85,9 +89,5 @@ namespace JSSoft.Crema.Presentation.Users.Dialogs.Views
                 this.newPasswordBinding.UpdateSource();
             });
         }
-
-        private SecureString Password => (SecureString)this.GetValue(PasswordProperty);
-
-        private SecureString NewPassword => (SecureString)this.GetValue(NewPasswordProperty);
     }
 }

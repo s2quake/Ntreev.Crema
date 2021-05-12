@@ -44,9 +44,7 @@ namespace JSSoft.Crema.Presentation.Converters.Dialogs.ViewModels
         private readonly IDataBase dataBase;
         private readonly IExportService exportService;
         private readonly IAppConfiguration configs;
-        private readonly Authentication authentication;
         private readonly ObservableCollection<ExportTreeViewItemViewModel> categories;
-        private readonly ObservableCollection<IExporter> exporters;
         private IExporter selectedExporter;
 
         private bool isExporting;
@@ -58,7 +56,6 @@ namespace JSSoft.Crema.Presentation.Converters.Dialogs.ViewModels
             : base(dataBase)
         {
             this.DisplayName = Resources.Title_Export;
-            this.authentication = authentication;
             this.dataBase = dataBase;
             this.dataBase.Dispatcher.VerifyAccess();
             this.exportService = dataBase.GetService(typeof(IExportService)) as IExportService;
@@ -71,7 +68,7 @@ namespace JSSoft.Crema.Presentation.Converters.Dialogs.ViewModels
             };
             this.SelectItems(this.root, selectedPaths);
 
-            this.exporters = new ObservableCollection<IExporter>(this.exportService.Exporters);
+            this.Exporters = new ObservableCollection<IExporter>(this.exportService.Exporters);
             this.configs.Update(this);
         }
 
@@ -143,7 +140,7 @@ namespace JSSoft.Crema.Presentation.Converters.Dialogs.ViewModels
             }
         }
 
-        public ObservableCollection<IExporter> Exporters => this.exporters;
+        public ObservableCollection<IExporter> Exporters { get; private set; }
 
         public IExporter SelectedExporter
         {
@@ -338,14 +335,14 @@ namespace JSSoft.Crema.Presentation.Converters.Dialogs.ViewModels
         }
 
         [ConfigurationProperty("SelectedExporter")]
-        private string SelectedExporterName
+        protected string SelectedExporterName
         {
             get => this.selectedExporter?.Name;
             set
             {
                 if (value != null)
                 {
-                    this.SelectedExporter = this.exporters.FirstOrDefault(item => item.Name == (string)value);
+                    this.SelectedExporter = this.Exporters.FirstOrDefault(item => item.Name == (string)value);
                 }
             }
         }

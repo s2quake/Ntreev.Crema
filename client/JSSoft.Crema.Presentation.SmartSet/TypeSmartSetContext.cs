@@ -44,7 +44,6 @@ namespace JSSoft.Crema.Presentation.SmartSet
     {
         private readonly ICremaAppHost cremaAppHost;
         private readonly ITypeBrowser typeBrowser;
-        private readonly IRule[] rules;
         private readonly HashSet<string> bookmarks = new();
         private bool isModified;
 
@@ -53,7 +52,7 @@ namespace JSSoft.Crema.Presentation.SmartSet
         {
             this.cremaAppHost = cremaAppHost;
             this.typeBrowser = typeBrowser;
-            this.rules = rules.Where(item => item.SupportType == typeof(ITypeDescriptor)).ToArray();
+            this.Rules = rules.Where(item => item.SupportType == typeof(ITypeDescriptor)).ToArray();
             this.cremaAppHost.Loaded += CremaAppHost_Loaded;
             this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
             this.cremaAppHost.Resetting += CremaAppHost_Resetting;
@@ -67,7 +66,7 @@ namespace JSSoft.Crema.Presentation.SmartSet
 
         public bool Verify(ITypeDescriptor descriptor, IRuleItem ruleItem)
         {
-            var rule = this.rules.FirstOrDefault(item => item.Name == ruleItem.RuleName);
+            var rule = this.Rules.FirstOrDefault(item => item.Name == ruleItem.RuleName);
             if (rule == null)
                 return false;
             return rule.Verify(descriptor, ruleItem);
@@ -87,7 +86,7 @@ namespace JSSoft.Crema.Presentation.SmartSet
             this.OnBookmarkChanged(EventArgs.Empty);
         }
 
-        public IRule[] Rules => this.rules;
+        public IRule[] Rules { get; private set; }
 
         [ConfigurationProperty("bookmarkItems")]
         public string[] BookmarkItems

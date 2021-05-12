@@ -38,10 +38,7 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
         private readonly ITypeCollection types;
         private readonly ITypeCategoryCollection categories;
         private bool isValid;
-
-        private readonly string[] categoryPaths;
         private string categoryPath;
-        private readonly string typeName;
         private string newName;
 
         private CopyTypeViewModel(Authentication authentication, IType type)
@@ -51,9 +48,9 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
             this.type.Dispatcher.VerifyAccess();
             this.types = type.GetService(typeof(ITypeCollection)) as ITypeCollection;
             this.categories = type.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
-            this.categoryPaths = this.categories.Select(item => item.Path).ToArray();
+            this.CategoryPaths = this.categories.Select(item => item.Path).ToArray();
             this.categoryPath = this.type.Category.Path;
-            this.typeName = type.Name;
+            this.TypeName = type.Name;
             this.NewName = type.Name;
             this.DisplayName = Resources.Title_CopyType;
         }
@@ -95,7 +92,7 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
             }
         }
 
-        public string[] CategoryPaths => this.categoryPaths;
+        public string[] CategoryPaths { get; private set; }
 
         public string NewName
         {
@@ -119,7 +116,7 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
             }
         }
 
-        public string TypeName => this.typeName;
+        public string TypeName { get; private set; }
 
         public bool CanCopy
         {

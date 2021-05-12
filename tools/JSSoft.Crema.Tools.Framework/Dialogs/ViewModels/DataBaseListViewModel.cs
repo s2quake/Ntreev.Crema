@@ -22,10 +22,7 @@
 using JSSoft.Crema.ServiceModel;
 using JSSoft.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -51,7 +48,7 @@ namespace JSSoft.Crema.Tools.Framework.Dialogs.ViewModels
 
         public ObservableCollection<DataBaseInfo> ItemsSource
         {
-            get { return this.itemsSource; }
+            get => this.itemsSource;
             private set
             {
                 this.itemsSource = value;
@@ -62,7 +59,14 @@ namespace JSSoft.Crema.Tools.Framework.Dialogs.ViewModels
 
         public DataBaseInfo? SelectedItem
         {
+
+/* 'JSSoft.Crema.Tools.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return this.selectedItem; }
+이후:
+            get => this.selectedItem; }
+*/
+            get => this.selectedItem;
             set
             {
                 this.selectedItem = value;
@@ -82,14 +86,18 @@ namespace JSSoft.Crema.Tools.Framework.Dialogs.ViewModels
 
         public string SelectedValue
         {
+
+/* 'JSSoft.Crema.Tools.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return this.selectedValue ?? string.Empty; }
-            set { this.selectedValue = value; }
+이후:
+            get => this.selectedValue ?? string.Empty; }
+*/
+            get => this.selectedValue ?? string.Empty;
+            set => this.selectedValue = value;
         }
 
-        public bool CanOK
-        {
-            get { return this.selectedItem != null; }
-        }
+        public bool CanOK => this.selectedItem != null;
 
         protected override async void OnViewLoaded(object view)
         {

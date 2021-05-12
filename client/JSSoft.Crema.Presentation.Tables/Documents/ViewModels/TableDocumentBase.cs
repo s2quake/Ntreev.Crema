@@ -30,12 +30,11 @@ namespace JSSoft.Crema.Presentation.Tables.Documents.ViewModels
 {
     abstract class TableDocumentBase : DocumentBase, ITableDocument
     {
-        private readonly ObservableCollection<TableItemViewModel> tables = new();
         private TableItemViewModel selectedTable;
 
         protected TableDocumentBase()
         {
-            this.tables.CollectionChanged += Tables_CollectionChanged;
+            this.Tables.CollectionChanged += Tables_CollectionChanged;
         }
 
         public object Target
@@ -44,7 +43,7 @@ namespace JSSoft.Crema.Presentation.Tables.Documents.ViewModels
             protected set;
         }
 
-        public ObservableCollection<TableItemViewModel> Tables => this.tables;
+        public ObservableCollection<TableItemViewModel> Tables { get; } = new();
 
         public TableItemViewModel SelectedTable
         {
@@ -89,7 +88,7 @@ namespace JSSoft.Crema.Presentation.Tables.Documents.ViewModels
 
         #region ITableDocument
 
-        IEnumerable<ITableDocumentItem> ITableDocument.TableItems => this.tables;
+        IEnumerable<ITableDocumentItem> ITableDocument.TableItems => this.Tables;
 
         ITableDocumentItem ITableDocument.SelectedItem
         {

@@ -23,11 +23,7 @@ using FirstFloor.ModernUI.Windows;
 using JSSoft.Crema.Tools.Framework;
 using JSSoft.Library.IO;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace JSSoft.Crema.ApplicationHost

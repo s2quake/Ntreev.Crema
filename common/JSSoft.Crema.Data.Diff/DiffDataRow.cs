@@ -31,16 +31,13 @@ namespace JSSoft.Crema.Data.Diff
     {
         private const string rowError = "error";
         private readonly DiffDataTable diffTable;
-        private readonly int index;
-        private CremaDataRow item1;
-        private CremaDataRow item2;
 
         internal DiffDataRow(DiffDataTable diffTable, int index)
         {
             this.diffTable = diffTable;
-            this.index = index;
-            this.item1 = index < diffTable.SourceItem1.Rows.Count ? diffTable.SourceItem1.Rows[index] : null;
-            this.item2 = index < diffTable.SourceItem2.Rows.Count ? diffTable.SourceItem2.Rows[index] : null;
+            this.Index = index;
+            this.Item1 = index < diffTable.SourceItem1.Rows.Count ? diffTable.SourceItem1.Rows[index] : null;
+            this.Item2 = index < diffTable.SourceItem2.Rows.Count ? diffTable.SourceItem2.Rows[index] : null;
         }
 
         public CremaDataRow GetTarget1()
@@ -57,19 +54,11 @@ namespace JSSoft.Crema.Data.Diff
             return diffSource2.Rows[item1.Index];
         }
 
-        public CremaDataRow Item1
-        {
-            get => this.item1;
-            internal set => this.item1 = value;
-        }
+        public CremaDataRow Item1 { get; internal set; }
 
-        public CremaDataRow Item2
-        {
-            get => this.item2;
-            internal set => this.item2 = value;
-        }
+        public CremaDataRow Item2 { get; internal set; }
 
-        public int Index => this.index;
+        public int Index { get; private set; }
 
         public DiffState DiffState1 => DiffUtility.GetDiffState(this.Item1);
 

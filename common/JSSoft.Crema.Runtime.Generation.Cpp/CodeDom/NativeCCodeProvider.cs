@@ -20,9 +20,19 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using System;
+
+/* 'JSSoft.Crema.Runtime.Generation.Cpp (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.CodeDom.Compiler;
+이후:
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+*/
 using System.CodeDom.Compiler;
 
 namespace JSSoft.Crema.Runtime.Generation.Cpp.CodeDom

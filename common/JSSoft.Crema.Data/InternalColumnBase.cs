@@ -558,8 +558,7 @@ namespace JSSoft.Crema.Data
                 if (this.AutoIncrement == true)
                     throw new ArgumentException($"AutoIncrement 열에 DefaultValue를 설정할 수 없습니다.");
                 if (CremaConvert.VerifyChangeType(value, this.DataType) == false)
-                    throw new ArgumentException($"기본값 \"{value}\"은(는) {this.DataType.GetTypeName()} 타입으로 변환할 수 없습니다.");
-
+                    throw new FormatException($"기본값 \"{value}\"은(는) {this.DataType.GetTypeName()} 타입으로 변환할 수 없습니다.");
             }
         }
 

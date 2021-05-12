@@ -84,7 +84,10 @@ namespace JSSoft.Crema.ServiceModel
             }
         }
 
-        public static implicit operator T(ResultBase<T> result) => result.Value;
+        public static implicit operator T(ResultBase<T> result)
+        {
+            return result.Value;
+        }
     }
 
     [DataContract(Namespace = SchemaUtility.Namespace)]

@@ -29,7 +29,7 @@ namespace JSSoft.Crema.Services.Users
 {
     class UserRepositoryHost : RepositoryHost
     {
-        private readonly HashSet<string> users = new HashSet<string>();
+        private readonly HashSet<string> users = new();
 
         public UserRepositoryHost(UserContext userContext, IRepository repository)
             : base(repository)

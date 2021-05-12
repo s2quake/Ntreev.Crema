@@ -19,9 +19,11 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using System;
+using JSSoft.Crema.Runtime.Generation.TypeScript.Properties;
 using System.CodeDom;
-using System.Collections.Generic;
+using System.
+/* 'JSSoft.Crema.Runtime.Generation.TypeScript (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,12 +31,21 @@ using System.Collections.Specialized;
 using JSSoft.Crema.Runtime.Generation.TypeScript.Properties;
 using System.Reflection;
 using System.IO;
+이후:
+using System.Collections.Specialized;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+*/
+Reflection;
 
 namespace JSSoft.Crema.Runtime.Generation.TypeScript
 {
     static class CremaDataClassCreator
     {
-        private readonly static CodeThisReferenceExpression thisRef = new CodeThisReferenceExpression();
+        private readonly static CodeThisReferenceExpression thisRef = new();
 
         public static void Create(CodeNamespace codeNamespace, CodeGenerationInfo generationInfo)
         {
@@ -51,10 +62,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
                 CremaTableClassCreator.Create(codeNamespace, item, generationInfo);
             }
 
-            var classType = new CodeTypeDeclaration();
-            classType.Attributes = MemberAttributes.Public;
-            classType.Name = generationInfo.ClassName;
-            classType.IsClass = true;
+            var classType = new CodeTypeDeclaration
+            {
+                Attributes = MemberAttributes.Public,
+                Name = generationInfo.ClassName,
+                IsClass = true
+            };
             classType.TypeAttributes |= TypeAttributes.Sealed;
             classType.BaseTypes.Add("base", "CremaData");
 
@@ -80,9 +93,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateCreateFromDataSetMethod(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-            cmm.Name = "createFromDataSet";
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Static,
+                Name = "createFromDataSet"
+            };
             cmm.Parameters.Add("reader", "IDataSet", "dataSet");
             cmm.Parameters.Add(typeof(bool), "verifyRevision");
             cmm.ReturnType = new CodeTypeReference(generationInfo.ClassName);
@@ -113,9 +128,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateCreateFromFileMethod(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-            cmm.Name = "createFromFile";
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Static,
+                Name = "createFromFile"
+            };
             cmm.Parameters.Add(typeof(string), "filename");
             cmm.Parameters.Add(typeof(bool), "verifyRevision");
             cmm.ReturnType = new CodeTypeReference(generationInfo.ClassName);
@@ -146,9 +163,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateReadFromDataSetMethod(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public;
-            cmm.Name = "readFromDataSet";
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public,
+                Name = "readFromDataSet"
+            };
             cmm.Parameters.Add("reader", "IDataSet", "dataSet");
             cmm.Parameters.Add(typeof(bool), "verifyRevision");
 
@@ -223,9 +242,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateReadFromFileMethod(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public;
-            cmm.Name = "readFromFile";
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public,
+                Name = "readFromFile"
+            };
             cmm.Parameters.Add(typeof(string), "filename");
             cmm.Parameters.Add(typeof(bool), "verifyRevision");
 
@@ -244,10 +265,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
         {
             foreach (var item in generationInfo.GetTables(true))
             {
-                var cmf = new CodeMemberField();
-                cmf.Attributes = MemberAttributes.Private;
-                cmf.Name = item.GetFieldName();
-                cmf.Type = item.GetCodeType();
+                var cmf = new CodeMemberField
+                {
+                    Attributes = MemberAttributes.Private,
+                    Name = item.GetFieldName(),
+                    Type = item.GetCodeType()
+                };
 
                 classType.Members.Add(cmf);
             }
@@ -257,12 +280,14 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
         {
             foreach (var item in generationInfo.GetTables(true))
             {
-                var cmp = new CodeMemberProperty();
-                cmp.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-                cmp.Name = item.Name;
-                cmp.Type = item.GetCodeType();
-                cmp.HasGet = true;
-                cmp.HasSet = false;
+                var cmp = new CodeMemberProperty
+                {
+                    Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                    Name = item.Name,
+                    Type = item.GetCodeType(),
+                    HasGet = true,
+                    HasSet = false
+                };
                 cmp.Comments.AddSummary(item.Comment);
                 cmp.GetStatements.AddMethodReturn(item.GetFieldExpression());
 
@@ -272,61 +297,73 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateNameField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_name";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_name",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateRevisionField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_revision";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_revision",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateTypesHashValueField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_typesHashValue";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_typesHashValue",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateTablesHashValueField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_tablesHashValue";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_tablesHashValue",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateTagsHashValueField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_tags";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_tags",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateNameProperty(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberProperty();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "name";
-            cmm.HasGet = true;
-            cmm.Type = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberProperty
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "name",
+                HasGet = true,
+                Type = new CodeTypeReference(typeof(string))
+            };
             cmm.GetStatements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_name"));
 
             classType.Members.Add(cmm);
@@ -334,11 +371,13 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateRevisionProperty(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberProperty();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "revision";
-            cmm.HasGet = true;
-            cmm.Type = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberProperty
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "revision",
+                HasGet = true,
+                Type = new CodeTypeReference(typeof(string))
+            };
             cmm.GetStatements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_revision"));
 
             classType.Members.Add(cmm);
@@ -346,11 +385,13 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateTypesHashValueProperty(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberProperty();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "typesHashValue";
-            cmm.HasGet = true;
-            cmm.Type = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberProperty
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "typesHashValue",
+                HasGet = true,
+                Type = new CodeTypeReference(typeof(string))
+            };
             cmm.GetStatements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_typesHashValue"));
 
             classType.Members.Add(cmm);
@@ -358,11 +399,13 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateTablesHashValueProperty(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberProperty();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "tablesHashValue";
-            cmm.HasGet = true;
-            cmm.Type = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberProperty
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "tablesHashValue",
+                HasGet = true,
+                Type = new CodeTypeReference(typeof(string))
+            };
             cmm.GetStatements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_tablesHashValue"));
 
             classType.Members.Add(cmm);
@@ -370,11 +413,13 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateTagsProperty(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberProperty();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "tags";
-            cmm.HasGet = true;
-            cmm.Type = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberProperty
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "tags",
+                HasGet = true,
+                Type = new CodeTypeReference(typeof(string))
+            };
             cmm.GetStatements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_tags"));
 
             classType.Members.Add(cmm);
@@ -459,8 +504,10 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
             var methodRefExp = new CodeMethodReferenceExpression(new CodeThisReferenceExpression(), "onErrorOccured");
             var methodInvokeExp = new CodeMethodInvokeExpression(methodRefExp, new CodeVariableReferenceExpression("e"));
 
-            var conditionStatement = new CodeConditionStatement();
-            conditionStatement.Condition = new CodeBinaryOperatorExpression(methodInvokeExp, CodeBinaryOperatorType.IdentityEquality, new CodePrimitiveExpression(false));
+            var conditionStatement = new CodeConditionStatement
+            {
+                Condition = new CodeBinaryOperatorExpression(methodInvokeExp, CodeBinaryOperatorType.IdentityEquality, new CodePrimitiveExpression(false))
+            };
             conditionStatement.TrueStatements.Add(new CodeThrowExceptionStatement(new CodeVariableReferenceExpression("e")));
 
             catchClause.Statements.Add(conditionStatement);

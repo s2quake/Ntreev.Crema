@@ -49,15 +49,12 @@ namespace JSSoft.Crema.Presentation.Controls.Actions
 
         class ItemInfo
         {
-            private readonly object dataItem;
-            private readonly object[] fields;
-
             private readonly List<ItemInfo> childList = new();
 
             public ItemInfo(object dataItem)
             {
-                this.dataItem = dataItem;
-                this.fields = DiffUtility.GetFields(dataItem);
+                this.Item = dataItem;
+                this.Fields = DiffUtility.GetFields(dataItem);
 
                 foreach (var item in DiffUtility.GetChilds(dataItem))
                 {
@@ -65,13 +62,13 @@ namespace JSSoft.Crema.Presentation.Controls.Actions
                 }
             }
 
-            public object Item => this.dataItem;
+            public object Item { get; private set; }
 
-            public object[] Fields => this.fields;
+            public object[] Fields { get; private set; }
 
             public void Redo()
             {
-                DiffUtility.Empty(this.dataItem);
+                DiffUtility.Empty(this.Item);
                 foreach (var item in this.childList)
                 {
                     item.Redo();
@@ -80,7 +77,7 @@ namespace JSSoft.Crema.Presentation.Controls.Actions
 
             public void Undo()
             {
-                DiffUtility.Copy(this.dataItem, this.fields);
+                DiffUtility.Copy(this.Item, this.Fields);
                 foreach (var item in this.childList)
                 {
                     item.Undo();

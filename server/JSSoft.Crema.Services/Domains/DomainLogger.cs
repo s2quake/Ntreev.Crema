@@ -45,8 +45,8 @@ namespace JSSoft.Crema.Services.Domains
         private readonly string completedPath;
 
         private readonly IObjectSerializer serializer;
-        private readonly List<DomainPostItemSerializationInfo> postedList = new List<DomainPostItemSerializationInfo>();
-        private readonly List<DomainCompleteItemSerializationInfo> completedList = new List<DomainCompleteItemSerializationInfo>();
+        private readonly List<DomainPostItemSerializationInfo> postedList = new();
+        private readonly List<DomainCompleteItemSerializationInfo> completedList = new();
 
         private DomainPostItemSerializationInfo currentPost;
 

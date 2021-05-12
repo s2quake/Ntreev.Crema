@@ -27,7 +27,6 @@ using System;
 using System.Linq;
 using System.Security;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ServiceHosts
@@ -37,7 +36,6 @@ namespace JSSoft.Crema.ServiceHosts
         private bool isSubscribed;
         private Guid authenticationToken;
         private Authentication authentication;
-        private long index = 0;
         private ShutdownContext shutdownContext;
 
         public CremaHostService(CremaService service, ICremaHostEventCallback callback)
@@ -54,6 +52,8 @@ namespace JSSoft.Crema.ServiceHosts
 
         public async Task<ResultBase> SubscribeAsync(string version, string platformID, string culture)
         {
+            if (this.isSubscribed == true)
+                throw new InvalidOperationException();
             var serverVersion = typeof(ICremaHost).Assembly.GetName().Version;
             var clientVersion = new Version(version);
             if (clientVersion < serverVersion)
@@ -95,6 +95,8 @@ namespace JSSoft.Crema.ServiceHosts
 
         public async Task<ResultBase> UnsubscribeAsync()
         {
+            if (this.isSubscribed == false)
+                throw new InvalidOperationException();
             if (this.authentication != null)
             {
                 await this.CremaHost.LogoutAsync(this.authentication);

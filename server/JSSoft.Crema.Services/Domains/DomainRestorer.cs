@@ -34,8 +34,8 @@ namespace JSSoft.Crema.Services.Domains
     {
         private readonly DomainContext domainContext;
         private readonly string workingPath;
-        private readonly Dictionary<long, DomainCompleteItemSerializationInfo> completedList = new Dictionary<long, DomainCompleteItemSerializationInfo>();
-        private readonly List<DomainActionBase> actionList = new List<DomainActionBase>();
+        private readonly Dictionary<long, DomainCompleteItemSerializationInfo> completedList = new();
+        private readonly List<DomainActionBase> actionList = new();
         private Dictionary<string, Authentication> authentications;
         private DateTime dateTime;
 
@@ -124,7 +124,7 @@ namespace JSSoft.Crema.Services.Domains
                 var authentication = this.authentications[item.UserID];
                 try
                 {
-                    if (!(item is DomainActionBase action))
+                    if (item is not DomainActionBase action)
                         throw new Exception();
 
                     this.Domain.DateTimeProvider = this.GetTime;

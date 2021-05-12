@@ -38,7 +38,6 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly Dictionary<string, TypeInfo> typeInfoByName;
         private readonly List<object> items = new();
         private readonly ITableContent parentContent;
-        private object[] keys;
 
         private NewRowViewModel(Authentication authentication, ITableRow row, TableInfo tableInfo, TypeInfo[] typeInfos)
         {
@@ -91,7 +90,7 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
             try
             {
                 await this.row.Content.EndNewAsync(this.authentication, this.row);
-                this.keys = await this.row.GetKeysAsync();
+                this.Keys = await this.row.GetKeysAsync();
                 await this.TryCloseAsync(true);
             }
             catch (Exception e)
@@ -100,6 +99,6 @@ namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
             }
         }
 
-        public object[] Keys => this.keys;
+        public object[] Keys { get; private set; }
     }
 }

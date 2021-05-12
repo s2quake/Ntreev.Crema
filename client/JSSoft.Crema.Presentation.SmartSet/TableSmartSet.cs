@@ -36,7 +36,6 @@ namespace JSSoft.Crema.Presentation.SmartSet
         IXmlSerializable, ISmartSet
     {
         private IRuleItem[] ruleItems = new IRuleItem[] { };
-        private readonly ObservableCollection<ITableDescriptor> items = new();
 
         public TableSmartSet()
         {
@@ -53,7 +52,7 @@ namespace JSSoft.Crema.Presentation.SmartSet
             }
         }
 
-        public ObservableCollection<ITableDescriptor> Items => this.items;
+        public ObservableCollection<ITableDescriptor> Items { get; } = new();
 
         public void Refresh()
         {
@@ -64,17 +63,17 @@ namespace JSSoft.Crema.Presentation.SmartSet
                         select item;
             var items = query.ToArray();
 
-            var exceptedItems = this.items.Except(items).ToArray();
-            var addedItems = items.Except(this.items).ToArray();
+            var exceptedItems = this.Items.Except(items).ToArray();
+            var addedItems = items.Except(this.Items).ToArray();
 
             foreach (var item in exceptedItems)
             {
-                this.items.Remove(item);
+                this.Items.Remove(item);
             }
 
             foreach (var item in addedItems)
             {
-                this.items.Add(item);
+                this.Items.Add(item);
             }
 
             this.OnChanged(EventArgs.Empty);
@@ -175,7 +174,7 @@ namespace JSSoft.Crema.Presentation.SmartSet
 
         ISmartSetCategory ISmartSet.Category => this.Category;
 
-        IEnumerable ISmartSet.Items => this.items;
+        IEnumerable ISmartSet.Items => this.Items;
 
         #endregion
 

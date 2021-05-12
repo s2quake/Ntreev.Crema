@@ -93,6 +93,8 @@ namespace JSSoft.Crema.Presentation.Types.BrowserItems.ViewModels
 
         public ICommand DeleteCommand => this.deleteCommand;
 
+        public Guid DataBaseID => this.dataBaseID;
+
         private void CremaAppHost_Loaded(object sender, EventArgs e)
         {
             this.Initialize();

@@ -154,9 +154,9 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void StringToDateTime()
         {
-            var value1 = DateTime.MinValue.ToOADate().ToString();
-            var value2 = DateTime.MaxValue.ToOADate().ToString();
-            var value3 = RandomUtility.Next<DateTime>().ToOADate().ToString();
+            var value1 = DateTime.MinValue.ToOADate().ToString("R");
+            var value2 = DateTime.MaxValue.ToOADate().ToString("R");
+            var value3 = RandomUtility.Next<DateTime>().ToOADate().ToString("R");
             this.AddRows(value1, value2, value3);
             column.DataType = typeof(DateTime);
         }

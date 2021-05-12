@@ -37,19 +37,15 @@ namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
 {
     public class AccessViewModel : ModalDialogAppBase
     {
-        private readonly IAccessible accessible;
-        private readonly Authentication authentication;
         private readonly TreeViewItemViewModel[] userItems;
         private AccessInfo accessInfo;
         private string comment;
-
-        private readonly ObservableCollection<AccessItemViewModel> itemsSource = new();
         private AccessType accessType;
         private string path;
 
         private AccessViewModel(Authentication authentication, IAccessible accessible, UserCategoryTreeViewItemViewModel userItem)
         {
-            this.accessible = accessible;
+            this.Accessible = accessible;
             if (accessible is IDispatcherObject dispatcherObject)
             {
                 this.accessInfo = dispatcherObject.Dispatcher.Invoke(() => accessible.AccessInfo);
@@ -58,7 +54,7 @@ namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
             {
                 this.accessInfo = accessible.AccessInfo;
             }
-            this.authentication = authentication;
+            this.Authentication = authentication;
             this.path = userItem.Path;
 
             this.userItems = EnumerableUtility.FamilyTree<TreeViewItemViewModel>(userItem, item => item.Items).ToArray();
@@ -69,9 +65,9 @@ namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
 
             foreach (var item in this.accessInfo.Members)
             {
-                this.itemsSource.Add(new AccessItemViewModel(this, item.UserID, item.AccessType));
+                this.ItemsSource.Add(new AccessItemViewModel(this, item.UserID, item.AccessType));
             }
-            this.itemsSource.CollectionChanged += (s, e) => this.NotifyOfPropertyChange(nameof(this.CanAdd));
+            this.ItemsSource.CollectionChanged += (s, e) => this.NotifyOfPropertyChange(nameof(this.CanAdd));
             this.accessType = AccessType.Master;
 #if DEBUG
             this.comment = "access test";
@@ -126,8 +122,8 @@ namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
             {
                 var memberID = this.Path;
                 var accessType = this.AccessType;
-                await this.accessible.AddAccessMemberAsync(this.authentication, memberID, accessType);
-                this.itemsSource.Add(new AccessItemViewModel(this, memberID, this.AccessType));
+                await this.Accessible.AddAccessMemberAsync(this.Authentication, memberID, accessType);
+                this.ItemsSource.Add(new AccessItemViewModel(this, memberID, this.AccessType));
                 this.Path = null;
                 this.AccessType = AccessType.Master;
             }
@@ -158,7 +154,7 @@ namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
                     return false;
                 if (this.Path == string.Empty)
                     return false;
-                return this.itemsSource.Any(item => item.MemberID == this.Path) == false;
+                return this.ItemsSource.Any(item => item.MemberID == this.Path) == false;
             }
         }
 
@@ -175,7 +171,7 @@ namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
             }
         }
 
-        public ObservableCollection<AccessItemViewModel> ItemsSource => this.itemsSource;
+        public ObservableCollection<AccessItemViewModel> ItemsSource { get; } = new();
 
         public IEnumerable AccessTypes
         {
@@ -204,7 +200,7 @@ namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
         {
             this.accessInfo = accessInfo;
             var query = from member in this.accessInfo.Members
-                        join viewModel in this.itemsSource on member.UserID equals viewModel.MemberID
+                        join viewModel in this.ItemsSource on member.UserID equals viewModel.MemberID
                         select new { ViewModel = viewModel, member.AccessType };
 
             foreach (var item in query)
@@ -215,10 +211,10 @@ namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
             }
         }
 
-        internal IAccessible Accessible => this.accessible;
+        internal IAccessible Accessible { get; private set; }
 
         internal new Dispatcher Dispatcher => base.Dispatcher;
 
-        internal Authentication Authentication => this.authentication;
+        internal Authentication Authentication { get; private set; }
     }
 }

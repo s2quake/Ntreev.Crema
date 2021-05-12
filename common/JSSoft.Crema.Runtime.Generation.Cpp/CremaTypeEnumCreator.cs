@@ -20,14 +20,9 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 using System.CodeDom;
 using System.CodeDom.Compiler;
-using System.Collections.Specialized;
-using JSSoft.Crema.Runtime.Generation.Cpp;
 using JSSoft.Crema.Data.Xml.Schema;
 using JSSoft.Crema.Data;
 
@@ -60,40 +55,17 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
             //    codeNamespace.AddHeaderStatement("void register_enums();");
         }
 
-        private static void CreateDataTypeRegisterMethods(CodeNamespace codeNamespace, CodeGenerationInfo generationInfo)
-        {
-            foreach (var item in generationInfo.Types)
-            {
-                CreateDataTypeRegisterMethod(codeNamespace, item, generationInfo);
-            }
-
-            using (var tw = new IndentedTextWriter(new StringWriter()))
-            {
-                tw.WriteLine("void register_enums()");
-                tw.WriteLine("{");
-
-                tw.Indent++;
-                foreach (var item in generationInfo.Types)
-                {
-                    tw.WriteLine("register_{0}();", item.Name);
-                }
-                tw.Indent--;
-
-                tw.Write("}");
-                tw.Flush();
-                codeNamespace.AddCppStatement(tw.InnerWriter.ToString());
-            }
-        }
-
         private static void CreateDataType(CodeNamespace codeNamespace, TypeInfo dataTypeInfo, CodeGenerationInfo generationInfo)
         {
-            var classType = new CodeTypeDeclaration(dataTypeInfo.Name);
-            classType.Attributes = MemberAttributes.Public;
-            classType.IsEnum = true;
+            var classType = new CodeTypeDeclaration(dataTypeInfo.Name)
+            {
+                Attributes = MemberAttributes.Public,
+                IsEnum = true
+            };
 
             if (dataTypeInfo.IsFlag == true)
             {
-                CodeAttributeDeclaration cad = new CodeAttributeDeclaration(new CodeTypeReference(typeof(FlagsAttribute)));
+                var cad = new CodeAttributeDeclaration(new CodeTypeReference(typeof(FlagsAttribute)));
 
                 classType.CustomAttributes.Add(cad);
             }
@@ -121,9 +93,11 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static void CreateDataMember(CodeTypeDeclaration classType, TypeMemberInfo typeMemberInfo, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberField();
-            cmm.Name = typeMemberInfo.Name;
-            cmm.InitExpression = new CodeSnippetExpression(generationInfo.EnumFomrat(typeMemberInfo.Value));
+            var cmm = new CodeMemberField
+            {
+                Name = typeMemberInfo.Name,
+                InitExpression = new CodeSnippetExpression(generationInfo.EnumFomrat(typeMemberInfo.Value))
+            };
             if (generationInfo.NoComment == false)
             {
                 cmm.Comments.AddSummary(typeMemberInfo.Comment);
@@ -137,33 +111,6 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
             }
 
             classType.Members.Add(cmm);
-        }
-
-        private static void CreateDataTypeRegisterMethod(CodeNamespace codeNamespace, TypeInfo dataTypeInfo, CodeGenerationInfo generationInfo)
-        {
-            using (IndentedTextWriter tw = new IndentedTextWriter(new StringWriter()))
-            {
-                tw.WriteLine("void register_{0}()", dataTypeInfo.Name);
-                tw.WriteLine("{");
-                tw.Indent++;
-                tw.WriteLine("static ntreev::crema::enum_info enumData({0});", dataTypeInfo.IsFlag.ToString().ToLower());
-                tw.WriteLine("if(ntreev::crema::enum_util::contains(typeid({0})) == true)", dataTypeInfo.Name);
-                tw.Indent++;
-                tw.WriteLine("return;");
-                tw.Indent--;
-
-                foreach (var item in dataTypeInfo.Members)
-                {
-                    tw.WriteLine("enumData.add(\"{0}_{1}\", {0}_{1});", dataTypeInfo.Name, item.Name);
-                }
-
-                tw.WriteLine("ntreev::crema::enum_util::add(typeid({0}), &enumData);", dataTypeInfo.Name);
-                tw.Indent--;
-                tw.Write("}");
-                tw.Flush();
-
-                codeNamespace.AddCppStatement(tw.InnerWriter.ToString());
-            }
         }
     }
 }

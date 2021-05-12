@@ -71,6 +71,8 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             this.token = Guid.Empty;
         }
 
+        protected Guid Token => this.token;
+
         private static string SecureStringToString(SecureString value)
         {
             var valuePtr = IntPtr.Zero;

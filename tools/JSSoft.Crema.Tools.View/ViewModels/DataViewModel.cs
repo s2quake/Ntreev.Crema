@@ -19,17 +19,16 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using Microsoft.WindowsAPICodePack.Dialogs;
 using JSSoft.Crema.Runtime.Serialization;
 using JSSoft.Crema.RuntimeService;
 using JSSoft.Crema.Tools.Framework;
 using JSSoft.Crema.Tools.View.Dialogs.ViewModels;
 using JSSoft.ModernUI.Framework;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -39,22 +38,24 @@ namespace JSSoft.Crema.Tools.View.ViewModels
     class DataViewModel : ContentBase
     {
         [Import]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:읽기 전용 한정자 추가", Justification = "<보류 중>")]
         private IRuntimeService service = null;
         [Import]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:읽기 전용 한정자 추가", Justification = "<보류 중>")]
         private IAppConfiguration configs = null;
         [ImportMany]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:읽기 전용 한정자 추가", Justification = "<보류 중>")]
         private IEnumerable<IDataSerializer> serializers = null;
         [Import]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:읽기 전용 한정자 추가", Justification = "<보류 중>")]
         private Lazy<IContentService> contentService = null;
-
-        private ICommand loadCommand;
 
         [ImportingConstructor]
         public DataViewModel()
         {
             this.DisplayName = "New View...";
             this.GroupName = "View";
-            this.loadCommand = new DelegateCommand(async (p) => await this.LoadAsync(p as string));
+            this.LoadCommand = new DelegateCommand(async (p) => await this.LoadAsync(p as string));
         }
 
         public async Task LoadAsync()
@@ -96,10 +97,7 @@ namespace JSSoft.Crema.Tools.View.ViewModels
             }
         }
 
-        public ICommand LoadCommand
-        {
-            get { return this.loadCommand; }
-        }
+        public ICommand LoadCommand { get; private set; }
 
         private void ViewModel_Disposed(object sender, EventArgs e)
         {

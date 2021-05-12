@@ -42,8 +42,7 @@ namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
         {
             get
             {
-                var parent = this.Parent as SpreadsheetTreeViewItemViewModel;
-                if (parent == null)
+                if (this.Parent is not SpreadsheetTreeViewItemViewModel parent)
                     return this.SheetName;
                 return parent.Path + "-" + this.SheetName;
             }

@@ -34,7 +34,6 @@ using System.IO;
 using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
-using System.Timers;
 
 namespace JSSoft.Crema.Services
 {

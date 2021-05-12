@@ -22,11 +22,7 @@
 using JSSoft.Crema.Data;
 using JSSoft.Library;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Runtime.Generation.Cpp
 {
@@ -106,20 +102,11 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
             }
         }
 
-        public string Revision
-        {
-            get { return this.metaData.Revision; }
-        }
+        public string Revision => this.metaData.Revision;
 
-        public string RequestedRevision
-        {
-            get { return this.settings.Revision; }
-        }
+        public string RequestedRevision => this.settings.Revision;
 
-        public string DataBaseName
-        {
-            get { return this.metaData.Name; }
-        }
+        public string DataBaseName => this.metaData.Name;
 
         public string ClassName
         {
@@ -151,13 +138,7 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
             }
         }
 
-        public string ReaderNamespace
-        {
-            get
-            {
-                return "reader";
-            }
-        }
+        public string ReaderNamespace => "reader";
 
         public string Prefix
         {
@@ -169,26 +150,20 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
             }
         }
 
+
+/* 'JSSoft.Crema.Runtime.Generation.Cpp (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
         public string Postfix
         {
             get { return this.settings.Postfix; }
-        }
+이후:
+        public string Postfix => this.settings.Postfix; }
+*/
+        public string Postfix => this.settings.Postfix;
 
-        public bool NoComment
-        {
-            get
-            {
-                return this.settings.Options.HasFlag(CodeGenerationOptions.OmitComments);
-            }
-        }
+        public bool NoComment => this.settings.Options.HasFlag(CodeGenerationOptions.OmitComments);
 
-        public bool NoChanges
-        {
-            get
-            {
-                return this.settings.Options.HasFlag(CodeGenerationOptions.OmitSignatureDate);
-            }
-        }
+        public bool NoChanges => this.settings.Options.HasFlag(CodeGenerationOptions.OmitSignatureDate);
 
         public bool BlankLinesBetweenMembers
         {
@@ -201,20 +176,11 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
             get; set;
         }
 
-        public string TypesHashValue
-        {
-            get { return this.metaData.TypesHashValue; }
-        }
+        public string TypesHashValue => this.metaData.TypesHashValue;
 
-        public string TablesHashValue
-        {
-            get { return this.metaData.TablesHashValue; }
-        }
+        public string TablesHashValue => this.metaData.TablesHashValue;
 
-        public TagInfo Tags
-        {
-            get { return (TagInfo)this.metaData.Tags; }
-        }
+        public TagInfo Tags => (TagInfo)this.metaData.Tags;
 
         //[Obsolete("타입 출력시 값의 포맷을 지정하는 임시 변수")]
         public Func<long, string> EnumFomrat

@@ -214,7 +214,7 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        public static readonly XmlObjectSerializer Default = new XmlObjectSerializer();
+        public static readonly XmlObjectSerializer Default = new();
 
         private string[] SerializeDataTable(CremaDataTable dataTable, string itemPath, ObjectSerializerSettings settings)
         {

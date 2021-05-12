@@ -87,8 +87,6 @@ namespace JSSoft.Crema.Presentation.Controls
         public static readonly DependencyProperty IsModifiedProperty =
             DependencyProperty.Register(nameof(IsModified), typeof(bool), typeof(DiffDataControl));
 
-        private Control dataGrid1;
-        private Control dataGrid2;
         private DiffVertScrollBar middleScrollBar;
         private DiffHorzScrollBar horzScrollBar1;
         private DiffHorzScrollBar horzScrollBar2;
@@ -150,8 +148,8 @@ namespace JSSoft.Crema.Presentation.Controls
         {
             base.OnApplyTemplate();
 
-            this.dataGrid1 = this.Template.FindName(PART_DataGrid1String, this) as Control;
-            this.dataGrid2 = this.Template.FindName(PART_DataGrid2String, this) as Control;
+            this.DataControl1 = this.Template.FindName(PART_DataGrid1String, this) as Control;
+            this.DataControl2 = this.Template.FindName(PART_DataGrid2String, this) as Control;
             this.middleScrollBar = this.Template.FindName(PART_MiddleScrollBarString, this) as DiffVertScrollBar;
             this.horzScrollBar1 = this.Template.FindName(PART_HorzScrollBar1String, this) as DiffHorzScrollBar;
             this.horzScrollBar2 = this.Template.FindName(PART_HorzScrollBar2String, this) as DiffHorzScrollBar;
@@ -160,10 +158,10 @@ namespace JSSoft.Crema.Presentation.Controls
             this.horzMinimap1 = this.Template.FindName(PART_HorzMinimap1String, this) as DiffHorzMinimap;
             this.horzMinimap2 = this.Template.FindName(PART_HorzMinimap2String, this) as DiffHorzMinimap;
 
-            this.dataGrid1.ApplyTemplate();
-            this.gridControl1 = this.GetGridControl(this.dataGrid1);
-            this.dataGrid2.ApplyTemplate();
-            this.gridControl2 = this.GetGridControl(this.dataGrid2);
+            this.DataControl1.ApplyTemplate();
+            this.gridControl1 = this.GetGridControl(this.DataControl1);
+            this.DataControl2.ApplyTemplate();
+            this.gridControl2 = this.GetGridControl(this.DataControl2);
 
             if (this.gridControl1 != null)
             {
@@ -186,9 +184,9 @@ namespace JSSoft.Crema.Presentation.Controls
             }
         }
 
-        public Control DataControl1 => this.dataGrid1;
+        public Control DataControl1 { get; private set; }
 
-        public Control DataControl2 => this.dataGrid2;
+        public Control DataControl2 { get; private set; }
 
         public DataTemplate DataContentTemplate
         {

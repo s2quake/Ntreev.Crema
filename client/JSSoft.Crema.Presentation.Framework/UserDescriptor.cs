@@ -28,27 +28,24 @@ namespace JSSoft.Crema.Presentation.Framework
     public class UserDescriptor : DescriptorBase, IUserDescriptor, IUserItemDescriptor
     {
         private IUser user;
-        private readonly object owner;
-
         private UserInfo userInfo;
-        private UserState userState;
         private BanInfo banInfo = BanInfo.Empty;
 
         public UserDescriptor(Authentication authentication, IUserDescriptor descriptor, bool isSubscriptable, object owner)
             : base(authentication, descriptor.Target, descriptor, isSubscriptable)
         {
             this.user = descriptor.Target;
-            this.owner = owner ?? this;
+            this.Owner = owner ?? this;
         }
 
         public UserDescriptor(Authentication authentication, IUser user, DescriptorTypes descriptorTypes, object owner)
             : base(authentication, user, descriptorTypes)
         {
             this.user = user;
-            this.owner = owner ?? this;
+            this.Owner = owner ?? this;
             this.user.Dispatcher.VerifyAccess();
             this.userInfo = this.user.UserInfo;
-            this.userState = this.user.UserState;
+            this.UserState = this.user.UserState;
             this.banInfo = this.user.BanInfo;
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
@@ -69,8 +66,8 @@ namespace JSSoft.Crema.Presentation.Framework
         [DescriptorProperty(nameof(userInfo))]
         public UserInfo UserInfo => this.userInfo;
 
-        [DescriptorProperty(nameof(userState))]
-        public UserState UserState => this.userState;
+        [DescriptorProperty]
+        public UserState UserState { get; private set; }
 
         [DescriptorProperty(nameof(banInfo))]
         public BanInfo BanInfo => this.banInfo;
@@ -108,6 +105,8 @@ namespace JSSoft.Crema.Presentation.Framework
             base.OnDisposed(e);
         }
 
+        protected object Owner { get; }
+
         private void User_Deleted(object sender, EventArgs e)
         {
             this.user = null;
@@ -125,7 +124,7 @@ namespace JSSoft.Crema.Presentation.Framework
 
         private async void User_UserStateChanged(object sender, EventArgs e)
         {
-            this.userState = this.user.UserState;
+            this.UserState = this.user.UserState;
             await this.RefreshAsync();
         }
 

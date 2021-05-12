@@ -29,7 +29,7 @@ namespace JSSoft.Crema.Services
 {
     public sealed class Authentication : IAuthentication
     {
-        private readonly static object lockobj = new object();
+        private readonly static object lockobj = new();
         internal static string SystemID = "system";
         internal static string SystemName = "System";
         internal static string AdminID = "admin";
@@ -95,7 +95,7 @@ namespace JSSoft.Crema.Services
 
         public SignatureDate SignatureDate { get; private set; }
 
-        public AuthenticationInfo AuthenticationInfo => new AuthenticationInfo()
+        public AuthenticationInfo AuthenticationInfo => new()
         {
             ID = this.ID,
             Name = this.Name,
@@ -173,7 +173,7 @@ namespace JSSoft.Crema.Services
 
         internal bool IsSystem => this.Types.HasFlag(AuthenticationType.System);
 
-        internal readonly static Authentication System = new Authentication(new SystemAuthenticationProvider(), Guid.Parse("62E5A6E9-D4BE-438F-A188-D5842C0ED65E"));
+        internal readonly static Authentication System = new(new SystemAuthenticationProvider(), Guid.Parse("62E5A6E9-D4BE-438F-A188-D5842C0ED65E"));
 
         #region IAuthentication
 

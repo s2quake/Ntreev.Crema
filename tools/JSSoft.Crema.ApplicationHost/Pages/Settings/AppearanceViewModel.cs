@@ -20,12 +20,8 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using FirstFloor.ModernUI.Presentation;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace JSSoft.Crema.ApplicationHost.Pages.Settings
@@ -38,22 +34,53 @@ namespace JSSoft.Crema.ApplicationHost.Pages.Settings
     {
         private const string FontSmall = "small";
         private const string FontLarge = "large";
+        private Color selectedAccentColor;
+        private Link selectedTheme;
+        private string selectedFontSize;
 
-        // 9 accent colors from metro design principles
-        /*private Color[] accentColors = new Color[]{
-            Color.FromRgb(0x33, 0x99, 0xff),   // blue
-            Color.FromRgb(0x00, 0xab, 0xa9),   // teal
-            Color.FromRgb(0x33, 0x99, 0x33),   // green
-            Color.FromRgb(0x8c, 0xbf, 0x26),   // lime
-            Color.FromRgb(0xf0, 0x96, 0x09),   // orange
-            Color.FromRgb(0xff, 0x45, 0x00),   // orange red
-            Color.FromRgb(0xe5, 0x14, 0x00),   // red
-            Color.FromRgb(0xff, 0x00, 0x97),   // magenta
-            Color.FromRgb(0xa2, 0x00, 0xff),   // purple            
-        };*/
+        public AppearanceViewModel()
+        {
+            // add the default themes
+            this.Themes.Add(new Link { DisplayName = "dark", Source = AppearanceManager.DarkThemeSource });
+            this.Themes.Add(new Link { DisplayName = "light", Source = AppearanceManager.LightThemeSource });
 
-        // 20 accent colors from Windows Phone 8
-        private Color[] accentColors = new Color[]{
+            this.SelectedFontSize = AppearanceManager.Current.FontSize == FontSize.Large ? FontLarge : FontSmall;
+            SyncThemeAndColor();
+
+            AppearanceManager.Current.PropertyChanged += OnAppearanceManagerPropertyChanged;
+        }
+
+        private void SyncThemeAndColor()
+        {
+            // synchronizes the selected viewmodel theme with the actual theme used by the appearance manager.
+            this.SelectedTheme = this.Themes.FirstOrDefault(l => l.Source.Equals(AppearanceManager.Current.ThemeSource));
+
+            // and make sure accent color is up-to-date
+            this.SelectedAccentColor = AppearanceManager.Current.AccentColor;
+        }
+
+        private void OnAppearanceManagerPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "ThemeSource" || e.PropertyName == "AccentColor")
+            {
+                SyncThemeAndColor();
+            }
+        }
+
+        public LinkCollection Themes { get; } = new();
+
+
+/* 'JSSoft.Crema.ApplicationHost (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
+        public string[] FontSizes
+        {
+            get { return new string[] { FontSmall, FontLarge }; }
+이후:
+        public string[] FontSizes => new string[] { FontSmall, FontLarge }; }
+*/
+        public string[] FontSizes => new string[] { FontSmall, FontLarge };
+
+        public Color[] AccentColors { get; } = new Color[]{
             Color.FromRgb(0xa4, 0xc4, 0x00),   // lime
             Color.FromRgb(0x60, 0xa9, 0x17),   // green
             Color.FromRgb(0x00, 0x8a, 0x00),   // emerald
@@ -76,58 +103,9 @@ namespace JSSoft.Crema.ApplicationHost.Pages.Settings
             Color.FromRgb(0x87, 0x79, 0x4e),   // taupe
         };
 
-        private Color selectedAccentColor;
-        private LinkCollection themes = new LinkCollection();
-        private Link selectedTheme;
-        private string selectedFontSize;
-
-        public AppearanceViewModel()
-        {
-            // add the default themes
-            this.themes.Add(new Link { DisplayName = "dark", Source = AppearanceManager.DarkThemeSource });
-            this.themes.Add(new Link { DisplayName = "light", Source = AppearanceManager.LightThemeSource });
-
-            this.SelectedFontSize = AppearanceManager.Current.FontSize == FontSize.Large ? FontLarge : FontSmall;
-            SyncThemeAndColor();
-
-            AppearanceManager.Current.PropertyChanged += OnAppearanceManagerPropertyChanged;
-        }
-
-        private void SyncThemeAndColor()
-        {
-            // synchronizes the selected viewmodel theme with the actual theme used by the appearance manager.
-            this.SelectedTheme = this.themes.FirstOrDefault(l => l.Source.Equals(AppearanceManager.Current.ThemeSource));
-
-            // and make sure accent color is up-to-date
-            this.SelectedAccentColor = AppearanceManager.Current.AccentColor;
-        }
-
-        private void OnAppearanceManagerPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "ThemeSource" || e.PropertyName == "AccentColor")
-            {
-                SyncThemeAndColor();
-            }
-        }
-
-        public LinkCollection Themes
-        {
-            get { return this.themes; }
-        }
-
-        public string[] FontSizes
-        {
-            get { return new string[] { FontSmall, FontLarge }; }
-        }
-
-        public Color[] AccentColors
-        {
-            get { return this.accentColors; }
-        }
-
         public Link SelectedTheme
         {
-            get { return this.selectedTheme; }
+            get => this.selectedTheme;
             set
             {
                 if (this.selectedTheme != value)
@@ -143,7 +121,7 @@ namespace JSSoft.Crema.ApplicationHost.Pages.Settings
 
         public string SelectedFontSize
         {
-            get { return this.selectedFontSize; }
+            get => this.selectedFontSize;
             set
             {
                 if (this.selectedFontSize != value)
@@ -158,7 +136,7 @@ namespace JSSoft.Crema.ApplicationHost.Pages.Settings
 
         public Color SelectedAccentColor
         {
-            get { return this.selectedAccentColor; }
+            get => this.selectedAccentColor;
             set
             {
                 if (this.selectedAccentColor != value)

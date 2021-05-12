@@ -28,6 +28,10 @@ namespace JSSoft.Crema.ConsoleHost
     {
         static async Task Main(string[] args)
         {
+            var d1= DateTime.Now;
+            var d2 = new DateTime(d1.Ticks, DateTimeKind.Unspecified);
+            var t1 = d2.ToString("o");
+            var d3 = DateTime.Parse(t1);
             try
             {
                 using var application = new CremaApplication();

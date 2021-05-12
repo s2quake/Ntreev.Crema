@@ -28,8 +28,6 @@ namespace JSSoft.Crema.Presentation.Tables.PropertyItems.ViewModels
     class ColumnInfoItemViewModel
     {
         private ColumnInfo columnInfo;
-        private readonly string dataType;
-        private readonly string categoryName;
 
         public ColumnInfoItemViewModel(ColumnInfo columnInfo)
         {
@@ -37,22 +35,22 @@ namespace JSSoft.Crema.Presentation.Tables.PropertyItems.ViewModels
 
             if (NameValidator.VerifyItemPath(this.columnInfo.DataType) == false)
             {
-                this.dataType = this.columnInfo.DataType;
-                this.categoryName = string.Empty;
+                this.DataType = this.columnInfo.DataType;
+                this.CategoryName = string.Empty;
             }
             else
             {
                 var itemName = new ItemName(this.columnInfo.DataType);
-                this.dataType = itemName.Name;
-                this.categoryName = itemName.CategoryPath;
+                this.DataType = itemName.Name;
+                this.CategoryName = itemName.CategoryPath;
             }
         }
 
         public string Name => this.columnInfo.Name;
 
-        public string DataType => this.dataType;
+        public string DataType { get; private set; }
 
-        public string CategoryName => this.categoryName;
+        public string CategoryName { get; private set; }
 
         public string Comment => this.columnInfo.Comment;
 

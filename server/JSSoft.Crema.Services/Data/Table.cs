@@ -39,7 +39,7 @@ namespace JSSoft.Crema.Services.Data
     class Table : TableBase<Table, TableCategory, TableCollection, TableCategoryCollection, TableContext>,
         ITable, ITableItem, IInfoProvider, IStateProvider
     {
-        private readonly List<NewTableTemplate> templateList = new List<NewTableTemplate>();
+        private readonly List<NewTableTemplate> templateList = new();
 
         public Table()
         {

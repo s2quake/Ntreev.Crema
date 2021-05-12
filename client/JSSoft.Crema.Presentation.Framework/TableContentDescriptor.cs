@@ -30,24 +30,17 @@ namespace JSSoft.Crema.Presentation.Framework
     public class TableContentDescriptor : DescriptorBase, ITableContentDescriptor
     {
         private readonly ITableContent content;
-        private readonly object owner;
-
-        private IDomain domain;
         private TableInfo tableInfo = TableInfo.Default;
-        private DomainAccessType accessType;
-        private bool isModified;
-        private bool isEditor;
-        private bool isOwner;
 
         public TableContentDescriptor(Authentication authentication, ITableContent content, DescriptorTypes descriptorTypes, object owner)
             : base(authentication, content, descriptorTypes)
         {
             this.content = content;
-            this.owner = owner ?? this;
+            this.Owner = owner ?? this;
             this.content.Dispatcher.VerifyAccess();
-            this.domain = this.content.Domain;
-            this.isEditor = this.content.Editors.Any(item => item == this.authentication.ID);
-            this.isOwner = this.content.Owner == this.authentication.ID;
+            this.TargetDomain = this.content.Domain;
+            this.IsEditor = this.content.Editors.Any(item => item == this.authentication.ID);
+            this.IsOwner = this.content.Owner == this.authentication.ID;
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
             {
@@ -73,19 +66,19 @@ namespace JSSoft.Crema.Presentation.Framework
         public string DisplayName => this.tableInfo.Name;
 
         [DescriptorProperty]
-        public bool IsModified => this.isModified;
+        public bool IsModified { get; private set; }
 
         [DescriptorProperty]
-        public DomainAccessType AccessType => this.accessType;
+        public DomainAccessType AccessType { get; private set; }
 
         [DescriptorProperty]
-        public IDomain TargetDomain => this.domain;
+        public IDomain TargetDomain { get; private set; }
 
         [DescriptorProperty]
-        public bool IsEditor => this.isEditor;
+        public bool IsEditor { get; private set; }
 
         [DescriptorProperty]
-        public bool IsOwner => this.isOwner;
+        public bool IsOwner { get; private set; }
 
         public event EventHandler EditBegun;
 
@@ -122,10 +115,12 @@ namespace JSSoft.Crema.Presentation.Framework
             this.Kicked?.Invoke(this, e);
         }
 
+        protected object Owner { get; }
+
         private async void Content_EditBegun(object sender, EventArgs e)
         {
-            this.domain = this.content.Domain;
-            await this.domain.Dispatcher.InvokeAsync(() => this.domain.UserRemoved += Domain_UserRemoved);
+            this.TargetDomain = this.content.Domain;
+            await this.TargetDomain.Dispatcher.InvokeAsync(() => this.TargetDomain.UserRemoved += Domain_UserRemoved);
             await this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();
@@ -135,9 +130,9 @@ namespace JSSoft.Crema.Presentation.Framework
 
         private void Content_EditEnded(object sender, EventArgs e)
         {
-            this.domain = null;
-            this.isEditor = false;
-            this.isOwner = false;
+            this.TargetDomain = null;
+            this.IsEditor = false;
+            this.IsOwner = false;
             this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();
@@ -147,9 +142,9 @@ namespace JSSoft.Crema.Presentation.Framework
 
         private void Content_EditCanceled(object sender, EventArgs e)
         {
-            this.domain = null;
-            this.isEditor = false;
-            this.isOwner = false;
+            this.TargetDomain = null;
+            this.IsEditor = false;
+            this.IsOwner = false;
             this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();
@@ -159,14 +154,14 @@ namespace JSSoft.Crema.Presentation.Framework
 
         private async void Content_Changed(object sender, EventArgs e)
         {
-            this.isModified = this.content.IsModified;
+            this.IsModified = this.content.IsModified;
             await this.RefreshAsync();
         }
 
         private async void Content_EditorsChanged(object sender, EventArgs e)
         {
-            this.isEditor = this.content.Editors.Any(item => item == this.authentication.ID);
-            this.isOwner = this.content.Owner == this.authentication.ID;
+            this.IsEditor = this.content.Editors.Any(item => item == this.authentication.ID);
+            this.IsOwner = this.content.Owner == this.authentication.ID;
             await this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();
@@ -181,7 +176,7 @@ namespace JSSoft.Crema.Presentation.Framework
             var userID = e.UserID;
             if (domainUserID == this.authentication.ID && removeInfo.Reason == RemoveReason.Kick)
             {
-                this.accessType = DomainAccessType.None;
+                this.AccessType = DomainAccessType.None;
                 this.Dispatcher.InvokeAsync(async () =>
                 {
                     await this.RefreshAsync();

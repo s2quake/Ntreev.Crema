@@ -19,14 +19,30 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+
+/* 'JSSoft.Crema.Runtime.Generation.Cpp (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
 using System;
-using System.CodeDom;
-using System.Collections.Generic;
+이후:
+using JSSoft.Crema.Runtime.Generation.Cpp.CodeDom;
+using System;
+*/
+using JSSoft.Crema.Runtime.
+/* 'JSSoft.Crema.Runtime.Generation.Cpp (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
 using JSSoft.Crema.Runtime.Generation.Cpp.CodeDom;
+이후:
+using System.Collections.Specialized;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+*/
+Generation.Cpp.CodeDom;
+using System.CodeDom;
 
 namespace JSSoft.Crema.Runtime.Generation.Cpp
 {
@@ -73,8 +89,10 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static void CreateConstructor(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cc = new CodeConstructor();
-            cc.Attributes = MemberAttributes.Public;
+            var cc = new CodeConstructor
+            {
+                Attributes = MemberAttributes.Public
+            };
             cc.Parameters.Add(generationInfo.ReaderNamespace, "idataset&", "dataSet");
             cc.Parameters.Add(new CodeTypeReference(typeof(bool)), "verifyRevision");
 
@@ -92,8 +110,10 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static void CreateDestructor(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cc = new CodeDestructor();
-            cc.Attributes = MemberAttributes.Public | MemberAttributes.Override;
+            var cc = new CodeDestructor
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Override
+            };
 
             foreach (var item in generationInfo.GetTables())
             {
@@ -108,8 +128,10 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static void CreateConstructorFromFile(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cc = new CodeConstructor();
-            cc.Attributes = MemberAttributes.Public;
+            var cc = new CodeConstructor
+            {
+                Attributes = MemberAttributes.Public
+            };
 
             var codeTypeRef = new CodeTypeReference(typeof(string));
             codeTypeRef.SetCodeType(CodeType.Reference | CodeType.Const);
@@ -128,9 +150,11 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static void CreateLoad(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cc = new CodeMemberMethod();
-            cc.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cc.Name = "Load";
+            var cc = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "Load"
+            };
             cc.Parameters.Add(generationInfo.ReaderNamespace, "idataset&", "dataSet");
             cc.Parameters.Add(new CodeTypeReference(typeof(bool)), "verifyRevision");
 
@@ -214,9 +238,11 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static void CreateLoadFromFile(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cc = new CodeMemberMethod();
-            cc.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cc.Name = "Load";
+            var cc = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "Load"
+            };
 
             var codeTypeRef = new CodeTypeReference(typeof(string));
             codeTypeRef.SetCodeType(CodeType.Reference | CodeType.Const);
@@ -239,70 +265,84 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
         {
             foreach (var item in generationInfo.GetTables(true))
             {
-                var cmf = new CodeMemberField();
-                cmf.Attributes = MemberAttributes.Public;
-                cmf.Name = item.Name;
-                cmf.Type = item.GetCodeType(CodeType.Pointer | CodeType.Const);
+                var cmf = new CodeMemberField
+                {
+                    Attributes = MemberAttributes.Public,
+                    Name = item.Name,
+                    Type = item.GetCodeType(CodeType.Pointer | CodeType.Const)
+                };
                 classType.Members.Add(cmf);
             }
         }
 
         private static void CreateNameField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_name";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_name",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateRevisionField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_revision";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_revision",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateTypesHashValueField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_typesHashValue";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_typesHashValue",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateTablesHashValueField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_tablesHashValue";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_tablesHashValue",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateTagsField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_tags";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_tags",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateNameMethod(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "name";
-            cmm.ReturnType = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "name",
+                ReturnType = new CodeTypeReference(typeof(string))
+            };
             cmm.Statements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_name"));
 
             classType.Members.Add(cmm);
@@ -310,10 +350,12 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static void CreateRevisionMethod(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "revision";
-            cmm.ReturnType = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "revision",
+                ReturnType = new CodeTypeReference(typeof(string))
+            };
             cmm.Statements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_revision"));
 
             classType.Members.Add(cmm);
@@ -321,10 +363,12 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static void CreateTypesHashValueMethod(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "typesHashValue";
-            cmm.ReturnType = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "typesHashValue",
+                ReturnType = new CodeTypeReference(typeof(string))
+            };
             cmm.Statements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_typesHashValue"));
 
             classType.Members.Add(cmm);
@@ -332,10 +376,12 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static void CreateTablesHashValueMethod(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "tablesHashValue";
-            cmm.ReturnType = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "tablesHashValue",
+                ReturnType = new CodeTypeReference(typeof(string))
+            };
             cmm.Statements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_tablesHashValue"));
 
             classType.Members.Add(cmm);
@@ -343,10 +389,12 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
 
         private static void CreateTagsMethod(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "tags";
-            cmm.ReturnType = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "tags",
+                ReturnType = new CodeTypeReference(typeof(string))
+            };
             cmm.Statements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_tags"));
 
             classType.Members.Add(cmm);
@@ -428,8 +476,10 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
             var methodRefExp = new CodeMethodReferenceExpression(new CodeTypeReferenceExpression($"{generationInfo.BaseNamespace}.CremaData"), "InvokeErrorOccured");
             var methodInvokeExp = new CodeMethodInvokeExpression(methodRefExp, new CodeVariableReferenceExpression("e"));
 
-            var conditionStatement = new CodeConditionStatement();
-            conditionStatement.Condition = new CodeBinaryOperatorExpression(methodInvokeExp, CodeBinaryOperatorType.IdentityEquality, new CodePrimitiveExpression(false));
+            var conditionStatement = new CodeConditionStatement
+            {
+                Condition = new CodeBinaryOperatorExpression(methodInvokeExp, CodeBinaryOperatorType.IdentityEquality, new CodePrimitiveExpression(false))
+            };
             conditionStatement.TrueStatements.Add(new CodeThrowExceptionStatement(new CodeVariableReferenceExpression("e")));
 
             catchClause.Statements.Add(conditionStatement);

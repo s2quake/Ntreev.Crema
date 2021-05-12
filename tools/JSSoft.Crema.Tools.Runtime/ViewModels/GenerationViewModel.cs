@@ -19,7 +19,6 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using Microsoft.WindowsAPICodePack.Dialogs;
 using JSSoft.Crema.Runtime.Generation;
 using JSSoft.Crema.Runtime.Serialization;
 using JSSoft.Crema.RuntimeService;
@@ -29,14 +28,21 @@ using JSSoft.Library;
 using JSSoft.Library.IO;
 using JSSoft.ModernUI.Framework;
 using JSSoft.ModernUI.Framework.Dialogs.ViewModels;
+
+/* 'JSSoft.Crema.Tools.Runtime (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
 using System;
-using System.Collections;
+이후:
+using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
+*/
+using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Tools.Runtime.ViewModels
@@ -48,11 +54,10 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
         private readonly IEnumerable<ICodeGenerator> generators;
         private readonly IEnumerable<IDataSerializer> serializers;
         private readonly IAppConfiguration configs;
-        private readonly ObservableCollection<string> dataBases = new ObservableCollection<string>();
         private readonly string[] languageTypes;
         private readonly GenerationItemCollection settingsList;
         private GenerationItemViewModel selectedItem;
-        private GenerationItemViewModel settings = new GenerationItemViewModel();
+        private GenerationItemViewModel settings = new();
         
         private bool openAfterGenerate;
 
@@ -69,11 +74,6 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
             this.settingsList = new GenerationItemCollection(configs);
             this.SelectedItem = this.settingsList.FirstOrDefault();
             this.configs.Update(this);
-        }
-
-        private void OnAddSettings()
-        {
-            this.settingsList.Insert(0, this.settings);
         }
 
         public void SelectPath()
@@ -135,7 +135,7 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
 
         public string SettingsName
         {
-            get { return this.settings.Name; }
+            get => this.settings.Name;
             set
             {
                 this.settings.Name = value;
@@ -146,7 +146,7 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
 
         public string Address
         {
-            get { return this.settings.Address; }
+            get => this.settings.Address;
             set
             {
                 this.settings.Address = value;
@@ -157,7 +157,7 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
 
         public string DataBase
         {
-            get { return this.settings.DataBase; }
+            get => this.settings.DataBase;
             set
             {
                 this.settings.DataBase = value;
@@ -168,7 +168,7 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
 
         public string Tags
         {
-            get { return this.settings.Tags; }
+            get => this.settings.Tags;
             set
             {
                 this.settings.Tags = value;
@@ -179,7 +179,7 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
 
         public string OutputPath
         {
-            get { return this.settings.OutputPath; }
+            get => this.settings.OutputPath;
             set
             {
                 this.settings.OutputPath = value;
@@ -188,14 +188,20 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
             }
         }
 
+
+/* 'JSSoft.Crema.Tools.Runtime (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
         public IEnumerable<string> LanguageTypes
         {
             get { return this.languageTypes; }
-        }
+이후:
+        public IEnumerable<string> LanguageTypes => this.languageTypes; }
+*/
+        public IEnumerable<string> LanguageTypes => this.languageTypes;
 
         public string LanguageType
         {
-            get { return this.settings.LanguageType; }
+            get => this.settings.LanguageType;
             set
             {
                 this.settings.LanguageType = value;
@@ -207,7 +213,7 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
         [Obsolete]
         public bool IsDevmode
         {
-            get { return this.settings.IsDevmode; }
+            get => this.settings.IsDevmode;
             set
             {
                 this.settings.IsDevmode = value;
@@ -219,7 +225,7 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
         [ConfigurationProperty("openAfterGenerate")]
         public bool OpenAfterGenerate
         {
-            get { return this.openAfterGenerate; }
+            get => this.openAfterGenerate;
             set
             {
                 this.openAfterGenerate = value;
@@ -229,7 +235,7 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
 
         public string FilterExpression
         {
-            get { return this.settings.FilterExpression ?? string.Empty; }
+            get => this.settings.FilterExpression ?? string.Empty;
             set
             {
                 this.settings.FilterExpression = value;
@@ -259,14 +265,11 @@ namespace JSSoft.Crema.Tools.Runtime.ViewModels
             }
         }
 
-        public IEnumerable<GenerationItemViewModel> ItemsSource
-        {
-            get { return this.settingsList; }
-        }
+        public IEnumerable<GenerationItemViewModel> ItemsSource => this.settingsList;
 
         public GenerationItemViewModel SelectedItem
         {
-            get { return this.selectedItem; }
+            get => this.selectedItem;
             set
             {
                 this.selectedItem = value;

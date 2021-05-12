@@ -28,14 +28,12 @@ namespace JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels
     class InvalidTreeViewItemViewModel : TreeViewItemViewModel
     {
         private readonly string displayName;
-        private readonly string displayPath;
-        private readonly string path;
         private readonly Action<InvalidTreeViewItemViewModel> deleteAction;
 
         public InvalidTreeViewItemViewModel(string path, Action<InvalidTreeViewItemViewModel> deleteAction)
         {
-            this.displayPath = path;
-            this.path = path;
+            this.DisplayPath = path;
+            this.Path = path;
 
             var index = path.LastIndexOf(PathUtility.SeparatorChar);
             this.displayName = path.Substring(index + 1);
@@ -50,10 +48,10 @@ namespace JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 
         public override string DisplayName => this.displayName;
 
-        public string DisplayPath => this.displayPath;
+        public string DisplayPath { get; private set; }
 
         public bool CanDelete => this.deleteAction != null;
 
-        public string Path => this.path;
+        public string Path { get; private set; }
     }
 }

@@ -30,7 +30,6 @@ namespace JSSoft.Crema.ConsoleHost
     class CremaService : ICremaService, IServiceProvider, IPartImportsSatisfiedNotification
     {
         public const string Namespace = "http://www.ntreev.com";
-        private const string cremaString = "Crema";
         private readonly IServiceProvider serviceProvider;
         private ICremaHost cremaHost;
         private Guid token;

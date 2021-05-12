@@ -31,6 +31,6 @@ namespace JSSoft.Crema.Services
             set => this.extension = value;
         }
 
-        public static readonly ObjectSerializerSettings Empty = new ObjectSerializerSettings();
+        public static readonly ObjectSerializerSettings Empty = new();
     }
 }

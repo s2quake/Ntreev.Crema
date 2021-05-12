@@ -20,29 +20,12 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using System;
-
-/* 'JSSoft.Crema.Presentation.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
-이전:
 using System.Xml;
 using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
-이후:
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-*/
-using System.Collections.Generic;
+using System.IO;
 using System.Text; // StringBuilder
-
-/* 'JSSoft.Crema.Presentation.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
-이전:
-using System.Text; // StringBuilder
-이후:
-using System.Text; // StringBuilder
-using System.Xml;
-*/
-using System.Xml;
 
 // important TODOS: 
 // TODO 1. Start tags: The ParseXmlElement function has been modified to be called after both the 

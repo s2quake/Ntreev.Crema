@@ -26,13 +26,11 @@ namespace JSSoft.Crema.Presentation.Differences.Documents.ViewModels
 {
     class DifferenceDocumentBase : DocumentBase
     {
-        private readonly DifferenceTreeViewItemViewModel target;
-
         public DifferenceDocumentBase(DifferenceTreeViewItemViewModel target)
         {
-            this.target = target;
+            this.Target = target;
         }
 
-        public DifferenceTreeViewItemViewModel Target => this.target;
+        public DifferenceTreeViewItemViewModel Target { get; private set; }
     }
 }

@@ -19,22 +19,17 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using Microsoft.CSharp;
-using JSSoft.Crema.Runtime.Generation;
-using JSSoft.Crema.Runtime.Generation.Cpp.Properties;
 using JSSoft.Library;
 using JSSoft.Library.IO;
+using Microsoft.CSharp;
 using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Runtime.Generation.Cpp
 {
@@ -63,11 +58,9 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
                     filename = Path.Combine(dirInfo.FullName, filename);
                     FileUtility.Prepare(filename);
 
-                    using (var sw = new StreamWriter(filename, false, Encoding.UTF8))
-                    {
-                        sw.WriteLine(item.Value);
-                        this.PrintResult(filename);
-                    }
+                    using var sw = new StreamWriter(filename, false, Encoding.UTF8);
+                    sw.WriteLine(item.Value);
+                    this.PrintResult(filename);
                 }
             }
 
@@ -78,11 +71,9 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
                 foreach (var item in codes)
                 {
                     var codePath = FileUtility.Prepare(codesPath, item.Key);
-                    using (var writer = new StreamWriter(codePath, false, Encoding.UTF8))
-                    {
-                        writer.WriteLine(item.Value);
-                        this.PrintResult(codePath);
-                    }
+                    using var writer = new StreamWriter(codePath, false, Encoding.UTF8);
+                    writer.WriteLine(item.Value);
+                    this.PrintResult(codePath);
                 }
             }
         }
@@ -104,11 +95,13 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
         {
             var codes = new Dictionary<string, string>();
             var codeDomProvider = new CodeDom.NativeCCodeProvider();
-            var options = new CodeGeneratorOptions();
-            options.BlankLinesBetweenMembers = generationInfo.BlankLinesBetweenMembers;
-            options.BracingStyle = "C";
-            options.ElseOnClosing = false;
-            options.IndentString = IndentedTextWriter.DefaultTabString;
+            var options = new CodeGeneratorOptions
+            {
+                BlankLinesBetweenMembers = generationInfo.BlankLinesBetweenMembers,
+                BracingStyle = "C",
+                ElseOnClosing = false,
+                IndentString = IndentedTextWriter.DefaultTabString
+            };
             options["CustomGeneratorOptionStringExampleID"] = "BuildFlags: /A /B /C /D /E";
 
             ColumnInfoExtensions.TypeNamespace = generationInfo.Namespace;
@@ -132,15 +125,9 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
             throw new NotImplementedException();
         }
 
-        public bool SupportsCompile
-        {
-            get { return false; }
-        }
+        public bool SupportsCompile => false;
 
-        public string Name
-        {
-            get { return "cpp"; }
-        }
+        public string Name => "cpp";
 
         private string GenerateBaseHeader(CodeGenerationInfo generationInfo)
         {
@@ -275,15 +262,13 @@ namespace JSSoft.Crema.Runtime.Generation.Cpp
         private string GetResourceString(string resourceName)
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            using (var stream = new StreamReader(assembly.GetManifestResourceStream(resourceName)))
-            {
-                return stream.ReadToEnd();
-            }
+            using var stream = new StreamReader(assembly.GetManifestResourceStream(resourceName));
+            return stream.ReadToEnd();
         }
 
         private void PrintResult(string path)
         {
-            FileInfo fileInfo = new FileInfo(path);
+            var fileInfo = new FileInfo(path);
             Console.WriteLine("created: {0}", fileInfo.FullName);
         }
     }

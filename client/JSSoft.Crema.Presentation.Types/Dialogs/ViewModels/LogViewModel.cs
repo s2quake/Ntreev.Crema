@@ -36,14 +36,13 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
         private readonly ITypeItem typeItem;
         private LogInfoViewModel[] itemsSource;
         private LogInfoViewModel selectedItem;
-        private readonly ICommand previewCommand;
 
         public LogViewModel(Authentication authentication, ITypeItem typeItem)
         {
             this.authentication = authentication;
             this.typeItem = typeItem;
             this.DisplayName = Resources.Title_ViewLog;
-            this.previewCommand = new DelegateCommand(async (p) => await this.PreviewAsync(), (p) => this.CanPreview);
+            this.PreviewCommand = new DelegateCommand(async (p) => await this.PreviewAsync(), (p) => this.CanPreview);
             this.Initialize();
         }
 
@@ -80,7 +79,7 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
 
         public IEnumerable<LogInfoViewModel> Items => this.itemsSource;
 
-        public ICommand PreviewCommand => this.previewCommand;
+        public ICommand PreviewCommand { get; private set; }
 
         private async void Initialize()
         {

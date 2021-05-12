@@ -32,7 +32,7 @@ namespace JSSoft.Crema.Services.Users
 
         public SignatureDateProvider SignatureDateProvider { get; set; }
 
-        public static readonly UserSet Empty = new UserSet()
+        public static readonly UserSet Empty = new()
         {
             ItemPaths = new string[] { },
             Infos = new UserSerializationInfo[] { },

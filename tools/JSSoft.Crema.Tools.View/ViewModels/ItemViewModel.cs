@@ -21,12 +21,8 @@
 
 using Caliburn.Micro;
 using JSSoft.Crema.Reader;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Tools.View.ViewModels
@@ -46,10 +42,16 @@ namespace JSSoft.Crema.Tools.View.ViewModels
             return this.Name;
         }
 
+
+/* 'JSSoft.Crema.Tools.View (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
         public string Name
         {
             get { return this.table.Name; }
-        }
+이후:
+        public string Name => this.table.Name; }
+*/
+        public string Name => this.table.Name;
 
         public IEnumerable ItemsSource
         {

@@ -31,13 +31,12 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
 {
     public class NewTypeViewModel : TemplateViewModel
     {
-        private readonly ITypeCategory category;
         private readonly ITypeContext typeContext;
 
         public NewTypeViewModel(Authentication authentication, ITypeCategory category, ITypeTemplate template)
             : base(authentication, template, true)
         {
-            this.category = category;
+            this.Category = category;
             this.typeContext = category.GetService(typeof(ITypeContext)) as ITypeContext;
             this.DisplayName = Resources.Title_NewType;
         }
@@ -62,6 +61,8 @@ namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
                 throw new ArgumentException("Invalid Target of Descriptor", nameof(descriptor));
             }
         }
+
+        protected ITypeCategory Category { get; }
 
         protected async override void Verify(Action<bool> isVerify)
         {

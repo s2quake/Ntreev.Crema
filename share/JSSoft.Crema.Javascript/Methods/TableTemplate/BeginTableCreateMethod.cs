@@ -57,7 +57,7 @@ namespace JSSoft.Crema.Javascript.Methods.TableTemplate
             }
             else if (NameValidator.VerifyItemPath(parentPath) == true)
             {
-                if (!(dataBase.TableContext[parentPath] is ITable table))
+                if (dataBase.TableContext[parentPath] is not ITable table)
                     throw new CategoryNotFoundException(parentPath);
                 var authentication = this.Context.GetAuthentication(this);
                 var template = await table.NewTableAsync(authentication);
@@ -65,7 +65,7 @@ namespace JSSoft.Crema.Javascript.Methods.TableTemplate
             }
             else
             {
-                if (!(dataBase.TableContext.Tables[parentPath] is ITable table))
+                if (dataBase.TableContext.Tables[parentPath] is not ITable table)
                     throw new CategoryNotFoundException(parentPath);
                 var authentication = this.Context.GetAuthentication(this);
                 var template = await table.NewTableAsync(authentication);

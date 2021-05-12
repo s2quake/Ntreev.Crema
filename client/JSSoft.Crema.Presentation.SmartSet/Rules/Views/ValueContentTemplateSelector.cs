@@ -29,14 +29,12 @@ namespace JSSoft.Crema.Presentation.SmartSet.Rules.Views
     {
         public override System.Windows.DataTemplate SelectTemplate(object item, System.Windows.DependencyObject container)
         {
-            var fe = container as FrameworkElement;
-            if (fe != null && item != null)
+            if (container is FrameworkElement fe && item != null)
             {
                 if (item.GetType().GenericTypeArguments.Any() == true)
                 {
                     var type = item.GetType().GenericTypeArguments[0];
-                    var template = fe.FindResource(type.FullName) as DataTemplate;
-                    if (template != null)
+                    if (fe.FindResource(type.FullName) is DataTemplate template)
                         return template;
                 }
             }

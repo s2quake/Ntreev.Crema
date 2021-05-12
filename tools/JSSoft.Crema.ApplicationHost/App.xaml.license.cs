@@ -19,19 +19,9 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace JSSoft.Crema.ApplicationHost
 {
     public partial class App
     {
-        static void RegisterLicense()
-        {
-
-        }
     }
 }

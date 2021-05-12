@@ -326,9 +326,7 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
             {
                 var domain = this.Domain;
                 var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
-#pragma warning disable CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
-                domain.Dispatcher.Invoke(() => domain.SetRowAsync(authenticator, rows));
-#pragma warning restore CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
+                await domain.Dispatcher.InvokeAsync(() => domain.SetRowAsync(authenticator, rows));
             }
             catch (Exception e)
             {
@@ -395,11 +393,9 @@ namespace JSSoft.Crema.Presentation.Framework.Controls
             e.CanExecute = this.CanPaste;
         }
 
-        private void PasteFromClipboard_Execute(object sender, ExecutedRoutedEventArgs e)
+        private async void PasteFromClipboard_Execute(object sender, ExecutedRoutedEventArgs e)
         {
-#pragma warning disable CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
-            this.RequestPasteFromClipboard();
-#pragma warning restore CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
+            await this.RequestPasteFromClipboard();
         }
 
         private async Task RequestPasteFromClipboard()

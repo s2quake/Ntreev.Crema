@@ -33,6 +33,6 @@ namespace JSSoft.Crema.Services
 
         public ILogService LogService { get; set; }
 
-        public static readonly RepositorySettings Default = new RepositorySettings();
+        public static readonly RepositorySettings Default = new();
     }
 }

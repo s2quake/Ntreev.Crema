@@ -28,26 +28,23 @@ namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
 {
     class SpreadsheetTreeViewItemViewModel : CheckableTreeViewItemViewModel
     {
-        private readonly string path;
         private string errorString;
 
         public SpreadsheetTreeViewItemViewModel(string path)
         {
-            this.path = path;
+            this.Path = path;
             this.Initialize();
         }
 
         public void Read(CremaDataSet dataSet)
         {
-            using (var reader = new SpreadsheetReader(this.Path))
-            {
-                reader.Read(dataSet);
-            }
+            using var reader = new SpreadsheetReader(this.Path);
+            reader.Read(dataSet);
         }
 
-        public override string DisplayName => this.path;
+        public override string DisplayName => this.Path;
 
-        public string Path => this.path;
+        public string Path { get; private set; }
 
         public bool IsEnabled => string.IsNullOrEmpty(this.errorString) == true;
 
@@ -73,7 +70,7 @@ namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
 
         private void Initialize()
         {
-            foreach (var item in SpreadsheetReader.ReadSheetNames(this.path))
+            foreach (var item in SpreadsheetReader.ReadSheetNames(this.Path))
             {
                 var viewModel = new SheetTreeViewItemViewModel(item)
                 {

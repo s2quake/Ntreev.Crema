@@ -23,17 +23,13 @@ using JSSoft.Crema.Reader;
 using JSSoft.Crema.Runtime.Serialization;
 using JSSoft.Crema.RuntimeService;
 using JSSoft.Crema.Tools.Framework;
-using JSSoft.Crema.Tools.View.Dialogs.ViewModels;
 using JSSoft.Crema.Tools.View.Views;
 using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -45,8 +41,8 @@ namespace JSSoft.Crema.Tools.View.ViewModels
         private readonly DataViewModel dataViewModel;
         private readonly IRuntimeService service;
         private readonly IDataSerializer serializer;
+        private readonly ObservableCollection<ItemViewModel> tables = new();
         private IDataSet dataSet;
-        private ObservableCollection<ItemViewModel> tables = new ObservableCollection<ItemViewModel>();
 
         public RemoteViewModel(DataViewModel dataViewModel, IRuntimeService service, IDataSerializer serializer)
         {
@@ -99,15 +95,9 @@ namespace JSSoft.Crema.Tools.View.ViewModels
             this.OnDisposed(EventArgs.Empty);
         }
 
-        public IEnumerable ItemsSource
-        {
-            get { return this.tables; }
-        }
+        public IEnumerable ItemsSource => this.tables;
 
-        public ICommand LoadCommand
-        {
-            get { return this.dataViewModel.LoadCommand; }
-        }
+        public ICommand LoadCommand => this.dataViewModel.LoadCommand;
 
         public event EventHandler Disposed;
 

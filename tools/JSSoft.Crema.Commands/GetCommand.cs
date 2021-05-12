@@ -31,7 +31,6 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -41,6 +40,7 @@ namespace JSSoft.Crema.Commands
     [CommandStaticProperty(typeof(CodeSettings))]
     [CommandStaticProperty(typeof(FilterSettings))]
     [CommandStaticProperty(typeof(DataBaseSettings))]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:읽기 전용 한정자 추가", Justification = "<보류 중>")]
     class GetCommand : CommandAsyncBase
     {
         [Import]
@@ -51,8 +51,6 @@ namespace JSSoft.Crema.Commands
         private IEnumerable<ICodeCompiler> compilers = null;
         [ImportMany]
         private IEnumerable<IDataSerializer> serializers = null;
-        [Import]
-        private Lazy<CommandContext> commandContext = null;
 
         public GetCommand()
             : base("get")

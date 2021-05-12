@@ -31,7 +31,6 @@ namespace JSSoft.Crema.Presentation.Types.PropertyItems.ViewModels
 {
     class TypeListBoxItemViewModel : TypeListItemBase
     {
-        private readonly ICommand selectInBrowserCommand;
         [Import]
         private readonly TypeBrowserViewModel browser = null;
         [Import]
@@ -42,13 +41,13 @@ namespace JSSoft.Crema.Presentation.Types.PropertyItems.ViewModels
         public TypeListBoxItemViewModel(Authentication authentication, IType type, object owner)
             : base(authentication, new TypeDescriptor(authentication, type, DescriptorTypes.IsSubscriptable, owner), owner)
         {
-            this.selectInBrowserCommand = new DelegateCommand(item => this.SelectInBrowser());
+            this.SelectInBrowserCommand = new DelegateCommand(item => this.SelectInBrowser());
         }
 
         public TypeListBoxItemViewModel(Authentication authentication, ITypeDescriptor descriptor, object owner)
             : base(authentication, new TypeDescriptor(authentication, descriptor, true, owner), owner)
         {
-            this.selectInBrowserCommand = new DelegateCommand(item => this.SelectInBrowser());
+            this.SelectInBrowserCommand = new DelegateCommand(item => this.SelectInBrowser());
         }
 
         public async void SelectInBrowser()
@@ -60,7 +59,7 @@ namespace JSSoft.Crema.Presentation.Types.PropertyItems.ViewModels
             }
         }
 
-        public ICommand SelectInBrowserCommand => this.selectInBrowserCommand;
+        public ICommand SelectInBrowserCommand { get; private set; }
 
         public override string DisplayName => this.descriptor.TypeName;
     }

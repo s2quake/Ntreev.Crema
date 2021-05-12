@@ -27,9 +27,8 @@ namespace JSSoft.Crema.Services
 {
     class ShutdownTimer : IDisposable
     {
-        private readonly Timer timer = new Timer() { Interval = 1000 };
+        private readonly Timer timer = new() { Interval = 1000 };
         private ShutdownContext shutdownContext;
-        private DateTime dateTime;
 
         public ShutdownTimer()
         {
@@ -39,7 +38,7 @@ namespace JSSoft.Crema.Services
         public void Start(ShutdownContext shutdownContext)
         {
             this.shutdownContext = shutdownContext;
-            this.dateTime = DateTime.Now.AddMilliseconds(shutdownContext.Milliseconds);
+            this.DateTime = DateTime.Now.AddMilliseconds(shutdownContext.Milliseconds);
             if (this.timer.Enabled == true)
                 this.timer.Stop();
             this.timer.Start();
@@ -51,13 +50,16 @@ namespace JSSoft.Crema.Services
                 this.timer.Stop();
         }
 
-        public void InvokeExceptionHandler(Exception e) => this.shutdownContext.InvokeShutdownException(e);
+        public void InvokeExceptionHandler(Exception e)
+        {
+            this.shutdownContext.InvokeShutdownException(e);
+        }
 
         public CloseReason CloseReason => this.shutdownContext.IsRestart ? CloseReason.Restart : CloseReason.None;
 
         public string Message => this.shutdownContext.Message;
 
-        public DateTime DateTime => this.dateTime;
+        public DateTime DateTime { get; private set; }
 
         public bool Enabled => this.timer.Enabled;
 
@@ -77,7 +79,7 @@ namespace JSSoft.Crema.Services
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (DateTime.Now >= this.dateTime)
+            if (DateTime.Now >= this.DateTime)
             {
                 this.OnDone(EventArgs.Empty);
             }

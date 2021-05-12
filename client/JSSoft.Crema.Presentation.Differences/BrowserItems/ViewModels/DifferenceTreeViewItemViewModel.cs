@@ -25,13 +25,11 @@ namespace JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels
 {
     class DifferenceTreeViewItemViewModel : TreeViewItemViewModel
     {
-        private readonly BrowserViewModel browser;
-
         public DifferenceTreeViewItemViewModel(BrowserViewModel browser)
         {
-            this.browser = browser;
+            this.Browser = browser;
         }
 
-        public BrowserViewModel Browser => this.browser;
+        public BrowserViewModel Browser { get; private set; }
     }
 }

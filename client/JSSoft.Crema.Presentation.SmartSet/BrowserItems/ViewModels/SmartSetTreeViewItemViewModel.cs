@@ -32,26 +32,25 @@ namespace JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
     class SmartSetTreeViewItemViewModel : TreeViewItemViewModel
     {
-        private readonly ISmartSet smartSet;
         private readonly SmartSetBrowserViewModel browser;
         private readonly Dictionary<object, TreeViewItemViewModel> items = new();
 
         public SmartSetTreeViewItemViewModel(ISmartSet smartSet, SmartSetBrowserViewModel browser)
         {
-            this.smartSet = smartSet;
+            this.SmartSet = smartSet;
             this.browser = browser;
             this.Target = smartSet;
 
-            foreach (var item in this.smartSet.Items)
+            foreach (var item in this.SmartSet.Items)
             {
                 this.AddViewModel(item);
             }
 
-            if (this.smartSet.Items is INotifyCollectionChanged)
+            if (this.SmartSet.Items is INotifyCollectionChanged)
             {
-                (this.smartSet.Items as INotifyCollectionChanged).CollectionChanged += Items_CollectionChanged;
+                (this.SmartSet.Items as INotifyCollectionChanged).CollectionChanged += Items_CollectionChanged;
             }
-            this.smartSet.Renamed += SmartSet_Renamed;
+            this.SmartSet.Renamed += SmartSet_Renamed;
         }
 
         public override int CompareTo(object obj)
@@ -65,16 +64,16 @@ namespace JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             return base.CompareTo(obj);
         }
 
-        public override string DisplayName => this.smartSet.Name;
+        public override string DisplayName => this.SmartSet.Name;
 
-        public ISmartSet SmartSet => this.smartSet;
+        public ISmartSet SmartSet { get; private set; }
 
         public async Task RenameAsync()
         {
-            var dialog = new RenameViewModel(this.smartSet.Name, item => this.smartSet.Category.Items.ContainsKey(item) == false);
+            var dialog = new RenameViewModel(this.SmartSet.Name, item => this.SmartSet.Category.Items.ContainsKey(item) == false);
             if (await dialog.ShowDialogAsync() == true)
             {
-                this.smartSet.Name = dialog.NewName;
+                this.SmartSet.Name = dialog.NewName;
             }
         }
 
@@ -82,12 +81,12 @@ namespace JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels
         {
             var dialog = new SmartSetEditViewModel(this.SmartSet.RuleItems, this.browser.Rules)
             {
-                SmartSetName = this.smartSet.Name,
+                SmartSetName = this.SmartSet.Name,
             };
 
             if (await dialog.ShowDialogAsync() == true)
             {
-                this.smartSet.RuleItems = dialog.RuleItems;
+                this.SmartSet.RuleItems = dialog.RuleItems;
             }
         }
 
@@ -96,7 +95,7 @@ namespace JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             if (await AppMessageBox.ConfirmDeleteAsync() == false)
                 return;
 
-            this.smartSet.Dispose();
+            this.SmartSet.Dispose();
         }
 
         private void SmartSet_Renamed(object sender, EventArgs e)

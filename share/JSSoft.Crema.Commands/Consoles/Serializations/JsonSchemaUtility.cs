@@ -19,8 +19,6 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-#pragma warning disable 0618
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
@@ -100,7 +98,7 @@ namespace JSSoft.Crema.Commands.Consoles.Serializations
             {
                 foreach (PropertyDescriptor item in TypeDescriptor.GetProperties(type))
                 {
-                    if (!(item.Attributes[typeof(JsonPropertyAttribute)] is JsonPropertyAttribute attr))
+                    if (item.Attributes[typeof(JsonPropertyAttribute)] is not JsonPropertyAttribute attr)
                         continue;
                     var name = attr.PropertyName ?? item.Name;
                     if (name == propertyName)

@@ -64,7 +64,7 @@ namespace JSSoft.Crema.Services
             return props;
         }
 
-        public readonly static RepositoryInfo Empty = new RepositoryInfo()
+        public readonly static RepositoryInfo Empty = new()
         {
             Name = string.Empty,
             Comment = string.Empty,

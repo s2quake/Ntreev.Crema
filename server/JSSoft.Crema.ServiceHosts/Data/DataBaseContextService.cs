@@ -33,7 +33,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
     class DataBaseContextService : CremaServiceItemBase<IDataBaseContextEventCallback>, IDataBaseContextService
     {
         private Authentication authentication;
-        private readonly Dictionary<Guid, ITransaction> transactionByID = new Dictionary<Guid, ITransaction>();
+        private readonly Dictionary<Guid, ITransaction> transactionByID = new();
         private long index = 0;
 
         public DataBaseContextService(CremaService service, IDataBaseContextEventCallback callback)

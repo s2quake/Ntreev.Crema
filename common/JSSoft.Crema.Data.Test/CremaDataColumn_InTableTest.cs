@@ -262,7 +262,7 @@ namespace JSSoft.Crema.Data.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(FormatException))]
         public void SetDefaultValue_Fail()
         {
             var column = this.RandomOrDefault(item => item.DataType != typeof(string));
@@ -270,7 +270,7 @@ namespace JSSoft.Crema.Data.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(FormatException))]
         public void SetDefaultValue_Guid_Fail()
         {
             var dataTable = new CremaDataTable();

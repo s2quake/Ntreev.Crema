@@ -35,8 +35,8 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 {
     static class CremaTableClassCreator
     {
-        private readonly static CodeThisReferenceExpression thisRef = new CodeThisReferenceExpression();
-        private readonly static CodeBaseReferenceExpression baseRef = new CodeBaseReferenceExpression();
+        private readonly static CodeThisReferenceExpression thisRef = new();
+        private readonly static CodeBaseReferenceExpression baseRef = new();
 
         public static void Create(CodeNamespace codeNamespace, CodeGenerationInfo generationInfo)
         {
@@ -63,10 +63,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static CodeTypeDeclaration CreateCore(TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var classType = new CodeTypeDeclaration();
-            classType.Attributes = MemberAttributes.Public;
-            classType.Name = tableInfo.GetClassName();
-            classType.IsClass = true;
+            var classType = new CodeTypeDeclaration
+            {
+                Attributes = MemberAttributes.Public,
+                Name = tableInfo.GetClassName(),
+                IsClass = true
+            };
             classType.TypeAttributes |= TypeAttributes.Sealed;
             classType.BaseTypes.Add("base", "CremaTable", tableInfo.GetRowCodeType());
             if (generationInfo.OmitComment == false)
@@ -100,10 +102,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
         {
             foreach (var item in generationInfo.GetChilds(tableInfo))
             {
-                var cmf = new CodeMemberField();
-                cmf.Attributes = MemberAttributes.Private;
-                cmf.Name = item.GetFieldName();
-                cmf.Type = item.GetCodeType();
+                var cmf = new CodeMemberField
+                {
+                    Attributes = MemberAttributes.Private,
+                    Name = item.GetFieldName(),
+                    Type = item.GetCodeType()
+                };
 
                 classType.Members.Add(cmf);
             }
@@ -113,12 +117,14 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
         {
             foreach (var item in generationInfo.GetChilds(tableInfo))
             {
-                var cmp = new CodeMemberProperty();
-                cmp.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-                cmp.Name = item.TableName;
-                cmp.Type = item.GetCodeType();
-                cmp.HasGet = true;
-                cmp.HasSet = false;
+                var cmp = new CodeMemberProperty
+                {
+                    Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                    Name = item.TableName,
+                    Type = item.GetCodeType(),
+                    HasGet = true,
+                    HasSet = false
+                };
 
                 // return field
                 {
@@ -133,9 +139,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateCreateFromTableMethod(CodeTypeDeclaration classType, TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-            cmm.Name = "createFromTable";
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Static,
+                Name = "createFromTable"
+            };
             cmm.Parameters.Add("reader", "ITable", "table");
             cmm.ReturnType = tableInfo.GetCodeType();
 
@@ -170,9 +178,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateCreateFromRowsMethod(CodeTypeDeclaration classType, TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-            cmm.Name = "createFromRows";
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Static,
+                Name = "createFromRows"
+            };
             cmm.Parameters.Add(typeof(string), "name");
             cmm.Parameters.Add(tableInfo.GetRowCodeType(), 1, "rows");
             cmm.ReturnType = tableInfo.GetCodeType();
@@ -203,9 +213,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateReadFromTableMethod(CodeTypeDeclaration classType, TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Family;
-            cmm.Name = "readFromTable";
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Family,
+                Name = "readFromTable"
+            };
             cmm.Parameters.Add("reader", "ITable", "table");
 
             // invoke super.readFromFile
@@ -258,9 +270,11 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
             if (string.IsNullOrEmpty(tableInfo.ParentName) == true)
                 return;
 
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Family;
-            cmm.Name = "readFromRows";
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Family,
+                Name = "readFromRows"
+            };
             cmm.Parameters.Add(typeof(string), "name");
             cmm.Parameters.Add(tableInfo.GetRowCodeType(), 1, "rows");
 
@@ -277,10 +291,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateFindMethod(CodeTypeDeclaration classType, TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "find";
-            cmm.ReturnType = tableInfo.GetRowCodeType();
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "find",
+                ReturnType = tableInfo.GetRowCodeType()
+            };
             cmm.Parameters.Add(tableInfo.Columns.Where(item => item.IsKey));
 
             // invoke super.findRow
@@ -299,10 +315,12 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
 
         private static void CreateCreateRowInstanceMethod(CodeTypeDeclaration classType, TableInfo tableInfo, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberMethod();
-            cmm.Attributes = MemberAttributes.Family | MemberAttributes.Override;
-            cmm.Name = "createRowInstance";
-            cmm.ReturnType = tableInfo.GetRowCodeType();
+            var cmm = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Family | MemberAttributes.Override,
+                Name = "createRowInstance",
+                ReturnType = tableInfo.GetRowCodeType()
+            };
             cmm.Parameters.Add("reader", "IRow", "row");
             cmm.Parameters.Add(typeof(object), "table");
 
@@ -324,8 +342,10 @@ namespace JSSoft.Crema.Runtime.Generation.TypeScript
             var table = new CodeVariableReferenceExpression("table");
             var version = new CodePropertyReferenceExpression(table, "hashValue");
 
-            var state = new CodeConditionStatement();
-            state.Condition = new CodeBinaryOperatorExpression(version, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(tableInfo.HashValue));
+            var state = new CodeConditionStatement
+            {
+                Condition = new CodeBinaryOperatorExpression(version, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(tableInfo.HashValue))
+            };
 
             var message = string.Format("{0} 테이블과 데이터의 형식이 맞지 않습니다.", tableInfo.Name);
             var exception = new CodeObjectCreateExpression("Error", new CodePrimitiveExpression(message));

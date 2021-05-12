@@ -125,7 +125,7 @@ namespace JSSoft.Crema.Presentation.Framework
             }
             else
             {
-                var propertyInfo = this.target.GetType().GetProperty(propertyName);
+                var propertyInfo = this.target.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 if (propertyInfo.CanWrite == true)
                 {
                     propertyInfo.SetValue(this.target, sourceValue);

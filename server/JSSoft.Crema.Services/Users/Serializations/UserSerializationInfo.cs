@@ -121,7 +121,7 @@ namespace JSSoft.Crema.Services.Users.Serializations
             return obj;
         }
 
-        public static readonly UserSerializationInfo Empty = new UserSerializationInfo()
+        public static readonly UserSerializationInfo Empty = new()
         {
             ID = string.Empty,
             Password = string.Empty,

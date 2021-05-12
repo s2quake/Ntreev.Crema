@@ -33,29 +33,26 @@ namespace JSSoft.Crema.Presentation.SmartSet.Dialogs.ViewModels
     [View(typeof(SmartSetEditView))]
     class SmartSetEditViewModel : ModalDialogBase
     {
-        private readonly IEnumerable<IRule> rules;
         private readonly ObservableCollection<RuleListItemViewModel> itemsSource = new();
 
         private string smartSetName;
-        private IRuleItem[] ruleItems;
-        private readonly bool canRename;
 
         public SmartSetEditViewModel(IEnumerable<IRule> rules)
         {
-            this.rules = rules;
+            this.Rules = rules;
             this.DisplayName = Resources.Title_NewSmartCollection;
-            this.canRename = true;
+            this.CanRename = true;
             this.itemsSource.Add(new RuleListItemViewModel(this.itemsSource, rules, null));
         }
 
         public SmartSetEditViewModel(IEnumerable<IRuleItem> ruleItems, IEnumerable<IRule> rules)
         {
-            this.rules = rules;
+            this.Rules = rules;
             this.DisplayName = Resources.Title_EditSmartCollection;
 
             foreach (var item in ruleItems)
             {
-                this.itemsSource.Add(new RuleListItemViewModel(this.itemsSource, this.rules, item));
+                this.itemsSource.Add(new RuleListItemViewModel(this.itemsSource, this.Rules, item));
             }
         }
 
@@ -72,11 +69,11 @@ namespace JSSoft.Crema.Presentation.SmartSet.Dialogs.ViewModels
 
         public IEnumerable<RuleListItemViewModel> ItemsSource => this.itemsSource;
 
-        public IEnumerable<IRule> Rules => this.rules;
+        public IEnumerable<IRule> Rules { get; private set; }
 
-        public IRuleItem[] RuleItems => this.ruleItems;
+        public IRuleItem[] RuleItems { get; private set; }
 
-        public bool CanRename => this.canRename;
+        public bool CanRename { get; private set; }
 
         public bool CanSave => !string.IsNullOrEmpty(this.SmartSetName);
 
@@ -84,7 +81,7 @@ namespace JSSoft.Crema.Presentation.SmartSet.Dialogs.ViewModels
         {
             try
             {
-                this.ruleItems = this.ItemsSource.Select(item => item.RuleItem).ToArray();
+                this.RuleItems = this.ItemsSource.Select(item => item.RuleItem).ToArray();
                 await this.TryCloseAsync(true);
             }
             catch (Exception ex)

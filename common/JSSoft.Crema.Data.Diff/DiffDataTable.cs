@@ -32,30 +32,21 @@ namespace JSSoft.Crema.Data.Diff
 {
     public class DiffDataTable : INotifyPropertyChanged
     {
-        private readonly CremaDataTable diffSource1;
-        private readonly CremaDataTable diffSource2;
         private readonly CremaDataTable dataTable1;
         private readonly CremaDataTable dataTable2;
         private readonly DiffMergeTypes mergeType;
-        private DiffState diffState;
-        private DiffTemplate template;
         private readonly ObservableCollection<object> unresolvedItemList = new();
-        private DiffDataTable[] childs = new DiffDataTable[] { };
-        private DiffDataTable[] derivedTables = new DiffDataTable[] { };
-        private DiffDataTable templatedParent;
         private DiffDataTable parent;
         private readonly List<DiffDataRow> itemList = new();
-        private bool isResolved;
         private string header1;
         private string header2;
         private string[] filters = new string[] { };
-        private readonly HashSet<object> itemSet = new();
 
         [Obsolete]
         public DiffDataTable(CremaDataTable dataTable1, CremaDataTable dataTable2, DiffMergeTypes mergeType)
         {
-            this.diffSource1 = dataTable1 == null ? new CremaDataTable() : new CremaDataTable(dataTable1.Name, dataTable1.CategoryPath);
-            this.diffSource2 = dataTable2 == null ? new CremaDataTable() : new CremaDataTable(dataTable2.Name, dataTable2.CategoryPath);
+            this.SourceItem1 = dataTable1 == null ? new CremaDataTable() : new CremaDataTable(dataTable1.Name, dataTable1.CategoryPath);
+            this.SourceItem2 = dataTable2 == null ? new CremaDataTable() : new CremaDataTable(dataTable2.Name, dataTable2.CategoryPath);
             this.dataTable1 = dataTable1;
             this.dataTable2 = dataTable2;
             this.mergeType = mergeType;
@@ -63,24 +54,24 @@ namespace JSSoft.Crema.Data.Diff
 
         internal DiffDataTable(CremaDataTable diffTable1, CremaDataTable diffTable2, CremaDataTable dataTable1, CremaDataTable dataTable2, DiffDataSet dataSet)
         {
-            this.diffSource1 = diffTable1;
-            this.diffSource2 = diffTable2;
+            this.SourceItem1 = diffTable1;
+            this.SourceItem2 = diffTable2;
             this.dataTable1 = dataTable1;
             this.dataTable2 = dataTable2;
-            this.diffSource1.ExtendedProperties[typeof(DiffDataTable)] = this;
-            this.diffSource2.ExtendedProperties[typeof(DiffDataTable)] = this;
-            this.diffSource1.InternalComment = (dataTable1 ?? dataTable2).Comment;
-            this.diffSource1.InternalTableID = (dataTable1 ?? dataTable2).TableID;
-            this.diffSource1.InternalTags = (dataTable1 ?? dataTable2).Tags;
-            this.diffSource1.InternalCreationInfo = (dataTable1 ?? dataTable2).CreationInfo;
-            this.diffSource1.InternalModificationInfo = (dataTable1 ?? dataTable2).ModificationInfo;
-            this.diffSource1.InternalContentsInfo = (dataTable1 ?? dataTable2).InternalContentsInfo;
-            this.diffSource2.InternalComment = (dataTable2 ?? dataTable1).Comment;
-            this.diffSource2.InternalTableID = (dataTable2 ?? dataTable1).TableID;
-            this.diffSource2.InternalTags = (dataTable2 ?? dataTable1).Tags;
-            this.diffSource2.InternalCreationInfo = (dataTable2 ?? dataTable1).CreationInfo;
-            this.diffSource2.InternalModificationInfo = (dataTable2 ?? dataTable1).ModificationInfo;
-            this.diffSource2.InternalContentsInfo = (dataTable2 ?? dataTable1).InternalContentsInfo;
+            this.SourceItem1.ExtendedProperties[typeof(DiffDataTable)] = this;
+            this.SourceItem2.ExtendedProperties[typeof(DiffDataTable)] = this;
+            this.SourceItem1.InternalComment = (dataTable1 ?? dataTable2).Comment;
+            this.SourceItem1.InternalTableID = (dataTable1 ?? dataTable2).TableID;
+            this.SourceItem1.InternalTags = (dataTable1 ?? dataTable2).Tags;
+            this.SourceItem1.InternalCreationInfo = (dataTable1 ?? dataTable2).CreationInfo;
+            this.SourceItem1.InternalModificationInfo = (dataTable1 ?? dataTable2).ModificationInfo;
+            this.SourceItem1.InternalContentsInfo = (dataTable1 ?? dataTable2).InternalContentsInfo;
+            this.SourceItem2.InternalComment = (dataTable2 ?? dataTable1).Comment;
+            this.SourceItem2.InternalTableID = (dataTable2 ?? dataTable1).TableID;
+            this.SourceItem2.InternalTags = (dataTable2 ?? dataTable1).Tags;
+            this.SourceItem2.InternalCreationInfo = (dataTable2 ?? dataTable1).CreationInfo;
+            this.SourceItem2.InternalModificationInfo = (dataTable2 ?? dataTable1).ModificationInfo;
+            this.SourceItem2.InternalContentsInfo = (dataTable2 ?? dataTable1).InternalContentsInfo;
             this.DiffSet = dataSet;
         }
 
@@ -88,27 +79,27 @@ namespace JSSoft.Crema.Data.Diff
         {
             this.ValidateResolve();
 
-            if (this.diffState == DiffState.Modified)
+            if (this.DiffState == DiffState.Modified)
             {
-                this.diffSource1.RowChanged -= DiffSource1_RowChanged;
-                this.diffSource2.RowChanged -= DiffSource2_RowChanged;
-                this.diffSource1.ReadOnly = false;
-                this.diffSource2.ReadOnly = false;
-                this.diffSource1.DeleteItems();
-                this.diffSource2.DeleteItems();
-                this.diffSource1.IsDiffMode = false;
-                this.diffSource2.IsDiffMode = false;
-                this.diffSource1.AcceptChanges();
-                this.diffSource2.AcceptChanges();
-                this.diffSource1.ReadOnly = true;
-                this.diffSource2.ReadOnly = true;
-                this.isResolved = true;
+                this.SourceItem1.RowChanged -= DiffSource1_RowChanged;
+                this.SourceItem2.RowChanged -= DiffSource2_RowChanged;
+                this.SourceItem1.ReadOnly = false;
+                this.SourceItem2.ReadOnly = false;
+                this.SourceItem1.DeleteItems();
+                this.SourceItem2.DeleteItems();
+                this.SourceItem1.IsDiffMode = false;
+                this.SourceItem2.IsDiffMode = false;
+                this.SourceItem1.AcceptChanges();
+                this.SourceItem2.AcceptChanges();
+                this.SourceItem1.ReadOnly = true;
+                this.SourceItem2.ReadOnly = true;
+                this.IsResolved = true;
             }
-            else if (this.diffState == DiffState.Deleted)
+            else if (this.DiffState == DiffState.Deleted)
             {
                 this.MergeDelete();
             }
-            else if (this.diffState == DiffState.Inserted)
+            else if (this.DiffState == DiffState.Inserted)
             {
                 this.MergeInsert();
             }
@@ -119,11 +110,11 @@ namespace JSSoft.Crema.Data.Diff
         public void ResolveAll()
         {
             this.ValidateResolveInternal();
-            foreach (var item in this.childs)
+            foreach (var item in this.Childs)
             {
                 item.ValidateResolveInternal();
             }
-            foreach (var item in this.childs)
+            foreach (var item in this.Childs)
             {
                 item.Resolve();
             }
@@ -137,27 +128,27 @@ namespace JSSoft.Crema.Data.Diff
 
         public void RejectChanges()
         {
-            this.diffSource1.RowChanged -= DiffSource1_RowChanged;
-            this.diffSource2.RowChanged -= DiffSource2_RowChanged;
+            this.SourceItem1.RowChanged -= DiffSource1_RowChanged;
+            this.SourceItem2.RowChanged -= DiffSource2_RowChanged;
             this.itemList.Clear();
             this.SourceItem1.RejectChanges();
             this.SourceItem2.RejectChanges();
-            this.itemList.Capacity = this.diffSource1.Rows.Count;
-            for (var i = 0; i < this.diffSource1.Rows.Count; i++)
+            this.itemList.Capacity = this.SourceItem1.Rows.Count;
+            for (var i = 0; i < this.SourceItem1.Rows.Count; i++)
             {
                 var item = new DiffDataRow(this, i);
                 this.itemList.Add(item);
                 item.UpdateValidation();
             }
-            this.diffSource1.RowChanged += DiffSource1_RowChanged;
-            this.diffSource2.RowChanged += DiffSource2_RowChanged;
+            this.SourceItem1.RowChanged += DiffSource1_RowChanged;
+            this.SourceItem2.RowChanged += DiffSource2_RowChanged;
         }
 
         public bool HasChanges()
         {
-            if (this.diffSource1.HasChanges(true) == true)
+            if (this.SourceItem1.HasChanges(true) == true)
                 return true;
-            if (this.diffSource2.HasChanges(true) == true)
+            if (this.SourceItem2.HasChanges(true) == true)
                 return true;
             return false;
         }
@@ -179,8 +170,8 @@ namespace JSSoft.Crema.Data.Diff
 
         public CremaDataTable ExportTable1(CremaDataSet exportSet)
         {
-            var dataTable = CreateExportTable(exportSet, this.diffSource1);
-            ExportTable(exportSet, this.diffSource1);
+            var dataTable = CreateExportTable(exportSet, this.SourceItem1);
+            ExportTable(exportSet, this.SourceItem1);
             return dataTable;
         }
 
@@ -191,14 +182,14 @@ namespace JSSoft.Crema.Data.Diff
 
         public CremaDataTable ExportTable2(CremaDataSet exportSet)
         {
-            var dataTable = CreateExportTable(exportSet, this.diffSource2);
-            ExportTable(exportSet, this.diffSource2);
+            var dataTable = CreateExportTable(exportSet, this.SourceItem2);
+            ExportTable(exportSet, this.SourceItem2);
             return dataTable;
         }
 
         public override string ToString()
         {
-            return this.diffSource2.TableName;
+            return this.SourceItem2.TableName;
         }
 
         public DiffDataSet DiffSet
@@ -207,15 +198,15 @@ namespace JSSoft.Crema.Data.Diff
             internal set;
         }
 
-        public CremaDataTable SourceItem1 => this.diffSource1;
+        public CremaDataTable SourceItem1 { get; private set; }
 
-        public CremaDataTable SourceItem2 => this.diffSource2;
+        public CremaDataTable SourceItem2 { get; private set; }
 
         public TableInfo TableInfo1
         {
             get
             {
-                var tableInfo = ((InternalDataTable)this.diffSource1).TableInfo;
+                var tableInfo = ((InternalDataTable)this.SourceItem1).TableInfo;
                 tableInfo.Name = DiffUtility.GetOriginalName(tableInfo.Name);
                 return tableInfo;
             }
@@ -225,7 +216,7 @@ namespace JSSoft.Crema.Data.Diff
         {
             get
             {
-                var tableInfo = ((InternalDataTable)this.diffSource2).TableInfo;
+                var tableInfo = ((InternalDataTable)this.SourceItem2).TableInfo;
                 tableInfo.Name = DiffUtility.GetOriginalName(tableInfo.Name);
                 return tableInfo;
             }
@@ -233,14 +224,14 @@ namespace JSSoft.Crema.Data.Diff
 
         public string ItemName1
         {
-            get => DiffUtility.GetOriginalName(this.diffSource1.TableName);
-            set => this.diffSource1.TableName = value;
+            get => DiffUtility.GetOriginalName(this.SourceItem1.TableName);
+            set => this.SourceItem1.TableName = value;
         }
 
         public string ItemName2
         {
-            get => DiffUtility.GetOriginalName(this.diffSource2.TableName);
-            set => this.diffSource2.TableName = value;
+            get => DiffUtility.GetOriginalName(this.SourceItem2.TableName);
+            set => this.SourceItem2.TableName = value;
         }
 
         public string Header1
@@ -265,23 +256,19 @@ namespace JSSoft.Crema.Data.Diff
             set => this.header2 = value;
         }
 
-        public DiffState DiffState => this.diffState;
+        public DiffState DiffState { get; private set; }
 
         public IReadOnlyList<DiffDataRow> Rows => this.itemList;
 
-        public bool IsResolved => this.isResolved;
+        public bool IsResolved { get; private set; }
 
-        public DiffTemplate Template
-        {
-            get => this.template;
-            internal set => this.template = value;
-        }
+        public DiffTemplate Template { get; internal set; }
 
-        public DiffDataTable TemplatedParent => this.templatedParent;
+        public DiffDataTable TemplatedParent { get; private set; }
 
-        public DiffDataTable[] DerivedTables => this.derivedTables;
+        public DiffDataTable[] DerivedTables { get; private set; } = new DiffDataTable[] { };
 
-        public DiffDataTable[] Childs => this.childs;
+        public DiffDataTable[] Childs { get; private set; } = new DiffDataTable[] { };
 
         public IEnumerable<object> UnresolvedItems => this.unresolvedItemList;
 
@@ -303,37 +290,37 @@ namespace JSSoft.Crema.Data.Diff
 
         internal void InitializeRows()
         {
-            this.diffSource1.RowChanged -= DiffSource1_RowChanged;
-            this.diffSource2.RowChanged -= DiffSource2_RowChanged;
-            this.diffSource1.ReadOnly = false;
-            this.diffSource2.ReadOnly = false;
+            this.SourceItem1.RowChanged -= DiffSource1_RowChanged;
+            this.SourceItem2.RowChanged -= DiffSource2_RowChanged;
+            this.SourceItem1.ReadOnly = false;
+            this.SourceItem2.ReadOnly = false;
 
             if (this.unresolvedItemList.Any() == true)
             {
                 if (this.parent == null)
                 {
-                    DiffInternalUtility.InitializeRows(this.diffSource1, this.diffSource2, this.dataTable1, this.dataTable2);
+                    DiffInternalUtility.InitializeRows(this.SourceItem1, this.SourceItem2, this.dataTable1, this.dataTable2);
                 }
                 else
                 {
-                    DiffInternalUtility.InitializeChildRows(this.diffSource1, this.diffSource2, this.dataTable1, this.dataTable2);
+                    DiffInternalUtility.InitializeChildRows(this.SourceItem1, this.SourceItem2, this.dataTable1, this.dataTable2);
                 }
             }
             else
             {
                 if (this.parent == null)
                 {
-                    DiffInternalUtility.InitializeRows(this.diffSource1, this.diffSource2, this.dataTable1 ?? this.dataTable2, this.dataTable2 ?? this.dataTable1);
+                    DiffInternalUtility.InitializeRows(this.SourceItem1, this.SourceItem2, this.dataTable1 ?? this.dataTable2, this.dataTable2 ?? this.dataTable1);
                 }
                 else
                 {
-                    DiffInternalUtility.InitializeChildRows(this.diffSource1, this.diffSource2, this.dataTable1 ?? this.dataTable2, this.dataTable2 ?? this.dataTable1);
+                    DiffInternalUtility.InitializeChildRows(this.SourceItem1, this.SourceItem2, this.dataTable1 ?? this.dataTable2, this.dataTable2 ?? this.dataTable1);
                 }
             }
 
             this.itemList.Clear();
-            this.itemList.Capacity = this.diffSource1.Rows.Count;
-            for (var i = 0; i < this.diffSource1.Rows.Count; i++)
+            this.itemList.Capacity = this.SourceItem1.Rows.Count;
+            for (var i = 0; i < this.SourceItem1.Rows.Count; i++)
             {
                 var item = new DiffDataRow(this, i);
                 this.itemList.Add(item);
@@ -345,10 +332,10 @@ namespace JSSoft.Crema.Data.Diff
                 item.Update();
             }
 
-            this.diffSource1.AcceptChanges();
-            this.diffSource2.AcceptChanges();
-            this.diffSource1.RowChanged += DiffSource1_RowChanged;
-            this.diffSource2.RowChanged += DiffSource2_RowChanged;
+            this.SourceItem1.AcceptChanges();
+            this.SourceItem2.AcceptChanges();
+            this.SourceItem1.RowChanged += DiffSource1_RowChanged;
+            this.SourceItem2.RowChanged += DiffSource2_RowChanged;
         }
 
         internal void InitializeChilds()
@@ -364,15 +351,15 @@ namespace JSSoft.Crema.Data.Diff
                 {
                     var dataTable1 = item;
                     var dataTable2 = tables2.Single(i => i.TableID == item.TableID);
-                    var diffTable1 = DiffDataTable.Create(this.diffSource1, dataTable1.TableName);
-                    var diffTable2 = DiffDataTable.Create(this.diffSource2, dataTable2.TableName);
+                    var diffTable1 = DiffDataTable.Create(this.SourceItem1, dataTable1.TableName);
+                    var diffTable2 = DiffDataTable.Create(this.SourceItem2, dataTable2.TableName);
                     DiffInternalUtility.SyncColumns(diffTable1, diffTable2, dataTable1, dataTable2);
                     var diffTable = new DiffDataTable(diffTable1, diffTable2, dataTable1, dataTable2, this.DiffSet)
                     {
                         parent = this,
                     };
                     var diffTemplate = new DiffTemplate(diffTable1, diffTable2, dataTable1, dataTable2) { DiffTable = diffTable };
-                    diffTable.template = diffTemplate;
+                    diffTable.Template = diffTemplate;
                     tableList.Add(diffTable);
                     tables1.Remove(dataTable1);
                     tables2.Remove(dataTable2);
@@ -385,29 +372,29 @@ namespace JSSoft.Crema.Data.Diff
                 if (this.dataTable2 != null && this.dataTable2.Childs.Contains(dataTable1.TableName) == true)
                 {
                     var dataTable2 = this.dataTable2.Childs[dataTable1.TableName];
-                    var diffTable1 = DiffDataTable.Create(this.diffSource1, dataTable1.TableName);
-                    var diffTable2 = DiffDataTable.Create(this.diffSource2, dataTable2.TableName);
+                    var diffTable1 = DiffDataTable.Create(this.SourceItem1, dataTable1.TableName);
+                    var diffTable2 = DiffDataTable.Create(this.SourceItem2, dataTable2.TableName);
                     DiffInternalUtility.SyncColumns(diffTable1, diffTable2, dataTable1, dataTable2);
                     var diffTable = new DiffDataTable(diffTable1, diffTable2, dataTable1, dataTable2, this.DiffSet)
                     {
                         parent = this,
                     };
                     var diffTemplate = new DiffTemplate(diffTable1, diffTable2, dataTable1, dataTable2) { DiffTable = diffTable };
-                    diffTable.template = diffTemplate;
+                    diffTable.Template = diffTemplate;
                     tableList.Add(diffTable);
                     tables2.Remove(dataTable2);
                 }
                 else
                 {
-                    var diffTable1 = DiffDataTable.Create(this.diffSource1, dataTable1.TableName);
-                    var diffTable2 = DiffDataTable.Create(this.diffSource2, dataTable1.TableName);
+                    var diffTable1 = DiffDataTable.Create(this.SourceItem1, dataTable1.TableName);
+                    var diffTable2 = DiffDataTable.Create(this.SourceItem2, dataTable1.TableName);
                     DiffInternalUtility.SyncColumns(diffTable1, diffTable2, dataTable1, null);
                     var diffTable = new DiffDataTable(diffTable1, diffTable2, dataTable1, null, this.DiffSet)
                     {
                         parent = this,
                     };
                     var diffTemplate = new DiffTemplate(diffTable1, diffTable2, dataTable1, null) { DiffTable = diffTable };
-                    diffTable.template = diffTemplate;
+                    diffTable.Template = diffTemplate;
                     tableList.Add(diffTable);
                 }
             }
@@ -415,19 +402,19 @@ namespace JSSoft.Crema.Data.Diff
             foreach (var item in tables2)
             {
                 var dataTable2 = item;
-                var diffTable1 = DiffDataTable.Create(this.diffSource1, dataTable2.TableName);
-                var diffTable2 = DiffDataTable.Create(this.diffSource2, dataTable2.TableName);
+                var diffTable1 = DiffDataTable.Create(this.SourceItem1, dataTable2.TableName);
+                var diffTable2 = DiffDataTable.Create(this.SourceItem2, dataTable2.TableName);
                 DiffInternalUtility.SyncColumns(diffTable1, diffTable2, null, dataTable2);
                 var diffTable = new DiffDataTable(diffTable1, diffTable2, null, dataTable2, this.DiffSet)
                 {
                     parent = this,
                 };
                 var diffTemplate = new DiffTemplate(diffTable1, diffTable2, null, dataTable2) { DiffTable = diffTable };
-                diffTable.template = diffTemplate;
+                diffTable.Template = diffTemplate;
                 tableList.Add(diffTable);
             }
 
-            this.childs = tableList.OrderBy(item => item.SourceItem1.TableName).ToArray();
+            this.Childs = tableList.OrderBy(item => item.SourceItem1.TableName).ToArray();
         }
 
         internal void InitializeDerivedTables()
@@ -443,19 +430,19 @@ namespace JSSoft.Crema.Data.Diff
                 {
                     var dataTable1 = item;
                     var dataTable2 = tables2.Single(i => i.TableID == item.TableID);
-                    var diffTable1 = DiffDataTable.Inherit(this.diffSource1, dataTable1.TableName);
-                    var diffTable2 = DiffDataTable.Inherit(this.diffSource2, dataTable2.TableName);
-                    var diffTable = new DiffDataTable(diffTable1, diffTable2, dataTable1, dataTable2, this.DiffSet) { templatedParent = this };
+                    var diffTable1 = DiffDataTable.Inherit(this.SourceItem1, dataTable1.TableName);
+                    var diffTable2 = DiffDataTable.Inherit(this.SourceItem2, dataTable2.TableName);
+                    var diffTable = new DiffDataTable(diffTable1, diffTable2, dataTable1, dataTable2, this.DiffSet) { TemplatedParent = this };
                     var childList = new List<DiffDataTable>();
-                    foreach (var i in this.childs)
+                    foreach (var i in this.Childs)
                     {
                         var d1 = diffTable1.Childs[i.SourceItem1.TableName];
                         var d2 = diffTable2.Childs[i.SourceItem2.TableName];
                         var t1 = dataTable1.Childs[i.SourceItem1.TableName];
                         var t2 = dataTable2.Childs[i.SourceItem2.TableName];
-                        childList.Add(new DiffDataTable(d1, d2, t1, t2, this.DiffSet) { parent = diffTable, templatedParent = i });
+                        childList.Add(new DiffDataTable(d1, d2, t1, t2, this.DiffSet) { parent = diffTable, TemplatedParent = i });
                     }
-                    diffTable.childs = childList.ToArray();
+                    diffTable.Childs = childList.ToArray();
                     tableList.Add(diffTable);
                     tables1.Remove(dataTable1);
                     tables2.Remove(dataTable2);
@@ -468,36 +455,36 @@ namespace JSSoft.Crema.Data.Diff
                 var dataTable2 = this.dataTable2?.DerivedTables.FirstOrDefault(i => i.TableName == dataTable1.TableName);
                 if (this.dataTable2 != null && dataTable2 != null)
                 {
-                    var diffTable1 = DiffDataTable.Inherit(this.diffSource1, dataTable1.TableName);
-                    var diffTable2 = DiffDataTable.Inherit(this.diffSource2, dataTable2.TableName);
-                    var diffTable = new DiffDataTable(diffTable1, diffTable2, dataTable1, dataTable2, this.DiffSet) { templatedParent = this };
+                    var diffTable1 = DiffDataTable.Inherit(this.SourceItem1, dataTable1.TableName);
+                    var diffTable2 = DiffDataTable.Inherit(this.SourceItem2, dataTable2.TableName);
+                    var diffTable = new DiffDataTable(diffTable1, diffTable2, dataTable1, dataTable2, this.DiffSet) { TemplatedParent = this };
                     var childList = new List<DiffDataTable>();
-                    foreach (var i in this.childs)
+                    foreach (var i in this.Childs)
                     {
                         var d1 = diffTable1.Childs[i.SourceItem1.TableName];
                         var d2 = diffTable2.Childs[i.SourceItem2.TableName];
                         var t1 = dataTable1.Childs[i.SourceItem1.TableName];
                         var t2 = dataTable2.Childs[i.SourceItem2.TableName];
-                        childList.Add(new DiffDataTable(d1, d2, t1, t2, this.DiffSet) { parent = diffTable, templatedParent = i });
+                        childList.Add(new DiffDataTable(d1, d2, t1, t2, this.DiffSet) { parent = diffTable, TemplatedParent = i });
                     }
-                    diffTable.childs = childList.ToArray();
+                    diffTable.Childs = childList.ToArray();
                     tableList.Add(diffTable);
                     tables2.Remove(dataTable2);
                 }
                 else
                 {
-                    var diffTable1 = DiffDataTable.Inherit(this.diffSource1, DiffUtility.DiffDummyKey + dataTable1.TableName);
-                    var diffTable2 = DiffDataTable.Inherit(this.diffSource2, DiffUtility.DiffDummyKey + dataTable1.TableName);
-                    var diffTable = new DiffDataTable(diffTable1, diffTable2, dataTable1, null, this.DiffSet) { templatedParent = this };
+                    var diffTable1 = DiffDataTable.Inherit(this.SourceItem1, DiffUtility.DiffDummyKey + dataTable1.TableName);
+                    var diffTable2 = DiffDataTable.Inherit(this.SourceItem2, DiffUtility.DiffDummyKey + dataTable1.TableName);
+                    var diffTable = new DiffDataTable(diffTable1, diffTable2, dataTable1, null, this.DiffSet) { TemplatedParent = this };
                     var childList = new List<DiffDataTable>();
-                    foreach (var i in this.childs)
+                    foreach (var i in this.Childs)
                     {
                         var d1 = diffTable1.Childs[i.SourceItem1.TableName];
                         var d2 = diffTable2.Childs[i.SourceItem2.TableName];
                         var t1 = dataTable1.Childs[i.SourceItem1.TableName];
-                        childList.Add(new DiffDataTable(d1, d2, t1, null, this.DiffSet) { parent = diffTable, templatedParent = i });
+                        childList.Add(new DiffDataTable(d1, d2, t1, null, this.DiffSet) { parent = diffTable, TemplatedParent = i });
                     }
-                    diffTable.childs = childList.ToArray();
+                    diffTable.Childs = childList.ToArray();
                     tableList.Add(diffTable);
                 }
             }
@@ -505,69 +492,69 @@ namespace JSSoft.Crema.Data.Diff
             foreach (var item in tables2)
             {
                 var dataTable2 = item;
-                var diffTable1 = DiffDataTable.Inherit(this.diffSource1, DiffUtility.DiffDummyKey + dataTable2.TableName);
-                var diffTable2 = DiffDataTable.Inherit(this.diffSource2, DiffUtility.DiffDummyKey + dataTable2.TableName);
-                var diffTable = new DiffDataTable(diffTable1, diffTable2, null, dataTable2, this.DiffSet) { templatedParent = this };
+                var diffTable1 = DiffDataTable.Inherit(this.SourceItem1, DiffUtility.DiffDummyKey + dataTable2.TableName);
+                var diffTable2 = DiffDataTable.Inherit(this.SourceItem2, DiffUtility.DiffDummyKey + dataTable2.TableName);
+                var diffTable = new DiffDataTable(diffTable1, diffTable2, null, dataTable2, this.DiffSet) { TemplatedParent = this };
                 var childList = new List<DiffDataTable>();
-                foreach (var i in this.childs)
+                foreach (var i in this.Childs)
                 {
                     var d1 = diffTable1.Childs[i.SourceItem1.TableName];
                     var d2 = diffTable2.Childs[i.SourceItem2.TableName];
                     var t2 = dataTable2.Childs[i.SourceItem2.TableName];
-                    childList.Add(new DiffDataTable(d1, d2, null, t2, this.DiffSet) { parent = diffTable, templatedParent = i });
+                    childList.Add(new DiffDataTable(d1, d2, null, t2, this.DiffSet) { parent = diffTable, TemplatedParent = i });
                 }
-                diffTable.childs = childList.ToArray();
+                diffTable.Childs = childList.ToArray();
                 tableList.Add(diffTable);
             }
 
-            this.derivedTables = tableList.OrderBy(item => item.SourceItem1.TableName).ToArray();
+            this.DerivedTables = tableList.OrderBy(item => item.SourceItem1.TableName).ToArray();
         }
 
         internal void InitializeTemplate()
         {
-            if (this.templatedParent == null)
+            if (this.TemplatedParent == null)
             {
-                this.template = new DiffTemplate(this.diffSource1, this.diffSource2, this.dataTable1, this.dataTable2)
+                this.Template = new DiffTemplate(this.SourceItem1, this.SourceItem2, this.dataTable1, this.dataTable2)
                 {
                     DiffTable = this,
                 };
 
-                this.template.Diff();
+                this.Template.Diff();
             }
             else
             {
-                this.template = this.templatedParent.template;
+                this.Template = this.TemplatedParent.Template;
             }
 
-            foreach (var item in this.childs)
+            foreach (var item in this.Childs)
             {
                 item.InitializeTemplate();
             }
 
-            foreach (var item in this.derivedTables)
+            foreach (var item in this.DerivedTables)
             {
                 item.InitializeTemplate();
             }
 
-            if (this.template.IsResolved == false)
+            if (this.Template.IsResolved == false)
             {
-                this.unresolvedItemList.Add(this.template);
-                this.template.PropertyChanged += Template_PropertyChanged;
+                this.unresolvedItemList.Add(this.Template);
+                this.Template.PropertyChanged += Template_PropertyChanged;
             }
 
-            foreach (var item in this.childs)
+            foreach (var item in this.Childs)
             {
-                if (item.template.IsResolved == false)
+                if (item.Template.IsResolved == false)
                 {
-                    this.unresolvedItemList.Add(item.template);
-                    item.template.PropertyChanged += Template_PropertyChanged;
+                    this.unresolvedItemList.Add(item.Template);
+                    item.Template.PropertyChanged += Template_PropertyChanged;
                 }
             }
 
-            if (this.parent != null && this.parent.template.IsResolved == false)
+            if (this.parent != null && this.parent.Template.IsResolved == false)
             {
-                this.unresolvedItemList.Add(this.parent.template);
-                this.parent.template.PropertyChanged += Template_PropertyChanged;
+                this.unresolvedItemList.Add(this.parent.Template);
+                this.parent.Template.PropertyChanged += Template_PropertyChanged;
             }
         }
 
@@ -644,19 +631,19 @@ namespace JSSoft.Crema.Data.Diff
         {
             Validate();
 
-            this.diffSource2.ReadOnly = false;
-            for (var i = 0; i < this.diffSource1.Rows.Count; i++)
+            this.SourceItem2.ReadOnly = false;
+            for (var i = 0; i < this.SourceItem1.Rows.Count; i++)
             {
-                var item1 = this.diffSource1.Rows[i];
-                var item2 = this.diffSource2.Rows[i];
+                var item1 = this.SourceItem1.Rows[i];
+                var item2 = this.SourceItem2.Rows[i];
                 item2.CopyFrom(item1);
             }
-            this.diffSource2.ReadOnly = true;
-            this.isResolved = true;
+            this.SourceItem2.ReadOnly = true;
+            this.IsResolved = true;
 
             void Validate()
             {
-                if (this.diffState != DiffState.Deleted)
+                if (this.DiffState != DiffState.Deleted)
                     throw new Exception();
             }
         }
@@ -665,34 +652,34 @@ namespace JSSoft.Crema.Data.Diff
         {
             Validate();
 
-            this.diffSource1.ReadOnly = false;
-            this.diffSource2.ReadOnly = false;
-            for (var i = 0; i < this.diffSource2.Rows.Count; i++)
+            this.SourceItem1.ReadOnly = false;
+            this.SourceItem2.ReadOnly = false;
+            for (var i = 0; i < this.SourceItem2.Rows.Count; i++)
             {
-                var item1 = this.diffSource1.Rows[i];
-                var item2 = this.diffSource2.Rows[i];
+                var item1 = this.SourceItem1.Rows[i];
+                var item2 = this.SourceItem2.Rows[i];
                 item1.CopyFrom(item2);
             }
-            this.diffSource1.ReadOnly = true;
-            this.diffSource2.ReadOnly = true;
-            this.isResolved = true;
+            this.SourceItem1.ReadOnly = true;
+            this.SourceItem2.ReadOnly = true;
+            this.IsResolved = true;
 
             void Validate()
             {
-                if (this.diffState != DiffState.Inserted)
+                if (this.DiffState != DiffState.Inserted)
                     throw new Exception();
             }
         }
 
         private void ValidateResolveInternal()
         {
-            if (this.diffState == DiffState.Modified)
+            if (this.DiffState == DiffState.Modified)
             {
-                if (this.diffSource1.TableName != this.diffSource2.TableName)
+                if (this.SourceItem1.TableName != this.SourceItem2.TableName)
                     throw new Exception();
-                if (this.diffSource1.Tags != this.diffSource2.Tags)
+                if (this.SourceItem1.Tags != this.SourceItem2.Tags)
                     throw new Exception();
-                if (this.diffSource1.Comment != this.diffSource2.Comment)
+                if (this.SourceItem1.Comment != this.SourceItem2.Comment)
                     throw new Exception();
                 foreach (var item in this.itemList)
                 {
@@ -709,7 +696,7 @@ namespace JSSoft.Crema.Data.Diff
         private void ValidateResolve()
         {
             this.ValidateResolveInternal();
-            foreach (var item in this.childs)
+            foreach (var item in this.Childs)
             {
                 if (item.IsResolved == false)
                     throw new Exception(Resources.Exception_UnresolvedChildTablesExist);
@@ -718,30 +705,25 @@ namespace JSSoft.Crema.Data.Diff
 
         private bool VerifyModified()
         {
-            if (this.diffSource1.TableName != this.diffSource2.TableName)
+            if (this.SourceItem1.TableName != this.SourceItem2.TableName)
                 return true;
-            if (this.diffSource1.Tags != this.diffSource2.Tags)
+            if (this.SourceItem1.Tags != this.SourceItem2.Tags)
                 return true;
-            if (this.diffSource1.Comment != this.diffSource2.Comment)
+            if (this.SourceItem1.Comment != this.SourceItem2.Comment)
                 return true;
 
-            foreach (var item in this.diffSource1.Rows)
+            foreach (var item in this.SourceItem1.Rows)
             {
                 if (DiffUtility.GetDiffState(item) != DiffState.Unchanged)
                     return true;
             }
 
-            foreach (var item in this.diffSource2.Rows)
+            foreach (var item in this.SourceItem2.Rows)
             {
                 if (DiffUtility.GetDiffState(item) != DiffState.Unchanged)
                     return true;
             }
             return false;
-        }
-
-        private bool VerifyImaginary()
-        {
-            return this.unresolvedItemList.Any();
         }
 
         private void SyncTemplate(CremaTemplate template, CremaDataTable dataTable)
@@ -832,18 +814,18 @@ namespace JSSoft.Crema.Data.Diff
 
         private void SyncTemplate()
         {
-            if (this.template.DiffState == DiffState.Inserted)
+            if (this.Template.DiffState == DiffState.Inserted)
             {
-                this.SyncTemplate(this.template.SourceItem1, this.diffSource1);
+                this.SyncTemplate(this.Template.SourceItem1, this.SourceItem1);
             }
-            else if (this.template.DiffState == DiffState.Deleted)
+            else if (this.Template.DiffState == DiffState.Deleted)
             {
-                this.SyncTemplate(this.template.SourceItem2, this.diffSource2);
+                this.SyncTemplate(this.Template.SourceItem2, this.SourceItem2);
             }
-            else if (this.template.DiffState == DiffState.Modified)
+            else if (this.Template.DiffState == DiffState.Modified)
             {
-                this.SyncTemplate(this.template.SourceItem1, this.diffSource1);
-                this.SyncTemplate(this.template.SourceItem2, this.diffSource2);
+                this.SyncTemplate(this.Template.SourceItem1, this.SourceItem1);
+                this.SyncTemplate(this.Template.SourceItem2, this.SourceItem2);
             }
         }
 
@@ -851,9 +833,9 @@ namespace JSSoft.Crema.Data.Diff
         {
             if (sender is DiffTemplate diffTemplate)
             {
-                if (e.PropertyName == nameof(this.template.IsResolved) && diffTemplate.IsResolved == true)
+                if (e.PropertyName == nameof(this.Template.IsResolved) && diffTemplate.IsResolved == true)
                 {
-                    if (this.template == diffTemplate)
+                    if (this.Template == diffTemplate)
                     {
                         this.SyncTemplate();
                     }
@@ -1057,12 +1039,12 @@ namespace JSSoft.Crema.Data.Diff
             {
                 item.DiffTemplateInternal();
 
-                if (this.templatedParent == null)
+                if (this.TemplatedParent == null)
                 {
-                    if (item.template != null && item.template.IsResolved == false)
+                    if (item.Template != null && item.Template.IsResolved == false)
                     {
-                        this.unresolvedItemList.Add(item.template);
-                        item.template.PropertyChanged += Template_PropertyChanged;
+                        this.unresolvedItemList.Add(item.Template);
+                        item.Template.PropertyChanged += Template_PropertyChanged;
                     }
                     else
                     {
@@ -1075,37 +1057,37 @@ namespace JSSoft.Crema.Data.Diff
 
         internal void DiffTemplateInternal()
         {
-            if (this.templatedParent == null)
+            if (this.TemplatedParent == null)
             {
-                this.template.Diff();
-                if (this.template.IsResolved == false)
+                this.Template.Diff();
+                if (this.Template.IsResolved == false)
                 {
-                    this.unresolvedItemList.Add(this.template);
-                    this.template.PropertyChanged += Template_PropertyChanged;
+                    this.unresolvedItemList.Add(this.Template);
+                    this.Template.PropertyChanged += Template_PropertyChanged;
                 }
                 else
                 {
                     this.SyncTemplate();
                 }
 
-                if (this.parent != null && this.parent.template.IsResolved == false)
+                if (this.parent != null && this.parent.Template.IsResolved == false)
                 {
-                    this.unresolvedItemList.Add(this.parent.template);
-                    this.parent.template.PropertyChanged += Template_PropertyChanged;
+                    this.unresolvedItemList.Add(this.parent.Template);
+                    this.parent.Template.PropertyChanged += Template_PropertyChanged;
                 }
             }
             else
             {
-                if (this.templatedParent.template.IsResolved == false)
+                if (this.TemplatedParent.Template.IsResolved == false)
                 {
-                    this.unresolvedItemList.Add(this.templatedParent.template);
-                    this.templatedParent.template.PropertyChanged += Template_PropertyChanged;
+                    this.unresolvedItemList.Add(this.TemplatedParent.Template);
+                    this.TemplatedParent.Template.PropertyChanged += Template_PropertyChanged;
                 }
             }
-            this.diffSource1.IsDiffMode = true;
-            this.diffSource2.IsDiffMode = true;
-            this.diffSource1.InternalObject.OmitSignatureDate = true;
-            this.diffSource2.InternalObject.OmitSignatureDate = true;
+            this.SourceItem1.IsDiffMode = true;
+            this.SourceItem2.IsDiffMode = true;
+            this.SourceItem1.InternalObject.OmitSignatureDate = true;
+            this.SourceItem2.InternalObject.OmitSignatureDate = true;
         }
 
         internal void Diff()
@@ -1123,36 +1105,36 @@ namespace JSSoft.Crema.Data.Diff
 
             if (this.dataTable1 == null)
             {
-                this.diffSource1.ReadOnly = true;
-                this.diffSource2.ReadOnly = true;
-                this.diffState = DiffState.Inserted;
-                this.isResolved = this.unresolvedItemList.Any() == false;
+                this.SourceItem1.ReadOnly = true;
+                this.SourceItem2.ReadOnly = true;
+                this.DiffState = DiffState.Inserted;
+                this.IsResolved = this.unresolvedItemList.Any() == false;
             }
             else if (this.dataTable2 == null)
             {
-                this.diffSource1.ReadOnly = true;
-                this.diffSource2.ReadOnly = true;
-                this.diffState = DiffState.Deleted;
-                this.isResolved = this.unresolvedItemList.Any() == false;
+                this.SourceItem1.ReadOnly = true;
+                this.SourceItem2.ReadOnly = true;
+                this.DiffState = DiffState.Deleted;
+                this.IsResolved = this.unresolvedItemList.Any() == false;
             }
             else if (this.VerifyModified() == true)
             {
-                this.diffSource1.ReadOnly = false;
-                this.diffSource2.ReadOnly = false;
-                this.diffSource1.IsDiffMode = true;
-                this.diffSource2.IsDiffMode = true;
-                this.diffState = DiffState.Modified;
-                this.isResolved = false;
+                this.SourceItem1.ReadOnly = false;
+                this.SourceItem2.ReadOnly = false;
+                this.SourceItem1.IsDiffMode = true;
+                this.SourceItem2.IsDiffMode = true;
+                this.DiffState = DiffState.Modified;
+                this.IsResolved = false;
             }
             else
             {
-                this.diffState = DiffState.Unchanged;
-                this.isResolved = this.unresolvedItemList.Any() == false;
+                this.DiffState = DiffState.Unchanged;
+                this.IsResolved = this.unresolvedItemList.Any() == false;
             }
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IsResolved)));
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.DiffState)));
         }
 
-        internal HashSet<object> ItemSet => this.itemSet;
+        internal HashSet<object> ItemSet { get; } = new();
     }
 }

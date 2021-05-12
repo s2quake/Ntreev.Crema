@@ -21,12 +21,7 @@
 
 using JSSoft.Crema.Runtime.Generation;
 using JSSoft.Library.Commands;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands
 {

@@ -33,15 +33,11 @@ namespace JSSoft.Crema.Presentation.Framework
         private ITypeCategory category;
         private readonly object owner;
         private readonly ObservableCollection<TypeCategoryDescriptor> categories = new();
-        private readonly ReadOnlyObservableCollection<TypeCategoryDescriptor> categoriesReadonly;
         private readonly ObservableCollection<TypeDescriptor> types = new();
-        private readonly ReadOnlyObservableCollection<TypeDescriptor> typesReadonly;
-
         private string categoryName;
         private string categoryPath;
         private AccessInfo accessInfo = AccessInfo.Empty;
         private LockInfo lockInfo = LockInfo.Empty;
-        private AccessType accessType;
 
         public TypeCategoryDescriptor(Authentication authentication, ITypeCategoryDescriptor descriptor, bool isSubscriptable, object owner)
             : base(authentication, descriptor.Target, descriptor, isSubscriptable)
@@ -60,10 +56,10 @@ namespace JSSoft.Crema.Presentation.Framework
             this.categoryPath = category.Path;
             this.accessInfo = category.AccessInfo;
             this.lockInfo = category.LockInfo;
-            this.accessType = category.GetAccessType(authentication);
+            this.AccessType = category.GetAccessType(authentication);
 
-            this.typesReadonly = new ReadOnlyObservableCollection<TypeDescriptor>(this.types);
-            this.categoriesReadonly = new ReadOnlyObservableCollection<TypeCategoryDescriptor>(this.categories);
+            this.Types = new ReadOnlyObservableCollection<TypeDescriptor>(this.types);
+            this.Categories = new ReadOnlyObservableCollection<TypeCategoryDescriptor>(this.categories);
             this.category.ExtendedProperties[this.owner] = this;
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
@@ -99,9 +95,9 @@ namespace JSSoft.Crema.Presentation.Framework
             }
         }
 
-        public ReadOnlyObservableCollection<TypeCategoryDescriptor> Categories => this.categoriesReadonly;
+        public ReadOnlyObservableCollection<TypeCategoryDescriptor> Categories { get; private set; }
 
-        public ReadOnlyObservableCollection<TypeDescriptor> Types => this.typesReadonly;
+        public ReadOnlyObservableCollection<TypeDescriptor> Types { get; private set; }
 
         [DescriptorProperty(nameof(categoryName))]
         public string Name => this.categoryName ?? string.Empty;
@@ -118,8 +114,8 @@ namespace JSSoft.Crema.Presentation.Framework
         [DescriptorProperty(nameof(accessInfo))]
         public AccessInfo AccessInfo => this.accessInfo;
 
-        [DescriptorProperty(nameof(accessType))]
-        public AccessType AccessType => this.accessType;
+        [DescriptorProperty]
+        public AccessType AccessType { get; private set; }
 
         [DescriptorProperty]
         public bool IsLocked => LockableDescriptorUtility.IsLocked(this.authentication, this);
@@ -322,14 +318,14 @@ namespace JSSoft.Crema.Presentation.Framework
         private async void Category_AccessChanged(object sender, EventArgs e)
         {
             this.accessInfo = this.category.AccessInfo;
-            this.accessType = this.category.GetAccessType(this.authentication);
+            this.AccessType = this.category.GetAccessType(this.authentication);
             await this.RefreshAsync();
         }
 
         private async void Category_LockChanged(object sender, EventArgs e)
         {
             this.lockInfo = this.category.LockInfo;
-            this.accessType = this.category.GetAccessType(this.authentication);
+            this.AccessType = this.category.GetAccessType(this.authentication);
             await this.RefreshAsync();
         }
 

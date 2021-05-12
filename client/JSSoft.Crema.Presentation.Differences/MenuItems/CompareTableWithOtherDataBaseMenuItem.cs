@@ -39,14 +39,12 @@ namespace JSSoft.Crema.Presentation.Differences.MenuItems
     class CompareTableWithOtherDataBaseMenuItem : MenuItemBase
     {
         private readonly Authenticator authenticator;
-        private readonly ICremaHost cremaHost;
         private readonly ICremaAppHost cremaAppHost;
 
         [ImportingConstructor]
-        public CompareTableWithOtherDataBaseMenuItem(Authenticator authenticator, ICremaHost cremaHost, ICremaAppHost cremaAppHost)
+        public CompareTableWithOtherDataBaseMenuItem(Authenticator authenticator, ICremaAppHost cremaAppHost)
         {
             this.authenticator = authenticator;
-            this.cremaHost = cremaHost;
             this.cremaAppHost = cremaAppHost;
             this.DisplayName = Resources.MenuItem_CompareWithOtherDataBase;
         }

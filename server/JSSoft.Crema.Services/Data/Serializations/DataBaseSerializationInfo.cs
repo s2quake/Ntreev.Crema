@@ -80,6 +80,6 @@ namespace JSSoft.Crema.Services.Data.Serializations
             };
         }
 
-        public static readonly ObjectSerializerSettings Settings = new ObjectSerializerSettings() { Extension = Extension };
+        public static readonly ObjectSerializerSettings Settings = new() { Extension = Extension };
     }
 }

@@ -23,19 +23,15 @@ using JSSoft.Crema.Data;
 using JSSoft.Library;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 using System.Windows.Media;
 
 namespace JSSoft.Crema.Tools.Framework.Controls
 {
     public class TagSelector : ButtonBase
     {
-        private static Dictionary<string, Color> tagToColor = new Dictionary<string, Color>();
+        private static readonly Dictionary<string, Color> tagToColor = new();
 
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(TagInfo?), typeof(TagSelector),
             new UIPropertyMetadata(TagInfo.All, ValuePropertyChangedCallback, ValuePropertyCoerceValueCallback));
@@ -65,20 +61,34 @@ namespace JSSoft.Crema.Tools.Framework.Controls
 
         public TagInfo? Value
         {
+
+/* 'JSSoft.Crema.Tools.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return (TagInfo?)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
+이후:
+            get => (TagInfo?)GetValue(ValueProperty); }
+*/
+            get => (TagInfo?)GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
         }
 
         public TagInfo Filter
         {
+
+/* 'JSSoft.Crema.Tools.Framework (net452)' 프로젝트에서 병합되지 않은 변경 내용
+이전:
             get { return (TagInfo)GetValue(FilterProperty); }
-            set { SetValue(FilterProperty, value); }
+이후:
+            get => (TagInfo)GetValue(FilterProperty); }
+*/
+            get => (TagInfo)GetValue(FilterProperty);
+            set => SetValue(FilterProperty, value);
         }
 
         public bool IsPopupOpen
         {
-            get { return (bool)GetValue(IsPopupOpenProperty); }
-            set { SetValue(IsPopupOpenProperty, value); }
+            get => (bool)GetValue(IsPopupOpenProperty);
+            set => SetValue(IsPopupOpenProperty, value);
         }
 
         public event RoutedEventHandler ValueChanged
@@ -93,18 +103,12 @@ namespace JSSoft.Crema.Tools.Framework.Controls
 
         protected virtual void OnPopupOpened(EventArgs e)
         {
-            if (this.PopupOpened != null)
-            {
-                this.PopupOpened(this, e);
-            }
+            this.PopupOpened?.Invoke(this, e);
         }
 
         protected virtual void OnPopupClosed(EventArgs e)
         {
-            if (this.PopupClosed != null)
-            {
-                this.PopupClosed(this, e);
-            }
+            this.PopupClosed?.Invoke(this, e);
         }
 
         protected override void OnClick()
@@ -131,10 +135,10 @@ namespace JSSoft.Crema.Tools.Framework.Controls
 
                     menuItem.IsEnabled = (this.Filter & value) == value;
                     menuItem.IsChecked = this.Value == value;
-                    menuItem.Click += menuItem_Click;
+                    menuItem.Click += MenuItem_Click;
                 }
 
-                popup.Closed += popup_Closed;
+                popup.Closed += Popup_Closed;
                 popup.PlacementTarget = this;
                 popup.Placement = System.Windows.Controls.Primitives.PlacementMode.Right;
                 popup.IsOpen = true;
@@ -178,19 +182,19 @@ namespace JSSoft.Crema.Tools.Framework.Controls
             }
         }
 
-        private void selector_Click(object sender, RoutedEventArgs e)
+        private void Selector_Click(object sender, RoutedEventArgs e)
         {
             
         }
 
-        private void popup_Closed(object sender, RoutedEventArgs e)
+        private void Popup_Closed(object sender, RoutedEventArgs e)
         {
-            this.popup.Closed -= popup_Closed;
+            this.popup.Closed -= Popup_Closed;
             this.popup = null;
             this.OnPopupClosed(EventArgs.Empty);
         }
 
-        private void menuItem_Click(object sender, RoutedEventArgs e)
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             var item = sender as System.Windows.Controls.MenuItem;
             if (item.IsChecked == true)
