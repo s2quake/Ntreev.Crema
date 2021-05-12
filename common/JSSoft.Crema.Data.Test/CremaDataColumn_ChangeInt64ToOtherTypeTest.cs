@@ -55,24 +55,71 @@ namespace JSSoft.Crema.Data.Test
         }
 
         [TestMethod]
+        public void Int64ToBoolean()
+        {
+            this.AddRows((long)0, (long)1);
+            column.DataType = typeof(bool);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(FormatException))]
         public void Int64ToBoolean_Fail()
         {
-            this.AddRows((long)0);
+            this.AddRows((long)2);
             column.DataType = typeof(bool);
         }
 
         [TestMethod]
         public void Int64ToSingle()
         {
-            this.AddRows(long.MinValue, long.MaxValue);
+            this.AddRows((long)-16777216, (long)16777216);
+            column.DataType = typeof(float);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Int64ToSingle_Fail1()
+        {
+            this.AddRows(long.MinValue + 1);
+            column.DataType = typeof(float);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Int64ToSingle_Fail2()
+        {
+            this.AddRows(long.MaxValue - 1);
             column.DataType = typeof(float);
         }
 
         [TestMethod]
         public void Int64ToDouble()
         {
-            this.AddRows(long.MinValue, long.MaxValue);
+            this.AddRows(long.MinValue);
+            column.DataType = typeof(double);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Int64ToDouble_Fail()
+        {
+            this.AddRows(long.MaxValue);
+            column.DataType = typeof(double);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Int64ToDouble_Fail1()
+        {
+            this.AddRows(long.MinValue + 1);
+            column.DataType = typeof(double);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Int64ToDouble_Fail2()
+        {
+            this.AddRows(long.MaxValue);
             column.DataType = typeof(double);
         }
 
@@ -193,52 +240,21 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void Int64ToUInt64()
         {
-            this.AddRows((long)0, long.MaxValue);
-            column.DataType = typeof(ulong);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(FormatException))]
-        public void Int64ToUInt64_Fail()
-        {
-            this.AddRows(long.MinValue);
+            this.AddRows(long.MinValue, (long)0, long.MaxValue);
             column.DataType = typeof(ulong);
         }
 
         [TestMethod]
         public void Int64ToDateTime()
         {
-            this.AddRows(minOADateValue);
+            this.AddRows(DateTime.MinValue.Ticks, DateTime.MaxValue.Ticks);
             column.DataType = typeof(DateTime);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FormatException))]
-        public void Int64ToDateTime_Fail1()
+        public void Int64ToTimeSpan()
         {
-            this.AddRows(minOADateValue - 1);
-            column.DataType = typeof(DateTime);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(FormatException))]
-        public void Int64ToDateTime_Fail2()
-        {
-            this.AddRows(maxOADateValue + 1);
-            column.DataType = typeof(DateTime);
-        }
-
-        [TestMethod]
-        public void Int64ToTimeSpan1()
-        {
-            this.AddRows(minOADateValue);
-            column.DataType = typeof(TimeSpan);
-        }
-
-        [TestMethod]
-        public void Int64ToTimeSpan2()
-        {
-            this.AddRows(maxOADateValue);
+            this.AddRows(TimeSpan.MinValue.Ticks, TimeSpan.MaxValue.Ticks);
             column.DataType = typeof(TimeSpan);
         }
 

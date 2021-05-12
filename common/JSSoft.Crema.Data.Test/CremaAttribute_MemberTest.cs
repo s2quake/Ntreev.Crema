@@ -132,7 +132,7 @@ namespace JSSoft.Crema.Data.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(FormatException))]
         public void SetDefaultValue_Fail()
         {
             var type1 = CremaDataTypeUtility.GetBaseTypes().Random(item => item != typeof(string));

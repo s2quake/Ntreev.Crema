@@ -52,10 +52,17 @@ namespace JSSoft.Crema.Data.Test
         }
 
         [TestMethod]
+        public void UInt8ToBoolean()
+        {
+            this.AddRows((byte)0, (byte)1);
+            column.DataType = typeof(bool);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(FormatException))]
         public void UInt8ToBoolean_Fail()
         {
-            this.AddRows((byte)0);
+            this.AddRows((byte)2);
             column.DataType = typeof(bool);
         }
 

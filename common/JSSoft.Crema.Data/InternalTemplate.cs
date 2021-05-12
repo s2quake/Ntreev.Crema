@@ -653,14 +653,19 @@ namespace JSSoft.Crema.Data
                     item.InternalDataTypeName = targetColumn.InternalDataTypeName;
                 if (item.InternalComment != targetColumn.InternalComment)
                     item.InternalComment = targetColumn.InternalComment;
-                if (object.Equals(item.InternalDefaultValue, targetColumn.InternalDefaultValue) == false)
-                    item.InternalDefaultValue = targetColumn.InternalDefaultValue;
                 if (item.InternalAllowNull != targetColumn.InternalAllowDBNull)
                     item.InternalAllowNull = targetColumn.InternalAllowDBNull;
                 if (item.InternalReadOnly != targetColumn.InternalReadOnly)
                     item.InternalReadOnly = targetColumn.InternalReadOnly;
                 if (item.InternalAutoIncrement != targetColumn.InternalAutoIncrement)
                     item.InternalAutoIncrement = targetColumn.InternalAutoIncrement;
+                if (object.Equals(item.InternalDefaultValue, targetColumn.InternalDefaultValue) == false)
+                {
+                    if (targetColumn.InternalDefaultValue == DBNull.Value)
+                        item.InternalDefaultValue = DBNull.Value;
+                    else
+                        item.InternalDefaultValue = CremaConvert.ToString(targetColumn.InternalDefaultValue);
+                }
             }
 
             this.OmitSignatureDate = omitSignatureDate;

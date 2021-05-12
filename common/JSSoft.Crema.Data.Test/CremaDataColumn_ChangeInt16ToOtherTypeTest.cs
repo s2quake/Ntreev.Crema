@@ -52,10 +52,17 @@ namespace JSSoft.Crema.Data.Test
         }
 
         [TestMethod]
+        public void Int16ToBoolean()
+        {
+            this.AddRows((short)0, (short)1);
+            column.DataType = typeof(bool);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(FormatException))]
         public void Int16ToBoolean_Fail()
         {
-            this.AddRows((short)0);
+            this.AddRows((short)2);
             column.DataType = typeof(bool);
         }
 
@@ -165,7 +172,15 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void Int16ToDateTime()
         {
-            this.AddRows(short.MinValue, short.MaxValue);
+            this.AddRows((short)0, short.MaxValue);
+            column.DataType = typeof(DateTime);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Int16ToDateTime_Fail()
+        {
+            this.AddRows(short.MinValue);
             column.DataType = typeof(DateTime);
         }
 

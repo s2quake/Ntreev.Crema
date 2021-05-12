@@ -64,7 +64,15 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void Int32ToSingle()
         {
-            this.AddRows(int.MinValue, int.MaxValue);
+            this.AddRows(-16777216, 0, 16777216);
+            column.DataType = typeof(float);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Int32ToSingle_Fail()
+        {
+            this.AddRows(int.MaxValue);
             column.DataType = typeof(float);
         }
 

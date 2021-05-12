@@ -243,7 +243,31 @@ namespace JSSoft.Crema.Data.Test
             var template = new CremaTemplate(dataTable);
             template.Columns[0].DefaultValue = "1";
             template.Columns[0].SetDataType(typeof(TimeSpan));
+            template.Columns[0].DefaultValue = "62.9:00:00";
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Test5_Fail1()
+        {
+            var dataTable = new CremaDataTable();
+            var c1 = dataTable.Columns.Add("Column1", typeof(string));
+            var template = new CremaTemplate(dataTable);
+            template.Columns[0].DefaultValue = "1";
+            template.Columns[0].SetDataType(typeof(TimeSpan));
             template.Columns[0].DefaultValue = "62.9";
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Test5_Fail2()
+        {
+            var dataTable = new CremaDataTable();
+            var c1 = dataTable.Columns.Add("Column1", typeof(string));
+            var template = new CremaTemplate(dataTable);
+            template.Columns[0].DefaultValue = "1";
+            template.Columns[0].SetDataType(typeof(TimeSpan));
+            template.Columns[0].DefaultValue = "62.24:00:00";
         }
 
         [TestMethod]
