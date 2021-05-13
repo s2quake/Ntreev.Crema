@@ -35,7 +35,6 @@ namespace JSSoft.Crema.Data
         {
             try
             {
-                // throw new FormatException($"기본값 \"{value}\"은(는) {this.DataType.GetTypeName()} 타입으로 변환할 수 없습니다.");
                 return ChangeType(value, dataType, true) is not DBNull;
             }
             catch
@@ -135,9 +134,7 @@ namespace JSSoft.Crema.Data
                 if (byte.TryParse(@string, out var @byte) == true)
                     return ValidateRoundTrip<string, byte>(@string, @byte, (v) => @string, verify);
             }
-            if (verify == true)
-                return DBNull.Value;
-            throw new FormatException();
+            return InvokeException(@string, dataType, verify);
         }
 
         private static object ConvertTo(bool @bool, Type dataType, bool verify)
@@ -148,45 +145,45 @@ namespace JSSoft.Crema.Data
             }
             else if (dataType == typeof(double))
             {
-                return ValidateRoundTrip<bool, double>(@bool, @bool ? 1 : 0, (v) => v == 1 ? true : false, verify);
+                return ValidateRoundTrip<bool, double>(@bool, @bool ? 1 : 0, (v) => v == 1, verify);
             }
             else if (dataType == typeof(float))
             {
-                return ValidateRoundTrip<bool, float>(@bool, @bool ? 1 : 0, (v) => v == 1 ? true : false, verify);
+                return ValidateRoundTrip<bool, float>(@bool, @bool ? 1 : 0, (v) => v == 1, verify);
             }
             else if (dataType == typeof(long))
             {
-                return ValidateRoundTrip<bool, long>(@bool, @bool ? 1 : 0, (v) => v == 1 ? true : false, verify);
+                return ValidateRoundTrip<bool, long>(@bool, @bool ? 1 : 0, (v) => v == 1, verify);
             }
             else if (dataType == typeof(ulong))
             {
-                return ValidateRoundTrip<bool, ulong>(@bool, @bool ? (ulong)1 : (ulong)0, (v) => v == 1 ? true : false, verify);
+                return ValidateRoundTrip<bool, ulong>(@bool, @bool ? (ulong)1 : (ulong)0, (v) => v == 1, verify);
             }
             else if (dataType == typeof(int))
             {
-                return ValidateRoundTrip<bool, int>(@bool, @bool ? 1 : 0, (v) => v == 1 ? true : false, verify);
+                return ValidateRoundTrip<bool, int>(@bool, @bool ? 1 : 0, (v) => v == 1, verify);
             }
             else if (dataType == typeof(uint))
             {
-                return ValidateRoundTrip<bool, uint>(@bool, @bool ? (uint)1 : (uint)0, (v) => v == 1 ? true : false, verify);
+                return ValidateRoundTrip<bool, uint>(@bool, @bool ? (uint)1 : (uint)0, (v) => v == 1, verify);
             }
             else if (dataType == typeof(short))
             {
-                return ValidateRoundTrip<bool, short>(@bool, @bool ? (short)1 : (short)0, (v) => v == 1 ? true : false, verify);
+                return ValidateRoundTrip<bool, short>(@bool, @bool ? (short)1 : (short)0, (v) => v == 1, verify);
             }
             else if (dataType == typeof(ushort))
             {
-                return ValidateRoundTrip<bool, ushort>(@bool, @bool ? (ushort)1 : (ushort)0, (v) => v == 1 ? true : false, verify);
+                return ValidateRoundTrip<bool, ushort>(@bool, @bool ? (ushort)1 : (ushort)0, (v) => v == 1, verify);
             }
             else if (dataType == typeof(sbyte))
             {
-                return ValidateRoundTrip<bool, sbyte>(@bool, @bool ? (sbyte)1 : (sbyte)0, (v) => v == 1 ? true : false, verify);
+                return ValidateRoundTrip<bool, sbyte>(@bool, @bool ? (sbyte)1 : (sbyte)0, (v) => v == 1, verify);
             }
             else if (dataType == typeof(byte))
             {
-                return ValidateRoundTrip<bool, byte>(@bool, @bool ? (byte)1 : (byte)0, (v) => v == 1 ? true : false, verify);
+                return ValidateRoundTrip<bool, byte>(@bool, @bool ? (byte)1 : (byte)0, (v) => v == 1, verify);
             }
-            throw new FormatException();
+            return InvokeException(@bool, dataType, verify);
         }
 
         private static object ConvertTo(Guid guid, Type dataType, bool verify)
@@ -255,7 +252,7 @@ namespace JSSoft.Crema.Data
                 if (dateTime.Ticks >= byte.MinValue && dateTime.Ticks <= byte.MaxValue)
                     return ValidateRoundTrip<DateTime, byte>(dateTime, (byte)dateTime.Ticks, (v) => new DateTime((long)v), verify);
             }
-            throw new FormatException();
+            return InvokeException(dateTime, dataType, verify);
         }
 
         private static object ConvertTo(TimeSpan timeSpan, Type dataType, bool verify)
@@ -312,7 +309,7 @@ namespace JSSoft.Crema.Data
                 if (timeSpan.Ticks >= byte.MinValue && timeSpan.Ticks <= byte.MaxValue)
                     return ValidateRoundTrip<TimeSpan, byte>(timeSpan, (byte)timeSpan.Ticks, (v) => new TimeSpan(v), verify);
             }
-            throw new FormatException();
+            return InvokeException(timeSpan, dataType, verify);
         }
 
         private static object ConvertTo(float @float, Type dataType, bool verify)
@@ -330,11 +327,13 @@ namespace JSSoft.Crema.Data
             }
             else if (dataType == typeof(DateTime))
             {
-                return ValidateRoundTrip<float, DateTime>(@float, DateTime.FromOADate((double)@float), (v) => (float)v.ToOADate(), verify);
+                if (@float >= DateTime.MinValue.ToOADate() && @float <= DateTime.MaxValue.ToOADate())
+                    return ValidateRoundTrip<float, DateTime>(@float, DateTime.FromOADate((double)@float), (v) => (float)v.ToOADate(), verify);
             }
             else if (dataType == typeof(TimeSpan))
             {
-                return ValidateRoundTrip<float, TimeSpan>(@float, TimeSpan.FromMilliseconds(@float), (v) => (float)v.TotalMilliseconds, verify);
+                if (@float >= TimeSpan.MinValue.TotalMilliseconds && @float <= TimeSpan.MaxValue.TotalMilliseconds)
+                    return ValidateRoundTrip<float, TimeSpan>(@float, TimeSpan.FromMilliseconds(@float), (v) => (float)v.TotalMilliseconds, verify);
             }
             else if (dataType == typeof(double))
             {
@@ -372,7 +371,7 @@ namespace JSSoft.Crema.Data
             {
                 return ValidateRoundTrip<float, byte>(@float, (byte)@float, (v) => (float)v, verify);
             }
-            throw new FormatException();
+            return InvokeException(@float, dataType, verify);
         }
 
         private static object ConvertTo(double @double, Type dataType, bool verify)
@@ -434,7 +433,7 @@ namespace JSSoft.Crema.Data
             {
                 return ValidateRoundTrip<double, byte>(@double, (byte)@double, (v) => (double)v, verify);
             }
-            throw new FormatException();
+            return InvokeException(@double, dataType, verify);
         }
 
         private static object ConvertTo(long @long, Type dataType, bool verify)
@@ -495,7 +494,7 @@ namespace JSSoft.Crema.Data
             {
                 return ValidateRoundTrip<long, byte>(@long, (byte)@long, (v) => (long)v, verify);
             }
-            throw new FormatException();
+            return InvokeException(@long, dataType, verify);
         }
 
         private static object ConvertTo(ulong @ulong, Type dataType, bool verify)
@@ -519,7 +518,7 @@ namespace JSSoft.Crema.Data
             else if (dataType == typeof(TimeSpan))
             {
                 if (@ulong <= long.MaxValue)
-                return ValidateRoundTrip<ulong, TimeSpan>(@ulong, new TimeSpan((long)@ulong), (v) => (ulong)v.Ticks, verify);
+                    return ValidateRoundTrip<ulong, TimeSpan>(@ulong, new TimeSpan((long)@ulong), (v) => (ulong)v.Ticks, verify);
             }
             else if (dataType == typeof(float))
             {
@@ -564,7 +563,7 @@ namespace JSSoft.Crema.Data
                 if (@ulong <= byte.MaxValue)
                     return ValidateRoundTrip<ulong, byte>(@ulong, (byte)@ulong, (v) => (ulong)v, verify);
             }
-            throw new FormatException();
+            return InvokeException(@ulong, dataType, verify);
         }
 
         private static object ConvertTo(int @int, Type dataType, bool verify)
@@ -603,11 +602,13 @@ namespace JSSoft.Crema.Data
             }
             else if (dataType == typeof(ulong))
             {
-                return ValidateRoundTrip<int, ulong>(@int, (ulong)@int, (v) => (int)v, verify);
+                if (@int >= 0)
+                    return ValidateRoundTrip<int, ulong>(@int, (ulong)@int, (v) => (int)v, verify);
             }
             else if (dataType == typeof(uint))
             {
-                return ValidateRoundTrip<int, uint>(@int, (uint)@int, (v) => (int)v, verify);
+                if (@int >= uint.MinValue && @int <= int.MaxValue)
+                    return ValidateRoundTrip<int, uint>(@int, (uint)@int, (v) => (int)v, verify);
             }
             else if (dataType == typeof(short))
             {
@@ -625,7 +626,7 @@ namespace JSSoft.Crema.Data
             {
                 return ValidateRoundTrip<int, byte>(@int, (byte)@int, (v) => (int)v, verify);
             }
-            throw new FormatException();
+            return InvokeException(@int, dataType, verify);
         }
 
         private static object ConvertTo(uint @uint, Type dataType, bool verify)
@@ -668,25 +669,30 @@ namespace JSSoft.Crema.Data
             }
             else if (dataType == typeof(int))
             {
-                return ValidateRoundTrip<uint, int>(@uint, (int)@uint, (v) => (uint)v, verify);
+                if (@uint <= int.MaxValue)
+                    return ValidateRoundTrip<uint, int>(@uint, (int)@uint, (v) => (uint)v, verify);
             }
             else if (dataType == typeof(short))
             {
-                return ValidateRoundTrip<uint, short>(@uint, (short)@uint, (v) => (uint)v, verify);
+                if (@uint <= short.MaxValue)
+                    return ValidateRoundTrip<uint, short>(@uint, (short)@uint, (v) => (uint)v, verify);
             }
             else if (dataType == typeof(ushort))
             {
-                return ValidateRoundTrip<uint, ushort>(@uint, (ushort)@uint, (v) => (uint)v, verify);
+                if (@uint <= ushort.MaxValue)
+                    return ValidateRoundTrip<uint, ushort>(@uint, (ushort)@uint, (v) => (uint)v, verify);
             }
             else if (dataType == typeof(sbyte))
             {
-                return ValidateRoundTrip<uint, sbyte>(@uint, (sbyte)@uint, (v) => (uint)v, verify);
+                if (@uint <= sbyte.MaxValue)
+                    return ValidateRoundTrip<uint, sbyte>(@uint, (sbyte)@uint, (v) => (uint)v, verify);
             }
             else if (dataType == typeof(byte))
             {
-                return ValidateRoundTrip<uint, byte>(@uint, (byte)@uint, (v) => (uint)v, verify);
+                if (@uint <= byte.MaxValue)
+                    return ValidateRoundTrip<uint, byte>(@uint, (byte)@uint, (v) => (uint)v, verify);
             }
-            throw new FormatException();
+            return InvokeException(@uint, dataType, verify);
         }
 
         private static object ConvertTo(short @short, Type dataType, bool verify)
@@ -752,7 +758,7 @@ namespace JSSoft.Crema.Data
                 if (@short >= 0 && @short <= byte.MaxValue)
                     return ValidateRoundTrip<short, byte>(@short, (byte)@short, (v) => (short)v, verify);
             }
-            throw new FormatException();
+            return InvokeException(@short, dataType, verify);
         }
 
         private static object ConvertTo(ushort @ushort, Type dataType, bool verify)
@@ -816,7 +822,7 @@ namespace JSSoft.Crema.Data
                 if (@ushort <= byte.MaxValue)
                     return ValidateRoundTrip<ushort, byte>(@ushort, (byte)@ushort, (v) => (ushort)v, verify);
             }
-            throw new FormatException();
+            return InvokeException(@ushort, dataType, verify);
         }
 
         private static object ConvertTo(sbyte @sbyte, Type dataType, bool verify)
@@ -881,7 +887,7 @@ namespace JSSoft.Crema.Data
                 if (@sbyte >= 0)
                     return ValidateRoundTrip<sbyte, byte>(@sbyte, (byte)@sbyte, (v) => (sbyte)v, verify);
             }
-            throw new FormatException();
+            return InvokeException(@sbyte, dataType, verify);
         }
 
         private static object ConvertTo(byte @byte, Type dataType, bool verify)
@@ -943,7 +949,7 @@ namespace JSSoft.Crema.Data
                 if (@byte <= sbyte.MaxValue)
                     return ValidateRoundTrip<byte, sbyte>(@byte, (sbyte)@byte, (v) => (byte)v, verify);
             }
-            throw new FormatException();
+            return InvokeException(@byte, dataType, verify);
         }
 
         private static object ValidateRoundTrip<T, U>(T var1, U var2, Func<U, T> func, bool verify)
@@ -1027,6 +1033,13 @@ namespace JSSoft.Crema.Data
             {
                 throw new FormatException();
             }
+        }
+
+        private static object InvokeException(object value, Type dataType, bool verify)
+        {
+            if (verify == true)
+                return DBNull.Value;
+            throw new FormatException($"'{value}' cannot be converted to type '{dataType}'.");
         }
     }
 }

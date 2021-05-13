@@ -154,20 +154,38 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void StringToDateTime()
         {
-            var value1 = DateTime.MinValue.ToOADate().ToString("R");
-            var value2 = DateTime.MaxValue.ToOADate().ToString("R");
-            var value3 = RandomUtility.Next<DateTime>().ToOADate().ToString("R");
+            var value1 = DateTime.MinValue.ToString("o");
+            var value2 = DateTime.MaxValue.ToString("o");
+            var value3 = RandomUtility.Next<DateTime>().ToString("o");
             this.AddRows(value1, value2, value3);
+            column.DataType = typeof(DateTime);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void StringToDateTime_Fail()
+        {
+            var value = RandomUtility.Next<DateTime>().ToOADate().ToString("R");
+            this.AddRows(value);
             column.DataType = typeof(DateTime);
         }
 
         [TestMethod]
         public void StringToTimeSpan()
         {
-            var value1 = TimeSpan.MinValue.TotalSeconds.ToString("R");
-            var value2 = TimeSpan.MaxValue.TotalSeconds.ToString("R");
-            var value3 = RandomUtility.Next<TimeSpan>().TotalSeconds.ToString("R");
+            var value1 = TimeSpan.MinValue.ToString();
+            var value2 = TimeSpan.MaxValue.ToString();
+            var value3 = RandomUtility.Next<TimeSpan>().ToString();
             this.AddRows(value1, value2, value3);
+            column.DataType = typeof(TimeSpan);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void StringToTimeSpan_Fail()
+        {
+            var value = RandomUtility.Next<TimeSpan>().TotalSeconds.ToString("R");
+            this.AddRows(value);
             column.DataType = typeof(TimeSpan);
         }
     }

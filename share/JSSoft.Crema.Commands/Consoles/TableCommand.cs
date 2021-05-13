@@ -511,40 +511,5 @@ namespace JSSoft.Crema.Commands.Consoles
         private ICremaHost CremaHost { get; }
 
         private IDataBaseContext DataBaseContext => this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
-
-        // #region classes
-
-        // class ColumnItem : TerminalTextItem
-        // {
-        //     private readonly ColumnInfo columnInfo;
-
-        //     public ColumnItem(ColumnInfo columnInfo)
-        //         : base(columnInfo)
-        //     {
-        //         this.columnInfo = columnInfo;
-        //     }
-
-        //     public override string ToString()
-        //     {
-        //         return this.columnInfo.Name;
-        //     }
-
-        //     protected override void OnDraw(TextWriter writer, string text)
-        //     {
-        //         if (this.columnInfo.IsKey == true)
-        //         {
-        //             using (TerminalColor.SetForeground(ConsoleColor.Cyan))
-        //             {
-        //                 base.OnDraw(writer, text);
-        //             }
-        //         }
-        //         else
-        //         {
-        //             base.OnDraw(writer, text);
-        //         }
-        //     }
-        // }
-
-        // #endregion
     }
 }

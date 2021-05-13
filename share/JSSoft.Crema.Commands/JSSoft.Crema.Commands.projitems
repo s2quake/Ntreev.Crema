@@ -29,7 +29,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\AuthorityAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\ConsoleCommandBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\ConsoleCommandContextBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Consoles\ConsoleCommandProviderBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\ConsoleCommandMethodBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\ConsoleTerminalBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\ChangeDirectoryCommand.cs" />

@@ -54,17 +54,32 @@ namespace JSSoft.Crema.Data.Test
         }
 
         [TestMethod]
+        public void UInt32ToBoolean()
+        {
+            this.AddRows((uint)0, (uint)1);
+            column.DataType = typeof(bool);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(FormatException))]
         public void UInt32ToBoolean_Fail()
         {
-            this.AddRows((uint)0);
+            this.AddRows((uint)2);
             column.DataType = typeof(bool);
         }
 
         [TestMethod]
         public void UInt32ToSingle()
         {
-            this.AddRows(uint.MinValue, uint.MaxValue);
+            this.AddRows((uint)0, (uint)1);
+            column.DataType = typeof(float);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void UInt32ToSingle_Fail()
+        {
+            this.AddRows(uint.MaxValue);
             column.DataType = typeof(float);
         }
 
