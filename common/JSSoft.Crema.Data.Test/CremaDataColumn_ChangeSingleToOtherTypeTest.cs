@@ -29,10 +29,6 @@ namespace JSSoft.Crema.Data.Test
     [TestClass]
     public class CremaDataColumn_ChangeSingleToOtherTypeTest : CremaDataColumn_ChangeTypeTestBase
     {
-        private const float minIntValue = -16777216.0f;
-        private const float maxIntValue = 16777216.0f;
-        private const float maxOADateValue = 2958465.0f;
-
         public CremaDataColumn_ChangeSingleToOtherTypeTest()
             : base(typeof(float))
         {
@@ -57,10 +53,17 @@ namespace JSSoft.Crema.Data.Test
         }
 
         [TestMethod]
+        public void SingleToBoolean()
+        {
+            this.AddRows((float)0.0f, (float)1.0f);
+            column.DataType = typeof(bool);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(FormatException))]
         public void SingleToBoolean_Fail()
         {
-            this.AddRows(0.0f);
+            this.AddRows((float)2.0f);
             column.DataType = typeof(bool);
         }
 
@@ -134,45 +137,45 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void SingleToInt32()
         {
-            this.AddRows(minIntValue, maxIntValue);
+            this.AddRows(0.0f, 1.0f, 2.0f);
             column.DataType = typeof(int);
         }
 
         [TestMethod]
         [ExpectedException(typeof(FormatException))]
-        public void SingleToInt32_MinValue_Fail()
+        public void SingleToInt32_Fail()
         {
-            this.AddRows(minIntValue - 1.0f);
-            column.DataType = typeof(int);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(FormatException))]
-        public void SingleToInt32_MaxValue_Fail()
-        {
-            this.AddRows(maxIntValue + 1.0f);
+            this.AddRows(1.1f);
             column.DataType = typeof(int);
         }
 
         [TestMethod]
         public void SingleToUInt32()
         {
-            this.AddRows(0.0f, maxIntValue);
+            this.AddRows(0.0f, 1.0f, 2.0f);
             column.DataType = typeof(uint);
         }
 
         [TestMethod]
         [ExpectedException(typeof(FormatException))]
-        public void SingleToUInt32_Fail()
+        public void SingleToUInt32_Fail1()
         {
-            this.AddRows(maxIntValue + 1.0f);
+            this.AddRows(1.1f);
+            column.DataType = typeof(uint);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void SingleToUInt32_Fail2()
+        {
+            this.AddRows(-1.1f);
             column.DataType = typeof(uint);
         }
 
         [TestMethod]
         public void SingleToInt64()
         {
-            this.AddRows(minIntValue, maxIntValue);
+            this.AddRows(-1.0f, 0.0f, 1.0f);
             column.DataType = typeof(long);
         }
 
@@ -180,44 +183,76 @@ namespace JSSoft.Crema.Data.Test
         [ExpectedException(typeof(FormatException))]
         public void SingleToInt64_Fail()
         {
-            this.AddRows(maxIntValue + 1.0f);
+            this.AddRows(-1.1f);
             column.DataType = typeof(long);
         }
 
         [TestMethod]
         public void SingleToUInt64()
         {
-            this.AddRows(0.0f, maxIntValue);
+            this.AddRows(0.0f, 1.0f, 2.0f);
             column.DataType = typeof(ulong);
         }
 
         [TestMethod]
         [ExpectedException(typeof(FormatException))]
-        public void SingleToUInt64_Fail()
+        public void SingleToUInt64_Fail1()
         {
-            this.AddRows(float.MinValue, float.MaxValue, RandomUtility.Next(typeof(float)));
+            this.AddRows(2.1f);
+            column.DataType = typeof(ulong);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void SingleToUInt64_Fail2()
+        {
+            this.AddRows(-2.1f);
             column.DataType = typeof(ulong);
         }
 
         [TestMethod]
         public void SingleToDateTime()
         {
-            this.AddRows(0.0f, maxOADateValue);
+            this.AddRows(0.0f);
             column.DataType = typeof(DateTime);
         }
 
         [TestMethod]
         [ExpectedException(typeof(FormatException))]
-        public void SingleToDateTime_Fail()
+        public void SingleToDateTime_Fail1()
         {
-            this.AddRows(maxOADateValue + 1.0f);
+            this.AddRows(-1.0f);
+            column.DataType = typeof(DateTime);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void SingleToDateTime_Fail2()
+        {
+            this.AddRows(float.MaxValue);
             column.DataType = typeof(DateTime);
         }
 
         [TestMethod]
         public void SingleToTimeSpan()
         {
-            this.AddRows(minIntValue, maxIntValue);
+            this.AddRows(-1.0f, 0.0f, 1.0f);
+            column.DataType = typeof(TimeSpan);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void SingleToTimeSpan_Fail1()
+        {
+            this.AddRows(float.MinValue);
+            column.DataType = typeof(TimeSpan);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void SingleToTimeSpan_Fail2()
+        {
+            this.AddRows(float.MaxValue);
             column.DataType = typeof(TimeSpan);
         }
 

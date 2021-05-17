@@ -42,7 +42,6 @@ namespace JSSoft.Crema.ApplicationHost.Controls
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
             base.OnRenderSizeChanged(sizeInfo);
-            // JSSoft.Library.Commands.Terminal.BufferWidth = (int)sizeInfo.NewSize.Width / 6;
         }
 
         protected override Inline[] GetPrompt(string prompt)

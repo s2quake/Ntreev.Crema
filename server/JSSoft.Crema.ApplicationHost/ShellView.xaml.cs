@@ -68,11 +68,11 @@ namespace JSSoft.Crema.ApplicationHost
             this.terminal.ApplyTemplate();
         }
 
-        public async void Run(string commandLine)
+        public async Task Run(string commandLine)
         {
             try
             {
-                await Task.Run(() => this.commandContext.Execute(this.commandContext.Name + " " + commandLine));
+                await this.commandContext.ExecuteAsync(this.commandContext.Name + " " + commandLine);
                 this.SetPrompt();
             }
             catch (System.Reflection.TargetInvocationException e)

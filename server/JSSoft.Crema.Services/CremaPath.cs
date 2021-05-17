@@ -21,7 +21,7 @@
 
 namespace JSSoft.Crema.Services
 {
-    public enum CremaPath
+    enum CremaPath
     {
         Repository,
 

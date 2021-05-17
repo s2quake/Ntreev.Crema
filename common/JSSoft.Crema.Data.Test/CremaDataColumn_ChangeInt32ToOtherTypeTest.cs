@@ -28,7 +28,6 @@ namespace JSSoft.Crema.Data.Test
     [TestClass]
     public class CremaDataColumn_ChangeInt32ToOtherTypeTest : CremaDataColumn_ChangeTypeTestBase
     {
-        private const int maxOADateValue = 2958465;
 
         public CremaDataColumn_ChangeInt32ToOtherTypeTest()
             : base(typeof(int))
@@ -54,10 +53,17 @@ namespace JSSoft.Crema.Data.Test
         }
 
         [TestMethod]
+        public void Int32ToBoolean()
+        {
+            this.AddRows((int)0, (int)1);
+            column.DataType = typeof(bool);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(FormatException))]
         public void Int32ToBoolean_Fail()
         {
-            this.AddRows((int)0);
+            this.AddRows((int)2);
             column.DataType = typeof(bool);
         }
 
@@ -184,7 +190,7 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void Int32ToDateTime()
         {
-            this.AddRows((int)0, maxOADateValue);
+            this.AddRows(0, int.MaxValue);
             column.DataType = typeof(DateTime);
         }
 
@@ -192,7 +198,7 @@ namespace JSSoft.Crema.Data.Test
         [ExpectedException(typeof(FormatException))]
         public void Int32ToDateTime_Fail()
         {
-            this.AddRows(maxOADateValue + 1);
+            this.AddRows(int.MinValue);
             column.DataType = typeof(DateTime);
         }
 

@@ -41,7 +41,7 @@ namespace JSSoft.Crema.ServerService.Test
             foreach (var item in users)
             {
                 var password = StringUtility.ToSecureString(item.Authority.ToString().ToLower());
-                var token = await cremaHost.LoginAsync(item.ID, password);
+                var token = await cremaHost.LoginAsync(item.ID, password, false);
                 var authentication = await cremaHost.AuthenticateAsync(token);
                 this.Add(item, authentication);
             }

@@ -77,7 +77,7 @@ namespace JSSoft.Crema.ServerService.Test
             var users = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
             var user = await users.Dispatcher.InvokeAsync(() => users.Random(item => item.Authority == Authority.Admin));
             var password = StringUtility.ToSecureString(user.Authority.ToString().ToLower());
-            var token = await cremaHost.LoginAsync(user.ID, password);
+            var token = await cremaHost.LoginAsync(user.ID, password, false);
             return await cremaHost.AuthenticateAsync(token);
         }
 
@@ -86,7 +86,7 @@ namespace JSSoft.Crema.ServerService.Test
             var users = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
             var user = await users.Dispatcher.InvokeAsync(() => users.Random(item => item.Authority == authority));
             var password = StringUtility.ToSecureString(user.Authority.ToString().ToLower());
-            var token = await cremaHost.LoginAsync(user.ID, password);
+            var token = await cremaHost.LoginAsync(user.ID, password, false);
             return await cremaHost.AuthenticateAsync(token);
         }
     }

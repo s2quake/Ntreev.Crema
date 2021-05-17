@@ -52,10 +52,17 @@ namespace JSSoft.Crema.Data.Test
         }
 
         [TestMethod]
+        public void Int8ToBoolean()
+        {
+            this.AddRows((sbyte)0, (sbyte)1);
+            column.DataType = typeof(bool);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(FormatException))]
         public void Int8ToBoolean_Fail()
         {
-            this.AddRows((sbyte)0);
+            this.AddRows((sbyte)2);
             column.DataType = typeof(bool);
         }
 
@@ -132,6 +139,14 @@ namespace JSSoft.Crema.Data.Test
 
         [TestMethod]
         public void Int8ToDateTime()
+        {
+            this.AddRows(sbyte.MaxValue);
+            column.DataType = typeof(DateTime);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void Int8ToDateTime_Fail()
         {
             this.AddRows(sbyte.MinValue, sbyte.MaxValue);
             column.DataType = typeof(DateTime);

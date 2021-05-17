@@ -95,7 +95,6 @@ namespace JSSoft.Crema.ApplicationHost.Commands.Consoles
         private void ShutdownContext_ShutdownException(object sender, ShutdownEventArgs e)
         {
             this.Error.WriteLine(e.Exception);
-            // this.cancellation.Cancel();
         }
     }
 }

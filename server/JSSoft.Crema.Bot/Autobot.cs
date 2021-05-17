@@ -49,7 +49,7 @@ namespace JSSoft.Crema.Bot
 
         protected override async Task<Authentication> OnLoginAsync()
         {
-            var token = await this.cremaHost.LoginAsync(this.AutobotID, this.password);
+            var token = await this.cremaHost.LoginAsync(this.AutobotID, this.password, false);
             return await this.cremaHost.AuthenticateAsync(token);
         }
 

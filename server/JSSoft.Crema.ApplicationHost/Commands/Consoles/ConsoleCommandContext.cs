@@ -61,34 +61,25 @@ namespace JSSoft.Crema.ApplicationHost.Commands.Consoles
                 throw new Exception("이미 로그인되어 있습니다.");
             var token = await this.CremaHost.LoginAsync(userID, password, false);
             this.authentication = await this.CremaHost.AuthenticateAsync(token);
-            this.authentication.Expired += (s, e) => this.authentication = null;
+            this.authentication.Expired += Authentication_Expired;
             this.Initialize(authentication);
         }
-
-#if DEBUG
-        public Task LoginAsync(string userID, string password)
-        {
-            var secureString = new SecureString();
-            foreach (var item in password)
-            {
-                secureString.AppendChar(item);
-            }
-            return this.LoginAsync(userID, secureString);
-        }
-#endif
 
         public async Task LogoutAsync()
         {
             if (this.authentication == null)
                 throw new Exception("로그인되어 있지 않습니다.");
+            this.Release();
+            this.authentication.Expired -= Authentication_Expired;
             await this.CremaHost.LogoutAsync(this.authentication);
             this.authentication = null;
-            this.Release();
         }
 
         public override ICremaHost CremaHost => this.cremaHost;
 
         public override string Address => AddressUtility.GetDisplayAddress($"localhost:{this.service.Port}");
+
+        public bool IsOpen => this.service.ServiceState == ServiceState.Open;
 
         private void CremaHost_Opened(object sender, EventArgs e)
         {
@@ -96,6 +87,11 @@ namespace JSSoft.Crema.ApplicationHost.Commands.Consoles
             {
                 this.BaseDirectory = System.IO.Path.Combine(settings.BasePath, "Documents");
             }
+        }
+
+        private void Authentication_Expired(object sender, EventArgs e)
+        {
+            this.authentication = null;
         }
     }
 }

@@ -32,7 +32,7 @@ namespace JSSoft.Crema.Data.Test
     [TestClass]
     public class CremaDataColumn_Complex_Test
     {
-        private readonly CremaDataSet dataSet = new CremaDataSet();
+        private readonly CremaDataSet dataSet = new();
         private readonly CremaDataTable table;
 
         public CremaDataColumn_Complex_Test()

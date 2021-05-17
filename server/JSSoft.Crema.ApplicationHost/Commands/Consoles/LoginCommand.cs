@@ -45,7 +45,7 @@ namespace JSSoft.Crema.ApplicationHost.Commands.Consoles
             get; set;
         }
 
-        public override bool IsEnabled => this.CommandContext.IsOnline == false;
+        public override bool IsEnabled => this.CommandContext.IsOpen == true && this.CommandContext.IsOnline == false;
 
         public new ConsoleCommandContext CommandContext => base.CommandContext as ConsoleCommandContext;
 
