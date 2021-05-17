@@ -28,17 +28,6 @@ namespace JSSoft.Crema.ConsoleHost
     {
         static async Task Main(string[] args)
         {
-            var d1 = DateTime.Now;
-            var text = d1.ToString("R");
-            var d2 = DateTime.Parse(text);
-            var b = d1 == d2;
-            
-            var t1 = DateTime.Now - d1;
-            var text2 = t1.ToString();
-            var t2 = TimeSpan.Parse(text2);
-            var t3 = new TimeSpan(t1.Ticks);
-            var t4 = TimeSpan.FromMilliseconds(t1.TotalMilliseconds);
-            var b2 = t1 == t2;
             try
             {
                 using var application = new CremaApplication();
