@@ -58,11 +58,6 @@ namespace JSSoft.Crema.Javascript
                 if (CommandStringUtility.TryGetKeyValue(item, out var key, out var value) == true)
                 {
                     var typeName = value;
-                    if (CommandStringUtility.IsWrappedOfQuote(value))
-                    {
-                        value = CommandStringUtility.TrimQuot(value);
-                    }
-
                     if (value == "number")
                     {
                         properties.Add(key, typeof(decimal));
