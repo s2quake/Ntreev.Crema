@@ -1,0 +1,397 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "server", "server", "{42B800F5-7B40-4FF3-843E-F76945B655F8}"
+	ProjectSection(SolutionItems) = preProject
+		server\Directory.Build.props = server\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ServiceHosts", "server\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.csproj", "{CAC3EDF8-30CA-4413-8C0A-867B04CF7FB0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Services", "server\JSSoft.Crema.Services\JSSoft.Crema.Services.csproj", "{E8455FFB-4563-4602-8607-8B2E9ADA1D7C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ConsoleHost", "server\JSSoft.Crema.ConsoleHost\JSSoft.Crema.ConsoleHost.csproj", "{19F44FC7-48FA-42C5-99C6-430B49545B7B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Commands", "server\JSSoft.Crema.Commands\JSSoft.Crema.Commands.csproj", "{C6D8194E-B593-4138-851E-A63CC0391DA6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{7628581C-F073-411C-8D1D-CDEAEEC69C0D}"
+	ProjectSection(SolutionItems) = preProject
+		common\Directory.Build.props = common\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ServiceModel", "common\JSSoft.Crema.ServiceModel\JSSoft.Crema.ServiceModel.csproj", "{C2F83A83-0650-4A5F-B4BC-4E8EA8BA29DF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Spreadsheet", "common\JSSoft.Crema.Spreadsheet\JSSoft.Crema.Spreadsheet.csproj", "{EEA1D7EE-7D98-49C0-A2CE-8685A1D709DE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{E2B8B9E6-994F-4E4C-875D-D50608E498C5}"
+	ProjectSection(SolutionItems) = preProject
+		client\Directory.Build.props = client\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Services", "client\JSSoft.Crema.Services\JSSoft.Crema.Services.csproj", "{BC14E19C-3EBB-40F3-BECA-89D207FC4C15}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Library", "..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj", "{D242A9FF-8D41-4760-8C5C-36719BFC302E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{820D586B-BF8C-4FC2-985C-50C802480B8E}"
+	ProjectSection(SolutionItems) = preProject
+		tools\Directory.Build.props = tools\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Commands", "client\JSSoft.Crema.Commands\JSSoft.Crema.Commands.csproj", "{CFEB0CC5-E0D6-4950-9812-F0F530E3736B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Library.Commands", "..\JSSoft.Library.Commands\JSSoft.Library.Commands\JSSoft.Library.Commands.csproj", "{535822AD-AEA1-46F8-B7E8-D1ECCFD2BB52}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Commands", "tools\JSSoft.Crema.Commands\JSSoft.Crema.Commands.csproj", "{3AA5BEED-CEDD-4E07-A265-AF1494538FF7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Runtime.Serialization", "common\JSSoft.Crema.Runtime.Serialization\JSSoft.Crema.Runtime.Serialization.csproj", "{091B2680-4DD4-4E00-BB98-7E5342148A23}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Runtime.Generation", "common\JSSoft.Crema.Runtime.Generation\JSSoft.Crema.Runtime.Generation.csproj", "{B2F44F59-CF2F-460C-B418-2DD702531A3E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Runtime.Generation.Cpp", "common\JSSoft.Crema.Runtime.Generation.Cpp\JSSoft.Crema.Runtime.Generation.Cpp.csproj", "{E0135EC2-092B-45E7-B325-1DC8003FAC5B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Runtime.Generation.TypeScript", "common\JSSoft.Crema.Runtime.Generation.TypeScript\JSSoft.Crema.Runtime.Generation.TypeScript.csproj", "{D9CC7A1F-04A1-45F3-BCE6-3374D1B7692D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.RuntimeService", "server\JSSoft.Crema.RuntimeService\JSSoft.Crema.RuntimeService.csproj", "{E785C08B-62F9-4B26-A56E-1E292E0F4157}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ConsoleHost", "tools\JSSoft.Crema.ConsoleHost\JSSoft.Crema.ConsoleHost.csproj", "{62BA13D1-AB06-4634-A61C-C6C107980B18}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.RuntimeService", "tools\JSSoft.Crema.RuntimeService\JSSoft.Crema.RuntimeService.csproj", "{E5B7D919-98EF-4603-BBAE-54EDC53822A2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Data", "common\JSSoft.Crema.Data\JSSoft.Crema.Data.csproj", "{E90C0268-BD9A-48DB-AA69-6DC41A5FD184}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Reader", "tools\JSSoft.Crema.Reader\JSSoft.Crema.Reader.csproj", "{DEB27E04-54FC-4D92-9D5D-6B518BEA8B76}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ConsoleHost", "client\JSSoft.Crema.ConsoleHost\JSSoft.Crema.ConsoleHost.csproj", "{DDB91754-5739-4347-A9AE-BEF5DCEAF8C7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Repository.Svn", "server\JSSoft.Crema.Repository.Svn\JSSoft.Crema.Repository.Svn.csproj", "{CE603AC5-2526-4578-B793-BADEAAAD9A21}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Commands.Spreadsheet", "client\JSSoft.Crema.Commands.Spreadsheet\JSSoft.Crema.Commands.Spreadsheet.csproj", "{FCE9404F-ED8F-4BE1-BB7A-2B98C7B941CC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Commands.Spreadsheet", "server\JSSoft.Crema.Commands.Spreadsheet\JSSoft.Crema.Commands.Spreadsheet.csproj", "{F884C492-D731-4434-A4A0-F90BA8A4E0EF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Javascript", "client\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.csproj", "{0EE705A5-B5E1-4F06-9380-BE9E8F8A3AE6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Javascript", "server\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.csproj", "{483FD005-5AE2-4BC3-BB90-8AC1F963EEDE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Data.Diff", "common\JSSoft.Crema.Data.Diff\JSSoft.Crema.Data.Diff.csproj", "{D67CC60F-2417-445F-B81C-977F15642991}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Repository.Git", "server\JSSoft.Crema.Repository.Git\JSSoft.Crema.Repository.Git.csproj", "{C5A3E94F-DE87-444D-ADF0-EB2802694F2D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ObjectSerializer.Yaml", "server\JSSoft.Crema.ObjectSerializer.Yaml\JSSoft.Crema.ObjectSerializer.Yaml.csproj", "{85BA8930-4405-4A55-829F-1DEE14D1B77F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ObjectSerializer.Json", "server\JSSoft.Crema.ObjectSerializer.Json\JSSoft.Crema.ObjectSerializer.Json.csproj", "{F46559BA-6758-458C-9A44-399110F066FF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Services.Extentions", "client\JSSoft.Crema.Services.Extentions\JSSoft.Crema.Services.Extentions.csproj", "{957C9292-F518-4C3D-856D-E3B094102A55}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Services.Extensions", "server\JSSoft.Crema.Services.Extensions\JSSoft.Crema.Services.Extensions.csproj", "{D334A888-251A-42B5-8E6E-24F21FE99236}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "share", "share", "{6694E6CE-60A0-475C-B4D5-B4A078388C2F}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.Bot", "share\JSSoft.Crema.Bot\JSSoft.Crema.Bot.shproj", "{35AD4803-BEC1-4F3E-98AB-5C7961F2C261}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.Commands", "share\JSSoft.Crema.Commands\JSSoft.Crema.Commands.shproj", "{3D3128AA-908D-44C4-9EFD-0E1A903F5287}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.Commands.Spreadsheet", "share\JSSoft.Crema.Commands.Spreadsheet\JSSoft.Crema.Commands.Spreadsheet.shproj", "{05971A74-2D68-4781-9CEB-DF2B48F8BA75}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.Javascript", "share\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.shproj", "{A4955825-195F-4677-9695-5FC67362A449}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.ServiceHosts", "share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.shproj", "{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.ServiceHosts.Data", "share\JSSoft.Crema.ServiceHosts.Data\JSSoft.Crema.ServiceHosts.Data.shproj", "{BABAB208-95FB-4D06-B801-3FEE20F980EB}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.ServiceHosts.Domains", "share\JSSoft.Crema.ServiceHosts.Domains\JSSoft.Crema.ServiceHosts.Domains.shproj", "{F2688CF8-CC3E-48C9-A718-738F57388165}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.ServiceHosts.RuntimeService", "share\JSSoft.Crema.ServiceHosts.RuntimeService\JSSoft.Crema.ServiceHosts.RuntimeService.shproj", "{7E5C7310-0DA2-4F46-896B-C8E871C22E37}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.ServiceHosts.Users", "share\JSSoft.Crema.ServiceHosts.Users\JSSoft.Crema.ServiceHosts.Users.shproj", "{4E857C1F-3CA7-45B7-9B3F-2AF6D49071B2}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.Services", "share\JSSoft.Crema.Services\JSSoft.Crema.Services.shproj", "{24ECBEE1-2859-4F09-969B-F382E6341814}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.Services.Extensions", "share\JSSoft.Crema.Services.Extensions\JSSoft.Crema.Services.Extensions.shproj", "{97AD6C00-3B71-4E83-97C3-0201BC035471}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{1F5FB141-283E-4160-B680-84B34E032DCC}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Communication", "..\JSSoft.Communication\JSSoft.Communication\JSSoft.Communication.csproj", "{DA4C52CD-107D-4A04-955B-67961EE26214}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Bot", "client\JSSoft.Crema.Bot\JSSoft.Crema.Bot.csproj", "{595830E8-8FD3-44BF-AE07-79E8EC57A830}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Services.Random", "client\JSSoft.Crema.Services.Random\JSSoft.Crema.Services.Random.csproj", "{89395ED5-5F1A-44CA-BCD6-480A44AF840B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Services.Test", "client\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.csproj", "{81948C77-9F48-4B76-B2A4-79C59A190CB9}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.Services.Random", "share\JSSoft.Crema.Services.Random\JSSoft.Crema.Services.Random.shproj", "{1F4A20AE-F955-4231-8636-27B7A38EB4B3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Bot", "server\JSSoft.Crema.Bot\JSSoft.Crema.Bot.csproj", "{1133B040-C0B6-4C13-A162-FFCD6827EF80}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Services.Random", "server\JSSoft.Crema.Services.Random\JSSoft.Crema.Services.Random.csproj", "{BFE3A041-7A31-4CD5-B43B-41F001E59CBD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Services.Test", "server\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.csproj", "{71A236C3-7B3B-4C97-A0A2-49A663D79A78}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		share\JSSoft.Crema.Commands.Spreadsheet\JSSoft.Crema.Commands.Spreadsheet.projitems*{05971a74-2d68-4781-9ceb-df2b48f8ba75}*SharedItemsImports = 13
+		share\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.projitems*{0ee705a5-b5e1-4f06-9380-be9e8f8a3ae6}*SharedItemsImports = 5
+		share\JSSoft.Crema.Bot\JSSoft.Crema.Bot.projitems*{1133b040-c0b6-4c13-a162-ffcd6827ef80}*SharedItemsImports = 5
+		share\JSSoft.Crema.Services.Random\JSSoft.Crema.Services.Random.projitems*{1f4a20ae-f955-4231-8636-27b7a38eb4b3}*SharedItemsImports = 13
+		share\JSSoft.Crema.Services\JSSoft.Crema.Services.projitems*{24ecbee1-2859-4f09-969b-f382e6341814}*SharedItemsImports = 13
+		share\JSSoft.Crema.Bot\JSSoft.Crema.Bot.projitems*{35ad4803-bec1-4f3e-98ab-5c7961f2c261}*SharedItemsImports = 13
+		share\JSSoft.Crema.Commands\JSSoft.Crema.Commands.projitems*{3d3128aa-908d-44c4-9efd-0e1a903f5287}*SharedItemsImports = 13
+		share\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.projitems*{483fd005-5ae2-4bc3-bb90-8ac1f963eede}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts.Users\JSSoft.Crema.ServiceHosts.Users.projitems*{4e857c1f-3ca7-45b7-9b3f-2af6d49071b2}*SharedItemsImports = 13
+		share\JSSoft.Crema.Bot\JSSoft.Crema.Bot.projitems*{595830e8-8fd3-44bf-ae07-79e8ec57a830}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
+		share\JSSoft.Crema.ServiceHosts.RuntimeService\JSSoft.Crema.ServiceHosts.RuntimeService.projitems*{7e5c7310-0da2-4f46-896b-c8e871c22e37}*SharedItemsImports = 13
+		share\JSSoft.Crema.Services.Random\JSSoft.Crema.Services.Random.projitems*{89395ed5-5f1a-44ca-bcd6-480a44af840b}*SharedItemsImports = 5
+		share\JSSoft.Crema.Services.Extensions\JSSoft.Crema.Services.Extensions.projitems*{957c9292-f518-4c3d-856d-e3b094102a55}*SharedItemsImports = 5
+		share\JSSoft.Crema.Services.Extensions\JSSoft.Crema.Services.Extensions.projitems*{97ad6c00-3b71-4e83-97c3-0201bc035471}*SharedItemsImports = 13
+		share\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.projitems*{a4955825-195f-4677-9695-5fc67362a449}*SharedItemsImports = 13
+		share\JSSoft.Crema.ServiceHosts.Data\JSSoft.Crema.ServiceHosts.Data.projitems*{babab208-95fb-4d06-b801-3fee20f980eb}*SharedItemsImports = 13
+		share\JSSoft.Crema.ServiceHosts.Data\JSSoft.Crema.ServiceHosts.Data.projitems*{bc14e19c-3ebb-40f3-beca-89d207fc4c15}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts.Domains\JSSoft.Crema.ServiceHosts.Domains.projitems*{bc14e19c-3ebb-40f3-beca-89d207fc4c15}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts.Users\JSSoft.Crema.ServiceHosts.Users.projitems*{bc14e19c-3ebb-40f3-beca-89d207fc4c15}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.projitems*{bc14e19c-3ebb-40f3-beca-89d207fc4c15}*SharedItemsImports = 5
+		share\JSSoft.Crema.Services\JSSoft.Crema.Services.projitems*{bc14e19c-3ebb-40f3-beca-89d207fc4c15}*SharedItemsImports = 5
+		share\JSSoft.Crema.Services.Random\JSSoft.Crema.Services.Random.projitems*{bfe3a041-7a31-4cd5-b43b-41f001e59cbd}*SharedItemsImports = 5
+		share\JSSoft.Crema.Commands\JSSoft.Crema.Commands.projitems*{c6d8194e-b593-4138-851e-a63cc0391da6}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts.Data\JSSoft.Crema.ServiceHosts.Data.projitems*{cac3edf8-30ca-4413-8c0a-867b04cf7fb0}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts.Domains\JSSoft.Crema.ServiceHosts.Domains.projitems*{cac3edf8-30ca-4413-8c0a-867b04cf7fb0}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts.Users\JSSoft.Crema.ServiceHosts.Users.projitems*{cac3edf8-30ca-4413-8c0a-867b04cf7fb0}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.projitems*{cac3edf8-30ca-4413-8c0a-867b04cf7fb0}*SharedItemsImports = 5
+		share\JSSoft.Crema.Commands\JSSoft.Crema.Commands.projitems*{cfeb0cc5-e0d6-4950-9812-f0f530e3736b}*SharedItemsImports = 5
+		share\JSSoft.Crema.Services.Extensions\JSSoft.Crema.Services.Extensions.projitems*{d334a888-251a-42b5-8e6e-24f21fe99236}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts.RuntimeService\JSSoft.Crema.ServiceHosts.RuntimeService.projitems*{e5b7d919-98ef-4603-bbae-54edc53822a2}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.projitems*{e5b7d919-98ef-4603-bbae-54edc53822a2}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts.RuntimeService\JSSoft.Crema.ServiceHosts.RuntimeService.projitems*{e785c08b-62f9-4b26-a56e-1e292e0f4157}*SharedItemsImports = 5
+		share\JSSoft.Crema.Services\JSSoft.Crema.Services.projitems*{e8455ffb-4563-4602-8607-8b2e9ada1d7c}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts.Domains\JSSoft.Crema.ServiceHosts.Domains.projitems*{f2688cf8-cc3e-48c9-a718-738f57388165}*SharedItemsImports = 13
+		share\JSSoft.Crema.Commands.Spreadsheet\JSSoft.Crema.Commands.Spreadsheet.projitems*{f884c492-d731-4434-a4a0-f90ba8a4e0ef}*SharedItemsImports = 5
+		share\JSSoft.Crema.Commands.Spreadsheet\JSSoft.Crema.Commands.Spreadsheet.projitems*{fce9404f-ed8f-4be1-bb7a-2b98c7b941cc}*SharedItemsImports = 5
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CAC3EDF8-30CA-4413-8C0A-867B04CF7FB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAC3EDF8-30CA-4413-8C0A-867B04CF7FB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAC3EDF8-30CA-4413-8C0A-867B04CF7FB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAC3EDF8-30CA-4413-8C0A-867B04CF7FB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8455FFB-4563-4602-8607-8B2E9ADA1D7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8455FFB-4563-4602-8607-8B2E9ADA1D7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8455FFB-4563-4602-8607-8B2E9ADA1D7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8455FFB-4563-4602-8607-8B2E9ADA1D7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19F44FC7-48FA-42C5-99C6-430B49545B7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19F44FC7-48FA-42C5-99C6-430B49545B7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19F44FC7-48FA-42C5-99C6-430B49545B7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19F44FC7-48FA-42C5-99C6-430B49545B7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6D8194E-B593-4138-851E-A63CC0391DA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6D8194E-B593-4138-851E-A63CC0391DA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6D8194E-B593-4138-851E-A63CC0391DA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6D8194E-B593-4138-851E-A63CC0391DA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2F83A83-0650-4A5F-B4BC-4E8EA8BA29DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2F83A83-0650-4A5F-B4BC-4E8EA8BA29DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2F83A83-0650-4A5F-B4BC-4E8EA8BA29DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2F83A83-0650-4A5F-B4BC-4E8EA8BA29DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEA1D7EE-7D98-49C0-A2CE-8685A1D709DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEA1D7EE-7D98-49C0-A2CE-8685A1D709DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEA1D7EE-7D98-49C0-A2CE-8685A1D709DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEA1D7EE-7D98-49C0-A2CE-8685A1D709DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC14E19C-3EBB-40F3-BECA-89D207FC4C15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC14E19C-3EBB-40F3-BECA-89D207FC4C15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC14E19C-3EBB-40F3-BECA-89D207FC4C15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC14E19C-3EBB-40F3-BECA-89D207FC4C15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D242A9FF-8D41-4760-8C5C-36719BFC302E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D242A9FF-8D41-4760-8C5C-36719BFC302E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D242A9FF-8D41-4760-8C5C-36719BFC302E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D242A9FF-8D41-4760-8C5C-36719BFC302E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFEB0CC5-E0D6-4950-9812-F0F530E3736B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFEB0CC5-E0D6-4950-9812-F0F530E3736B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFEB0CC5-E0D6-4950-9812-F0F530E3736B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFEB0CC5-E0D6-4950-9812-F0F530E3736B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{535822AD-AEA1-46F8-B7E8-D1ECCFD2BB52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{535822AD-AEA1-46F8-B7E8-D1ECCFD2BB52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{535822AD-AEA1-46F8-B7E8-D1ECCFD2BB52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{535822AD-AEA1-46F8-B7E8-D1ECCFD2BB52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AA5BEED-CEDD-4E07-A265-AF1494538FF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AA5BEED-CEDD-4E07-A265-AF1494538FF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AA5BEED-CEDD-4E07-A265-AF1494538FF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AA5BEED-CEDD-4E07-A265-AF1494538FF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{091B2680-4DD4-4E00-BB98-7E5342148A23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{091B2680-4DD4-4E00-BB98-7E5342148A23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{091B2680-4DD4-4E00-BB98-7E5342148A23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{091B2680-4DD4-4E00-BB98-7E5342148A23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2F44F59-CF2F-460C-B418-2DD702531A3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2F44F59-CF2F-460C-B418-2DD702531A3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2F44F59-CF2F-460C-B418-2DD702531A3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2F44F59-CF2F-460C-B418-2DD702531A3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0135EC2-092B-45E7-B325-1DC8003FAC5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0135EC2-092B-45E7-B325-1DC8003FAC5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0135EC2-092B-45E7-B325-1DC8003FAC5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0135EC2-092B-45E7-B325-1DC8003FAC5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9CC7A1F-04A1-45F3-BCE6-3374D1B7692D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9CC7A1F-04A1-45F3-BCE6-3374D1B7692D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9CC7A1F-04A1-45F3-BCE6-3374D1B7692D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9CC7A1F-04A1-45F3-BCE6-3374D1B7692D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E785C08B-62F9-4B26-A56E-1E292E0F4157}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E785C08B-62F9-4B26-A56E-1E292E0F4157}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E785C08B-62F9-4B26-A56E-1E292E0F4157}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E785C08B-62F9-4B26-A56E-1E292E0F4157}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62BA13D1-AB06-4634-A61C-C6C107980B18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62BA13D1-AB06-4634-A61C-C6C107980B18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62BA13D1-AB06-4634-A61C-C6C107980B18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62BA13D1-AB06-4634-A61C-C6C107980B18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5B7D919-98EF-4603-BBAE-54EDC53822A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5B7D919-98EF-4603-BBAE-54EDC53822A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5B7D919-98EF-4603-BBAE-54EDC53822A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5B7D919-98EF-4603-BBAE-54EDC53822A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E90C0268-BD9A-48DB-AA69-6DC41A5FD184}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E90C0268-BD9A-48DB-AA69-6DC41A5FD184}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E90C0268-BD9A-48DB-AA69-6DC41A5FD184}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E90C0268-BD9A-48DB-AA69-6DC41A5FD184}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEB27E04-54FC-4D92-9D5D-6B518BEA8B76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEB27E04-54FC-4D92-9D5D-6B518BEA8B76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEB27E04-54FC-4D92-9D5D-6B518BEA8B76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEB27E04-54FC-4D92-9D5D-6B518BEA8B76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDB91754-5739-4347-A9AE-BEF5DCEAF8C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDB91754-5739-4347-A9AE-BEF5DCEAF8C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDB91754-5739-4347-A9AE-BEF5DCEAF8C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDB91754-5739-4347-A9AE-BEF5DCEAF8C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE603AC5-2526-4578-B793-BADEAAAD9A21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE603AC5-2526-4578-B793-BADEAAAD9A21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE603AC5-2526-4578-B793-BADEAAAD9A21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE603AC5-2526-4578-B793-BADEAAAD9A21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCE9404F-ED8F-4BE1-BB7A-2B98C7B941CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCE9404F-ED8F-4BE1-BB7A-2B98C7B941CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCE9404F-ED8F-4BE1-BB7A-2B98C7B941CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCE9404F-ED8F-4BE1-BB7A-2B98C7B941CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F884C492-D731-4434-A4A0-F90BA8A4E0EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F884C492-D731-4434-A4A0-F90BA8A4E0EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F884C492-D731-4434-A4A0-F90BA8A4E0EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F884C492-D731-4434-A4A0-F90BA8A4E0EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EE705A5-B5E1-4F06-9380-BE9E8F8A3AE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EE705A5-B5E1-4F06-9380-BE9E8F8A3AE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EE705A5-B5E1-4F06-9380-BE9E8F8A3AE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EE705A5-B5E1-4F06-9380-BE9E8F8A3AE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{483FD005-5AE2-4BC3-BB90-8AC1F963EEDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{483FD005-5AE2-4BC3-BB90-8AC1F963EEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{483FD005-5AE2-4BC3-BB90-8AC1F963EEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{483FD005-5AE2-4BC3-BB90-8AC1F963EEDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D67CC60F-2417-445F-B81C-977F15642991}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D67CC60F-2417-445F-B81C-977F15642991}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D67CC60F-2417-445F-B81C-977F15642991}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D67CC60F-2417-445F-B81C-977F15642991}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5A3E94F-DE87-444D-ADF0-EB2802694F2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5A3E94F-DE87-444D-ADF0-EB2802694F2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5A3E94F-DE87-444D-ADF0-EB2802694F2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5A3E94F-DE87-444D-ADF0-EB2802694F2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85BA8930-4405-4A55-829F-1DEE14D1B77F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85BA8930-4405-4A55-829F-1DEE14D1B77F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85BA8930-4405-4A55-829F-1DEE14D1B77F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85BA8930-4405-4A55-829F-1DEE14D1B77F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F46559BA-6758-458C-9A44-399110F066FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F46559BA-6758-458C-9A44-399110F066FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F46559BA-6758-458C-9A44-399110F066FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F46559BA-6758-458C-9A44-399110F066FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{957C9292-F518-4C3D-856D-E3B094102A55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{957C9292-F518-4C3D-856D-E3B094102A55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{957C9292-F518-4C3D-856D-E3B094102A55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{957C9292-F518-4C3D-856D-E3B094102A55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D334A888-251A-42B5-8E6E-24F21FE99236}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D334A888-251A-42B5-8E6E-24F21FE99236}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D334A888-251A-42B5-8E6E-24F21FE99236}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D334A888-251A-42B5-8E6E-24F21FE99236}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA4C52CD-107D-4A04-955B-67961EE26214}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA4C52CD-107D-4A04-955B-67961EE26214}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA4C52CD-107D-4A04-955B-67961EE26214}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA4C52CD-107D-4A04-955B-67961EE26214}.Release|Any CPU.Build.0 = Release|Any CPU
+		{595830E8-8FD3-44BF-AE07-79E8EC57A830}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{595830E8-8FD3-44BF-AE07-79E8EC57A830}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{595830E8-8FD3-44BF-AE07-79E8EC57A830}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{595830E8-8FD3-44BF-AE07-79E8EC57A830}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89395ED5-5F1A-44CA-BCD6-480A44AF840B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89395ED5-5F1A-44CA-BCD6-480A44AF840B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89395ED5-5F1A-44CA-BCD6-480A44AF840B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89395ED5-5F1A-44CA-BCD6-480A44AF840B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81948C77-9F48-4B76-B2A4-79C59A190CB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81948C77-9F48-4B76-B2A4-79C59A190CB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81948C77-9F48-4B76-B2A4-79C59A190CB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81948C77-9F48-4B76-B2A4-79C59A190CB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1133B040-C0B6-4C13-A162-FFCD6827EF80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1133B040-C0B6-4C13-A162-FFCD6827EF80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1133B040-C0B6-4C13-A162-FFCD6827EF80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1133B040-C0B6-4C13-A162-FFCD6827EF80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFE3A041-7A31-4CD5-B43B-41F001E59CBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFE3A041-7A31-4CD5-B43B-41F001E59CBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFE3A041-7A31-4CD5-B43B-41F001E59CBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFE3A041-7A31-4CD5-B43B-41F001E59CBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71A236C3-7B3B-4C97-A0A2-49A663D79A78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71A236C3-7B3B-4C97-A0A2-49A663D79A78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71A236C3-7B3B-4C97-A0A2-49A663D79A78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71A236C3-7B3B-4C97-A0A2-49A663D79A78}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CAC3EDF8-30CA-4413-8C0A-867B04CF7FB0} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{E8455FFB-4563-4602-8607-8B2E9ADA1D7C} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{19F44FC7-48FA-42C5-99C6-430B49545B7B} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{C6D8194E-B593-4138-851E-A63CC0391DA6} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{C2F83A83-0650-4A5F-B4BC-4E8EA8BA29DF} = {7628581C-F073-411C-8D1D-CDEAEEC69C0D}
+		{EEA1D7EE-7D98-49C0-A2CE-8685A1D709DE} = {7628581C-F073-411C-8D1D-CDEAEEC69C0D}
+		{BC14E19C-3EBB-40F3-BECA-89D207FC4C15} = {E2B8B9E6-994F-4E4C-875D-D50608E498C5}
+		{D242A9FF-8D41-4760-8C5C-36719BFC302E} = {7628581C-F073-411C-8D1D-CDEAEEC69C0D}
+		{CFEB0CC5-E0D6-4950-9812-F0F530E3736B} = {E2B8B9E6-994F-4E4C-875D-D50608E498C5}
+		{535822AD-AEA1-46F8-B7E8-D1ECCFD2BB52} = {7628581C-F073-411C-8D1D-CDEAEEC69C0D}
+		{3AA5BEED-CEDD-4E07-A265-AF1494538FF7} = {820D586B-BF8C-4FC2-985C-50C802480B8E}
+		{091B2680-4DD4-4E00-BB98-7E5342148A23} = {7628581C-F073-411C-8D1D-CDEAEEC69C0D}
+		{B2F44F59-CF2F-460C-B418-2DD702531A3E} = {7628581C-F073-411C-8D1D-CDEAEEC69C0D}
+		{E0135EC2-092B-45E7-B325-1DC8003FAC5B} = {7628581C-F073-411C-8D1D-CDEAEEC69C0D}
+		{D9CC7A1F-04A1-45F3-BCE6-3374D1B7692D} = {7628581C-F073-411C-8D1D-CDEAEEC69C0D}
+		{E785C08B-62F9-4B26-A56E-1E292E0F4157} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{62BA13D1-AB06-4634-A61C-C6C107980B18} = {820D586B-BF8C-4FC2-985C-50C802480B8E}
+		{E5B7D919-98EF-4603-BBAE-54EDC53822A2} = {820D586B-BF8C-4FC2-985C-50C802480B8E}
+		{E90C0268-BD9A-48DB-AA69-6DC41A5FD184} = {7628581C-F073-411C-8D1D-CDEAEEC69C0D}
+		{DEB27E04-54FC-4D92-9D5D-6B518BEA8B76} = {820D586B-BF8C-4FC2-985C-50C802480B8E}
+		{DDB91754-5739-4347-A9AE-BEF5DCEAF8C7} = {E2B8B9E6-994F-4E4C-875D-D50608E498C5}
+		{CE603AC5-2526-4578-B793-BADEAAAD9A21} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{FCE9404F-ED8F-4BE1-BB7A-2B98C7B941CC} = {E2B8B9E6-994F-4E4C-875D-D50608E498C5}
+		{F884C492-D731-4434-A4A0-F90BA8A4E0EF} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{0EE705A5-B5E1-4F06-9380-BE9E8F8A3AE6} = {E2B8B9E6-994F-4E4C-875D-D50608E498C5}
+		{483FD005-5AE2-4BC3-BB90-8AC1F963EEDE} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{D67CC60F-2417-445F-B81C-977F15642991} = {7628581C-F073-411C-8D1D-CDEAEEC69C0D}
+		{C5A3E94F-DE87-444D-ADF0-EB2802694F2D} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{85BA8930-4405-4A55-829F-1DEE14D1B77F} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{F46559BA-6758-458C-9A44-399110F066FF} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{957C9292-F518-4C3D-856D-E3B094102A55} = {E2B8B9E6-994F-4E4C-875D-D50608E498C5}
+		{D334A888-251A-42B5-8E6E-24F21FE99236} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{35AD4803-BEC1-4F3E-98AB-5C7961F2C261} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
+		{3D3128AA-908D-44C4-9EFD-0E1A903F5287} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
+		{05971A74-2D68-4781-9CEB-DF2B48F8BA75} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
+		{A4955825-195F-4677-9695-5FC67362A449} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
+		{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
+		{BABAB208-95FB-4D06-B801-3FEE20F980EB} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
+		{F2688CF8-CC3E-48C9-A718-738F57388165} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
+		{7E5C7310-0DA2-4F46-896B-C8E871C22E37} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
+		{4E857C1F-3CA7-45B7-9B3F-2AF6D49071B2} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
+		{24ECBEE1-2859-4F09-969B-F382E6341814} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
+		{97AD6C00-3B71-4E83-97C3-0201BC035471} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
+		{DA4C52CD-107D-4A04-955B-67961EE26214} = {7628581C-F073-411C-8D1D-CDEAEEC69C0D}
+		{595830E8-8FD3-44BF-AE07-79E8EC57A830} = {E2B8B9E6-994F-4E4C-875D-D50608E498C5}
+		{89395ED5-5F1A-44CA-BCD6-480A44AF840B} = {E2B8B9E6-994F-4E4C-875D-D50608E498C5}
+		{81948C77-9F48-4B76-B2A4-79C59A190CB9} = {E2B8B9E6-994F-4E4C-875D-D50608E498C5}
+		{1F4A20AE-F955-4231-8636-27B7A38EB4B3} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
+		{1133B040-C0B6-4C13-A162-FFCD6827EF80} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{BFE3A041-7A31-4CD5-B43B-41F001E59CBD} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{71A236C3-7B3B-4C97-A0A2-49A663D79A78} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {14FB22CB-2420-4F8B-9112-F64D7814E3EF}
+	EndGlobalSection
+EndGlobal
