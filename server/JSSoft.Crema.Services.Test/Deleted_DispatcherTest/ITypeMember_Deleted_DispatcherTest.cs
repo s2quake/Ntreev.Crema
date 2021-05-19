@@ -22,6 +22,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Library.Random;
 using System;
+using System.Threading.Tasks;
+using JSSoft.Crema.Services.Random;
 
 namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
 {
@@ -36,69 +38,63 @@ namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
         private static ITypeMember member;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(ITypeMember_Deleted_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                dataBase = cremaHost.DataBases.Random();
-                dataBase.Load(authentication);
-                dataBase.Enter(authentication);
-                dataBase.TypeContext.AddRandomItems(authentication);
-                template = dataBase.TypeContext.Types.Random().Template;
-                template.BeginEdit(authentication);
-                member = template.Random();
-                dataBase.Leave(authentication);
-                dataBase.Unload(authentication);
-            });
+            authentication = await cremaHost.StartAsync();
+            dataBase = await cremaHost.GetRandomDataBaseAsync();
+            await dataBase.LoadAsync(authentication);
+            await dataBase.EnterAsync(authentication);
+            await dataBase.TypeContext.AddRandomItemsAsync(authentication);
+            template = dataBase.TypeContext.Types.Random().Template;
+            await template.BeginEditAsync(authentication);
+            member = template.Random();
+            await dataBase.LeaveAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                cremaHost.Stop(authentication);
-            });
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Delete()
+        public async Task DeleteAsync()
         {
-            member.Delete(authentication);
+            await member.DeleteAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetIndex()
+        public async Task SetIndexAsync()
         {
-            member.SetIndex(authentication, RandomUtility.Next(int.MaxValue));
+            await member.SetIndexAsync(authentication, RandomUtility.Next(int.MaxValue));
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetName()
+        public async Task SetNameAsync()
         {
-            member.SetName(authentication, RandomUtility.NextIdentifier());
+            await member.SetNameAsync(authentication, RandomUtility.NextIdentifier());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetValue()
+        public async Task SetValueAsync()
         {
-            member.SetValue(authentication, RandomUtility.NextLong(long.MaxValue));
+            await member.SetValueAsync(authentication, RandomUtility.NextLong(long.MaxValue));
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetComment()
+        public async Task SetCommentAsync()
         {
-            member.SetComment(authentication, RandomUtility.NextString());
+            await member.SetCommentAsync(authentication, RandomUtility.NextString());
         }
 
         [TestMethod]

@@ -44,7 +44,7 @@ namespace JSSoft.Crema.Bot
 
         public override string ToString()
         {
-            return $"{nameof(AutobotService)}: {this.cremaHost.UserID}";
+            return $"{nameof(AutobotService)}";
         }
 
         public void Initialize(Authentication authentication)
@@ -59,7 +59,7 @@ namespace JSSoft.Crema.Bot
 
         protected override AutobotBase CreateInstance(string autobotID, SecureString password)
         {
-            return new Autobot(this, this.cremaHost.Address, autobotID, password);
+            return new Autobot(this, "localhost", autobotID, password);
         }
 
         public string Name => "bot";

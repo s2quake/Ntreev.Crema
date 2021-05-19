@@ -24,6 +24,7 @@ using JSSoft.Library.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test.DispatcherTest
 {
@@ -36,25 +37,19 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
         private static IUserCategoryCollection categories;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(IUserCategoryCollection_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                categories = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-            });
+            authentication = await cremaHost.StartAsync();
+            categories = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                cremaHost.Stop(authentication);
-            });
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
@@ -132,13 +127,6 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
             {
                 Console.Write(item);
             }
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void CollectionChanged()
-        {
-            categories.CollectionChanged += (s, e) => Assert.Inconclusive();
         }
 
         [TestMethod]

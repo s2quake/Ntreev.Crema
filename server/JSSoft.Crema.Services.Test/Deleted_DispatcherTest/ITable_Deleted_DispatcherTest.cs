@@ -22,7 +22,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Library.IO;
 using JSSoft.Library.Random;
+using JSSoft.Crema.Services.Random;
 using System;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
 {
@@ -36,95 +38,89 @@ namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
         private static ITable table;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(ITable_Deleted_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                dataBase = cremaHost.DataBases.Random();
-                dataBase.Load(authentication);
-                dataBase.Enter(authentication);
-                dataBase.Initialize(authentication);
-                table = dataBase.TableContext.Tables.Random();
-                dataBase.Leave(authentication);
-                dataBase.Unload(authentication);
-            });
+            authentication = await cremaHost.StartAsync();
+            dataBase = await cremaHost.GetRandomDataBaseAsync();
+            await dataBase.LoadAsync(authentication);
+            await dataBase.EnterAsync(authentication);
+            await dataBase.InitializeAsync(authentication);
+            table = dataBase.TableContext.Tables.Random();
+            await dataBase.LeaveAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                cremaHost.Stop(authentication);
-            });
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Rename()
+        public async Task RenameAsync()
         {
-            table.Rename(authentication, RandomUtility.NextIdentifier());
+            await table.RenameAsync(authentication, RandomUtility.NextIdentifier());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Move()
+        public async Task MoveAsync()
         {
-            table.Move(authentication, PathUtility.Separator);
+            await table.MoveAsync(authentication, PathUtility.Separator);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Delete()
+        public async Task DeleteAsync()
         {
-            table.Delete(authentication);
+            await table.DeleteAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Copy()
+        public async Task CopyAsync()
         {
-            table.Copy(authentication, RandomUtility.NextIdentifier(), PathUtility.Separator, true);
+            await table.CopyAsync(authentication, RandomUtility.NextIdentifier(), PathUtility.Separator, true);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Inherit()
+        public async Task InheritAsync()
         {
-            table.Inherit(authentication, RandomUtility.NextIdentifier(), PathUtility.Separator, true);
+            await table.InheritAsync(authentication, RandomUtility.NextIdentifier(), PathUtility.Separator, true);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void NewTable()
+        public async Task NewTableAsync()
         {
-            table.NewTable(authentication);
+            await table.NewTableAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Preview()
+        public async Task PreviewAsync()
         {
-            table.GetDataSet(authentication, null);
+            await table.GetDataSetAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GetLog()
+        public async Task GetLogAsync()
         {
-            table.GetLog(authentication, null);
+            await table.GetLogAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Find()
+        public async Task FindAsync()
         {
-            table.Find(authentication, "1", ServiceModel.FindOptions.None);
+            await table.FindAsync(authentication, "1", ServiceModel.FindOptions.None);
         }
 
         [TestMethod]
@@ -279,44 +275,44 @@ namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetPublic()
+        public async Task SetPublicAsync()
         {
-            table.SetPublic(authentication);
+            await table.SetPublicAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetPrivate()
+        public async Task SetPrivateAsync()
         {
-            table.SetPrivate(authentication);
+            await table.SetPrivateAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void AddAccessMember()
+        public async Task AddAccessMemberAsync()
         {
-            table.AddAccessMember(authentication, "admin", ServiceModel.AccessType.Owner);
+            await table.AddAccessMemberAsync(authentication, "admin", ServiceModel.AccessType.Owner);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void RemoveAccessMember()
+        public async Task RemoveAccessMemberAsync()
         {
-            table.RemoveAccessMember(authentication, "admin");
+            await table.RemoveAccessMemberAsync(authentication, "admin");
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Lock()
+        public async Task LockAsync()
         {
-            table.Lock(authentication, RandomUtility.NextString());
+            await table.LockAsync(authentication, RandomUtility.NextString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Unlock()
+        public async Task UnlockAsync()
         {
-            table.Unlock(authentication);
+            await table.UnlockAsync(authentication);
         }
 
         [TestMethod]
@@ -325,27 +321,6 @@ namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
         {
             table.GetAccessType(authentication);
         }
-
-        //[TestMethod]
-        //[ExpectedException(typeof(InvalidOperationException))]
-        //public void VerifyRead()
-        //{
-        //    table.VerifyRead(authentication);
-        //}
-
-        //[TestMethod]
-        //[ExpectedException(typeof(InvalidOperationException))]
-        //public void VerifyOwner()
-        //{
-        //    table.VerifyOwner(authentication);
-        //}
-
-        //[TestMethod]
-        //[ExpectedException(typeof(InvalidOperationException))]
-        //public void VerifyMember()
-        //{
-        //    table.VerifyMember(authentication);
-        //}
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]

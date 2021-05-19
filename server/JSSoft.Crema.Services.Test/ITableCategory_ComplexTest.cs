@@ -21,6 +21,8 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Library.Random;
+using System.Threading.Tasks;
+using JSSoft.Crema.Services.Random;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -34,44 +36,35 @@ namespace JSSoft.Crema.Services.Test
         private static ITableCategory category;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(ITableCategory_ComplexTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                dataBase = cremaHost.DataBases.Random();
-                dataBase.Load(authentication);
-                dataBase.Enter(authentication);
-                dataBase.Initialize(authentication);
-                category = dataBase.TableContext.Categories.Random(item => item.Parent != null);
-            });
+            authentication = await cremaHost.StartAsync();
+            dataBase = await cremaHost.GetRandomDataBaseAsync();
+            await dataBase.LoadAsync(authentication);
+            await dataBase.EnterAsync(authentication);
+            await dataBase.InitializeAsync(authentication);
+            category = dataBase.TableContext.Categories.Random(item => item.Parent != null);
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                dataBase.Unload(authentication);
-                cremaHost.Stop(authentication);
-            });
+            await dataBase.UnloadAsync(authentication);
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
-        public void CategoryLockRenameTest()
+        public async Task CategoryLockRenameTestAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                var newName = RandomUtility.NextIdentifier();
-                category.LockAsync(authentication, string.Empty);
-                category.Rename(authentication, newName);
+            var newName = RandomUtility.NextIdentifier();
+            await category.LockAsync(authentication, string.Empty);
+            await category.RenameAsync(authentication, newName);
 
-                Assert.AreEqual(category.Path, category.LockInfo.Path);
-            });
+            Assert.AreEqual(category.Path, category.LockInfo.Path);
         }
     }
 }

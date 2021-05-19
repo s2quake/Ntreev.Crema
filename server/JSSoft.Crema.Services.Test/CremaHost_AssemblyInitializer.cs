@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Crema.Services.Random;
 using JSSoft.Library;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -57,18 +58,18 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(CremaHost_AssemblyInitializer));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            authentication = cremaHost.Dispatcher.Invoke(() => cremaHost.Start());
+            authentication = await cremaHost.StartAsync();
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() => cremaHost.Stop(authentication));
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 

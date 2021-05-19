@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Library.IO;
 using JSSoft.Library.Random;
 using System;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test.DispatcherTest
 {
@@ -36,76 +37,70 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
         private static IUser user;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(IUser_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            });
-            user = userContext.Dispatcher.Invoke(() => userContext.Users.Random());
+            authentication = await cremaHost.StartAsync();
+            userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            user = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random());
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                cremaHost.Stop(authentication);
-            });
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Move()
+        public async Task MoveAsync()
         {
-            user.Move(authentication, PathUtility.Separator);
+            await user.MoveAsync(authentication, PathUtility.Separator);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Delete()
+        public async Task DeleteAsync()
         {
-            user.Delete(authentication);
+            await user.DeleteAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ChangeUserInfo()
+        public async Task ChangeUserInfoAsync()
         {
-            user.ChangeUserInfo(authentication, null, null, null, null);
+            await user.ChangeUserInfoAsync(authentication, null, null, null, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SendMessage()
+        public async Task SendMessageAsync()
         {
-            user.SendMessage(authentication, RandomUtility.NextString());
+            await user.SendMessageAsync(authentication, RandomUtility.NextString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Kick()
+        public async Task KickAsync()
         {
-            user.Kick(authentication, RandomUtility.NextString());
+            await user.KickAsync(authentication, RandomUtility.NextString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Ban()
+        public async Task BanAsync()
         {
-            user.Ban(authentication, RandomUtility.NextString());
+            await user.BanAsync(authentication, RandomUtility.NextString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Unban()
+        public async Task UnbanAsync()
         {
-            user.Unban(authentication);
+            await user.UnbanAsync(authentication);
         }
 
         [TestMethod]

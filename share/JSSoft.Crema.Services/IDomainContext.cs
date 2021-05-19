@@ -22,11 +22,14 @@
 using JSSoft.Crema.ServiceModel;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services
 {
     public interface IDomainContext : IEnumerable<IDomainItem>, IServiceProvider, IDispatcherObject
     {
+        DomainContextMetaData GetMetaData(Authentication authentication);
+
         bool Contains(string itemPath);
 
         IDomainCategoryCollection Categories { get; }
@@ -46,7 +49,5 @@ namespace JSSoft.Crema.Services
         event ItemsDeletedEventHandler<IDomainItem> ItemsDeleted;
 
         event TaskCompletedEventHandler TaskCompleted;
-
-        DomainContextMetaData GetMetaData(Authentication authentication);
     }
 }

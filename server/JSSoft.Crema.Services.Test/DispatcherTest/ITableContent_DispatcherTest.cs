@@ -24,6 +24,8 @@ using JSSoft.Library.Random;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using JSSoft.Crema.Services.Random;
 
 namespace JSSoft.Crema.Services.Test.DispatcherTest
 {
@@ -37,79 +39,70 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
         private static ITableContent content;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(ITableContent_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                dataBase = cremaHost.DataBases.Random();
-                dataBase.Load(authentication);
-                dataBase.Enter(authentication);
-                dataBase.Initialize(authentication);
-                content = dataBase.TableContext.Tables.Random(item => item.Parent == null).Content;
-            });
+            authentication = await cremaHost.StartAsync();
+            dataBase = await cremaHost.GetRandomDataBaseAsync();
+            await dataBase.LoadAsync(authentication);
+            await dataBase.EnterAsync(authentication);
+            await dataBase.InitializeAsync(authentication);
+            content = dataBase.TableContext.Tables.Random(item => item.Parent == null).Content;
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                dataBase.Unload(authentication);
-                cremaHost.Stop(authentication);
-            });
+            await dataBase.UnloadAsync(authentication);
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Enter()
+        public async Task EnterEditAsync()
         {
-            content.EnterEdit(authentication);
+            await content.EnterEditAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Leave()
+        public async Task LeaveEditAsync()
         {
-            content.LeaveEdit(authentication);
+            await content.LeaveEditAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void CancelEdit()
+        public async Task CancelEditAsync()
         {
-            content.CancelEdit(authentication);
+            await content.CancelEditAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Clear()
+        public async Task ClearAsync()
         {
-            content.Clear(authentication);
+            await content.ClearAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void AddNew()
+        public async Task AddNewAsync()
         {
-            content.AddNew(authentication, null);
+            await content.AddNewAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void EndNew()
+        public async Task EndNewAsync()
         {
-            var row = content.Dispatcher.Invoke(() =>
-            {
-                content.BeginEdit(authentication);
-                content.EnterEdit(authentication);
-                return content.AddNew(authentication, null);
-            });
-            content.EndNew(authentication, row);
+            await content.BeginEditAsync(authentication);
+            await content.EnterEditAsync(authentication);
+            var row = await content.AddNewAsync(authentication, null);
+            await content.EndNewAsync(authentication, row);
         }
 
         [TestMethod]

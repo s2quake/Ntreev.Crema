@@ -47,7 +47,7 @@ using System.Threading.Tasks;
 //         private ITypeCategory category;
 
 //         [ClassInitialize()]
-//         public static void ClassInit(TestContext context)
+//         public static async Task ClassInitAsync(TestContext context)
 //         {
 //             var solutionDir = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
 //             var tempDir = Path.Combine(solutionDir, "crema_repo", "permission_test", "type_category_guest");
@@ -87,7 +87,7 @@ using System.Threading.Tasks;
 //         }
 
 //         [ClassCleanup()]
-//         public static void ClassCleanup()
+//         public static async Task ClassCleanupAsync()
 //         {
 //             cremaHost.Dispatcher.Invoke(() => cremaHost.Close());
 //             cremaHost.Dispose();

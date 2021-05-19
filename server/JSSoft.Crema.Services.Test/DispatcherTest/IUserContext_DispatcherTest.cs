@@ -24,6 +24,7 @@ using JSSoft.Library.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test.DispatcherTest
 {
@@ -36,33 +37,27 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
         private static IUserContext userContext;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(IUserContext_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            });
+            authentication = await cremaHost.StartAsync();
+            userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                cremaHost.Stop(authentication);
-            });
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void NotifyMessage()
+        public async Task NotifyMessageAsync()
         {
-            userContext.NotifyMessage(authentication, null);
+            await userContext.NotifyMessageAsync(authentication, null);
         }
 
         [TestMethod]

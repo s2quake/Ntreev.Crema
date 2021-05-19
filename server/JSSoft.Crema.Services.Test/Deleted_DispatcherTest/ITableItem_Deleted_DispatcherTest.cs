@@ -23,6 +23,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Library.IO;
 using JSSoft.Library.Random;
 using System;
+using System.Threading.Tasks;
+using JSSoft.Crema.Services.Random;
 
 namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
 {
@@ -36,67 +38,61 @@ namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
         private static ITableItem tableItem;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(ITableItem_Deleted_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                dataBase = cremaHost.DataBases.Random();
-                dataBase.Load(authentication);
-                dataBase.Enter(authentication);
-                dataBase.Initialize(authentication);
-                tableItem = dataBase.TableContext.Random();
-                dataBase.Leave(authentication);
-                dataBase.Unload(authentication);
-            });
+            authentication = await cremaHost.StartAsync();
+            dataBase = await cremaHost.GetRandomDataBaseAsync();
+            await dataBase.LoadAsync(authentication);
+            await dataBase.EnterAsync(authentication);
+            await dataBase.InitializeAsync(authentication);
+            tableItem = dataBase.TableContext.Random();
+            await dataBase.LeaveAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                cremaHost.Stop(authentication);
-            });
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Rename()
+        public async Task RenameAsync()
         {
-            tableItem.Rename(authentication, RandomUtility.NextIdentifier());
+            await tableItem.RenameAsync(authentication, RandomUtility.NextIdentifier());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Move()
+        public async Task MoveAsync()
         {
-            tableItem.Move(authentication, PathUtility.Separator);
+            await tableItem.MoveAsync(authentication, PathUtility.Separator);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Delete()
+        public async Task DeleteAsync()
         {
-            tableItem.Delete(authentication);
+            await tableItem.DeleteAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GetLog()
+        public async Task GetLogAsync()
         {
-            tableItem.GetLog(authentication, null);
+            await tableItem.GetLogAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Find()
+        public async Task FindAsync()
         {
-            tableItem.Find(authentication, "1", ServiceModel.FindOptions.None);
+            await tableItem.FindAsync(authentication, "1", ServiceModel.FindOptions.None);
         }
 
         [TestMethod]
@@ -194,72 +190,44 @@ namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetPublic()
+        public async Task SetPublicAsync()
         {
-            tableItem.SetPublic(authentication);
+            await tableItem.SetPublicAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetPrivate()
+        public async Task SetPrivateAsync()
         {
-            tableItem.SetPrivate(authentication);
+            await tableItem.SetPrivateAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void AddAccessMember()
+        public async Task AddAccessMemberAsync()
         {
-            tableItem.AddAccessMember(authentication, "admin", ServiceModel.AccessType.Owner);
+            await tableItem.AddAccessMemberAsync(authentication, "admin", ServiceModel.AccessType.Owner);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void RemoveAccessMember()
+        public async Task RemoveAccessMemberAsync()
         {
-            tableItem.RemoveAccessMember(authentication, "admin");
+            await tableItem.RemoveAccessMemberAsync(authentication, "admin");
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Lock()
+        public async Task LockAsync()
         {
-            tableItem.Lock(authentication, RandomUtility.NextString());
+            await tableItem.LockAsync(authentication, RandomUtility.NextString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Unlock()
+        public async Task UnlockAsync()
         {
-            tableItem.Unlock(authentication);
+            await tableItem.UnlockAsync(authentication);
         }
-
-        //[TestMethod]
-        //[ExpectedException(typeof(InvalidOperationException))]
-        //public void VerifyWrite()
-        //{
-        //    tableItem.VerifyWrite(authentication);
-        //}
-
-        //[TestMethod]
-        //[ExpectedException(typeof(InvalidOperationException))]
-        //public void VerifyRead()
-        //{
-        //    tableItem.VerifyRead(authentication);
-        //}
-
-        //[TestMethod]
-        //[ExpectedException(typeof(InvalidOperationException))]
-        //public void VerifyOwner()
-        //{
-        //    tableItem.VerifyOwner(authentication);
-        //}
-
-        //[TestMethod]
-        //[ExpectedException(typeof(InvalidOperationException))]
-        //public void VerifyMember()
-        //{
-        //    tableItem.VerifyMember(authentication);
-        //}
     }
 }

@@ -22,6 +22,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Library.Random;
 using System;
+using System.Threading.Tasks;
+using JSSoft.Crema.Services.Random;
 
 namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
 {
@@ -36,118 +38,112 @@ namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
         private static ITableColumn column;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(ITableColumn_Deleted_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                dataBase = cremaHost.DataBases.Random();
-                dataBase.Load(authentication);
-                dataBase.Enter(authentication);
-                dataBase.Initialize(authentication);
-                template = dataBase.TableContext.Tables.Random(item => item.TemplatedParent == null).Template;
-                template.BeginEdit(authentication);
-                column = template.Random();
-                dataBase.Leave(authentication);
-                dataBase.Unload(authentication);
-            });
+            authentication = await cremaHost.StartAsync();
+            dataBase = await cremaHost.GetRandomDataBaseAsync();
+            await dataBase.LoadAsync(authentication);
+            await dataBase.EnterAsync(authentication);
+            await dataBase.InitializeAsync(authentication);
+            template = dataBase.TableContext.Tables.Random(item => item.TemplatedParent == null).Template;
+            await template.BeginEditAsync(authentication);
+            column = template.Random();
+            await dataBase.LeaveAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                cremaHost.Stop(authentication);
-            });
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Delete()
+        public async Task DeleteAsync()
         {
-            column.Delete(authentication);
+            await column.DeleteAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetIndex()
+        public async Task SetIndexAsync()
         {
-            column.SetIndex(authentication, RandomUtility.Next(int.MaxValue));
+            await column.SetIndexAsync(authentication, RandomUtility.Next(int.MaxValue));
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetIsKey()
+        public async Task SetIsKeyAsync()
         {
-            column.SetIsKey(authentication, RandomUtility.NextBoolean());
+            await column.SetIsKeyAsync(authentication, RandomUtility.NextBoolean());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetIsUnique()
+        public async Task SetIsUniqueAsync()
         {
-            column.SetIsUnique(authentication, RandomUtility.NextBoolean());
+            await column.SetIsUniqueAsync(authentication, RandomUtility.NextBoolean());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetName()
+        public async Task SetNameAsync()
         {
-            column.SetName(authentication, RandomUtility.NextIdentifier());
+            await column.SetNameAsync(authentication, RandomUtility.NextIdentifier());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetDataType()
+        public async Task SetDataTypeAsync()
         {
-            column.SetDataType(authentication, string.Empty);
+            await column.SetDataTypeAsync(authentication, string.Empty);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetDefaultValue()
+        public async Task SetDefaultValueAsync()
         {
-            column.SetDefaultValue(authentication, null);
+            await column.SetDefaultValueAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetComment()
+        public async Task SetCommentAsync()
         {
-            column.SetComment(authentication, RandomUtility.NextString());
+            await column.SetCommentAsync(authentication, RandomUtility.NextString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetAutoIncrement()
+        public async Task SetAutoIncrementAsync()
         {
-            column.SetAutoIncrement(authentication, RandomUtility.NextBoolean());
+            await column.SetAutoIncrementAsync(authentication, RandomUtility.NextBoolean());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetTags()
+        public async Task SetTagsAsync()
         {
-            column.SetTags(authentication, RandomUtility.NextTags());
+            await column.SetTagsAsync(authentication, RandomUtility.NextTags());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetIsReadOnly()
+        public async Task SetIsReadOnlyAsync()
         {
-            column.SetIsReadOnly(authentication, RandomUtility.NextBoolean());
+            await column.SetIsReadOnlyAsync(authentication, RandomUtility.NextBoolean());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetAllowNull()
+        public async Task SetAllowNullAsync()
         {
-            column.SetAllowNull(authentication, RandomUtility.NextBoolean());
+            await column.SetAllowNullAsync(authentication, RandomUtility.NextBoolean());
         }
 
         [TestMethod]

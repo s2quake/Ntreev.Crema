@@ -40,7 +40,7 @@
 //        private int repeatCount = 1;
 
 //        [ClassInitialize()]
-//        public static void ClassInit(TestContext context)
+//        public static async Task ClassInitAsync(TestContext context)
 //        {
 //            var solutionDir = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
 //            var path = Path.Combine(solutionDir, "crema_repo", "test_all");
@@ -61,7 +61,7 @@
 //        }
 
 //        [ClassCleanup()]
-//        public static void ClassCleanup()
+//        public static async Task ClassCleanupAsync()
 //        {
 //            cremaHost.Dispatcher.Invoke(() => cremaHost.Close());
 //            cremaHost.Dispose();

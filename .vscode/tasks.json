@@ -25,7 +25,7 @@
         },
         {
             "label": "build server-console",
-            "command": "dotnet build ./server/JSSoft.Crema.ConsoleHost --framework netcoreapp3.1",
+            "command": "dotnet build server-console.sln --framework netcoreapp3.1",
             "type": "shell",
             "group": "build",
             "presentation": {
@@ -35,7 +35,17 @@
         },
         {
             "label": "build client-console",
-            "command": "dotnet build ./client/JSSoft.Crema.ConsoleHost --framework netcoreapp3.1",
+            "command": "dotnet build client-console.sln --framework netcoreapp3.1",
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build crema-console",
+            "command": "dotnet build crema-console.sln --framework netcoreapp3.1",
             "type": "shell",
             "group": "build",
             "presentation": {

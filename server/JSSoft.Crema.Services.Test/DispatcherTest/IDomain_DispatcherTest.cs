@@ -24,6 +24,7 @@ using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Random;
 using JSSoft.Library.Random;
 using System;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test.DispatcherTest
 {
@@ -38,105 +39,99 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
         private static IDomain domain;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(IDomain_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                dataBase = cremaHost.DataBases.Random();
-                dataBase.Load(authentication);
-                dataBase.Enter(authentication);
-                dataBase.TypeContext.AddRandomItems(authentication);
-                dataBase.TableContext.AddRandomItemsAsync(authentication);
-                table = dataBase.TableContext.Tables.Random(item => item.TemplatedParent == null);
-                table.Template.BeginEdit(authentication);
-                domain = table.Template.Domain;
-            });
+            authentication = await cremaHost.StartAsync();
+            dataBase = await cremaHost.GetRandomDataBaseAsync();
+            await dataBase.LoadAsync(authentication);
+            await dataBase.EnterAsync(authentication);
+            await dataBase.TypeContext.AddRandomItemsAsync(authentication);
+            await dataBase.TableContext.AddRandomItemsAsync(authentication);
+            table = dataBase.TableContext.Tables.Random(item => item.TemplatedParent == null);
+            await table.Template.BeginEditAsync(authentication);
+            domain = table.Template.Domain;
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                table.Template.CancelEdit(authentication);
-                dataBase.Unload(authentication);
-                cremaHost.Stop(authentication);
-            });
+            await table.Template.CancelEditAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Delete()
+        public async Task DeleteAsync()
         {
-            domain.Delete(authentication, false);
+            await domain.DeleteAsync(authentication, false);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void BeginUserEdit()
+        public async Task BeginUserEditAsync()
         {
-            domain.BeginUserEdit(authentication, DomainLocationInfo.Empty);
+            await domain.BeginUserEditAsync(authentication, DomainLocationInfo.Empty);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void EndUserEdit()
+        public async Task EndUserEditAsync()
         {
-            domain.EndUserEdit(authentication);
+            await domain.EndUserEditAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void NewRow()
+        public async Task NewRowAsync()
         {
-            domain.NewRow(authentication, null);
+            await domain.NewRowAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetRow()
+        public async Task SetRowAsync()
         {
-            domain.SetRow(authentication, null);
+            await domain.SetRowAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void RemoveRow()
+        public async Task RemoveRowAsync()
         {
-            domain.RemoveRow(authentication, null);
+            await domain.RemoveRowAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetProperty()
+        public async Task SetPropertyAsync()
         {
-            domain.SetProperty(authentication, null, null);
+            await domain.SetPropertyAsync(authentication, null, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetUserLocation()
+        public async Task SetUserLocationAsync()
         {
-            domain.SetUserLocation(authentication, DomainLocationInfo.Empty);
+            await domain.SetUserLocationAsync(authentication, DomainLocationInfo.Empty);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Kick()
+        public async Task KickAsync()
         {
-            domain.Kick(authentication, null, null);
+            await domain.KickAsync(authentication, null, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetOwner()
+        public async Task SetOwnerAsync()
         {
-            domain.SetOwner(authentication, null);
+            await domain.SetOwnerAsync(authentication, null);
         }
 
         [TestMethod]
@@ -198,9 +193,16 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UserChanged()
+        public void UserStateChanged()
         {
-            domain.UserChanged += (s, e) => Assert.Inconclusive();
+            domain.UserStateChanged += (s, e) => Assert.Inconclusive();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void UserLocationChanged()
+        {
+            domain.UserLocationChanged += (s, e) => Assert.Inconclusive();
         }
 
         [TestMethod]
@@ -252,14 +254,12 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
             domain.DomainStateChanged += (s, e) => Assert.Inconclusive();
         }
 
-#if SERVER
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GetMetaData()
+        public async Task GetMetaDataAsync()
         {
-            domain.GetMetaData(authentication);
+            await domain.GetMetaDataAsync(authentication);
         }
-#endif
 
         [TestMethod]
         public void GetService()

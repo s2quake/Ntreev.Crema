@@ -461,7 +461,7 @@ namespace JSSoft.Crema.Data.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Remove_Fail()
+        public async Task Remove_Fail()
         {
             var dataTable = new CremaDataTable();
             var dataColumn = new CremaDataColumn();

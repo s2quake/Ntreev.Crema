@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Library.IO;
 using JSSoft.Library.Random;
 using System;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test.DispatcherTest
 {
@@ -36,48 +37,42 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
         private static IUserItem userItem;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(IUserItem_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            });
-            userItem = userContext.Dispatcher.Invoke(() => userContext.Random());
+            authentication = await cremaHost.StartAsync();
+            userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            userItem = await userContext.Dispatcher.InvokeAsync(() => userContext.Random());
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                cremaHost.Stop(authentication);
-            });
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Rename()
+        public async Task RenameAsync()
         {
-            userItem.Rename(authentication, RandomUtility.NextIdentifier());
+            await userItem.RenameAsync(authentication, RandomUtility.NextIdentifier());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Move()
+        public async Task MoveAsync()
         {
-            userItem.Move(authentication, PathUtility.Separator);
+            await userItem.MoveAsync(authentication, PathUtility.Separator);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Delete()
+        public async Task DeleteAsync()
         {
-            userItem.Delete(authentication);
+            await userItem.DeleteAsync(authentication);
         }
 
         [TestMethod]

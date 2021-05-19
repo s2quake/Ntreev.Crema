@@ -27,13 +27,22 @@ namespace JSSoft.Crema.Services.Random
 {
     public static class CremaHostExtensions
     {
-        public static Task<IDataBase> CreateRandomAsync(this ICremaHost cremaHost, Authentication authentication)
+        public static Task<IDataBase> CreateRandomDataBaseAsync(this ICremaHost cremaHost, Authentication authentication)
         {
             var dataBaseName = RandomUtility.NextIdentifier();
             var comment = RandomUtility.NextString();
             if (cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
             {
                 return dataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<IDataBase> GetRandomDataBaseAsync(this ICremaHost cremaHost)
+        {
+            if (cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
+            {
+                return dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.Random());
             }
             throw new NotImplementedException();
         }

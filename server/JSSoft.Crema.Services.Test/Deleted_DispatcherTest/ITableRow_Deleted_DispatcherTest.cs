@@ -24,6 +24,7 @@ using JSSoft.Crema.Services.Random;
 using JSSoft.Library;
 using JSSoft.Library.Random;
 using System;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
 {
@@ -38,65 +39,59 @@ namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
         private static ITableRow row;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(ITableRow_Deleted_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                dataBase = cremaHost.DataBases.Random();
-                dataBase.Load(authentication);
-                dataBase.Enter(authentication);
-                dataBase.Initialize(authentication);
-                content = dataBase.TableContext.Tables.Random(item => item.Parent == null).Content;
-                content.BeginEdit(authentication);
-                content.EnterEdit(authentication);
-                if (content.Count == 0)
-                    content.AddRandomRowsAsync(authentication);
-                row = content.Random();
-                dataBase.Leave(authentication);
-                dataBase.Unload(authentication);
-            });
+            authentication = await cremaHost.StartAsync();
+            dataBase = await cremaHost.GetRandomDataBaseAsync();
+            await dataBase.LoadAsync(authentication);
+            await dataBase.EnterAsync(authentication);
+            await dataBase.InitializeAsync(authentication);
+            content = dataBase.TableContext.Tables.Random(item => item.Parent == null).Content;
+            await content.BeginEditAsync(authentication);
+            await content.EnterEditAsync(authentication);
+            if (content.Count == 0)
+                await content.AddRandomRowsAsync(authentication);
+            row = content.Random();
+            await dataBase.LeaveAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                cremaHost.Stop(authentication);
-            });
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Delete()
+        public async Task DeleteAsync()
         {
-            row.Delete(authentication);
+            await row.DeleteAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetIsEnabled()
+        public async Task SetIsEnabledAsync()
         {
-            row.SetIsEnabled(authentication, false);
+            await row.SetIsEnabledAsync(authentication, false);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetTags()
+        public async Task SetTagsAsync()
         {
-            row.SetTags(authentication, TagInfo.All);
+            await row.SetTagsAsync(authentication, TagInfo.All);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetField()
+        public async Task SetFieldAsync()
         {
-            row.SetField(authentication, null, null);
+            await row.SetFieldAsync(authentication, null, null);
         }
 
         [TestMethod]
@@ -125,9 +120,9 @@ namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
         }
 
         [TestMethod]
-        public void RelationID()
+        public void ParentID()
         {
-            Console.Write(row.RelationID);
+            Console.Write(row.ParentID);
         }
     }
 }

@@ -47,6 +47,8 @@ namespace JSSoft.Crema.Services
 
         Task SetOwnerAsync(Authentication authentication, string userID);
 
+        Task<DomainMetaData> GetMetaDataAsync(Authentication authentication);
+
         Guid ID { get; }
 
         Guid DataBaseID { get; }
@@ -90,7 +92,5 @@ namespace JSSoft.Crema.Services
         event EventHandler DomainStateChanged;
 
         event EventHandler<DomainDeletedEventArgs> Deleted;
-
-        Task<DomainMetaData> GetMetaDataAsync(Authentication authentication);
     }
 }

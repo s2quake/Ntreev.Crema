@@ -41,7 +41,7 @@ namespace JSSoft.Crema.ServerService.Test
     //     private static Guid token;
 
     //     [ClassInitialize()]
-    //     public static void ClassInit(TestContext context)
+    //     public static async Task ClassInitAsync(TestContext context)
     //     {
     //         var solutionDir = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
     //         var path = Path.Combine(solutionDir, "crema_repo", "test_all");
@@ -62,7 +62,7 @@ namespace JSSoft.Crema.ServerService.Test
     //     }
 
     //     [ClassCleanup()]
-    //     public static void ClassCleanup()
+    //     public static async Task ClassCleanupAsync()
     //     {
     //         // cremaHost.Dispose();
     //     }

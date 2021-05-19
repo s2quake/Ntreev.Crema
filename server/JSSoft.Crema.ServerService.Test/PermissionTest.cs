@@ -51,7 +51,7 @@ using JSSoft.Crema.Services.Random;
 //         private IDataBase dataBase;
 
 //         [ClassInitialize()]
-//         public static void ClassInit(TestContext context)
+//         public static async Task ClassInitAsync(TestContext context)
 //         {
 //             var solutionDir = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
 //             var tempDir = Path.Combine(solutionDir, "crema_repo", "permission_test", typeof(PermissionTest).Name);
@@ -69,7 +69,7 @@ using JSSoft.Crema.Services.Random;
 //         }
 
 //         [ClassCleanup()]
-//         public static void ClassCleanup()
+//         public static async Task ClassCleanupAsync()
 //         {
 //             cremaHost.Dispatcher.Invoke(() => cremaHost.Close());
 //             cremaHost.Dispose();

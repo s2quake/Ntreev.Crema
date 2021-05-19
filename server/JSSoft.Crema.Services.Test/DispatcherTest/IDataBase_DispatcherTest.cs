@@ -22,6 +22,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Library.Random;
 using System;
+using System.Threading.Tasks;
+using JSSoft.Crema.Services.Random;
 
 namespace JSSoft.Crema.Services.Test.DispatcherTest
 {
@@ -34,72 +36,69 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
         private static IDataBase dataBase;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(IDataBase_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                dataBase = cremaHost.DataBases.Random();
-            });
+                authentication = await cremaHost.StartAsync();
+                dataBase = await cremaHost.GetRandomDataBaseAsync();
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() => cremaHost.Stop(authentication));
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Load()
+        public async Task LoadAsync()
         {
-            dataBase.Load(authentication);
+            await dataBase.LoadAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Unload()
+        public async Task UnloadAsync()
         {
-            dataBase.Unload(authentication);
+            await dataBase.UnloadAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Enter()
+        public async Task EnterAsync()
         {
-            dataBase.Enter(authentication);
+            await dataBase.EnterAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Leave()
+        public async Task LeaveAsync()
         {
-            dataBase.Leave(authentication);
+            await dataBase.LeaveAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Rename()
+        public async Task RenameAsync()
         {
-            dataBase.Rename(authentication, null);
+            await dataBase.RenameAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Delete()
+        public async Task DeleteAsync()
         {
-            dataBase.Delete(authentication);
+            await dataBase.DeleteAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Copy()
+        public async Task CopyAsync()
         {
-            dataBase.Copy(authentication, null, null, false);
+            await dataBase.CopyAsync(authentication, null, null, false);
         }
 
         [TestMethod]

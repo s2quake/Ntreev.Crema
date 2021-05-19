@@ -24,6 +24,8 @@ using JSSoft.Library.Random;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using JSSoft.Crema.Services.Random;
 
 namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
 {
@@ -38,90 +40,84 @@ namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
         private static ITableColumn column;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(ITableTemplate_Deleted_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                dataBase = cremaHost.DataBases.Random();
-                dataBase.Load(authentication);
-                dataBase.Enter(authentication);
-                dataBase.Initialize(authentication);
-                template = dataBase.TableContext.Tables.Random(item => item.TemplatedParent == null).Template;
-                template.BeginEdit(authentication);
-                column = template.AddNew(authentication);
-                dataBase.Leave(authentication);
-                dataBase.Unload(authentication);
-            });
+            authentication = await cremaHost.StartAsync();
+            dataBase = await cremaHost.GetRandomDataBaseAsync();
+            await dataBase.LoadAsync(authentication);
+            await dataBase.EnterAsync(authentication);
+            await dataBase.InitializeAsync(authentication);
+            template = dataBase.TableContext.Tables.Random(item => item.TemplatedParent == null).Template;
+            await template.BeginEditAsync(authentication);
+            column = await template.AddNewAsync(authentication);
+            await dataBase.LeaveAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                cremaHost.Stop(authentication);
-            });
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void BeginEdit()
+        public async Task BeginEditAsync()
         {
-            template.BeginEdit(authentication);
+            await template.BeginEditAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void EndEdit()
+        public async Task EndEditAsync()
         {
-            template.EndEdit(authentication);
+            await template.EndEditAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void CancelEdit()
+        public async Task CancelEditAsync()
         {
-            template.CancelEdit(authentication);
+            await template.CancelEditAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetTableName()
+        public async Task SetTableNameAsync()
         {
-            template.SetTableName(authentication, RandomUtility.NextIdentifier());
+            await template.SetTableNameAsync(authentication, RandomUtility.NextIdentifier());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetTags()
+        public async Task SetTagsAsync()
         {
-            template.SetTags(authentication, RandomUtility.NextTags());
+            await template.SetTagsAsync(authentication, RandomUtility.NextTags());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetComment()
+        public async Task SetCommentAsync()
         {
-            template.SetComment(authentication, RandomUtility.NextString());
+            await template.SetCommentAsync(authentication, RandomUtility.NextString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void AddNew()
+        public async Task AddNewAsync()
         {
-            template.AddNew(authentication);
+            await template.AddNewAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void EndNew()
+        public async Task EndNewAsync()
         {
-            template.EndNew(authentication, column);
+            await template.EndNewAsync(authentication, column);
         }
 
         [TestMethod]

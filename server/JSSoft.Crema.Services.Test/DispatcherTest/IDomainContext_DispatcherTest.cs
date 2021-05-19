@@ -21,6 +21,7 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test.DispatcherTest
 {
@@ -33,25 +34,19 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
         private static IDomainContext domainContext;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(IDomainContext_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                domainContext = cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
-            });
+            authentication = await cremaHost.StartAsync();
+            domainContext = cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                cremaHost.Stop(authentication);
-            });
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
@@ -79,14 +74,14 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
         [ExpectedException(typeof(InvalidOperationException))]
         public void DomainCreated()
         {
-            domainContext.Domains.DomainCreated += (s, e) => Assert.Inconclusive();
+            domainContext.Domains.DomainsCreated += (s, e) => Assert.Inconclusive();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void DomainDeleted()
         {
-            domainContext.Domains.DomainDeleted += (s, e) => Assert.Inconclusive();
+            domainContext.Domains.DomainsDeleted += (s, e) => Assert.Inconclusive();
         }
 
         [TestMethod]
@@ -105,9 +100,16 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void DomainUserChanged()
+        public void DomainUserLocationChanged()
         {
-            domainContext.Domains.DomainUserChanged += (s, e) => Assert.Inconclusive();
+            domainContext.Domains.DomainUserLocationChanged += (s, e) => Assert.Inconclusive();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void DomainUserStateChanged()
+        {
+            domainContext.Domains.DomainUserStateChanged += (s, e) => Assert.Inconclusive();
         }
 
         [TestMethod]
@@ -145,14 +147,12 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
             domainContext.Domains.DomainPropertyChanged += (s, e) => Assert.Inconclusive();
         }
 
-#if SERVER
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void GetMetaData()
         {
             domainContext.GetMetaData(authentication);
         }
-#endif
 
         [TestMethod]
         public void GetService()

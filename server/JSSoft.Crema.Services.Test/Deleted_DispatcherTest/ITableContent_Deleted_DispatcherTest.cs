@@ -24,6 +24,8 @@ using JSSoft.Library.Random;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using JSSoft.Crema.Services.Random;
 
 namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
 {
@@ -38,77 +40,71 @@ namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
         private static ITableRow row;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(ITableContent_Deleted_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                dataBase = cremaHost.DataBases.Random();
-                dataBase.Load(authentication);
-                dataBase.Enter(authentication);
-                dataBase.Initialize(authentication);
-                content = dataBase.TableContext.Tables.Random(item => item.Parent == null).Content;
-                content.BeginEdit(authentication);
-                content.EnterEdit(authentication);
-                row = content.AddNew(authentication, null);
-                dataBase.Leave(authentication);
-                dataBase.Unload(authentication);
-            });
+            authentication = await cremaHost.StartAsync();
+            dataBase = await cremaHost.GetRandomDataBaseAsync();
+            await dataBase.LoadAsync(authentication);
+            await dataBase.EnterAsync(authentication);
+            await dataBase.InitializeAsync(authentication);
+            content = dataBase.TableContext.Tables.Random(item => item.Parent == null).Content;
+            await content.BeginEditAsync(authentication);
+            await content.EnterEditAsync(authentication);
+            row = await content.AddNewAsync(authentication, null);
+            await dataBase.LeaveAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                cremaHost.Stop(authentication);
-            });
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Enter()
+        public async Task EnterAsync()
         {
-            content.EnterEdit(authentication);
+            await content.EnterEditAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Leave()
+        public async Task LeaveAsync()
         {
-            content.LeaveEdit(authentication);
+            await content.LeaveEditAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void CancelEdit()
+        public async Task CancelEditAsync()
         {
-            content.CancelEdit(authentication);
+            await content.CancelEditAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Clear()
+        public async Task ClearAsync()
         {
-            content.Clear(authentication);
+            await content.ClearAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void AddNew()
+        public async Task AddNewAsync()
         {
-            content.AddNew(authentication, null);
+            await content.AddNewAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void EndNew()
+        public async Task EndNewAsync()
         {
-            content.EndNew(authentication, row);
+            await content.EndNewAsync(authentication, row);
         }
 
         [TestMethod]

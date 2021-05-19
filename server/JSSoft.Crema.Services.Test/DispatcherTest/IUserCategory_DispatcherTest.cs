@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Library.IO;
 using JSSoft.Library.Random;
 using System;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test.DispatcherTest
 {
@@ -36,63 +37,56 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
         private static IUserCategory category;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(IUserCategory_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-
-            });
-            category = userContext.Dispatcher.Invoke(() => userContext.Categories.Random());
+            authentication = await cremaHost.StartAsync();
+            userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            category = await userContext.Dispatcher.InvokeAsync(() => userContext.Categories.Random());
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                cremaHost.Stop(authentication);
-            });
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Rename()
+        public async Task RenameAsync()
         {
-            category.Rename(authentication, RandomUtility.NextIdentifier());
+            await category.RenameAsync(authentication, RandomUtility.NextIdentifier());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Move()
+        public async Task MoveAsync()
         {
-            category.Move(authentication, PathUtility.Separator);
+            await category.MoveAsync(authentication, PathUtility.Separator);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Delete()
+        public async Task DeleteAsync()
         {
-            category.Delete(authentication);
+            await category.DeleteAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void AddNewCategory()
+        public async Task AddNewCategoryAsync()
         {
-            category.AddNewCategory(authentication, RandomUtility.NextIdentifier());
+            await category.AddNewCategoryAsync(authentication, RandomUtility.NextIdentifier());
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void AddNewUser()
+        public async Task AddNewUserAsync()
         {
-            category.AddNewUser(authentication, null, null, null, ServiceModel.Authority.Admin);
+            await category.AddNewUserAsync(authentication, null, null, null, ServiceModel.Authority.Admin);
         }
 
         [TestMethod]

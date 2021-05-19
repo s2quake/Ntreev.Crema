@@ -22,6 +22,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -65,39 +66,26 @@ namespace JSSoft.Crema.Services.Test
 #endif
         }
 
-        public static void Initialize(this IDataBase dataBase, Authentication authentication)
+        public static async Task InitializeAsync(this IDataBase dataBase, Authentication authentication)
         {
-#if SERVER
-            dataBase.InitializeRandomItemsAsync(authentication);
-#else
-            dataBase.InitializeRandomItems(authentication, false);
-#endif
+            //     await dataBase.InitializeRandomItemsAsync(authentication);
+            await Task.Delay(1);
         }
 
-        public static Authentication Start(this ICremaHost cremaHost)
+        public static async Task<Authentication> StartAsync(this ICremaHost cremaHost)
         {
-#if SERVER
-            var token = cremaHost.OpenAsync();
-            var authentication = cremaHost.LoginAsync("admin", Utility.AdminPassword);
+            var token = await cremaHost.OpenAsync();
+            var authenticationToken = await cremaHost.LoginAsync("admin", Utility.AdminPassword, false);
+            var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
             authenticationToToken.Add(authentication, token);
             return authentication;
-#endif
-#if CLIENT
-            var port = cremaHostToPort[cremaHost];
-            var token = cremaHost.Open($"localhost:{port}", "admin", Utility.AdminPassword);
-            var authentication = cremaHost.GetService(typeof(Authenticator)) as Authenticator;
-            authenticationToToken.Add(authentication, token);
-            return authentication;
-#endif
         }
 
-        public static void Stop(this ICremaHost cremaHost, Authentication authentication)
+        public static async Task StopAsync(this ICremaHost cremaHost, Authentication authentication)
         {
             var token = authenticationToToken[authentication];
-#if SERVER
-            cremaHost.Logout(authentication);
-#endif
-            cremaHost.CloseAsync(token);
+            await cremaHost.LogoutAsync(authentication);
+            await cremaHost.CloseAsync(token);
             authenticationToToken.Remove(authentication);
         }
     }

@@ -24,6 +24,8 @@ using JSSoft.Library.Random;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using JSSoft.Crema.Services.Random;
 
 namespace JSSoft.Crema.Services.Test.DispatcherTest
 {
@@ -37,30 +39,25 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
         private static ITableCollection tables;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
             app.Initialize(context, nameof(ITableCollection_DispatcherTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                authentication = cremaHost.Start();
-                dataBase = cremaHost.DataBases.Random();
-                dataBase.Load(authentication);
-                dataBase.Enter(authentication);
-                dataBase.Initialize(authentication);
-                tables = dataBase.TableContext.Tables;
-            });
+
+            authentication = await cremaHost.StartAsync();
+            dataBase = await cremaHost.GetRandomDataBaseAsync();
+            await dataBase.LoadAsync(authentication);
+            await dataBase.EnterAsync(authentication);
+            await dataBase.InitializeAsync(authentication);
+            tables = dataBase.TableContext.Tables;
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            cremaHost.Dispatcher.Invoke(() =>
-            {
-                dataBase.Unload(authentication);
-                cremaHost.Stop(authentication);
-            });
+            await dataBase.UnloadAsync(authentication);
+            await cremaHost.StopAsync(authentication);
             app.Dispose();
         }
 
@@ -145,13 +142,6 @@ namespace JSSoft.Crema.Services.Test.DispatcherTest
             {
                 Console.Write(item);
             }
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void CollectionChanged()
-        {
-            tables.CollectionChanged += (s, e) => Assert.Inconclusive();
         }
 
         [TestMethod]
