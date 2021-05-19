@@ -31,7 +31,7 @@ namespace JSSoft.Crema.ConsoleHost
             try
             {
                 using var application = new CremaApplication();
-                await application.RunAsync();
+                await application.RunAsync(args);
             }
             catch (Exception e)
             {

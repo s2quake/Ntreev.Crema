@@ -22,6 +22,7 @@
 using JSSoft.Crema.Commands.Consoles;
 using JSSoft.Library;
 using JSSoft.Library.Commands;
+using System;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,20 +38,20 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
         {
         }
 
-        [CommandProperty]
+        [CommandPropertyRequired(DefaultValue = "")]
         public string UserID
         {
             get; set;
         }
 
-        [CommandProperty]
+        [CommandPropertyRequired(DefaultValue = "")]
         public string Password
         {
             get; set;
         }
 
-        [CommandProperty]
-        public string Address
+        [CommandPropertySwitch]
+        public bool Force
         {
             get; set;
         }
@@ -61,9 +62,17 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 
         protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
-            var userID = this.UserID != string.Empty ? this.UserID : this.CommandContext.ReadString("UserID:");
-            var password = this.Password != string.Empty ? StringUtility.ToSecureString(this.Password) : this.CommandContext.ReadSecureString("Password:");
-            return this.CommandContext.LoginAsync(userID, password);
+            try
+            {
+                var userID = this.UserID != string.Empty ? this.UserID : this.CommandContext.ReadString("UserID:");
+                var password = this.Password != string.Empty ? StringUtility.ToSecureString(this.Password) : this.CommandContext.ReadSecureString("Password:");
+                var force = this.Force;
+                return this.CommandContext.LoginAsync(userID, password, force);
+            }
+            catch (OperationCanceledException e)
+            {
+                throw new Exception("login is cancelled.", e);
+            }
         }
     }
 }

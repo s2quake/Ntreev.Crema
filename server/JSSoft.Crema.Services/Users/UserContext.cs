@@ -588,6 +588,8 @@ namespace JSSoft.Crema.Services.Users
 
         private void ValidateLogout(Authentication authentication)
         {
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
             var user = this.Users[authentication.ID];
             if (user == null)
                 throw new UserNotFoundException(authentication.ID);

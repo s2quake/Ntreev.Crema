@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.Commands.Consoles;
 using JSSoft.Crema.Services;
+using JSSoft.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -31,71 +32,60 @@ using System.Threading.Tasks;
 namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 {
     [Export(typeof(ConsoleCommandContext))]
-    public class ConsoleCommandContext : ConsoleCommandContextBase
+    class ConsoleCommandContext : ConsoleCommandContextBase
     {
         private readonly ICremaHost cremaHost;
         private readonly CremaApplication application;
         private Authentication authentication;
-        private Guid token;
 
         [ImportingConstructor]
         public ConsoleCommandContext(ICremaHost cremaHost,
+            CremaApplication application,
             [ImportMany] IEnumerable<IConsoleDrive> driveItems,
             [ImportMany] IEnumerable<IConsoleCommand> commands)
             : base(driveItems, commands)
         {
             this.cremaHost = cremaHost;
-            this.application = cremaHost.GetService(typeof(CremaApplication)) as CremaApplication;
+            this.application = application;
             this.BaseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            this.Dispatcher = application.Dispatcher;
         }
 
-        public override string Address => this.application.Address;
-
-        public override ICremaHost CremaHost => this.cremaHost;
-
-        public async Task LoginAsync(string userID, SecureString password)
+        public async Task LoginAsync(string userID, SecureString password, bool force)
         {
-            this.token = await this.CremaHost.LoginAsync(userID, password, false);
-            this.authentication = this.CremaHost.GetService(typeof(Authenticator)) as Authenticator;
-            this.Initialize(this.authentication);
+            var token = await this.CremaHost.LoginAsync(userID, password, force);
+            var authentication = await this.cremaHost.AuthenticateAsync(token);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.authentication = authentication;
+                this.authentication.Expired += Authentication_Expired;
+                this.Initialize(authentication);
+            });
         }
 
         public async Task LogoutAsync()
         {
             if (this.authentication == null)
                 throw new Exception("로그인되어 있지 않습니다.");
-
             await this.CremaHost.LogoutAsync(this.authentication);
-            this.Release();
-            this.authentication = null;
-            this.token = Guid.Empty;
-        }
-
-        protected Guid Token => this.token;
-
-        private static string SecureStringToString(SecureString value)
-        {
-            var valuePtr = IntPtr.Zero;
-            try
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                valuePtr = Marshal.SecureStringToGlobalAllocUnicode(value);
-                return Marshal.PtrToStringUni(valuePtr);
-            }
-            finally
-            {
-                Marshal.ZeroFreeGlobalAllocUnicode(valuePtr);
-            }
+                if (this.authentication != null)
+                    this.authentication.Expired -= Authentication_Expired;
+                this.authentication = null;
+                this.Release();
+            });
         }
 
-        private void CremaHost_Closed(object sender, ClosedEventArgs e)
-        {
-            this.Release();
-        }
+        public override ICremaHost CremaHost => this.cremaHost;
 
-        internal static void Validate(SecureString value1, SecureString value2)
+        public override Dispatcher Dispatcher { get; }
+
+        public override string Address => this.application.Address;
+
+        private void Authentication_Expired(object sender, EventArgs e)
         {
-            if (SecureStringToString(value1) != SecureStringToString(value2))
-                throw new Exception("암호가 일치하지 않습니다.");
+            this.Dispatcher.InvokeAsync(() => this.authentication = null);
         }
     }
 }

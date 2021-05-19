@@ -25,6 +25,7 @@ using JSSoft.Library;
 using JSSoft.Library.Commands;
 using JSSoft.Library.IO;
 using JSSoft.Library.ObjectModel;
+using JSSoft.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -286,6 +287,8 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public abstract string Address { get; }
 
+        public abstract Dispatcher Dispatcher { get; }
+
         public string UserID => this.authentication.ID;
 
         public ConsoleTerminalBase Terminal { get; internal set; }
@@ -294,6 +297,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         protected void Initialize(Authentication authentication)
         {
+            this.Dispatcher.VerifyAccess();
             this.authentication = authentication ?? throw new ArgumentNullException(nameof(authentication));
             this.authentication.Expired += Authentication_Expired;
             this.Authority = authentication.Authority;
@@ -302,7 +306,9 @@ namespace JSSoft.Crema.Commands.Consoles
 
         protected void Release()
         {
-            this.authentication.Expired -= Authentication_Expired;
+            this.Dispatcher.VerifyAccess();
+            if (this.authentication != null)
+                this.authentication.Expired -= Authentication_Expired;
             if (this.commission != null && this.authentication != null)
                 this.authentication.EndCommission(this.commission);
             this.authentication = null;
@@ -396,7 +402,11 @@ namespace JSSoft.Crema.Commands.Consoles
 
         private void Authentication_Expired(object sender, EventArgs e)
         {
-            this.authentication = null;
+            this.Dispatcher.InvokeAsync(() => 
+            {
+                this.authentication = null;
+                this.Terminal?.CancelInput();
+            });
         }
 
         private void Update(Authentication authentication, string[] segments, string path)

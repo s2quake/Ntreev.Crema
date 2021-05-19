@@ -22,6 +22,7 @@
 using JSSoft.Crema.Commands.Consoles;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
+using JSSoft.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -31,7 +32,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 {
     [Export(typeof(ConsoleCommandContext))]
-    public class ConsoleCommandContext : ConsoleCommandContextBase
+    class ConsoleCommandContext : ConsoleCommandContextBase
     {
         private readonly ICremaHost cremaHost;
         private readonly CremaApplication application;
@@ -39,23 +40,29 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 
         [ImportingConstructor]
         public ConsoleCommandContext(ICremaHost cremaHost,
+            CremaApplication application,
             [ImportMany] IEnumerable<IConsoleDrive> rootItems,
             [ImportMany] IEnumerable<IConsoleCommand> commands)
             : base(rootItems, commands)
         {
             this.cremaHost = cremaHost;
-            this.application = cremaHost.GetService(typeof(CremaApplication)) as CremaApplication;
+            this.application = application;
             this.BaseDirectory = application.DocumentsPath;
+            this.Dispatcher = application.Dispatcher;
         }
 
-        public async Task LoginAsync(string userID, SecureString password)
+        public async Task LoginAsync(string userID, SecureString password, bool force)
         {
             if (this.authentication != null)
                 throw new Exception("이미 로그인되어 있습니다.");
-            var token = await this.CremaHost.LoginAsync(userID, password, false);
-            this.authentication = await this.CremaHost.AuthenticateAsync(token);
-            this.authentication.Expired += (s, e) => this.authentication = null;
-            this.Initialize(authentication);
+            var token = await this.CremaHost.LoginAsync(userID, password, force);
+            var authentication = await this.CremaHost.AuthenticateAsync(token);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.authentication = authentication;
+                this.authentication.Expired += Authentication_Expired;
+                this.Initialize(authentication);
+            });
         }
 
         public async Task LogoutAsync()
@@ -63,12 +70,24 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             if (this.authentication == null)
                 throw new Exception("로그인되어 있지 않습니다.");
             await this.CremaHost.LogoutAsync(this.authentication);
-            this.authentication = null;
-            this.Release();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.authentication != null)
+                    this.authentication.Expired -= Authentication_Expired;
+                this.authentication = null;
+                this.Release();
+            });
         }
 
         public override ICremaHost CremaHost => this.cremaHost;
 
+        public override Dispatcher Dispatcher { get; }
+
         public override string Address => AddressUtility.GetDisplayAddress($"localhost:{this.application.Port}");
+
+        private void Authentication_Expired(object sender, EventArgs e)
+        {
+            this.Dispatcher.InvokeAsync(() => this.authentication = null);
+        }
     }
 }

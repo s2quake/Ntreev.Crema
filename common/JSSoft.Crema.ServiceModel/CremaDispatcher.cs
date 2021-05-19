@@ -26,7 +26,7 @@ namespace JSSoft.Crema.ServiceModel
     public sealed class CremaDispatcher : Dispatcher
     {
         public CremaDispatcher(object owner)
-        : base(owner)
+            : base(owner)
         {
 
         }

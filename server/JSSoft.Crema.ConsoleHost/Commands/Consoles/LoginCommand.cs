@@ -33,10 +33,9 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
     [ResourceUsageDescription("Resources")]
     class LoginCommand : ConsoleCommandAsyncBase
     {
+        [ImportingConstructor]
         public LoginCommand()
-            : base("login")
         {
-
         }
 
         [CommandPropertyRequired(DefaultValue = "")]
@@ -51,6 +50,12 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             get; set;
         }
 
+        [CommandPropertySwitch]
+        public bool Force
+        {
+            get; set;
+        }
+
         public override bool IsEnabled => this.CommandContext.IsOnline == false;
 
         public new ConsoleCommandContext CommandContext => base.CommandContext as ConsoleCommandContext;
@@ -61,7 +66,8 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             {
                 var userID = this.UserID == string.Empty ? this.CommandContext.ReadString("UserID:") : this.UserID;
                 var password = this.Password == string.Empty ? this.CommandContext.ReadSecureString("Password:") : StringUtility.ToSecureString(this.Password);
-                await this.CommandContext.LoginAsync(userID, password);
+                var force = this.Force;
+                await this.CommandContext.LoginAsync(userID, password, force);
             }
             catch (OperationCanceledException e)
             {

@@ -23,6 +23,7 @@ using JSSoft.Crema.Commands;
 using JSSoft.Crema.ServiceHosts;
 using JSSoft.Crema.Services;
 using JSSoft.Library;
+using JSSoft.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,14 +39,21 @@ namespace JSSoft.Crema.ConsoleHost
         public CremaApplication()
         {
             this.service = this.GetService(typeof(CremaService)) as CremaService;
+            this.Dispatcher = new Dispatcher(this);
+            this.service.Opening += Service_Opening;
+            this.service.Opened += Service_Opened;
+            this.service.Closing += Service_Closing;
+            this.service.Closed += Service_Closed;
+            this.Port = this.service.Port;
+            this.Timeout = this.service.Timeout;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
-        public async Task RunAsync()
+        public async Task RunAsync(string[] args)
         {
             var configs = this.GetService(typeof(ConsoleConfiguration)) as ConsoleConfiguration;
             var commandContext = this.GetService(typeof(CommandContext)) as CommandContext;
-            await commandContext.ExecuteAsync(Environment.CommandLine);
+            await commandContext.ExecuteAsync(args);
             configs.Write();
         }
 
@@ -78,6 +86,8 @@ namespace JSSoft.Crema.ConsoleHost
 
         public Task OpenAsync()
         {
+            this.service.Port = this.Port;
+            this.service.Timeout = this.Timeout;
             return this.service.OpenAsync();
         }
 
@@ -86,17 +96,9 @@ namespace JSSoft.Crema.ConsoleHost
             return this.service.CloseAsync();
         }
 
-        public int Port
-        {
-            get => this.service.Port;
-            set => this.service.Port = value;
-        }
+        public int Port { get; set; }
 
-        public int Timeout
-        {
-            get => this.service.Timeout;
-            set => this.service.Timeout = value;
-        }
+        public int Timeout { get; set; }
 
         public ServiceState ServiceState => this.service.ServiceState;
 
@@ -108,33 +110,20 @@ namespace JSSoft.Crema.ConsoleHost
 
         public string DocumentsPath => Path.Combine(base.BasePath, "Documents");
 
-        public event EventHandler Opening
-        {
-            add { this.service.Opening += value; }
-            remove { this.service.Opening -= value; }
-        }
+        public Dispatcher Dispatcher { get; }
 
-        public event EventHandler Opened
-        {
-            add { this.service.Opened += value; }
-            remove { this.service.Opened -= value; }
-        }
+        public event EventHandler Opening;
 
-        public event EventHandler Closing
-        {
-            add { this.service.Closing += value; }
-            remove { this.service.Closing -= value; }
-        }
+        public event EventHandler Opened;
 
-        public event ClosedEventHandler Closed
-        {
-            add { this.service.Closed += value; }
-            remove { this.service.Closed -= value; }
-        }
+        public event EventHandler Closing;
+
+        public event ClosedEventHandler Closed;
 
         protected override void OnDisposed(EventArgs e)
         {
             base.OnDisposed(e);
+            this.Dispatcher.Dispose();
             this.service.Dispose();
         }
 
@@ -147,13 +136,32 @@ namespace JSSoft.Crema.ConsoleHost
                 {
                     item.Publish(e.ExceptionObject);
                 }
-                Console.WriteLine(e.ExceptionObject);
+                Console.Error.WriteLine(e.ExceptionObject);
             }
             catch (Exception)
             {
             }
-
             Environment.Exit(-1);
+        }
+
+        private void Service_Opening(object sender, EventArgs e)
+        {
+            this.Dispatcher.InvokeAsync(() => this.Opening?.Invoke(this, e));
+        }
+
+        private void Service_Opened(object sender, EventArgs e)
+        {
+            this.Dispatcher.InvokeAsync(() => this.Opened?.Invoke(this, e));
+        }
+
+        private void Service_Closing(object sender, EventArgs e)
+        {
+            this.Dispatcher.InvokeAsync(() => this.Closing?.Invoke(this, e));
+        }
+
+        private void Service_Closed(object sender, ClosedEventArgs e)
+        {
+            this.Dispatcher.InvokeAsync(() => this.Closed?.Invoke(this, e));
         }
     }
 }
