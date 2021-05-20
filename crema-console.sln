@@ -133,6 +133,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Services.Rando
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Services.Test", "server\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.csproj", "{71A236C3-7B3B-4C97-A0A2-49A663D79A78}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.Services.Test", "share\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.shproj", "{A90FA10D-5668-40F3-B554-43BA02FF0A87}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		share\JSSoft.Crema.Commands.Spreadsheet\JSSoft.Crema.Commands.Spreadsheet.projitems*{05971a74-2d68-4781-9ceb-df2b48f8ba75}*SharedItemsImports = 13
@@ -146,11 +148,14 @@ Global
 		share\JSSoft.Crema.ServiceHosts.Users\JSSoft.Crema.ServiceHosts.Users.projitems*{4e857c1f-3ca7-45b7-9b3f-2af6d49071b2}*SharedItemsImports = 13
 		share\JSSoft.Crema.Bot\JSSoft.Crema.Bot.projitems*{595830e8-8fd3-44bf-ae07-79e8ec57a830}*SharedItemsImports = 5
 		share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
+		share\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.projitems*{71a236c3-7b3b-4c97-a0a2-49a663d79a78}*SharedItemsImports = 5
 		share\JSSoft.Crema.ServiceHosts.RuntimeService\JSSoft.Crema.ServiceHosts.RuntimeService.projitems*{7e5c7310-0da2-4f46-896b-c8e871c22e37}*SharedItemsImports = 13
+		share\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.projitems*{81948c77-9f48-4b76-b2a4-79c59a190cb9}*SharedItemsImports = 5
 		share\JSSoft.Crema.Services.Random\JSSoft.Crema.Services.Random.projitems*{89395ed5-5f1a-44ca-bcd6-480a44af840b}*SharedItemsImports = 5
 		share\JSSoft.Crema.Services.Extensions\JSSoft.Crema.Services.Extensions.projitems*{957c9292-f518-4c3d-856d-e3b094102a55}*SharedItemsImports = 5
 		share\JSSoft.Crema.Services.Extensions\JSSoft.Crema.Services.Extensions.projitems*{97ad6c00-3b71-4e83-97c3-0201bc035471}*SharedItemsImports = 13
 		share\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.projitems*{a4955825-195f-4677-9695-5fc67362a449}*SharedItemsImports = 13
+		share\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.projitems*{a90fa10d-5668-40f3-b554-43ba02ff0a87}*SharedItemsImports = 13
 		share\JSSoft.Crema.ServiceHosts.Data\JSSoft.Crema.ServiceHosts.Data.projitems*{babab208-95fb-4d06-b801-3fee20f980eb}*SharedItemsImports = 13
 		share\JSSoft.Crema.ServiceHosts.Data\JSSoft.Crema.ServiceHosts.Data.projitems*{bc14e19c-3ebb-40f3-beca-89d207fc4c15}*SharedItemsImports = 5
 		share\JSSoft.Crema.ServiceHosts.Domains\JSSoft.Crema.ServiceHosts.Domains.projitems*{bc14e19c-3ebb-40f3-beca-89d207fc4c15}*SharedItemsImports = 5
@@ -390,6 +395,7 @@ Global
 		{1133B040-C0B6-4C13-A162-FFCD6827EF80} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
 		{BFE3A041-7A31-4CD5-B43B-41F001E59CBD} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
 		{71A236C3-7B3B-4C97-A0A2-49A663D79A78} = {42B800F5-7B40-4FF3-843E-F76945B655F8}
+		{A90FA10D-5668-40F3-B554-43BA02FF0A87} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {14FB22CB-2420-4F8B-9112-F64D7814E3EF}
