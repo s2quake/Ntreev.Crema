@@ -19,6 +19,8 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Crema.Services.Random;
+using JSSoft.Library.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -36,12 +38,12 @@ namespace JSSoft.Crema.Services.Test
         private static readonly Dictionary<ICremaHost, int> cremaHostToPort = new Dictionary<ICremaHost, int>();
         private static readonly Dictionary<Authentication, Guid> authenticationToToken = new Dictionary<Authentication, Guid>();
 
-        public static void Initialize(this CremaBootstrapper boot, TestContext context, string name)
+        public static void Initialize(this CremaBootstrapper app, TestContext context, string name)
         {
 #if SERVER
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory + "_repo", name);
-            CremaBootstrapper.CreateRepository(boot, repositoryPath, "git", "xml", true);
-            boot.BasePath = repositoryPath;
+            CremaBootstrapper.CreateRepository(app, repositoryPath, "git", "xml");
+            app.BasePath = repositoryPath;
 #endif
 #if CLIENT
             var cremaHost = boot.GetService(typeof(ICremaHost)) as ICremaHost;
@@ -68,8 +70,7 @@ namespace JSSoft.Crema.Services.Test
 
         public static async Task InitializeAsync(this IDataBase dataBase, Authentication authentication)
         {
-            //     await dataBase.InitializeRandomItemsAsync(authentication);
-            await Task.Delay(1);
+            await dataBase.InitializeRandomItemsAsync(authentication);
         }
 
         public static async Task<Authentication> StartAsync(this ICremaHost cremaHost)
