@@ -124,7 +124,7 @@ namespace JSSoft.Crema.Data.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task RemoveType_Fail()
+        public void RemoveType_Fail()
         {
             var dataSet = new CremaDataSet();
             var type = dataSet.Types.Add();

@@ -118,7 +118,7 @@ namespace JSSoft.Crema.Data.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task InheritWithNameAndCategoryPath_Fail()
+        public void InheritWithNameAndCategoryPath_Fail()
         {
             var tableName = RandomUtility.NextIdentifier();
             var categoryPath = RandomUtility.NextCategoryPath();
@@ -174,7 +174,7 @@ namespace JSSoft.Crema.Data.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task CopyWithNameAndCategoryPath_Fail()
+        public void CopyWithNameAndCategoryPath_Fail()
         {
             var tableName = RandomUtility.NextIdentifier();
             var categoryPath = RandomUtility.NextCategoryPath();

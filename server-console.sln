@@ -98,6 +98,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{922B62F6-AB6
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ServerService.Test", "server\JSSoft.Crema.ServerService.Test\JSSoft.Crema.ServerService.Test.csproj", "{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.Services.Test", "share\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.shproj", "{A90FA10D-5668-40F3-B554-43BA02FF0A87}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Services.Test", "server\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.csproj", "{EF98E2C2-40D5-43CA-83E4-8803F6F91426}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		share\JSSoft.Crema.Commands.Spreadsheet\JSSoft.Crema.Commands.Spreadsheet.projitems*{05971a74-2d68-4781-9ceb-df2b48f8ba75}*SharedItemsImports = 13
@@ -116,12 +120,14 @@ Global
 		share\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.projitems*{a4955825-195f-4677-9695-5fc67362a449}*SharedItemsImports = 13
 		share\JSSoft.Crema.ServiceHosts.RuntimeService\JSSoft.Crema.ServiceHosts.RuntimeService.projitems*{a714ce01-2673-4363-a6ef-03b9b428b335}*SharedItemsImports = 5
 		share\JSSoft.Crema.Commands\JSSoft.Crema.Commands.projitems*{a8e931d5-20c0-4a7c-b95b-e0032bbe0a28}*SharedItemsImports = 5
+		share\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.projitems*{a90fa10d-5668-40f3-b554-43ba02ff0a87}*SharedItemsImports = 13
 		share\JSSoft.Crema.Services\JSSoft.Crema.Services.projitems*{b2e09c43-f946-41e3-97c7-585934b4fb36}*SharedItemsImports = 5
 		share\JSSoft.Crema.Commands.Spreadsheet\JSSoft.Crema.Commands.Spreadsheet.projitems*{b4e56f7a-262b-42af-985e-9b1333cc8cba}*SharedItemsImports = 5
 		share\JSSoft.Crema.ServiceHosts.Data\JSSoft.Crema.ServiceHosts.Data.projitems*{babab208-95fb-4d06-b801-3fee20f980eb}*SharedItemsImports = 13
 		share\JSSoft.Crema.Services.Extensions\JSSoft.Crema.Services.Extensions.projitems*{c0b74c8e-bcc3-41ae-9a1f-e6fc2ef1dc85}*SharedItemsImports = 5
 		share\JSSoft.Crema.Services.Random\JSSoft.Crema.Services.Random.projitems*{da7e6948-3c9b-48f1-a9e8-4c9b4c540e09}*SharedItemsImports = 5
 		share\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.projitems*{dfd86280-1bb1-40d2-9542-8f605c5c1c89}*SharedItemsImports = 5
+		share\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.projitems*{ef98e2c2-40d5-43ca-83e4-8803f6f91426}*SharedItemsImports = 5
 		share\JSSoft.Crema.ServiceHosts.Domains\JSSoft.Crema.ServiceHosts.Domains.projitems*{f2688cf8-cc3e-48c9-a718-738f57388165}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -237,6 +243,10 @@ Global
 		{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF98E2C2-40D5-43CA-83E4-8803F6F91426}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF98E2C2-40D5-43CA-83E4-8803F6F91426}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF98E2C2-40D5-43CA-83E4-8803F6F91426}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF98E2C2-40D5-43CA-83E4-8803F6F91426}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -280,6 +290,8 @@ Global
 		{24ECBEE1-2859-4F09-969B-F382E6341814} = {4BB77DD8-CE06-403A-BB8C-E652E9284511}
 		{1F4A20AE-F955-4231-8636-27B7A38EB4B3} = {4BB77DD8-CE06-403A-BB8C-E652E9284511}
 		{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0} = {8D8DC23A-F758-402E-ABA2-5C7C7268B378}
+		{A90FA10D-5668-40F3-B554-43BA02FF0A87} = {4BB77DD8-CE06-403A-BB8C-E652E9284511}
+		{EF98E2C2-40D5-43CA-83E4-8803F6F91426} = {8D8DC23A-F758-402E-ABA2-5C7C7268B378}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D0597CA1-B5A4-4E76-92FA-066003A1D135}
