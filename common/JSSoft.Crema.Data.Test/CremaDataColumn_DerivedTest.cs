@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Data.Test
     [TestClass]
     public class CremaDataColumn_DerivedTest
     {
-        private readonly CremaDataSet dataSet = new CremaDataSet();
+        private readonly CremaDataSet dataSet = new();
         private readonly CremaDataTable dataTable;
         private readonly CremaDataTable derivedTable;
         private readonly CremaDataColumn[] columns;

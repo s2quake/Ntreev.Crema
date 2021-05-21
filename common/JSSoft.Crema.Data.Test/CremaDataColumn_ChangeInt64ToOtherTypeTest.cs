@@ -28,9 +28,6 @@ namespace JSSoft.Crema.Data.Test
     [TestClass]
     public class CremaDataColumn_ChangeInt64ToOtherTypeTest : CremaDataColumn_ChangeTypeTestBase
     {
-        private const long minOADateValue = -(657435 - 1);
-        private const long maxOADateValue = (2958466 - 1);
-
         public CremaDataColumn_ChangeInt64ToOtherTypeTest()
             : base(typeof(long))
         {

@@ -147,7 +147,7 @@ namespace JSSoft.Crema.Data.Test
 
             foreach (var item in dataSet.Types)
             {
-                MemoryStream ms = new MemoryStream();
+                var ms = new MemoryStream();
                 item.Write(ms);
                 ms.Position = 0;
 
@@ -166,10 +166,10 @@ namespace JSSoft.Crema.Data.Test
 
             foreach (var item in dataSet.Types)
             {
-                StringWriter sw = new StringWriter();
+                var sw = new StringWriter();
                 item.Write(sw);
 
-                StringReader sr = new StringReader(sw.ToString());
+                var sr = new StringReader(sw.ToString());
                 testSet.ReadType(sr);
                 var newType = testSet.Types[item.TypeName];
 
@@ -185,13 +185,13 @@ namespace JSSoft.Crema.Data.Test
 
             foreach (var item in dataSet.Types)
             {
-                StringBuilder sb = new StringBuilder();
-                XmlWriter writer = XmlWriter.Create(sb);
+                var sb = new StringBuilder();
+                var writer = XmlWriter.Create(sb);
                 item.Write(writer);
                 writer.Close();
 
-                StringReader sr = new StringReader(sb.ToString());
-                XmlReader reader = XmlReader.Create(sr);
+                var sr = new StringReader(sb.ToString());
+                var reader = XmlReader.Create(sr);
                 testSet.ReadType(reader);
                 var newType = testSet.Types[item.TypeName];
 
@@ -322,7 +322,7 @@ namespace JSSoft.Crema.Data.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task RemoveUsingType_Fail()
+        public void RemoveUsingType_Fail()
         {
             var dataSet = new CremaDataSet();
             var dataType = dataSet.Types.Add();
@@ -651,7 +651,7 @@ namespace JSSoft.Crema.Data.Test
         [TestMethod]
         public void Test1()
         {
-            CremaDataType type = new CremaDataType();
+            var type = new CremaDataType();
             var member = type.NewMember();
             member.Name = "A";
             member.Value = 0;

@@ -26,7 +26,7 @@ namespace JSSoft.Crema.Data.Test
 {
     public abstract class CremaDataColumn_ChangeTypeTestBase
     {
-        protected CremaDataTable table = new CremaDataTable();
+        protected CremaDataTable table = new();
         protected CremaDataColumn column;
 
         protected CremaDataColumn_ChangeTypeTestBase(Type dataType)

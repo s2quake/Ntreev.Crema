@@ -29,7 +29,7 @@ namespace JSSoft.Crema.Data.Test
     [TestClass]
     public class CremaTemplateColumn_PropertyTest
     {
-        private readonly CremaTemplate template = new CremaTemplate(new CremaDataTable());
+        private readonly CremaTemplate template = new(new CremaDataTable());
         private readonly CremaTemplateColumn column;
 
         public CremaTemplateColumn_PropertyTest()

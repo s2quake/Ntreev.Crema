@@ -279,15 +279,15 @@ namespace JSSoft.Crema.Data.Test
                 if (item.TemplateNamespace != string.Empty)
                     continue;
 
-                StringWriter schemaWriter = new StringWriter();
-                StringWriter xmlWriter = new StringWriter();
+                var schemaWriter = new StringWriter();
+                var xmlWriter = new StringWriter();
 
                 item.WriteXmlSchema(schemaWriter);
                 item.WriteXml(xmlWriter);
 
                 try
                 {
-                    using (StringReader sr = new StringReader(schemaWriter.ToString()))
+                    using (var sr = new StringReader(schemaWriter.ToString()))
                     {
                         testSet.ReadXmlSchema(sr);
                     }
@@ -296,11 +296,11 @@ namespace JSSoft.Crema.Data.Test
                 }
                 catch
                 {
-                    using StringReader sr = new StringReader(schemaWriter.ToString());
+                    using var sr = new StringReader(schemaWriter.ToString());
                     testSet.ReadXmlSchema(sr, new CremaTypeXmlResolver(dataSet, item.Namespace));
                 }
 
-                using (StringReader sr = new StringReader(xmlWriter.ToString()))
+                using (var sr = new StringReader(xmlWriter.ToString()))
                 {
                     testSet.ReadXml(sr);
                 }
@@ -325,21 +325,21 @@ namespace JSSoft.Crema.Data.Test
                 if (item.TemplateNamespace != string.Empty)
                     continue;
 
-                StringBuilder schemaBuilder = new StringBuilder();
-                StringBuilder xmlBuilder = new StringBuilder();
-                using (XmlWriter schemaWriter = XmlWriter.Create(schemaBuilder))
+                var schemaBuilder = new StringBuilder();
+                var xmlBuilder = new StringBuilder();
+                using (var schemaWriter = XmlWriter.Create(schemaBuilder))
                 {
                     item.WriteXmlSchema(schemaWriter);
                 }
-                using (XmlWriter xmlWriter = XmlWriter.Create(xmlBuilder))
+                using (var xmlWriter = XmlWriter.Create(xmlBuilder))
                 {
                     item.WriteXml(xmlWriter);
                 }
 
                 try
                 {
-                    using (StringReader sr = new StringReader(schemaBuilder.ToString()))
-                    using (XmlReader reader = XmlReader.Create(sr))
+                    using (var sr = new StringReader(schemaBuilder.ToString()))
+                    using (var reader = XmlReader.Create(sr))
                     {
                         testSet.ReadXmlSchema(reader);
                     }
@@ -348,13 +348,13 @@ namespace JSSoft.Crema.Data.Test
                 }
                 catch
                 {
-                    using StringReader sr = new StringReader(schemaBuilder.ToString());
-                    using XmlReader reader = XmlReader.Create(sr);
+                    using var sr = new StringReader(schemaBuilder.ToString());
+                    using var reader = XmlReader.Create(sr);
                     testSet.ReadXmlSchema(reader, new CremaTypeXmlResolver(dataSet, item.Namespace));
                 }
 
-                using (StringReader sr = new StringReader(xmlBuilder.ToString()))
-                using (XmlReader reader = XmlReader.Create(sr))
+                using (var sr = new StringReader(xmlBuilder.ToString()))
+                using (var reader = XmlReader.Create(sr))
                 {
                     testSet.ReadXml(reader);
                 }

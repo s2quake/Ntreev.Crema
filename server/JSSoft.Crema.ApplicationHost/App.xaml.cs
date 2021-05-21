@@ -60,7 +60,7 @@ namespace JSSoft.Crema.ApplicationHost
                 {
                     Out = new StringWriter(sb)
                 };
-                if (parser.TryParse(Environment.CommandLine) == false)
+                if (parser.TryParseCommandLine(Environment.CommandLine) == false)
                 {
                     MessageBox.Show(sb.ToString(), "Usage", MessageBoxButton.OK, MessageBoxImage.Information);
                     return false;

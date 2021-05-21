@@ -220,8 +220,16 @@ namespace JSSoft.Crema.Services.Data
                 var newItemCategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
                 var itemPath1 = new RepositoryPath(this.TableContext, item.Path);
                 var itemPath2 = new RepositoryPath(this.TableContext, newItemCategoryPath + tableInfo.Name);
-                itemPath1.ValidateExists();
-                itemPath2.ValidateNotExists();
+                if (item.Parent == null)
+                {
+                    itemPath1.ValidateExists();
+                    itemPath2.ValidateNotExists();
+                }
+                else
+                {
+                    itemPath1.ValidateNotExists();
+                    itemPath2.ValidateExists();
+                }
                 item.CategoryPath = newItemCategoryPath;
             }
 

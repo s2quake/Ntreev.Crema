@@ -24,6 +24,7 @@ using JSSoft.Crema.ServiceHosts;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
 using JSSoft.Library.Commands;
+using JSSoft.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -80,6 +81,8 @@ namespace JSSoft.Crema.ApplicationHost.Commands.Consoles
         public override string Address => AddressUtility.GetDisplayAddress($"localhost:{this.service.Port}");
 
         public bool IsOpen => this.service.ServiceState == ServiceState.Open;
+
+        public override Dispatcher Dispatcher => this.service.Dispatcher;
 
         private void CremaHost_Opened(object sender, EventArgs e)
         {

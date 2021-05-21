@@ -33,7 +33,7 @@ namespace JSSoft.Crema.Data.Json
     {
         private const string schemaKey = "$schema";
 
-        private static readonly Dictionary<Type, JSchema> schemas = new Dictionary<Type, JSchema>();
+        private static readonly Dictionary<Type, JSchema> schemas = new();
 
         static JsonSchemaUtility()
         {
@@ -108,7 +108,7 @@ namespace JSSoft.Crema.Data.Json
             {
                 foreach (PropertyDescriptor item in TypeDescriptor.GetProperties(type))
                 {
-                    if (!(item.Attributes[typeof(JsonPropertyAttribute)] is JsonPropertyAttribute attr))
+                    if (item.Attributes[typeof(JsonPropertyAttribute)] is not JsonPropertyAttribute attr)
                         continue;
                     var name = attr.PropertyName ?? item.Name;
                     if (name == propertyName)

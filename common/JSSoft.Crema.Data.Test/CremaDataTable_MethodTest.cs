@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Data.Test
     [TestClass]
     public class CremaDataTable_MethodTest
     {
-        private readonly CremaDataTable table = new CremaDataTable();
+        private readonly CremaDataTable table = new();
 
         [TestMethod]
         public void BeginLoad()

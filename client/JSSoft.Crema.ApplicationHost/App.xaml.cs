@@ -25,6 +25,7 @@ using JSSoft.Library.Commands;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows;
 
@@ -87,8 +88,8 @@ namespace JSSoft.Crema.ApplicationHost
                     {
                         Out = new StringWriter(sb)
                     };
-                    var (name, arguments) = CommandStringUtility.Split(Environment.CommandLine);
-                    if (parser.TryParse(name, arguments) == false && arguments != string.Empty)
+                    var (name, arguments) = CommandStringUtility.SplitCommandLine(Environment.CommandLine);
+                    if (parser.TryParseCommandLine(Environment.CommandLine) == false && arguments.Any() == false)
                     {
                         MessageBox.Show(sb.ToString(), "Usage", MessageBoxButton.OK, MessageBoxImage.Information);
                         return false;

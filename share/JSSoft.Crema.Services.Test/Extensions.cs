@@ -30,13 +30,12 @@ namespace JSSoft.Crema.Services.Test
 {
     static class Extensions
     {
-        private static readonly object lockobj = new object();
 #if CLIENT
         private static int port = 4006;
+        private static readonly Dictionary<ICremaHost, int> cremaHostToPort = new Dictionary<ICremaHost, int>();
 #endif
 
-        private static readonly Dictionary<ICremaHost, int> cremaHostToPort = new Dictionary<ICremaHost, int>();
-        private static readonly Dictionary<Authentication, Guid> authenticationToToken = new Dictionary<Authentication, Guid>();
+        private static readonly Dictionary<Authentication, Guid> authenticationToToken = new();
 
         public static void Initialize(this CremaBootstrapper app, TestContext context, string name)
         {

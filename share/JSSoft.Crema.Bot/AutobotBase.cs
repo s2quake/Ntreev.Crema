@@ -230,7 +230,7 @@ namespace JSSoft.Crema.Bot
 
             static int SelectWeight(ITaskProvider predicate)
             {
-                if (!(Attribute.GetCustomAttribute(predicate.GetType(), typeof(TaskClassAttribute)) is TaskClassAttribute attr))
+                if (Attribute.GetCustomAttribute(predicate.GetType(), typeof(TaskClassAttribute)) is not TaskClassAttribute attr)
                     return 100;
                 return attr.Weight;
             }

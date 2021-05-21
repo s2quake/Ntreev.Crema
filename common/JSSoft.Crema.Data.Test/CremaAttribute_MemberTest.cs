@@ -28,7 +28,7 @@ namespace JSSoft.Crema.Data.Test
     [TestClass]
     public class CremaAttribute_MemberTest
     {
-        private readonly CremaAttribute attribute = new CremaAttribute();
+        private readonly CremaAttribute attribute = new();
 
         public CremaAttribute_MemberTest()
         {

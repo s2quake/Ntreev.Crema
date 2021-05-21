@@ -29,7 +29,7 @@ namespace JSSoft.Crema.Data.Test
     [TestClass]
     public class CremaDataColumn_MemberTest
     {
-        private readonly CremaDataColumn column = new CremaDataColumn();
+        private readonly CremaDataColumn column = new();
 
         public CremaDataColumn_MemberTest()
         {

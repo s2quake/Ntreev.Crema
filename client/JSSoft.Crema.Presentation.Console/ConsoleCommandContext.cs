@@ -23,6 +23,7 @@ using JSSoft.Crema.Commands.Consoles;
 using JSSoft.Crema.Presentation.Framework;
 using JSSoft.Crema.Services;
 using JSSoft.Library.Commands;
+using JSSoft.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -30,7 +31,7 @@ using System.ComponentModel.Composition;
 namespace JSSoft.Crema.Presentation.Console
 {
     [Export(typeof(ConsoleCommandContext))]
-    public class ConsoleCommandContext : ConsoleCommandContextBase
+    public class ConsoleCommandContext : ConsoleCommandContextBase, IDisposable
     {
         private readonly ICremaHost cremaHost;
         private readonly ICremaAppHost cremaAppHost;
@@ -51,11 +52,14 @@ namespace JSSoft.Crema.Presentation.Console
             this.cremaHost.Closed += CremaHost_Closed;
             this.cremaAppHost = cremaAppHost;
             this.BaseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            this.Dispatcher = new Dispatcher(this);
         }
 
         public override ICremaHost CremaHost => this.cremaHost;
 
         public override string Address => this.cremaAppHost.Address;
+
+        public override Dispatcher Dispatcher { get; }
 
         private void CremaHost_Opened(object sender, EventArgs e)
         {
@@ -65,6 +69,11 @@ namespace JSSoft.Crema.Presentation.Console
         private void CremaHost_Closed(object sender, ClosedEventArgs e)
         {
             this.Release();
+        }
+
+        void IDisposable.Dispose()
+        {
+            this.Dispatcher.Dispose();
         }
     }
 }
