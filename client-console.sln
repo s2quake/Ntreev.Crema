@@ -79,6 +79,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{7E9D059E-8B0
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.Services.Test", "share\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.shproj", "{A90FA10D-5668-40F3-B554-43BA02FF0A87}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		share\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.projitems*{03f8b24b-dc54-480f-bd8e-bef5ad484754}*SharedItemsImports = 5
@@ -100,6 +102,7 @@ Global
 		share\JSSoft.Crema.ServiceHosts.Users\JSSoft.Crema.ServiceHosts.Users.projitems*{a8bcd565-f67d-4c79-ae8c-fae3e78f12f8}*SharedItemsImports = 5
 		share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.projitems*{a8bcd565-f67d-4c79-ae8c-fae3e78f12f8}*SharedItemsImports = 5
 		share\JSSoft.Crema.Services\JSSoft.Crema.Services.projitems*{a8bcd565-f67d-4c79-ae8c-fae3e78f12f8}*SharedItemsImports = 5
+		share\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.projitems*{a90fa10d-5668-40f3-b554-43ba02ff0a87}*SharedItemsImports = 13
 		share\JSSoft.Crema.ServiceHosts.Data\JSSoft.Crema.ServiceHosts.Data.projitems*{babab208-95fb-4d06-b801-3fee20f980eb}*SharedItemsImports = 13
 		share\JSSoft.Crema.Commands\JSSoft.Crema.Commands.projitems*{cfe867c9-f43b-498b-b1b5-04f32a8a025e}*SharedItemsImports = 5
 		share\JSSoft.Crema.Services.Extensions\JSSoft.Crema.Services.Extensions.projitems*{e4e56f94-ba03-444f-a6b1-d37c0ddc0743}*SharedItemsImports = 5
@@ -216,6 +219,7 @@ Global
 		{24ECBEE1-2859-4F09-969B-F382E6341814} = {1AA4BDEA-61F8-4332-B347-E45E8F0534B7}
 		{97AD6C00-3B71-4E83-97C3-0201BC035471} = {1AA4BDEA-61F8-4332-B347-E45E8F0534B7}
 		{1F4A20AE-F955-4231-8636-27B7A38EB4B3} = {1AA4BDEA-61F8-4332-B347-E45E8F0534B7}
+		{A90FA10D-5668-40F3-B554-43BA02FF0A87} = {1AA4BDEA-61F8-4332-B347-E45E8F0534B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C2BDF84E-4170-43BC-B7AF-E4195227B53E}

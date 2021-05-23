@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System;
 using System.Text.RegularExpressions;
 
 namespace JSSoft.Crema.ServiceModel
@@ -62,6 +63,8 @@ namespace JSSoft.Crema.ServiceModel
 
         public static string GetIPAddress(string address)
         {
+            if (address is null)
+                throw new ArgumentNullException(nameof(address));
             var match = Regex.Match(address, "(?<name>[^:]*)[:]*(?<port>\\d*)", RegexOptions.ExplicitCapture);
             return match.Groups["name"].Value;
         }

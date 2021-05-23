@@ -25,6 +25,7 @@ using JSSoft.Library;
 using System.IO;
 using System.Threading.Tasks;
 using JSSoft.Crema.Services.Test.Extensions;
+using System.Reflection;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -56,6 +57,13 @@ namespace JSSoft.Crema.Services.Test
 
             TableTemplateExtensions.MinColumnCount = 2;
             TableTemplateExtensions.MaxColumnCount = 5;
+
+
+
+            //var solutionDir = Path.GetDirectoryName(context.TestDir);
+            //var exePath = Path.Combine(solutionDir, "server", "JSSoft.Crema.ConsoleHost", "bin", "debug", "netcoreapp3.1", "crema-server.dll");
+
+            //var domain = System.AppDomain.CreateDomain("crema-server");
         }
 
         [ClassInitialize]

@@ -1,7 +1,9 @@
-﻿using JSSoft.Library.IO;
+﻿using JSSoft.Library;
+using JSSoft.Library.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace JSSoft.Crema.Services.Test.Extensions
@@ -9,8 +11,10 @@ namespace JSSoft.Crema.Services.Test.Extensions
     static class CremaBootstrapperExtensions
     {
 #if CLIENT
-        private static int port = 4006;
-        private static readonly Dictionary<ICremaHost, int> cremaHostToPort = new Dictionary<ICremaHost, int>();
+        private static readonly object obj = new();
+        private static readonly int startPort = 4006;
+        private static readonly HashSet<int> reservedPort = new();
+        private static readonly Dictionary<CremaBootstrapper, ServerHost> serverHostByApp = new();
 #endif
 #if SERVER
         private static readonly Dictionary<CremaBootstrapper, string> repositoryPathByApp = new();
@@ -27,34 +31,69 @@ namespace JSSoft.Crema.Services.Test.Extensions
             repositoryPathByApp.Add(app, repositoryPath);
 #endif
 #if CLIENT
-            var cremaHost = boot.GetService(typeof(ICremaHost)) as ICremaHost;
+            var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory + "_repo", name);
-            CremaServeHost.Run("init", repositoryPath.WrapQuot());
-            var process = CremaServeHost.RunAsync("run", repositoryPath.WrapQuot(), "--port", port);
-            var eventSet = new ManualResetEvent(false);
-            cremaHostToPort[cremaHost] = port;
-            port += 2;
-            process.OutputDataReceived += (s, e) =>
+            var solutionPath = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
+            var executablePath = Path.Combine(solutionPath, "server", "JSSoft.Crema.ConsoleHost", "bin", "Debug", "netcoreapp3.1", "cremaserver.exe");
+            var port = ReservePort();
+            var repositoryInitCommand = new CommandHost(executablePath, solutionPath)
             {
-                if (e.Data == "종료하시려면 <Q> 키를 누르세요.")
-                    eventSet.Set();
+                "init",
+                $"\"{repositoryPath}\""
             };
-            eventSet.WaitOne();
-            boot.Disposed += (s, e) =>
+            var serverHost = new ServerHost()
             {
-                process.StandardInput.WriteLine("exit");
-                process.WaitForExit(100);
-                cremaHostToPort.Remove(cremaHost);
+                ExecutablePath = executablePath,
+                RepositoryPath = repositoryPath,
+                WorkingPath = solutionPath,
+                Port = port
             };
+            repositoryInitCommand.Run();
+            serverHost.Start();
+            serverHostByApp.Add(app, serverHost);
+            app.Address = $"localhost:{port}";
 #endif
         }
 
         public static void Release(this CremaBootstrapper app)
         {
+#if SERVER
             var repositoryPath = repositoryPathByApp[app];
             DirectoryUtility.Delete(repositoryPath);
             repositoryPathByApp.Remove(app);
+#endif
+#if CLIENT
+            var serverHost = serverHostByApp[app];
+            serverHost.Stop();
+            ReleasePort(serverHost.Port);
+#endif
             app.Dispose();
         }
+
+#if CLIENT
+        private static int ReservePort()
+        {
+            lock (obj)
+            {
+                for (var i = startPort; i < int.MaxValue; i++)
+                {
+                    if (reservedPort.Contains(i) == false)
+                    {
+                        reservedPort.Add(i);
+                        return i;
+                    }
+                }
+                throw new NotImplementedException();
+            }
+        }
+
+        private static void ReleasePort(int port)
+        {
+            lock (obj)
+            {
+                reservedPort.Remove(port);
+            }
+        }
+#endif
     }
 }

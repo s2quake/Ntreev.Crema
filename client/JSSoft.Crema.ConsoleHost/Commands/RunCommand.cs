@@ -111,6 +111,12 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             get; set;
         }
 
+        [CommandProperty]
+        public string StartupMessage
+        {
+            get; set;
+        }
+
         protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             this.application.Culture = this.Culture;
@@ -119,6 +125,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             // this.CommandContext.SetAddress(this.Address);
             // this.CommandContext.SetAddress(this.Address);
             await this.application.OpenAsync();
+            await this.Out.WriteLineAsync(this.StartupMessage);
             await this.WaitAsync();
 
             if (this.application.ServiceState == ServiceState.Open)

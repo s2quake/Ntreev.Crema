@@ -21,6 +21,7 @@ Forked from https://github.com/NtreevSoft/Crema
 Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+	  <DefineConstants>CLIENT</DefineConstants>
     <RunSettingsFilePath>$(MSBuildProjectDirectory)\..\..\crema.runsettings</RunSettingsFilePath>
   </PropertyGroup>
   <ItemGroup>

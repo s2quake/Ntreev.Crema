@@ -147,6 +147,12 @@ namespace JSSoft.Crema.ConsoleHost.Commands
         }
 #endif
 
+        [CommandProperty]
+        public string StartupMessage
+        {
+            get; set;
+        }
+
         protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             CremaLog.Verbose = this.Verbose ? LogVerbose.Debug : LogVerbose.Info;
@@ -162,6 +168,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             this.application.Timeout = this.Timeout;
             await this.application.OpenAsync();
             this.application.Title = $"{this.application.BasePath} --port {this.application.Port}";
+            await this.Out.WriteLineAsync(this.StartupMessage);
             await this.WaitAsync();
             if (this.application.ServiceState == ServiceState.Open)
             {
