@@ -377,11 +377,11 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
+            var signatureDate = this.authentication.SignatureDate;
             var actionUserID = e.UserID;
-            var contains = e.Items.Any(item => item.ID == this.authentication.ID);
+            var contains = e.Items.Any(item => item.ID == signatureDate.ID);
             var closeInfo = (CloseInfo)e.MetaData;
-            var signatureDate = e.SignatureDate;
-            if (actionUserID != this.authentication.ID && contains == true)
+            if (actionUserID != signatureDate.ID && contains == true)
             {
                 await this.DetachEventHandlersAsync();
                 this.authentication = null;
@@ -391,7 +391,6 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainsCreated(object sender, DomainsCreatedEventArgs e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var metaDatas = e.MetaDatas;
@@ -400,7 +399,6 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainsDeleted(object sender, DomainsDeletedEventArgs e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainIDs = e.DomainInfos.Select(item => item.DomainID).ToArray();
@@ -411,7 +409,6 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainInfoChanged(object sender, DomainEventArgs e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
@@ -421,7 +418,6 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainStateChanged(object sender, DomainEventArgs e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
@@ -453,7 +449,8 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainUserLocationChanged(object sender, DomainUserLocationEventArgs e)
         {
-            if (e.Domain.Users.Contains(this.authentication.ID) == false)
+            var signatureDate = this.authentication.SignatureDate;
+            if (e.Domain.Users.Contains(signatureDate.ID) == false)
                 return;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
@@ -471,7 +468,8 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainUserEditBegun(object sender, DomainUserLocationEventArgs e)
         {
-            if (e.Domain.Users.Contains(this.authentication.ID) == false)
+            var signatureDate = this.authentication.SignatureDate;
+            if (e.Domain.Users.Contains(signatureDate.ID) == false)
                 return;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
@@ -482,7 +480,8 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainUserEditEnded(object sender, DomainUserEventArgs e)
         {
-            if (e.Domain.Users.Contains(this.authentication.ID) == false)
+            var signatureDate = this.authentication.SignatureDate;
+            if (e.Domain.Users.Contains(signatureDate.ID) == false)
                 return;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
@@ -501,7 +500,8 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainRowAdded(object sender, DomainRowEventArgs e)
         {
-            if (e.Domain.Users.Contains(this.authentication.ID) == false)
+            var signatureDate = this.authentication.SignatureDate;
+            if (e.Domain.Users.Contains(signatureDate.ID) == false)
                 return;
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
@@ -514,9 +514,9 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainRowChanged(object sender, DomainRowEventArgs e)
         {
-            if (e.Domain.Users.Contains(this.authentication.ID) == false)
+            var signatureDate = this.authentication.SignatureDate;
+            if (e.Domain.Users.Contains(signatureDate.ID) == false)
                 return;
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
@@ -527,9 +527,9 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainRowRemoved(object sender, DomainRowEventArgs e)
         {
+            var signatureDate = this.authentication.SignatureDate;
             if (e.Domain.Users.Contains(this.authentication.ID) == false)
                 return;
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
@@ -540,9 +540,9 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainPropertyChanged(object sender, DomainPropertyEventArgs e)
         {
-            if (e.Domain.Users.Contains(this.authentication.ID) == false)
+            var signatureDate = this.authentication.SignatureDate;
+            if (e.Domain.Users.Contains(signatureDate.ID) == false)
                 return;
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;

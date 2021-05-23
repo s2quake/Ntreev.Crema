@@ -237,7 +237,7 @@ namespace JSSoft.Crema.ServiceHosts
                     this.LogService.Info(Resources.ServiceStart, item.Name);
                 }
             });
-            this.serverContext = await Task.Run(() => new ServerContext(this.hosts.ToArray()));
+            this.serverContext = await Task.Run(() => new ServerContext(this.hosts.ToArray()) { Port = this.Port });
             this.serviceToken = await this.serverContext.OpenAsync();
             await this.Dispatcher.InvokeAsync(() =>
             {

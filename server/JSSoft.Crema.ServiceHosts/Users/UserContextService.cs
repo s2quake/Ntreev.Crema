@@ -342,7 +342,6 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void Users_UsersStateChanged(object sender, Services.ItemsEventArgs<IUser> e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var userIDs = e.Items.Select(item => item.ID).ToArray();
@@ -352,7 +351,6 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void Users_UsersChanged(object sender, Services.ItemsEventArgs<IUser> e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = e.Items.Select(item => item.UserInfo).ToArray();
@@ -361,7 +359,6 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserContext_ItemsCreated(object sender, Services.ItemsCreatedEventArgs<IUserItem> e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.Items.Select(item => item.Path).ToArray();
@@ -371,7 +368,6 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserContext_ItemsRenamed(object sender, Services.ItemsRenamedEventArgs<IUserItem> e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
@@ -381,7 +377,6 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserContext_ItemsMoved(object sender, Services.ItemsMovedEventArgs<IUserItem> e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
@@ -391,7 +386,6 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserContext_ItemsDeleted(object sender, Services.ItemsDeletedEventArgs<IUserItem> e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.ItemPaths;
@@ -400,7 +394,6 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserContext_MessageReceived(object sender, MessageEventArgs e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var userIDs = e.Items.Select(item => item.ID).ToArray();
@@ -412,7 +405,6 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void Users_UsersLoggedIn(object sender, Services.ItemsEventArgs<IUser> e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var userIDs = e.Items.Select(item => item.ID).ToArray();
@@ -421,11 +413,11 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void Users_UsersLoggedOut(object sender, Services.ItemsEventArgs<IUser> e)
         {
-            var actionUserID = e.UserID;
-            var contains = e.Items.Any(item => item.ID == this.authentication.ID);
+            var signatureDate = this.authentication.SignatureDate;
+            var contains = e.Items.Any(item => item.ID == signatureDate.ID);
             var closeInfo = (CloseInfo)e.MetaData;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
-            var userID = this.authentication.ID;
+            var userID = signatureDate.ID;
             var exceptionUserID = e.UserID;
             var userIDs = e.Items.Select(item => item.ID).ToArray();
             this.InvokeEvent(() => this.Callback?.OnUsersLoggedOut(callbackInfo, userIDs, closeInfo));
@@ -433,7 +425,6 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void Users_UsersKicked(object sender, ItemsEventArgs<IUser> e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var userIDs = e.Items.Select(item => item.ID).ToArray();
@@ -443,7 +434,6 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void Users_UsersBanChanged(object sender, ItemsEventArgs<IUser> e)
         {
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = new BanInfo[e.Items.Length];

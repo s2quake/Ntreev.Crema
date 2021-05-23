@@ -441,10 +441,11 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
+            var signatureDate = this.authentication.SignatureDate;
             var actionUserID = e.UserID;
-            var contains = e.Items.Any(item => item.ID == this.authentication.ID);
+            var contains = e.Items.Any(item => item.ID == signatureDate.ID);
             var closeInfo = (CloseInfo)e.MetaData;
-            if (actionUserID != this.authentication.ID && contains == true)
+            if (actionUserID != signatureDate.ID && contains == true)
             {
                 await this.DetachEventHandlersAsync();
                 this.authentication = null;

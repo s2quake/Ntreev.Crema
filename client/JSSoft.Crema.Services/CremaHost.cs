@@ -157,14 +157,13 @@ namespace JSSoft.Crema.Services
             }
             catch (Exception e)
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                if (this.ServiceState != ServiceState.Open)
                 {
                     this.log?.Dispose();
                     this.log = null;
                     this.Address = string.Empty;
-                    this.ServiceState = ServiceState.None;
-                });
-                CremaLog.Error(e);
+                }
+                this.ErrorInternal(e);
                 throw;
             }
         }
@@ -586,12 +585,24 @@ namespace JSSoft.Crema.Services
                 {
                     this.authentications.Release(Authentication.SystemID);
                     this.serviceToken = Guid.Empty;
-                    this.Address = null;
+                    this.Address = string.Empty;
                     this.ServiceState = ServiceState.Closed;
                     this.OnClosed(new ClosedEventArgs((CloseReason)e.CloseCode, string.Empty));
                     CremaLog.Debug("Crema closed.");
                 });
             });
+        }
+
+        private void ErrorInternal(Exception e)
+        {
+            if (this.log != null)
+            {
+                this.log.Error(e);
+            }
+            else
+            {
+                CremaLog.Error(e);
+            }
         }
 
         private LogService Log
