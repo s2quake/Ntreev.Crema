@@ -79,6 +79,8 @@ namespace JSSoft.Crema.Services
 
         public void EndCommission(Authentication authentication)
         {
+            if (this.isExpired == true)
+                throw new InvalidOperationException();
             if (this.child == null)
                 throw new InvalidOperationException();
             if (this.child != authentication)
@@ -87,9 +89,25 @@ namespace JSSoft.Crema.Services
             this.child = null;
         }
 
-        public string ID => this.provider.ID;
+        public string ID
+        {
+            get
+            {
+                if (this.isExpired == true)
+                    throw new InvalidOperationException();
+                return this.provider.ID;
+            }
+        }
 
-        public string Name => this.provider.Name;
+        public string Name
+        {
+            get
+            {
+                if (this.isExpired == true)
+                    throw new InvalidOperationException();
+                return this.provider.Name;
+            }
+        }
 
         public Authority Authority => this.provider.Authority;
 
@@ -165,7 +183,15 @@ namespace JSSoft.Crema.Services
                 throw new InvalidOperationException(Resources.Exception_Commissioned);
         }
 
-        internal AuthenticationType Types => this.provider.AuthenticationTypes;
+        internal AuthenticationType Types
+        {
+            get
+            {
+                if (this.isExpired == true)
+                    throw new InvalidOperationException();
+                return this.provider.AuthenticationTypes;
+            }
+        }
 
         internal Authentication Parent { get; private set; }
 

@@ -9,9 +9,18 @@
     <Import_RootNamespace>JSSoft.Crema.Services.Test</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CreationTest - 복사.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CremaHostTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaHost_AssemblyInitializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\CremaBootstrapperExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\CremaHostExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DataBaseExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableCategoryExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableContextExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeCategoryExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeContextExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableCategory_ComplexTest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Utility.cs" />
   </ItemGroup>
 </Project>

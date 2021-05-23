@@ -29,5 +29,20 @@ namespace JSSoft.Crema.Services.Extensions
         {
             return template.Dispatcher.InvokeAsync(() => template.Contains(memberName));
         }
+
+        public static Task AddMemberAsync(this ITypeTemplate template, Authentication authentication, string name, long value)
+        {
+            return AddMemberAsync(template, authentication, name, value, string.Empty);
+        }
+
+        public static async Task AddMemberAsync(this ITypeTemplate template, Authentication authentication, string name, long value, string comment)
+        {
+            var member = await template.AddNewAsync(authentication);
+            await member.SetNameAsync(authentication, name);
+            await member.SetValueAsync(authentication, value);
+            if (comment != string.Empty)
+                await member.SetCommentAsync(authentication, comment);
+            await template.EndNewAsync(authentication, member);
+        }
     }
 }

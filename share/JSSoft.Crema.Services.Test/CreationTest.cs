@@ -31,27 +31,24 @@ using JSSoft.Crema.Services.Random;
 using JSSoft.Crema.ServiceModel;
 using System.Threading.Tasks;
 using System.Text;
+using JSSoft.Crema.Services.Test.Extensions;
+using JSSoft.Crema.Services.Extensions;
 
-namespace JSSoft.Crema.ServerService.Test
+namespace JSSoft.Crema.Services.Test
 {
     [TestClass]
     public class CreationTest
     {
         private static CremaBootstrapper app;
         private static ICremaHost cremaHost;
-        private static string tempDir;
         private static Guid token;
         private static IDataBase dataBase;
 
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
-            AppUtility.ProductName = "CremaTest";
-            var solutionDir = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
-            tempDir = Path.Combine(solutionDir, ".test", "unit_test");
-            app = new();
-            CremaBootstrapper.CreateRepository(app, tempDir, "git", "xml");
-            app.BasePath = tempDir;
+            app = new CremaBootstrapper();
+            app.Initialize(context, nameof(ITableCategory_ComplexTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             token = await cremaHost.OpenAsync();
         }
@@ -61,7 +58,7 @@ namespace JSSoft.Crema.ServerService.Test
         {
             var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
             var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
-            dataBase = await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.First());
+            dataBase = await cremaHost.GetRandomDataBaseAsync();
             await dataBase.LoadAsync(authentication);
             await cremaHost.LogoutAsync(authentication);
         }
@@ -71,7 +68,7 @@ namespace JSSoft.Crema.ServerService.Test
         {
             if (dataBase != null)
             {
-                var authentication = await cremaHost.LoginAdminAsync();
+                var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
                 await dataBase.UnloadAsync(authentication);
                 await cremaHost.LogoutAsync(authentication);
             }
@@ -81,8 +78,7 @@ namespace JSSoft.Crema.ServerService.Test
         public static async Task ClassCleanupAsync()
         {
             await cremaHost.CloseAsync(token);
-            app.Dispose();
-            DirectoryUtility.Delete(tempDir);
+            app.Release();
         }
 
         [TestMethod]
@@ -94,8 +90,8 @@ namespace JSSoft.Crema.ServerService.Test
             try
             {
                 var tableContext = dataBase.TableContext;
-                var category = await tableContext.Root.AddNewCategoryAsync(authentication, "Folder1");
-                var category1 = await category.AddNewCategoryAsync(authentication, "Folder1");
+                var category = await tableContext.Root.AddNewCategoryAsync(authentication);
+                var category1 = await category.AddNewCategoryAsync(authentication);
 
                 var template = await category1.NewTableAsync(authentication);
                 await template.AddRandomColumnsAsync(authentication);
@@ -108,7 +104,8 @@ namespace JSSoft.Crema.ServerService.Test
                 await childTemplate1.EndEditAsync(authentication);
 
                 var child = (childTemplate1.Target as ITable[]).First();
-                await child.RenameAsync(authentication, "Child_abc");
+                var childName = RandomUtility.NextName();
+                await child.RenameAsync(authentication, childName);
 
                 var childTemplate2 = await table.NewTableAsync(authentication);
                 await childTemplate2.AddRandomColumnsAsync(authentication);

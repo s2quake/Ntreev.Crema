@@ -20,6 +20,7 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Services.Random;
+using JSSoft.Library;
 using JSSoft.Library.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -28,44 +29,55 @@ using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test
 {
-    static class Extensions
+    static class Extensions2
     {
 #if CLIENT
         private static int port = 4006;
         private static readonly Dictionary<ICremaHost, int> cremaHostToPort = new Dictionary<ICremaHost, int>();
 #endif
+        //#if SERVER
+        //        private static readonly Dictionary<CremaBootstrapper, string> repositoryPathByApp = new();
+        //#endif
 
         private static readonly Dictionary<Authentication, Guid> authenticationToToken = new();
 
-        public static void Initialize(this CremaBootstrapper app, TestContext context, string name)
-        {
-#if SERVER
-            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory + "_repo", name);
-            CremaBootstrapper.CreateRepository(app, repositoryPath, "git", "xml");
-            app.BasePath = repositoryPath;
-#endif
-#if CLIENT
-            var cremaHost = boot.GetService(typeof(ICremaHost)) as ICremaHost;
-            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory + "_repo", name);
-            CremaServeHost.Run("init", repositoryPath.WrapQuot());
-            var process = CremaServeHost.RunAsync("run", repositoryPath.WrapQuot(), "--port", port);
-            var eventSet = new ManualResetEvent(false);
-            cremaHostToPort[cremaHost] = port;
-            port += 2;
-            process.OutputDataReceived += (s, e) =>
-            {
-                if (e.Data == "종료하시려면 <Q> 키를 누르세요.")
-                    eventSet.Set();
-            };
-            eventSet.WaitOne();
-            boot.Disposed += (s, e) =>
-            {
-                process.StandardInput.WriteLine("exit");
-                process.WaitForExit(100);
-                cremaHostToPort.Remove(cremaHost);
-            };
-#endif
-        }
+        //        public static void Initialize(this CremaBootstrapper app, TestContext context, string name)
+        //        {
+        //#if SERVER
+        //            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory + "_repo", name);
+        //            CremaBootstrapper.CreateRepository(app, repositoryPath, "git", "xml");
+        //            app.BasePath = repositoryPath;
+        //            repositoryPathByApp.Add(app, repositoryPath);
+        //#endif
+        //#if CLIENT
+        //            var cremaHost = boot.GetService(typeof(ICremaHost)) as ICremaHost;
+        //            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory + "_repo", name);
+        //            CremaServeHost.Run("init", repositoryPath.WrapQuot());
+        //            var process = CremaServeHost.RunAsync("run", repositoryPath.WrapQuot(), "--port", port);
+        //            var eventSet = new ManualResetEvent(false);
+        //            cremaHostToPort[cremaHost] = port;
+        //            port += 2;
+        //            process.OutputDataReceived += (s, e) =>
+        //            {
+        //                if (e.Data == "종료하시려면 <Q> 키를 누르세요.")
+        //                    eventSet.Set();
+        //            };
+        //            eventSet.WaitOne();
+        //            boot.Disposed += (s, e) =>
+        //            {
+        //                process.StandardInput.WriteLine("exit");
+        //                process.WaitForExit(100);
+        //                cremaHostToPort.Remove(cremaHost);
+        //            };
+        //#endif
+        //        }
+
+        //        public static void Release(this CremaBootstrapper app)
+        //        {
+        //            var repositoryPath = repositoryPathByApp[app];
+        //            DirectoryUtility.Delete(repositoryPath);
+        //            repositoryPathByApp.Remove(app);
+        //        }
 
         public static async Task InitializeAsync(this IDataBase dataBase, Authentication authentication)
         {
@@ -75,7 +87,7 @@ namespace JSSoft.Crema.Services.Test
         public static async Task<Authentication> StartAsync(this ICremaHost cremaHost)
         {
             var token = await cremaHost.OpenAsync();
-            var authenticationToken = await cremaHost.LoginAsync("admin", Utility.AdminPassword, false);
+            var authenticationToken = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
             var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
             authenticationToToken.Add(authentication, token);
             return authentication;

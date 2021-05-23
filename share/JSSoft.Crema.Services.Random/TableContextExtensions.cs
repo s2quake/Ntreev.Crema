@@ -28,16 +28,6 @@ namespace JSSoft.Crema.Services.Random
 {
     public static class TableContextExtensions
     {
-        static TableContextExtensions()
-        {
-            MinTableCount = 10;
-            MaxTableCount = 200;
-            MinTableCategoryCount = 1;
-            MaxTableCategoryCount = 20;
-            MinRowCount = 100;
-            MaxRowCount = 10000;
-        }
-
         public static async Task AddRandomItemsAsync(this ITableContext tableContext, Authentication authentication)
         {
             await AddRandomCategoriesAsync(tableContext, authentication);
@@ -48,7 +38,10 @@ namespace JSSoft.Crema.Services.Random
 
         public static Task AddRandomCategoriesAsync(this ITableContext tableContext, Authentication authentication)
         {
-            return AddRandomCategoriesAsync(tableContext, authentication, RandomUtility.Next(MinTableCategoryCount, MaxTableCategoryCount));
+            var minCount = CremaRandomSettings.TableContext.MinTableCategoryCount;
+            var maxCount = CremaRandomSettings.TableContext.MaxTableCategoryCount;
+            var count = RandomUtility.Next(minCount, maxCount);
+            return AddRandomCategoriesAsync(tableContext, authentication, count);
         }
 
         public static async Task AddRandomCategoriesAsync(this ITableContext tableContext, Authentication authentication, int tryCount)
@@ -82,7 +75,10 @@ namespace JSSoft.Crema.Services.Random
 
         public static Task AddRandomTablesAsync(this ITableContext tableContext, Authentication authentication)
         {
-            return AddRandomTablesAsync(tableContext, authentication, RandomUtility.Next(MinTableCount, MaxTableCount));
+            var minCount = CremaRandomSettings.TableContext.MinTableCount;
+            var maxCount = CremaRandomSettings.TableContext.MaxTableCount;
+            var count = RandomUtility.Next(minCount, maxCount);
+            return AddRandomTablesAsync(tableContext, authentication, count);
         }
 
         public static async Task AddRandomTablesAsync(this ITableContext tableContext, Authentication authentication, int tryCount)
@@ -109,7 +105,10 @@ namespace JSSoft.Crema.Services.Random
             {
                 foreach (var item in tables)
                 {
-                    await AddRandomRowsAsync(item, authentication, RandomUtility.Next(MinRowCount, MaxRowCount));
+                    var minCount = CremaRandomSettings.TableContext.MinRowCount;
+                    var maxCount = CremaRandomSettings.TableContext.MaxRowCount;
+                    var count = RandomUtility.Next(minCount, maxCount);
+                    await AddRandomRowsAsync(item, authentication, count);
                 }
                 return tables.First();
             }
@@ -166,7 +165,10 @@ namespace JSSoft.Crema.Services.Random
             {
                 foreach (var item in tables)
                 {
-                    await AddRandomRowsAsync(item, authentication, RandomUtility.Next(MinRowCount, MaxRowCount));
+                    var minCount = CremaRandomSettings.TableContext.MinRowCount;
+                    var maxCount = CremaRandomSettings.TableContext.MaxRowCount;
+                    var count = RandomUtility.Next(minCount, maxCount);
+                    await AddRandomRowsAsync(item, authentication, count);
                 }
                 return tables.First();
             }
@@ -224,17 +226,5 @@ namespace JSSoft.Crema.Services.Random
             }
             return level;
         }
-
-        public static int MinTableCount { get; set; }
-
-        public static int MaxTableCount { get; set; }
-
-        public static int MinTableCategoryCount { get; set; }
-
-        public static int MaxTableCategoryCount { get; set; }
-
-        public static int MinRowCount { get; set; }
-
-        public static int MaxRowCount { get; set; }
     }
 }

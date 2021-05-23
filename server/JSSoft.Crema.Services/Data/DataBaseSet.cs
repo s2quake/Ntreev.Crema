@@ -211,25 +211,25 @@ namespace JSSoft.Crema.Services.Data
             repositoryPath1.ValidateExists();
             repositoryPath2.ValidateNotExists();
 
-            foreach (var item in this.tables)
+            var query = from item in this.tables
+                        let tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)]
+                        where tableInfo.CategoryPath.StartsWith(categoryPath) == true
+                        select item;
+
+            foreach (var item in query)
             {
                 var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
-                if (tableInfo.CategoryPath.StartsWith(categoryPath) == false)
-                    continue;
-
                 var newItemCategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
                 var itemPath1 = new RepositoryPath(this.TableContext, item.Path);
                 var itemPath2 = new RepositoryPath(this.TableContext, newItemCategoryPath + tableInfo.Name);
-                if (item.Parent == null)
-                {
-                    itemPath1.ValidateExists();
-                    itemPath2.ValidateNotExists();
-                }
-                else
-                {
-                    itemPath1.ValidateNotExists();
-                    itemPath2.ValidateExists();
-                }
+                itemPath1.ValidateExists();
+                itemPath2.ValidateNotExists();
+            }
+
+            foreach (var item in query)
+            {
+                var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
+                var newItemCategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
                 item.CategoryPath = newItemCategoryPath;
             }
 

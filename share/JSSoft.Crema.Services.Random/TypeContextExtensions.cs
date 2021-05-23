@@ -27,14 +27,6 @@ namespace JSSoft.Crema.Services.Random
 {
     public static class TypeContextExtensions
     {
-        static TypeContextExtensions()
-        {
-            MinTypeCount = 1;
-            MaxTypeCount = 20;
-            MinTypeCategoryCount = 1;
-            MaxTypeCategoryCount = 20;
-        }
-
         public static async Task AddRandomItemsAsync(this ITypeContext typeContext, Authentication authentication)
         {
             await AddRandomCategoriesAsync(typeContext, authentication);
@@ -43,7 +35,10 @@ namespace JSSoft.Crema.Services.Random
 
         public static Task AddRandomCategoriesAsync(this ITypeContext typeContext, Authentication authentication)
         {
-            return AddRandomCategoriesAsync(typeContext, authentication, RandomUtility.Next(MinTypeCategoryCount, MaxTypeCategoryCount));
+            var minCount = CremaRandomSettings.TypeContext.MinTypeCategoryCount;
+            var maxCount = CremaRandomSettings.TypeContext.MaxTypeCategoryCount;
+            var count = RandomUtility.Next(minCount, maxCount);
+            return AddRandomCategoriesAsync(typeContext, authentication, count);
         }
 
         public static async Task AddRandomCategoriesAsync(this ITypeContext typeContext, Authentication authentication, int tryCount)
@@ -77,7 +72,10 @@ namespace JSSoft.Crema.Services.Random
 
         public static Task AddRandomTypesAsync(this ITypeContext typeContext, Authentication authentication)
         {
-            return AddRandomTypesAsync(typeContext, authentication, RandomUtility.Next(MinTypeCount, MaxTypeCount));
+            var minCount = CremaRandomSettings.TypeContext.MinTypeCount;
+            var maxCount = CremaRandomSettings.TypeContext.MaxTypeCount;
+            var count = RandomUtility.Next(minCount, maxCount);
+            return AddRandomTypesAsync(typeContext, authentication, count);
         }
 
         public static async Task AddRandomTypesAsync(this ITypeContext typeContext, Authentication authentication, int tryCount)
@@ -114,13 +112,5 @@ namespace JSSoft.Crema.Services.Random
             }
             return level;
         }
-
-        public static int MinTypeCount { get; set; }
-
-        public static int MaxTypeCount { get; set; }
-
-        public static int MinTypeCategoryCount { get; set; }
-
-        public static int MaxTypeCategoryCount { get; set; }
     }
 }

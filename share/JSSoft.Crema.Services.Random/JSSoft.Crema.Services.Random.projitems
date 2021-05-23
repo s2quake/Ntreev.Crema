@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CremaDataRandomUtility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaDataTableCreator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaHostExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CremaRandomSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBaseExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableRowExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableContextExtensions.cs" />

@@ -174,10 +174,10 @@ namespace JSSoft.Crema.Services.Users
                     this.ValidateLogout(authentication);
                     var users = new User[] { this };
                     var taskID = Guid.NewGuid();
+                    this.CremaHost.Sign(authentication);
                     this.Authentication.InvokeExpiredEvent(authentication.ID, string.Empty);
                     this.Authentication = null;
                     this.IsOnline = false;
-                    this.CremaHost.Sign(authentication);
                     this.Container.InvokeUsersStateChangedEvent(authentication, users);
                     this.Container.InvokeUsersLoggedOutEvent(authentication, users, CloseInfo.Empty);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);

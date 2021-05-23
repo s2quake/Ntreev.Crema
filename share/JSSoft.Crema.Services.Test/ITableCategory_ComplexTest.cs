@@ -23,6 +23,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Library.Random;
 using System.Threading.Tasks;
 using JSSoft.Crema.Services.Random;
+using JSSoft.Library.ObjectModel;
+using JSSoft.Crema.Services.Test.Extensions;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -45,7 +47,7 @@ namespace JSSoft.Crema.Services.Test
             dataBase = await cremaHost.GetRandomDataBaseAsync();
             await dataBase.LoadAsync(authentication);
             await dataBase.EnterAsync(authentication);
-            await dataBase.InitializeAsync(authentication);
+            await dataBase.InitializeRandomItemsAsync(authentication);
             category = dataBase.TableContext.Categories.Random(item => item.Parent != null);
         }
 
@@ -54,17 +56,19 @@ namespace JSSoft.Crema.Services.Test
         {
             await dataBase.UnloadAsync(authentication);
             await cremaHost.StopAsync(authentication);
-            app.Dispose();
+            app.Release();
         }
 
         [TestMethod]
         public async Task CategoryLockRenameTestAsync()
         {
             var newName = RandomUtility.NextIdentifier();
+            var categoryPath = new CategoryName(category.Path).ParentPath + newName;
             await category.LockAsync(authentication, string.Empty);
             await category.RenameAsync(authentication, newName);
 
-            Assert.AreEqual(category.Path, category.LockInfo.Path);
+            Assert.AreEqual(categoryPath, category.Path);
+            Assert.AreEqual(newName, category.Name);
         }
     }
 }

@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Library;
 using JSSoft.Library.Linq;
 using System;
 using System.Linq;
@@ -64,6 +65,12 @@ namespace JSSoft.Crema.Services.Extensions
                             select item;
                 return query.ToArray();
             });
+        }
+
+        public static async Task<ITypeCategory> AddNewCategoryAsync(this ITypeCategory category, Authentication authentication)
+        {
+            var newName = NameUtility.GenerateNewName("Folder", category.Categories.Select(item => item.Name));
+            return await category.AddNewCategoryAsync(authentication, newName);
         }
     }
 }

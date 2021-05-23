@@ -581,6 +581,10 @@ namespace JSSoft.Crema.Services.Users
 
         private void ValidateLogin(string userID, SecureString password)
         {
+            if (userID is null)
+                throw new ArgumentNullException(nameof(userID));
+            if (password is null)
+                throw new ArgumentNullException(nameof(password));
             var user = this.Users[userID];
             if (user == null || user.VerifyPassword(password) == false)
                 throw new ArgumentException(Resources.Exception_WrongIDOrPassword);

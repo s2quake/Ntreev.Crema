@@ -29,5 +29,36 @@ namespace JSSoft.Crema.Services.Extensions
         {
             return template.Dispatcher.InvokeAsync(() => template.Contains(columnName));
         }
+
+        public static Task AddKeyAsync(this ITableTemplate template, Authentication authentication, string name, string typeName)
+        {
+            return AddKeyAsync(template, authentication, name, typeName, string.Empty);
+        }
+
+        public static async Task AddKeyAsync(this ITableTemplate template, Authentication authentication, string name, string typeName, string comment)
+        {
+            var column = await template.AddNewAsync(authentication);
+            await column.SetNameAsync(authentication, name);
+            await column.SetIsKeyAsync(authentication, true);
+            await column.SetDataTypeAsync(authentication, typeName);
+            if (comment != string.Empty)
+                await column.SetCommentAsync(authentication, comment);
+            await template.EndNewAsync(authentication, column);
+        }
+
+        public static Task AddColumnAsync(this ITableTemplate template, Authentication authentication, string name, string typeName)
+        {
+            return AddColumnAsync(template, authentication, name, typeName);
+        }
+
+        public static async Task AddColumnAsync(this ITableTemplate template, Authentication authentication, string name, string typeName, string comment)
+        {
+            var column = await template.AddNewAsync(authentication);
+            await column.SetNameAsync(authentication, name);
+            await column.SetDataTypeAsync(authentication, typeName);
+            if (comment != string.Empty)
+                await column.SetCommentAsync(authentication, comment);
+            await template.EndNewAsync(authentication, column);
+        }
     }
 }

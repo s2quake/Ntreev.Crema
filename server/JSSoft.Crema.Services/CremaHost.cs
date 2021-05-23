@@ -107,7 +107,7 @@ namespace JSSoft.Crema.Services
                 }
                 catch (Exception e)
                 {
-                    CremaLog.Error(e);
+                    this.ErrorInternal(e);
                     return null;
                 }
             }
@@ -167,10 +167,13 @@ namespace JSSoft.Crema.Services
             }
             catch (Exception e)
             {
-                this.UserContext = null;
-                this.DomainContext = null;
-                this.DataBaseContext = null;
-                CremaLog.Error(e);
+                if (this.ServiceState != ServiceState.Open)
+                {
+                    this.UserContext = null;
+                    this.DomainContext = null;
+                    this.DataBaseContext = null;
+                }
+                this.ErrorInternal(e);
                 throw;
             }
         }
@@ -219,7 +222,7 @@ namespace JSSoft.Crema.Services
             }
             catch (Exception e)
             {
-                this.log.Error(e);
+                this.ErrorInternal(e);
                 throw;
             }
         }
@@ -250,7 +253,7 @@ namespace JSSoft.Crema.Services
             }
             catch (Exception e)
             {
-                this.log.Error(e);
+                this.ErrorInternal(e);
                 throw;
             }
         }
@@ -273,23 +276,29 @@ namespace JSSoft.Crema.Services
             }
             catch (Exception e)
             {
-                this.log.Error(e);
+                this.ErrorInternal(e);
                 throw;
             }
         }
 
         public Task<Guid> LoginAsync(string userID, SecureString password, bool force)
         {
+            if (this.ServiceState != ServiceState.Open)
+                throw new InvalidOperationException();
             return this.UserContext.LoginAsync(userID, password, force);
         }
 
         public Task<Authentication> AuthenticateAsync(Guid authenticationToken)
         {
+            if (this.ServiceState != ServiceState.Open)
+                throw new InvalidOperationException();
             return this.UserContext.AuthenticateAsync(authenticationToken);
         }
 
         public Task LogoutAsync(Authentication authentication)
         {
+            if (this.ServiceState != ServiceState.Open)
+                throw new InvalidOperationException();
             return this.UserContext.LogoutAsync(authentication);
         }
 
@@ -507,6 +516,18 @@ namespace JSSoft.Crema.Services
                 throw new InvalidOperationException("Shutdown is not in progress.");
         }
 
+        private void ErrorInternal(Exception e)
+        {
+            if (this.log != null)
+            {
+                this.log.Error(e);
+            }
+            else
+            {
+                CremaLog.Error(e);
+            }
+        }
+
         #region ILogService
 
         LogVerbose ILogService.Verbose
@@ -544,8 +565,10 @@ namespace JSSoft.Crema.Services
 
         async Task ICremaHost.CloseAsync(Guid token)
         {
+            if (this.ServiceState != ServiceState.Open)
+                throw new InvalidOperationException();
             if (this.token != token)
-                throw new InvalidOperationException(Resources.Exception_InvalidToken);
+                throw new ArgumentException(Resources.Exception_InvalidToken, nameof(token));
             await this.CloseAsync(CloseReason.None, string.Empty);
             this.token = Guid.Empty;
         }

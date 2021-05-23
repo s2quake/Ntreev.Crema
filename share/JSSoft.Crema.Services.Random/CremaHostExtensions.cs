@@ -19,6 +19,8 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
 using JSSoft.Library.Random;
 using System;
 using System.Threading.Tasks;
@@ -45,6 +47,15 @@ namespace JSSoft.Crema.Services.Random
                 return dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.Random());
             }
             throw new NotImplementedException();
+        }
+
+        public static async Task<Authentication> LoginRandomAsync(this ICremaHost cremaHost, Authority authority)
+        {
+            var users = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            var user = await users.Dispatcher.InvokeAsync(() => users.Random(item => item.Authority == authority));
+            var password = StringUtility.ToSecureString(user.Authority.ToString().ToLower());
+            var token = await cremaHost.LoginAsync(user.ID, password, false);
+            return await cremaHost.AuthenticateAsync(token);
         }
     }
 }
