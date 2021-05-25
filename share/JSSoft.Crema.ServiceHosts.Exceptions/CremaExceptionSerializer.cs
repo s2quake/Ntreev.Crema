@@ -30,28 +30,28 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
 {
     [Export(typeof(IExceptionDescriptor))]
     [Export(typeof(IDataSerializer))]
-    class PermissionDeniedExceptionSerializer : ExceptionSerializerBase<PermissionDeniedException>
+    class CremaExceptionSerializer : ExceptionSerializerBase<CremaException>
     {
-        private static readonly PermissionDeniedException empty = new();
+        private static readonly CremaException empty = new();
 
-        public PermissionDeniedExceptionSerializer()
-            : base(new Guid("acb3c579-0ee5-41fa-9329-81023a087726"))
+        public CremaExceptionSerializer()
+            : base(new Guid("ad1e60f0-2a38-4f19-98db-dad938834471"))
         {
 
         }
 
         public override Type[] PropertyTypes => new Type[] { typeof(string) };
 
-        public static readonly PermissionDeniedExceptionSerializer Default = new();
+        public static readonly CremaExceptionSerializer Default = new();
 
-        protected override PermissionDeniedException CreateInstance(object[] args)
+        protected override CremaException CreateInstance(object[] args)
         {
             if (args[0] is not string message)
-                return new PermissionDeniedException();
-            return new PermissionDeniedException(message);
+                return new CremaException();
+            return new CremaException(message);
         }
 
-        protected override object[] SelectProperties(PermissionDeniedException e)
+        protected override object[] SelectProperties(CremaException e)
         {
             if (e.Message == empty.Message)
                 return new object[] { null };

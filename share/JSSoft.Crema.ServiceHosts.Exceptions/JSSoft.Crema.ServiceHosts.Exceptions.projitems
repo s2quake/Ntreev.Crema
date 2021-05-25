@@ -9,6 +9,8 @@
     <Import_RootNamespace>JSSoft.Crema.ServiceHosts.Exceptions</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)PermissionExceptionSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CremaExceptionSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PermissionDeniedExceptionSerializer.cs" />
   </ItemGroup>
 </Project>

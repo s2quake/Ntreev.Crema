@@ -407,45 +407,17 @@ namespace JSSoft.Crema.Services
 
         public void Sign(Authentication authentication, ResultBase result)
         {
-            result.Validate(authentication);
+            authentication.SignatureDate = result.SignatureDate;
         }
 
         public void Sign<T>(Authentication authentication, ResultBase<T> result)
         {
-            result.Validate(authentication);
+            authentication.SignatureDate = result.SignatureDate;
         }
 
         public void Sign(Authentication authentication, SignatureDate signatureDate)
         {
             authentication.Sign(signatureDate.DateTime);
-        }
-
-        public async Task<ResultBase<TResult>> InvokeServiceAsync<TResult>(Func<ResultBase<TResult>> func)
-        {
-            var result = await Task.Run(func);
-            result.Validate();
-            return result;
-        }
-
-        public async Task<ResultBase> InvokeServiceAsync(Func<ResultBase> func)
-        {
-            var result = await Task.Run(func);
-            result.Validate();
-            return result;
-        }
-
-        public ResultBase<TResult> InvokeService<TResult>(Func<ResultBase<TResult>> func)
-        {
-            var result = func();
-            result.Validate();
-            return result;
-        }
-
-        public ResultBase InvokeService(Func<ResultBase> func)
-        {
-            var result = func();
-            result.Validate();
-            return result;
         }
 
         public ConfigurationBase Configs => this.configs;

@@ -19,34 +19,34 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Library;
-using System;
-using System.Runtime.Serialization;
+//using JSSoft.Library;
+//using System;
+//using System.Runtime.Serialization;
 
-namespace JSSoft.Crema.ServiceModel
-{
-    [DataContract(Namespace = SchemaUtility.Namespace)]
-    public class CremaFault
-    {
-        public CremaFault()
-        {
-        }
+//namespace JSSoft.Crema.ServiceModel
+//{
+//    [DataContract(Namespace = SchemaUtility.Namespace)]
+//    public class CremaFault
+//    {
+//        public CremaFault()
+//        {
+//        }
 
-        public CremaFault(Exception exception, string message)
-        {
-            this.ExceptionType = exception.GetType().AssemblyQualifiedName;
-            this.Message = message;
-        }
+//        public CremaFault(Exception exception, string message)
+//        {
+//            this.ExceptionType = exception.GetType().AssemblyQualifiedName;
+//            this.Message = message;
+//        }
 
-        public CremaFault(Exception exception)
-            : this(exception, exception.Message)
-        {
-        }
+//        public CremaFault(Exception exception)
+//            : this(exception, exception.Message)
+//        {
+//        }
 
-        [DataMember]
-        public string ExceptionType { get; set; }
+//        [DataMember]
+//        public string ExceptionType { get; set; }
 
-        [DataMember]
-        public string Message { get; set; }
-    }
-}
+//        [DataMember]
+//        public string Message { get; set; }
+//    }
+//}

@@ -27,26 +27,26 @@ namespace JSSoft.Crema.Services
     {
         public static void Validate(this ResultBase result, Authentication authentication)
         {
-            Validate(result);
+            //Validate(result);
             authentication.SignatureDate = result.SignatureDate;
         }
 
-        public static void Validate(this ResultBase result)
-        {
-            if (result.Fault != null)
-                throw new CremaFaultException(result.Fault.Message);
-        }
+        //public static void Validate(this ResultBase result)
+        //{
+        //    if (result.Fault != null)
+        //        throw new CremaFaultException(result.Fault.Message);
+        //}
 
         public static void Validate<T>(this ResultBase<T> result, Authentication authentication)
         {
-            Validate<T>(result);
+            //Validate<T>(result);
             authentication.SignatureDate = result.SignatureDate;
         }
 
-        public static void Validate<T>(this ResultBase<T> result)
-        {
-            if (result.Fault != null)
-                throw new CremaFaultException(result.Fault.Message);
-        }
+        //public static void Validate<T>(this ResultBase<T> result)
+        //{
+        //    if (result.Fault != null)
+        //        throw new CremaFaultException(result.Fault.Message);
+        //}
     }
 }

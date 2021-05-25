@@ -45,17 +45,17 @@ namespace JSSoft.Crema.ServiceModel
         [DataMember]
         public SignatureDate SignatureDate { get; set; }
 
-        [DataMember]
-        public CremaFault Fault
-        {
-            get; set;
-        }
+        //[DataMember]
+        //public CremaFault Fault
+        //{
+        //    get; set;
+        //}
 
-        public void Validate()
-        {
-            if (this.Fault != null)
-                throw new CremaFaultException(this.Fault.Message);
-        }
+        //public void Validate()
+        //{
+        //    if (this.Fault != null)
+        //        throw new CremaFaultException(this.Fault.Message);
+        //}
     }
 
     [DataContract(Namespace = SchemaUtility.Namespace)]
@@ -70,19 +70,19 @@ namespace JSSoft.Crema.ServiceModel
         [DataMember]
         public T Value { get; set; }
 
-        [DataMember]
-        public CremaFault Fault
-        {
-            get; set;
-        }
+        //[DataMember]
+        //public CremaFault Fault
+        //{
+        //    get; set;
+        //}
 
-        public void Validate()
-        {
-            if (this.Fault != null)
-            {
-                throw new CremaFaultException(this.Fault.Message);
-            }
-        }
+        //public void Validate()
+        //{
+        //    if (this.Fault != null)
+        //    {
+        //        throw new CremaFaultException(this.Fault.Message);
+        //    }
+        //}
 
         public static implicit operator T(ResultBase<T> result)
         {
@@ -105,18 +105,18 @@ namespace JSSoft.Crema.ServiceModel
         [DataMember]
         public T2 Value2 { get; set; }
 
-        [DataMember]
-        public CremaFault Fault
-        {
-            get; set;
-        }
+        //[DataMember]
+        //public CremaFault Fault
+        //{
+        //    get; set;
+        //}
 
-        public void Validate()
-        {
-            if (this.Fault != null)
-            {
-                throw new CremaFaultException(this.Fault.Message);
-            }
-        }
+        //public void Validate()
+        //{
+        //    if (this.Fault != null)
+        //    {
+        //        throw new CremaFaultException(this.Fault.Message);
+        //    }
+        //}
     }
 }

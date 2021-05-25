@@ -19,21 +19,21 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using System;
+//using System;
 
-namespace JSSoft.Crema.ServiceModel
-{
-    public class CremaFaultException : Exception
-    {
-        public CremaFaultException()
-        {
+//namespace JSSoft.Crema.ServiceModel
+//{
+//    public class CremaFaultException : Exception
+//    {
+//        public CremaFaultException()
+//        {
 
-        }
+//        }
 
-        public CremaFaultException(string message)
-            : base(message)
-        {
+//        public CremaFaultException(string message)
+//            : base(message)
+//        {
 
-        }
-    }
-}
+//        }
+//    }
+//}
