@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System;
 using JSSoft.Crema.ServiceModel.Properties;
 
 namespace JSSoft.Crema.ServiceModel
@@ -28,13 +29,9 @@ namespace JSSoft.Crema.ServiceModel
         public TableNotFoundException(string tableName)
             : base(string.Format(Resources.Exception_TableNotFound_Format, tableName))
         {
-
+            this.TableName = tableName ?? throw new ArgumentNullException(nameof(tableName));
         }
 
-        public TableNotFoundException(string tableName, string childName)
-            : base(string.Format(Resources.Exception_TableNotFound_Format, tableName + "." + childName))
-        {
-
-        }
+        public string TableName { get; }
     }
 }

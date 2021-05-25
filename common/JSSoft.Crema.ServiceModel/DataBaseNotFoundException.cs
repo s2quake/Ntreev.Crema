@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System;
 using JSSoft.Crema.ServiceModel.Properties;
 
 namespace JSSoft.Crema.ServiceModel
@@ -28,7 +29,9 @@ namespace JSSoft.Crema.ServiceModel
         public DataBaseNotFoundException(string dataBaseName)
             : base(string.Format(Resources.Exception_DataBaseNotFound_Format, dataBaseName))
         {
-
+            this.DataBaseName = dataBaseName ?? throw new ArgumentNullException(nameof(dataBaseName));
         }
+
+        public string DataBaseName {get;}
     }
 }

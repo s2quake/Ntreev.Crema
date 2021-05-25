@@ -95,95 +95,53 @@ namespace JSSoft.Crema.RuntimeService
         public async Task<ResultBase<GenerationSet>> GetCodeGenerationDataAsync(string dataBaseName, string tags, string filterExpression, string revision)
         {
             var result = new ResultBase<GenerationSet>();
-            try
-            {
-                using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
-                var dataBaseID = dataBaseItem.DataBase.ID;
-                var project = this.GetServiceItem(dataBaseID);
-                var tagInfo = new TagInfo(tags);
-                result.Value = await project.GernerationAsync(tagInfo, filterExpression, revision);
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
-
+            using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
+            var dataBaseID = dataBaseItem.DataBase.ID;
+            var project = this.GetServiceItem(dataBaseID);
+            var tagInfo = new TagInfo(tags);
+            result.Value = await project.GernerationAsync(tagInfo, filterExpression, revision);
             return result;
         }
 
         public async Task<ResultBase<SerializationSet>> GetDataGenerationDataAsync(string dataBaseName, string tags, string filterExpression, string revision)
         {
             var result = new ResultBase<SerializationSet>();
-            try
-            {
-                using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
-                var dataBaseID = dataBaseItem.DataBase.ID;
-                var project = this.GetServiceItem(dataBaseID);
-                var tagInfo = (TagInfo)tags;
-                result.Value = await project.SerializeAsync(tagInfo, filterExpression, revision);
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
-
+            using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
+            var dataBaseID = dataBaseItem.DataBase.ID;
+            var project = this.GetServiceItem(dataBaseID);
+            var tagInfo = (TagInfo)tags;
+            result.Value = await project.SerializeAsync(tagInfo, filterExpression, revision);
             return result;
         }
 
         public async Task<ResultBase<GenerationSet, SerializationSet>> GetMetaDataAsync(string dataBaseName, string tags, string filterExpression, string revision)
         {
             var result = new ResultBase<GenerationSet, SerializationSet>();
-            try
-            {
-                using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
-                var dataBaseID = dataBaseItem.DataBase.ID;
-                var project = this.GetServiceItem(dataBaseID);
-                var tagInfo = (TagInfo)tags;
-                result.Value1 = await project.GernerationAsync(tagInfo, filterExpression, revision);
-                result.Value2 = await project.SerializeAsync(tagInfo, filterExpression, revision);
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
-
+            using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
+            var dataBaseID = dataBaseItem.DataBase.ID;
+            var project = this.GetServiceItem(dataBaseID);
+            var tagInfo = (TagInfo)tags;
+            result.Value1 = await project.GernerationAsync(tagInfo, filterExpression, revision);
+            result.Value2 = await project.SerializeAsync(tagInfo, filterExpression, revision);
             return result;
         }
 
         public async Task<ResultBase> ResetDataAsync(string dataBaseName)
         {
             var result = new ResultBase();
-
-            try
-            {
-                using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
-                var dataBaseID = dataBaseItem.DataBase.ID;
-                var project = this.GetServiceItem(dataBaseID);
-                await project.ResetAsync();
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
-
+            using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
+            var dataBaseID = dataBaseItem.DataBase.ID;
+            var project = this.GetServiceItem(dataBaseID);
+            await project.ResetAsync();
             return result;
         }
 
         public async Task<ResultBase<string>> GetRevisionAsync(string dataBaseName)
         {
             var result = new ResultBase<string>();
-
-            try
-            {
-                using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
-                var dataBase = dataBaseItem.DataBase;
-                result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo.Revision);
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
-
+            using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
+            var dataBase = dataBaseItem.DataBase;
+            result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo.Revision);
             return result;
         }
 

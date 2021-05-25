@@ -30,30 +30,26 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
 {
     [Export(typeof(IExceptionDescriptor))]
     [Export(typeof(IDataSerializer))]
-    class CremaExceptionSerializer : ExceptionSerializerBase<CremaException>
+    class DataBaseNotFoundExceptionSerializer : ExceptionSerializerBase<DataBaseNotFoundException>
     {
-        private static readonly CremaException empty = new();
-
-        public CremaExceptionSerializer()
-            : base(new Guid("ad1e60f0-2a38-4f19-98db-dad938834471"))
+        public DataBaseNotFoundExceptionSerializer()
+            : base(new Guid("9ce29873-8235-426c-873c-ff8577ceab7d"))
         {
 
         }
 
         public override Type[] PropertyTypes => new Type[] { typeof(string) };
 
-        protected override CremaException CreateInstance(object[] args)
+        protected override DataBaseNotFoundException CreateInstance(object[] args)
         {
-            if (args[0] is not string message)
-                return new CremaException();
-            return new CremaException(message);
+            if (args[0] is string dataBaseName)
+                return new DataBaseNotFoundException(dataBaseName);
+            throw new NotImplementedException();
         }
 
-        protected override object[] SelectProperties(CremaException e)
+        protected override object[] SelectProperties(DataBaseNotFoundException e)
         {
-            if (e.Message == empty.Message)
-                return new object[] { null };
-            return new object[] { e.Message };
+            return new object[] { e.DataBaseName };
         }
     }
 }

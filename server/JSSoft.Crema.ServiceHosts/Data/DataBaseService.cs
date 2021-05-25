@@ -60,487 +60,296 @@ namespace JSSoft.Crema.ServiceHosts.Data
         public async Task<ResultBase<DataBaseMetaData>> SubscribeAsync(Guid authenticationToken, string dataBaseName)
         {
             var result = new ResultBase<DataBaseMetaData>();
-            try
+            this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
+            this.OwnerID = this.authentication.ID;
+            await this.DataBasesContext.Dispatcher.InvokeAsync(() =>
             {
-                this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
-                this.OwnerID = this.authentication.ID;
-                await this.DataBasesContext.Dispatcher.InvokeAsync(() =>
-                {
-                    this.dataBase = this.DataBasesContext[dataBaseName];
-                    this.dataBaseName = dataBaseName;
-                });
-                result.TaskID = await (Task<Guid>)this.dataBase.EnterAsync(this.authentication);
-                result.Value = await this.AttachEventHandlersAsync();
-                result.SignatureDate = this.authentication.SignatureDate;
-                this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(SubscribeAsync)} : {dataBaseName}");
-            }
-            catch (Exception e)
-            {
-                this.dataBase = null;
-                this.dataBaseName = null;
-                result.Fault = new CremaFault(e);
-            }
+                this.dataBase = this.DataBasesContext[dataBaseName];
+                this.dataBaseName = dataBaseName;
+            });
+            result.TaskID = await (Task<Guid>)this.dataBase.EnterAsync(this.authentication);
+            result.Value = await this.AttachEventHandlersAsync();
+            result.SignatureDate = this.authentication.SignatureDate;
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(SubscribeAsync)} : {dataBaseName}");
             return result;
         }
 
         public async Task<ResultBase> UnsubscribeAsync()
         {
             var result = new ResultBase();
-            try
+            await this.DetachEventHandlersAsync();
+            if (this.dataBase != null)
             {
-                await this.DetachEventHandlersAsync();
-                if (this.dataBase != null)
-                {
-                    result.TaskID = await (Task<Guid>)this.dataBase?.LeaveAsync(this.authentication);
-                }
-                this.dataBase = null;
-                this.authentication = null;
-                result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-                this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(UnsubscribeAsync)} : {this.dataBaseName}");
+                result.TaskID = await (Task<Guid>)this.dataBase?.LeaveAsync(this.authentication);
             }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            this.dataBase = null;
+            this.authentication = null;
+            result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(UnsubscribeAsync)} : {this.dataBaseName}");
             return result;
         }
 
         public async Task<ResultBase<DataBaseMetaData>> GetMetaDataAsync()
         {
             var result = new ResultBase<DataBaseMetaData>();
-            try
-            {
-                result.Value = await this.dataBase.Dispatcher.InvokeAsync(() => this.dataBase.GetMetaData(this.authentication));
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            result.Value = await this.dataBase.Dispatcher.InvokeAsync(() => this.dataBase.GetMetaData(this.authentication));
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> ImportDataSetAsync(CremaDataSet dataSet, string comment)
         {
             var result = new ResultBase();
-            try
-            {
-                result.TaskID = await (Task<Guid>)this.dataBase.ImportAsync(this.authentication, dataSet, comment);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            result.TaskID = await (Task<Guid>)this.dataBase.ImportAsync(this.authentication, dataSet, comment);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> NewTableCategoryAsync(string categoryPath)
         {
             var result = new ResultBase();
-            try
-            {
-                var categoryName = new JSSoft.Library.ObjectModel.CategoryName(categoryPath);
-                var category = await this.GetTableCategoryAsync(categoryName.ParentPath);
-                await category.AddNewCategoryAsync(this.authentication, categoryName.Name);
-                result.TaskID = GuidUtility.FromName(categoryPath);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var categoryName = new JSSoft.Library.ObjectModel.CategoryName(categoryPath);
+            var category = await this.GetTableCategoryAsync(categoryName.ParentPath);
+            await category.AddNewCategoryAsync(this.authentication, categoryName.Name);
+            result.TaskID = GuidUtility.FromName(categoryPath);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<CremaDataSet>> GetTableItemDataSetAsync(string itemPath, string revision)
         {
             var result = new ResultBase<CremaDataSet>();
-            try
-            {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                result.Value = await tableItem.GetDataSetAsync(this.authentication, revision);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            result.Value = await tableItem.GetDataSetAsync(this.authentication, revision);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> RenameTableItemAsync(string itemPath, string newName)
         {
             var result = new ResultBase();
-            try
-            {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)tableItem.RenameAsync(this.authentication, newName);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)tableItem.RenameAsync(this.authentication, newName);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> MoveTableItemAsync(string itemPath, string parentPath)
         {
             var result = new ResultBase();
-            try
-            {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)tableItem.MoveAsync(this.authentication, parentPath);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)tableItem.MoveAsync(this.authentication, parentPath);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> DeleteTableItemAsync(string itemPath)
         {
             var result = new ResultBase();
-            try
-            {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)tableItem.DeleteAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)tableItem.DeleteAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> SetPublicTableItemAsync(string itemPath)
         {
             var result = new ResultBase();
-            try
-            {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)tableItem.SetPublicAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)tableItem.SetPublicAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<AccessInfo>> SetPrivateTableItemAsync(string itemPath)
         {
             var result = new ResultBase<AccessInfo>();
-            try
-            {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)tableItem.SetPrivateAsync(this.authentication);
-                result.Value = await tableItem.Dispatcher.InvokeAsync(() => tableItem.AccessInfo);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)tableItem.SetPrivateAsync(this.authentication);
+            result.Value = await tableItem.Dispatcher.InvokeAsync(() => tableItem.AccessInfo);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<AccessMemberInfo>> AddAccessMemberTableItemAsync(string itemPath, string memberID, AccessType accessType)
         {
             var result = new ResultBase<AccessMemberInfo>();
-            try
-            {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)tableItem.AddAccessMemberAsync(this.authentication, memberID, accessType);
-                var accessInfo = await tableItem.Dispatcher.InvokeAsync(() => tableItem.AccessInfo);
-                result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)tableItem.AddAccessMemberAsync(this.authentication, memberID, accessType);
+            var accessInfo = await tableItem.Dispatcher.InvokeAsync(() => tableItem.AccessInfo);
+            result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<AccessMemberInfo>> SetAccessMemberTableItemAsync(string itemPath, string memberID, AccessType accessType)
         {
             var result = new ResultBase<AccessMemberInfo>();
-            try
-            {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)tableItem.SetAccessMemberAsync(this.authentication, memberID, accessType);
-                var accessInfo = await tableItem.Dispatcher.InvokeAsync(() => tableItem.AccessInfo);
-                result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)tableItem.SetAccessMemberAsync(this.authentication, memberID, accessType);
+            var accessInfo = await tableItem.Dispatcher.InvokeAsync(() => tableItem.AccessInfo);
+            result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> RemoveAccessMemberTableItemAsync(string itemPath, string memberID)
         {
             var result = new ResultBase();
-            try
-            {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)tableItem.RemoveAccessMemberAsync(this.authentication, memberID);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)tableItem.RemoveAccessMemberAsync(this.authentication, memberID);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<LockInfo>> LockTableItemAsync(string itemPath, string comment)
         {
             var result = new ResultBase<LockInfo>();
-            try
-            {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)tableItem.LockAsync(this.authentication, comment);
-                result.Value = await tableItem.Dispatcher.InvokeAsync(() => tableItem.LockInfo);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)tableItem.LockAsync(this.authentication, comment);
+            result.Value = await tableItem.Dispatcher.InvokeAsync(() => tableItem.LockInfo);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> UnlockTableItemAsync(string itemPath)
         {
             var result = new ResultBase();
-            try
-            {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)tableItem.UnlockAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)tableItem.UnlockAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<LogInfo[]>> GetTableItemLogAsync(string itemPath, string revision)
         {
             var result = new ResultBase<LogInfo[]>();
-            try
-            {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                result.Value = await tableItem.GetLogAsync(this.authentication, revision);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            result.Value = await tableItem.GetLogAsync(this.authentication, revision);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<FindResultInfo[]>> FindTableItemAsync(string itemPath, string text, FindOptions options)
         {
             var result = new ResultBase<FindResultInfo[]>();
-            try
-            {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                result.Value = await tableItem.FindAsync(this.authentication, text, options);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            result.Value = await tableItem.FindAsync(this.authentication, text, options);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<TableInfo[]>> CopyTableAsync(string tableName, string newTableName, string categoryPath, bool copyXml)
         {
             var result = new ResultBase<TableInfo[]>();
-            try
-            {
-                var table = await this.GetTableAsync(tableName);
-                var newTable = await table.CopyAsync(this.authentication, newTableName, categoryPath, copyXml);
-                result.TaskID = GuidUtility.FromName(categoryPath + newTableName);
-                result.Value = await table.Dispatcher.InvokeAsync(() => EnumerableUtility.FamilyTree(newTable, item => item.Childs).Select(item => item.TableInfo).ToArray());
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var table = await this.GetTableAsync(tableName);
+            var newTable = await table.CopyAsync(this.authentication, newTableName, categoryPath, copyXml);
+            result.TaskID = GuidUtility.FromName(categoryPath + newTableName);
+            result.Value = await table.Dispatcher.InvokeAsync(() => EnumerableUtility.FamilyTree(newTable, item => item.Childs).Select(item => item.TableInfo).ToArray());
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<TableInfo[]>> InheritTableAsync(string tableName, string newTableName, string categoryPath, bool copyXml)
         {
             var result = new ResultBase<TableInfo[]>();
-            try
-            {
-                var table = await this.GetTableAsync(tableName);
-                var newTable = await table.InheritAsync(this.authentication, newTableName, categoryPath, copyXml);
-                result.TaskID = GuidUtility.FromName(categoryPath + newTableName);
-                result.Value = await table.Dispatcher.InvokeAsync(() => EnumerableUtility.FamilyTree(newTable, item => item.Childs).Select(item => item.TableInfo).ToArray());
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var table = await this.GetTableAsync(tableName);
+            var newTable = await table.InheritAsync(this.authentication, newTableName, categoryPath, copyXml);
+            result.TaskID = GuidUtility.FromName(categoryPath + newTableName);
+            result.Value = await table.Dispatcher.InvokeAsync(() => EnumerableUtility.FamilyTree(newTable, item => item.Childs).Select(item => item.TableInfo).ToArray());
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<DomainMetaData>> EnterTableContentEditAsync(Guid domainID)
         {
             var result = new ResultBase<DomainMetaData>();
-            try
-            {
-                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
-                var content = domain.Host as ITableContentGroup;
-                await content.EnterEditAsync(this.authentication);
-                result.Value = await domain.GetMetaDataAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+            var content = domain.Host as ITableContentGroup;
+            await content.EnterEditAsync(this.authentication);
+            result.Value = await domain.GetMetaDataAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<DomainMetaData>> LeaveTableContentEditAsync(Guid domainID)
         {
             var result = new ResultBase<DomainMetaData>();
-            try
-            {
-                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
-                var content = domain.Host as ITableContentGroup;
-                await content.LeaveEditAsync(this.authentication);
-                result.Value = await domain.GetMetaDataAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+            var content = domain.Host as ITableContentGroup;
+            await content.LeaveEditAsync(this.authentication);
+            result.Value = await domain.GetMetaDataAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<DomainMetaData>> BeginTableContentEditAsync(string tableName)
         {
             var result = new ResultBase<DomainMetaData>();
-            try
-            {
-                var table = await this.GetTableAsync(tableName);
-                var content = table.Content;
-                await content.BeginEditAsync(this.authentication);
-                var domain = content.Domain;
-                result.Value = await domain.GetMetaDataAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var table = await this.GetTableAsync(tableName);
+            var content = table.Content;
+            await content.BeginEditAsync(this.authentication);
+            var domain = content.Domain;
+            result.Value = await domain.GetMetaDataAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<TableInfo[]>> EndTableContentEditAsync(Guid domainID)
         {
             var result = new ResultBase<TableInfo[]>();
-            try
-            {
-                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
-                var content = domain.Host as ITableContentGroup;
-                var tables = content.Tables;
-                await content.EndEditAsync(this.authentication);
-                result.Value = domain.Result as TableInfo[];
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+            var content = domain.Host as ITableContentGroup;
+            var tables = content.Tables;
+            await content.EndEditAsync(this.authentication);
+            result.Value = domain.Result as TableInfo[];
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> CancelTableContentEditAsync(Guid domainID)
         {
             var result = new ResultBase();
-            try
-            {
-                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
-                var content = domain.Host as ITableContentGroup;
-                await content.CancelEditAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+            var content = domain.Host as ITableContentGroup;
+            await content.CancelEditAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<DomainMetaData>> BeginTableTemplateEditAsync(string tableName)
         {
             var result = new ResultBase<DomainMetaData>();
-            try
-            {
-                var table = await this.GetTableAsync(tableName);
-                var template = table.Template;
-                await template.BeginEditAsync(this.authentication);
-                var domain = template.Domain;
-                result.Value = await domain.GetMetaDataAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var table = await this.GetTableAsync(tableName);
+            var template = table.Template;
+            await template.BeginEditAsync(this.authentication);
+            var domain = template.Domain;
+            result.Value = await domain.GetMetaDataAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<DomainMetaData>> BeginNewTableAsync(string itemPath)
         {
             var result = new ResultBase<DomainMetaData>();
-            try
+            var tableItem = await this.GetTableItemAsync(itemPath);
+            if (tableItem is ITableCategory category)
             {
-                var tableItem = await this.GetTableItemAsync(itemPath);
-                if (tableItem is ITableCategory category)
-                {
-                    var template = await category.NewTableAsync(this.authentication);
-                    var domain = template.Domain;
-                    result.Value = await domain.GetMetaDataAsync(this.authentication);
-                    result.SignatureDate = this.authentication.SignatureDate;
-                }
-                else if (tableItem is ITable table)
-                {
-                    var template = await table.NewTableAsync(this.authentication);
-                    var domain = template.Domain;
-                    result.Value = await domain.GetMetaDataAsync(this.authentication);
-                    result.SignatureDate = this.authentication.SignatureDate;
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
+                var template = await category.NewTableAsync(this.authentication);
+                var domain = template.Domain;
+                result.Value = await domain.GetMetaDataAsync(this.authentication);
+                result.SignatureDate = this.authentication.SignatureDate;
             }
-            catch (Exception e)
+            else if (tableItem is ITable table)
             {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+                var template = await table.NewTableAsync(this.authentication);
+                var domain = template.Domain;
+                result.Value = await domain.GetMetaDataAsync(this.authentication);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            else
+            {
+                throw new NotImplementedException();
             }
             return result;
         }
@@ -548,29 +357,22 @@ namespace JSSoft.Crema.ServiceHosts.Data
         public async Task<ResultBase<TableInfo[]>> EndTableTemplateEditAsync(Guid domainID)
         {
             var result = new ResultBase<TableInfo[]>();
-            try
+            var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+            var template = domain.Host as ITableTemplate;
+            await template.EndEditAsync(this.authentication);
+            if (template.Target is ITable table)
             {
-                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
-                var template = domain.Host as ITableTemplate;
-                await template.EndEditAsync(this.authentication);
-                if (template.Target is ITable table)
-                {
-                    result.Value = domain.Result as TableInfo[];
-                    result.SignatureDate = this.authentication.SignatureDate;
-                }
-                else if (template.Target is ITable[] tables)
-                {
-                    result.Value = await template.Dispatcher.InvokeAsync(() => tables.Select(item => item.TableInfo).ToArray());
-                    result.SignatureDate = this.authentication.SignatureDate;
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
+                result.Value = domain.Result as TableInfo[];
+                result.SignatureDate = this.authentication.SignatureDate;
             }
-            catch (Exception e)
+            else if (template.Target is ITable[] tables)
             {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+                result.Value = await template.Dispatcher.InvokeAsync(() => tables.Select(item => item.TableInfo).ToArray());
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            else
+            {
+                throw new NotImplementedException();
             }
             return result;
         }
@@ -578,342 +380,202 @@ namespace JSSoft.Crema.ServiceHosts.Data
         public async Task<ResultBase> CancelTableTemplateEditAsync(Guid domainID)
         {
             var result = new ResultBase();
-            try
-            {
-                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
-                if (domain == null)
-                    throw new DomainNotFoundException(domainID);
-                var template = domain.Host as ITableTemplate;
-                await template.CancelEditAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+            if (domain == null)
+                throw new DomainNotFoundException(domainID);
+            var template = domain.Host as ITableTemplate;
+            await template.CancelEditAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> NewTypeCategoryAsync(string categoryPath)
         {
             var result = new ResultBase();
-            try
-            {
-                var categoryName = new JSSoft.Library.ObjectModel.CategoryName(categoryPath);
-                var category = await this.GetTypeCategoryAsync(categoryName.ParentPath);
-                await category.AddNewCategoryAsync(this.authentication, categoryName.Name);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var categoryName = new JSSoft.Library.ObjectModel.CategoryName(categoryPath);
+            var category = await this.GetTypeCategoryAsync(categoryName.ParentPath);
+            await category.AddNewCategoryAsync(this.authentication, categoryName.Name);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<CremaDataSet>> GetTypeItemDataSetAsync(string itemPath, string revision)
         {
             var result = new ResultBase<CremaDataSet>();
-            try
-            {
-                var typeItem = await this.GetTypeItemAsync(itemPath);
-                result.Value = await typeItem.GetDataSetAsync(this.authentication, revision);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var typeItem = await this.GetTypeItemAsync(itemPath);
+            result.Value = await typeItem.GetDataSetAsync(this.authentication, revision);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> RenameTypeItemAsync(string itemPath, string newName)
         {
             var result = new ResultBase();
-            try
-            {
-                var typeItem = await this.GetTypeItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)typeItem.RenameAsync(this.authentication, newName);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var typeItem = await this.GetTypeItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)typeItem.RenameAsync(this.authentication, newName);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> MoveTypeItemAsync(string itemPath, string parentPath)
         {
             var result = new ResultBase();
-            try
-            {
-                var typeItem = await this.GetTypeItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)typeItem.MoveAsync(this.authentication, parentPath);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var typeItem = await this.GetTypeItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)typeItem.MoveAsync(this.authentication, parentPath);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> DeleteTypeItemAsync(string itemPath)
         {
             var result = new ResultBase();
-            try
-            {
-                var typeItem = await this.GetTypeItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)typeItem.DeleteAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var typeItem = await this.GetTypeItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)typeItem.DeleteAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<TypeInfo>> CopyTypeAsync(string typeName, string newTypeName, string categoryPath)
         {
             var result = new ResultBase<TypeInfo>();
-            try
-            {
-                var type = await this.GetTypeAsync(typeName);
-                var newType = await type.CopyAsync(this.authentication, newTypeName, categoryPath);
-                result.TaskID = GuidUtility.FromName(categoryPath + newTypeName);
-                result.Value = await type.Dispatcher.InvokeAsync(() => newType.TypeInfo);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var type = await this.GetTypeAsync(typeName);
+            var newType = await type.CopyAsync(this.authentication, newTypeName, categoryPath);
+            result.TaskID = GuidUtility.FromName(categoryPath + newTypeName);
+            result.Value = await type.Dispatcher.InvokeAsync(() => newType.TypeInfo);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<DomainMetaData>> BeginTypeTemplateEditAsync(string typeName)
         {
             var result = new ResultBase<DomainMetaData>();
-            try
-            {
-                var type = await this.GetTypeAsync(typeName);
-                var template = type.Template;
-                await template.BeginEditAsync(this.authentication);
-                var domain = template.Domain;
-                result.Value = await domain.GetMetaDataAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var type = await this.GetTypeAsync(typeName);
+            var template = type.Template;
+            await template.BeginEditAsync(this.authentication);
+            var domain = template.Domain;
+            result.Value = await domain.GetMetaDataAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<DomainMetaData>> BeginNewTypeAsync(string categoryPath)
         {
             var result = new ResultBase<DomainMetaData>();
-            try
-            {
-                var category = await this.GetTypeCategoryAsync(categoryPath);
-                var template = await category.NewTypeAsync(this.authentication);
-                var domain = template.Domain;
-                result.Value = await domain.GetMetaDataAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var category = await this.GetTypeCategoryAsync(categoryPath);
+            var template = await category.NewTypeAsync(this.authentication);
+            var domain = template.Domain;
+            result.Value = await domain.GetMetaDataAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<TypeInfo[]>> EndTypeTemplateEditAsync(Guid domainID)
         {
             var result = new ResultBase<TypeInfo[]>();
-            try
-            {
-                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
-                var template = domain.Host as ITypeTemplate;
-                await template.EndEditAsync(this.authentication);
-                result.Value = domain.Result as TypeInfo[];
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+            var template = domain.Host as ITypeTemplate;
+            await template.EndEditAsync(this.authentication);
+            result.Value = domain.Result as TypeInfo[];
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> CancelTypeTemplateEditAsync(Guid domainID)
         {
             var result = new ResultBase();
-            try
-            {
-                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
-                if (domain == null)
-                    throw new DomainNotFoundException(domainID);
-                var template = domain.Host as ITypeTemplate;
-                await template.CancelEditAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+            if (domain == null)
+                throw new DomainNotFoundException(domainID);
+            var template = domain.Host as ITypeTemplate;
+            await template.CancelEditAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> SetPublicTypeItemAsync(string itemPath)
         {
             var result = new ResultBase();
-            try
-            {
-                var typeItem = await this.GetTypeItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)typeItem.SetPublicAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var typeItem = await this.GetTypeItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)typeItem.SetPublicAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<AccessInfo>> SetPrivateTypeItemAsync(string itemPath)
         {
             var result = new ResultBase<AccessInfo>();
-            try
-            {
-                var typeItem = await this.GetTypeItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)typeItem.SetPrivateAsync(this.authentication);
-                result.Value = await typeItem.Dispatcher.InvokeAsync(() => typeItem.AccessInfo);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var typeItem = await this.GetTypeItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)typeItem.SetPrivateAsync(this.authentication);
+            result.Value = await typeItem.Dispatcher.InvokeAsync(() => typeItem.AccessInfo);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<AccessMemberInfo>> AddAccessMemberTypeItemAsync(string itemPath, string memberID, AccessType accessType)
         {
             var result = new ResultBase<AccessMemberInfo>();
-            try
-            {
-                var typeItem = await this.GetTypeItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)typeItem.AddAccessMemberAsync(this.authentication, memberID, accessType);
-                var accessInfo = await typeItem.Dispatcher.InvokeAsync(() => typeItem.AccessInfo);
-                result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var typeItem = await this.GetTypeItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)typeItem.AddAccessMemberAsync(this.authentication, memberID, accessType);
+            var accessInfo = await typeItem.Dispatcher.InvokeAsync(() => typeItem.AccessInfo);
+            result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<AccessMemberInfo>> SetAccessMemberTypeItemAsync(string itemPath, string memberID, AccessType accessType)
         {
             var result = new ResultBase<AccessMemberInfo>();
-            try
-            {
-                var typeItem = await this.GetTypeItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)typeItem.SetAccessMemberAsync(this.authentication, memberID, accessType);
-                var accessInfo = await typeItem.Dispatcher.InvokeAsync(() => typeItem.AccessInfo);
-                result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var typeItem = await this.GetTypeItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)typeItem.SetAccessMemberAsync(this.authentication, memberID, accessType);
+            var accessInfo = await typeItem.Dispatcher.InvokeAsync(() => typeItem.AccessInfo);
+            result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> RemoveAccessMemberTypeItemAsync(string itemPath, string memberID)
         {
             var result = new ResultBase();
-            try
-            {
-                var typeItem = await this.GetTypeItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)typeItem.RemoveAccessMemberAsync(this.authentication, memberID);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var typeItem = await this.GetTypeItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)typeItem.RemoveAccessMemberAsync(this.authentication, memberID);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<LockInfo>> LockTypeItemAsync(string itemPath, string comment)
         {
             var result = new ResultBase<LockInfo>();
-            try
-            {
-                var typeItem = await this.GetTypeItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)typeItem.LockAsync(this.authentication, comment);
-                result.Value = await typeItem.Dispatcher.InvokeAsync(() => typeItem.LockInfo);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var typeItem = await this.GetTypeItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)typeItem.LockAsync(this.authentication, comment);
+            result.Value = await typeItem.Dispatcher.InvokeAsync(() => typeItem.LockInfo);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> UnlockTypeItemAsync(string itemPath)
         {
             var result = new ResultBase();
-            try
-            {
-                var typeItem = await this.GetTypeItemAsync(itemPath);
-                result.TaskID = await (Task<Guid>)typeItem.UnlockAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var typeItem = await this.GetTypeItemAsync(itemPath);
+            result.TaskID = await (Task<Guid>)typeItem.UnlockAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<LogInfo[]>> GetTypeItemLogAsync(string itemPath, string revision)
         {
             var result = new ResultBase<LogInfo[]>();
-            try
-            {
-                var typeItem = await this.GetTypeItemAsync(itemPath);
-                result.Value = await typeItem.GetLogAsync(this.authentication, revision);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var typeItem = await this.GetTypeItemAsync(itemPath);
+            result.Value = await typeItem.GetLogAsync(this.authentication, revision);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<FindResultInfo[]>> FindTypeItemAsync(string itemPath, string text, FindOptions options)
         {
             var result = new ResultBase<FindResultInfo[]>();
-            try
-            {
-                var typeItem = await this.GetTypeItemAsync(itemPath);
-                result.Value = await typeItem.FindAsync(this.authentication, text, options);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var typeItem = await this.GetTypeItemAsync(itemPath);
+            result.Value = await typeItem.FindAsync(this.authentication, text, options);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
@@ -932,21 +594,6 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         public IDataBaseContext DataBasesContext { get; }
 
-        // protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
-        // {
-        //     var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = signatureDate };
-        //     this.Callback?.OnServiceClosed(callbackInfo, closeInfo);
-        // }
-
-        // protected override async Task OnCloseAsync(bool disconnect)
-        // {
-        //     if (this.authentication != null)
-        //     {
-        //         await this.DetachEventHandlersAsync();
-        //         this.authentication = null;
-        //     }
-        // }
-
         private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
             var actionUserID = e.UserID;
@@ -956,7 +603,6 @@ namespace JSSoft.Crema.ServiceHosts.Data
             {
                 await this.DetachEventHandlersAsync();
                 this.authentication = null;
-                // this.Channel.Abort();
             }
         }
 

@@ -35,7 +35,7 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
         private static readonly PermissionDeniedException empty = new();
 
         public PermissionDeniedExceptionSerializer()
-            : base(new Guid("acb3c579-0ee5-41fa-9329-81023a087726"))
+            : base(new Guid("42d6e2df-8792-4a84-995e-abcc08db4770"))
         {
 
         }

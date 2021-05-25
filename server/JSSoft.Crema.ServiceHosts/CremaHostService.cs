@@ -143,21 +143,14 @@ namespace JSSoft.Crema.ServiceHosts
         public async Task<ResultBase<bool>> IsOnlineAsync(string userID, byte[] password)
         {
             var result = new ResultBase<bool>();
-            try
-            {
-                var userContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
-                var text = Encoding.UTF8.GetString(password);
-                var pass = StringUtility.ToSecureString(StringUtility.Decrypt(text, userID));
-                var authenticationToken = await this.CremaHost.LoginAsync(userID, pass, false);
-                var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
-                await this.CremaHost.LogoutAsync(authentication);
-                result.Value = authenticationToken != Guid.Empty;
-                result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var userContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            var text = Encoding.UTF8.GetString(password);
+            var pass = StringUtility.ToSecureString(StringUtility.Decrypt(text, userID));
+            var authenticationToken = await this.CremaHost.LoginAsync(userID, pass, false);
+            var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
+            await this.CremaHost.LogoutAsync(authentication);
+            result.Value = authenticationToken != Guid.Empty;
+            result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
             return result;
         }
 

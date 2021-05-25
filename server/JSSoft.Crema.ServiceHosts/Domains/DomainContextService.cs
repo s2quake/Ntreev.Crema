@@ -55,227 +55,136 @@ namespace JSSoft.Crema.ServiceHosts.Domains
         public async Task<ResultBase<DomainContextMetaData>> SubscribeAsync(Guid authenticationToken)
         {
             var result = new ResultBase<DomainContextMetaData>();
-            try
-            {
-                this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
-                this.OwnerID = this.authentication.ID;
-                result.Value = await this.AttachEventHandlersAsync();
-                result.SignatureDate = this.authentication.SignatureDate;
-                this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(SubscribeAsync)}");
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
+            this.OwnerID = this.authentication.ID;
+            result.Value = await this.AttachEventHandlersAsync();
+            result.SignatureDate = this.authentication.SignatureDate;
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(SubscribeAsync)}");
             return result;
         }
 
         public async Task<ResultBase> UnsubscribeAsync()
         {
             var result = new ResultBase();
-            try
-            {
-                await this.DetachEventHandlersAsync();
-                this.authentication = null;
-                result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-                this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(UnsubscribeAsync)}");
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            await this.DetachEventHandlersAsync();
+            this.authentication = null;
+            result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(UnsubscribeAsync)}");
             return result;
         }
 
         public async Task<ResultBase<DomainMetaData[]>> GetMetaDataAsync(Guid dataBaseID)
         {
             var result = new ResultBase<DomainMetaData[]>();
-            try
+            result.Value = await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
-                result.Value = await this.DomainContext.Dispatcher.InvokeAsync(() =>
+                var metaData = this.DomainContext.GetMetaData(authentication);
+                var metaDataList = new List<DomainMetaData>(this.DomainContext.Domains.Count);
+                foreach (var item in metaData.Domains)
                 {
-                    var metaData = this.DomainContext.GetMetaData(authentication);
-                    var metaDataList = new List<DomainMetaData>(this.DomainContext.Domains.Count);
-                    foreach (var item in metaData.Domains)
-                    {
-                        if (item.DomainInfo.DataBaseID == dataBaseID)
-                            metaDataList.Add(item);
-                    }
-                    return metaDataList.ToArray();
-                });
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+                    if (item.DomainInfo.DataBaseID == dataBaseID)
+                        metaDataList.Add(item);
+                }
+                return metaDataList.ToArray();
+            });
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<DomainRowInfo[]>> SetRowAsync(Guid domainID, DomainRowInfo[] rows)
         {
             var result = new ResultBase<DomainRowInfo[]>();
-            try
-            {
-                var domain = await this.GetDomainAsync(domainID);
-                var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.SetRowAsync(this.authentication, rows);
-                result.TaskID = info.ID;
-                result.Value = info.Value;
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var domain = await this.GetDomainAsync(domainID);
+            var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.SetRowAsync(this.authentication, rows);
+            result.TaskID = info.ID;
+            result.Value = info.Value;
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> SetPropertyAsync(Guid domainID, string propertyName, object value)
         {
             var result = new ResultBase();
-            try
-            {
-                var domain = await this.GetDomainAsync(domainID);
-                result.TaskID = await (Task<Guid>)domain.SetPropertyAsync(this.authentication, propertyName, value);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var domain = await this.GetDomainAsync(domainID);
+            result.TaskID = await (Task<Guid>)domain.SetPropertyAsync(this.authentication, propertyName, value);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> BeginUserEditAsync(Guid domainID, DomainLocationInfo location)
         {
             var result = new ResultBase();
-            try
-            {
-                var domain = await this.GetDomainAsync(domainID);
-                await domain.BeginUserEditAsync(this.authentication, location);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var domain = await this.GetDomainAsync(domainID);
+            await domain.BeginUserEditAsync(this.authentication, location);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> EndUserEditAsync(Guid domainID)
         {
             var result = new ResultBase();
-            try
-            {
-                var domain = await this.GetDomainAsync(domainID);
-                await domain.EndUserEditAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var domain = await this.GetDomainAsync(domainID);
+            await domain.EndUserEditAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> KickAsync(Guid domainID, string userID, string comment)
         {
             var result = new ResultBase();
-            try
-            {
-                var domain = await this.GetDomainAsync(domainID);
-                result.TaskID = await (Task<Guid>)domain.KickAsync(this.authentication, userID, comment);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var domain = await this.GetDomainAsync(domainID);
+            result.TaskID = await (Task<Guid>)domain.KickAsync(this.authentication, userID, comment);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> SetOwnerAsync(Guid domainID, string userID)
         {
             var result = new ResultBase();
-            try
-            {
-                var domain = await this.GetDomainAsync(domainID);
-                await domain.SetOwnerAsync(this.authentication, userID);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var domain = await this.GetDomainAsync(domainID);
+            await domain.SetOwnerAsync(this.authentication, userID);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> SetUserLocationAsync(Guid domainID, DomainLocationInfo location)
         {
             var result = new ResultBase();
-            try
-            {
-                var domain = await this.GetDomainAsync(domainID);
-                await domain.SetUserLocationAsync(this.authentication, location);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var domain = await this.GetDomainAsync(domainID);
+            await domain.SetUserLocationAsync(this.authentication, location);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<DomainRowInfo[]>> NewRowAsync(Guid domainID, DomainRowInfo[] rows)
         {
             var result = new ResultBase<DomainRowInfo[]>();
-            try
-            {
-                var domain = await this.GetDomainAsync(domainID);
-                var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.NewRowAsync(this.authentication, rows);
-                result.TaskID = info.ID;
-                result.Value = info.Value;
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var domain = await this.GetDomainAsync(domainID);
+            var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.NewRowAsync(this.authentication, rows);
+            result.TaskID = info.ID;
+            result.Value = info.Value;
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<DomainRowInfo[]>> RemoveRowAsync(Guid domainID, DomainRowInfo[] rows)
         {
             var result = new ResultBase<DomainRowInfo[]>();
-            try
-            {
-                var domain = await this.GetDomainAsync(domainID);
-                var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.RemoveRowAsync(this.authentication, rows);
-                result.TaskID = info.ID;
-                result.Value = info.Value;
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var domain = await this.GetDomainAsync(domainID);
+            var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.RemoveRowAsync(this.authentication, rows);
+            result.TaskID = info.ID;
+            result.Value = info.Value;
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<object>> DeleteDomainAsync(Guid domainID, bool force)
         {
             var result = new ResultBase<object>();
-            try
-            {
-                var domain = await this.GetDomainAsync(domainID);
-                result.TaskID = await (Task<Guid>)domain.DeleteAsync(this.authentication, force);
-                result.Value = domain.Result;
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var domain = await this.GetDomainAsync(domainID);
+            result.TaskID = await (Task<Guid>)domain.DeleteAsync(this.authentication, force);
+            result.Value = domain.Result;
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
@@ -293,21 +202,6 @@ namespace JSSoft.Crema.ServiceHosts.Domains
         public IDataBaseContext DataBaseContext { get; }
 
         public IUserContext UserContext { get; }
-
-        // protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
-        // {
-        //     var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = signatureDate };
-        //     this.Callback?.OnServiceClosed(callbackInfo, closeInfo);
-        // }
-
-        // protected override async Task OnCloseAsync(bool disconnect)
-        // {
-        //     if (this.authentication != null)
-        //     {
-        //         await this.DetachEventHandlersAsync();
-        //         this.authentication = null;
-        //     }
-        // }
 
         private async Task<IDomain> GetDomainAsync(Guid domainID)
         {
@@ -385,7 +279,6 @@ namespace JSSoft.Crema.ServiceHosts.Domains
             {
                 await this.DetachEventHandlersAsync();
                 this.authentication = null;
-                // this.Channel.Abort();
             }
         }
 

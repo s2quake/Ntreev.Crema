@@ -9,8 +9,11 @@
     <Import_RootNamespace>JSSoft.Crema.ServiceHosts.Exceptions</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)PermissionExceptionSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CategoryNotFoundExceptionSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaExceptionSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBaseNotFoundExceptionSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DispatcherExpiredExceptionSerializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PermissionDeniedExceptionSerializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PermissionExceptionSerializer.cs" />
   </ItemGroup>
 </Project>

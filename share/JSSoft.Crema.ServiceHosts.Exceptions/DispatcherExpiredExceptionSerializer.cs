@@ -30,30 +30,26 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
 {
     [Export(typeof(IExceptionDescriptor))]
     [Export(typeof(IDataSerializer))]
-    class CremaExceptionSerializer : ExceptionSerializerBase<CremaException>
+    class DispatcherExpiredExceptionSerializer : ExceptionSerializerBase<DispatcherExpiredException>
     {
-        private static readonly CremaException empty = new();
-
-        public CremaExceptionSerializer()
-            : base(new Guid("ad1e60f0-2a38-4f19-98db-dad938834471"))
+        public DispatcherExpiredExceptionSerializer()
+            : base(new Guid("99aa8e19-845e-4ae4-9989-3f5ac296b518"))
         {
 
         }
 
         public override Type[] PropertyTypes => new Type[] { typeof(string) };
 
-        protected override CremaException CreateInstance(object[] args)
+        protected override DispatcherExpiredException CreateInstance(object[] args)
         {
-            if (args[0] is not string message)
-                return new CremaException();
-            return new CremaException(message);
+            if (args[0] is string message)
+                return new DispatcherExpiredException();
+            throw new NotImplementedException();
         }
 
-        protected override object[] SelectProperties(CremaException e)
+        protected override object[] SelectProperties(DispatcherExpiredException e)
         {
-            if (e.Message == empty.Message)
-                return new object[] { null };
-            return new object[] { e.Message };
+            return new object[] { string.Empty };
         }
     }
 }

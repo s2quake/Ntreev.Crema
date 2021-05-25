@@ -57,357 +57,210 @@ namespace JSSoft.Crema.ServiceHosts.Data
         public async Task<ResultBase<DataBaseContextMetaData>> SubscribeAsync(Guid authenticationToken)
         {
             var result = new ResultBase<DataBaseContextMetaData>();
-            try
-            {
-                this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
-                this.OwnerID = this.authentication.ID;
-                result.Value = await this.AttachEventHandlersAsync();
-                result.SignatureDate = this.authentication.SignatureDate;
-                this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(SubscribeAsync)}");
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
+            this.OwnerID = this.authentication.ID;
+            result.Value = await this.AttachEventHandlersAsync();
+            result.SignatureDate = this.authentication.SignatureDate;
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(SubscribeAsync)}");
             return result;
         }
 
         public async Task<ResultBase> UnsubscribeAsync()
         {
             var result = new ResultBase();
-            try
+            await this.DetachEventHandlersAsync();
+            await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
-                await this.DetachEventHandlersAsync();
-                await this.UserContext.Dispatcher.InvokeAsync(() =>
-                {
-                    this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                });
-                this.authentication = null;
-                result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-                this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(UnsubscribeAsync)}");
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+                this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+            });
+            this.authentication = null;
+            result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(UnsubscribeAsync)}");
             return result;
         }
 
         public async Task<ResultBase<CremaDataSet>> GetDataSetAsync(string dataBaseName, DataSetType dataSetType, string filterExpression, string revision)
         {
             var result = new ResultBase<CremaDataSet>();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.Value = await dataBase.GetDataSetAsync(this.authentication, dataSetType, filterExpression, revision);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.Value = await dataBase.GetDataSetAsync(this.authentication, dataSetType, filterExpression, revision);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> SetPublicAsync(string dataBaseName)
         {
             var result = new ResultBase();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.TaskID = await (Task<Guid>)dataBase.SetPublicAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.TaskID = await (Task<Guid>)dataBase.SetPublicAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<AccessInfo>> SetPrivateAsync(string dataBaseName)
         {
             var result = new ResultBase<AccessInfo>();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.TaskID = await (Task<Guid>)dataBase.SetPrivateAsync(this.authentication);
-                result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessInfo);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.TaskID = await (Task<Guid>)dataBase.SetPrivateAsync(this.authentication);
+            result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessInfo);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<AccessMemberInfo>> AddAccessMemberAsync(string dataBaseName, string memberID, AccessType accessType)
         {
             var result = new ResultBase<AccessMemberInfo>();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.TaskID = await (Task<Guid>)dataBase.AddAccessMemberAsync(this.authentication, memberID, accessType);
-                var accessInfo = await dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessInfo);
-                result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.TaskID = await (Task<Guid>)dataBase.AddAccessMemberAsync(this.authentication, memberID, accessType);
+            var accessInfo = await dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessInfo);
+            result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<AccessMemberInfo>> SetAccessMemberAsync(string dataBaseName, string memberID, AccessType accessType)
         {
             var result = new ResultBase<AccessMemberInfo>();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.TaskID = await (Task<Guid>)dataBase.SetAccessMemberAsync(this.authentication, memberID, accessType);
-                var accessInfo = await dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessInfo);
-                result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.TaskID = await (Task<Guid>)dataBase.SetAccessMemberAsync(this.authentication, memberID, accessType);
+            var accessInfo = await dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessInfo);
+            result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> RemoveAccessMemberAsync(string dataBaseName, string memberID)
         {
             var result = new ResultBase();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.TaskID = await (Task<Guid>)dataBase.RemoveAccessMemberAsync(this.authentication, memberID);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.TaskID = await (Task<Guid>)dataBase.RemoveAccessMemberAsync(this.authentication, memberID);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<LockInfo>> LockAsync(string dataBaseName, string comment)
         {
             var result = new ResultBase<LockInfo>();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.TaskID = await (Task<Guid>)dataBase.LockAsync(this.authentication, comment);
-                result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.LockInfo);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.TaskID = await (Task<Guid>)dataBase.LockAsync(this.authentication, comment);
+            result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.LockInfo);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> UnlockAsync(string dataBaseName)
         {
             var result = new ResultBase();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.TaskID = await (Task<Guid>)dataBase.UnlockAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.TaskID = await (Task<Guid>)dataBase.UnlockAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> LoadAsync(string dataBaseName)
         {
             var result = new ResultBase();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.TaskID = await (Task<Guid>)dataBase.LoadAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.TaskID = await (Task<Guid>)dataBase.LoadAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> UnloadAsync(string dataBaseName)
         {
             var result = new ResultBase();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.TaskID = await (Task<Guid>)dataBase.UnloadAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.TaskID = await (Task<Guid>)dataBase.UnloadAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<DataBaseInfo>> CreateAsync(string dataBaseName, string comment)
         {
             var result = new ResultBase<DataBaseInfo>();
-            try
-            {
-                var dataBase = await this.DataBaseContext.AddNewDataBaseAsync(this.authentication, dataBaseName, comment);
-                result.TaskID = GuidUtility.FromName(dataBaseName + comment);
-                result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.DataBaseContext.AddNewDataBaseAsync(this.authentication, dataBaseName, comment);
+            result.TaskID = GuidUtility.FromName(dataBaseName + comment);
+            result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> RenameAsync(string dataBaseName, string newDataBaseName)
         {
             var result = new ResultBase();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.TaskID = await (Task<Guid>)dataBase.RenameAsync(this.authentication, newDataBaseName);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.TaskID = await (Task<Guid>)dataBase.RenameAsync(this.authentication, newDataBaseName);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> DeleteAsync(string dataBaseName)
         {
             var result = new ResultBase();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.TaskID = await (Task<Guid>)dataBase.DeleteAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.TaskID = await (Task<Guid>)dataBase.DeleteAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<DataBaseInfo>> CopyAsync(string dataBaseName, string newDataBaseName, string comment, bool force)
         {
             var result = new ResultBase<DataBaseInfo>();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                var newDataBase = await dataBase.CopyAsync(this.authentication, newDataBaseName, comment, force);
-                result.TaskID = GuidUtility.FromName(newDataBaseName + comment);
-                result.Value = await newDataBase.Dispatcher.InvokeAsync(() => newDataBase.DataBaseInfo);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            var newDataBase = await dataBase.CopyAsync(this.authentication, newDataBaseName, comment, force);
+            result.TaskID = GuidUtility.FromName(newDataBaseName + comment);
+            result.Value = await newDataBase.Dispatcher.InvokeAsync(() => newDataBase.DataBaseInfo);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<LogInfo[]>> GetLogAsync(string dataBaseName, string revision)
         {
             var result = new ResultBase<LogInfo[]>();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.Value = await dataBase.GetLogAsync(this.authentication, revision);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.Value = await dataBase.GetLogAsync(this.authentication, revision);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<DataBaseInfo>> RevertAsync(string dataBaseName, string revision)
         {
             var result = new ResultBase<DataBaseInfo>();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                result.TaskID = await (Task<Guid>)dataBase.RevertAsync(this.authentication, revision);
-                result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            result.TaskID = await (Task<Guid>)dataBase.RevertAsync(this.authentication, revision);
+            result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo);
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase<Guid>> BeginTransactionAsync(string dataBaseName)
         {
             var result = new ResultBase<Guid>();
-            try
-            {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                var transaction = await dataBase.BeginTransactionAsync(this.authentication);
-                this.transactionByID[transaction.ID] = transaction;
-                result.Value = transaction.ID;
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            var transaction = await dataBase.BeginTransactionAsync(this.authentication);
+            this.transactionByID[transaction.ID] = transaction;
+            result.Value = transaction.ID;
+            result.SignatureDate = this.authentication.SignatureDate;
             return result;
         }
 
         public async Task<ResultBase> EndTransactionAsync(Guid transactionID)
         {
             var result = new ResultBase();
-            try
-            {
-                var transaction = this.transactionByID[transactionID];
-                await transaction.CommitAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-                this.transactionByID.Remove(transactionID);
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var transaction = this.transactionByID[transactionID];
+            await transaction.CommitAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
+            this.transactionByID.Remove(transactionID);
             return result;
         }
 
         public async Task<ResultBase<DataBaseMetaData>> CancelTransactionAsync(Guid transactionID)
         {
             var result = new ResultBase<DataBaseMetaData>();
-            try
-            {
-                var transaction = this.transactionByID[transactionID];
-                result.Value = await transaction.RollbackAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-                this.transactionByID.Remove(transactionID);
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault(e);
-            }
+            var transaction = this.transactionByID[transactionID];
+            result.Value = await transaction.RollbackAsync(this.authentication);
+            result.SignatureDate = this.authentication.SignatureDate;
+            this.transactionByID.Remove(transactionID);
             return result;
         }
 
@@ -424,21 +277,6 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         public IUserContext UserContext { get; }
 
-        // protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
-        // {
-        //     var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = signatureDate };
-        //     this.Callback?.OnServiceClosed(callbackInfo, closeInfo);
-        // }
-
-        // protected override async Task OnCloseAsync(bool disconnect)
-        // {
-        //     if (this.authentication != null)
-        //     {
-        //         await this.DetachEventHandlersAsync();
-        //         this.authentication = null;
-        //     }
-        // }
-
         private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
             var signatureDate = this.authentication.SignatureDate;
@@ -449,7 +287,6 @@ namespace JSSoft.Crema.ServiceHosts.Data
             {
                 await this.DetachEventHandlersAsync();
                 this.authentication = null;
-                // this.Channel.Abort();
             }
         }
 
