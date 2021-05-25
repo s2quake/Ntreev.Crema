@@ -20,13 +20,14 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Communication;
+using System.ComponentModel.Composition;
 
 namespace JSSoft.Crema.ServiceHosts
 {
     class ServerContext : ServerContextBase
     {
-        public ServerContext(params IServiceHost[] serviceHosts)
-            : base(serviceHosts)
+        public ServerContext(IComponentProvider componentProvider, IServiceHost[] serviceHosts)
+            : base(componentProvider, serviceHosts)
         {
 
         }

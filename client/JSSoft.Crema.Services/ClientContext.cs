@@ -30,5 +30,11 @@ namespace JSSoft.Crema.Services
         {
 
         }
+
+        public ClientContext(IComponentProvider componentProvider, IServiceHost[] serviceHosts)
+            : base(componentProvider, serviceHosts)
+        {
+
+        }
     }
 }

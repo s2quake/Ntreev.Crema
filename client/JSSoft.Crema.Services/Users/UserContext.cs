@@ -85,6 +85,7 @@ namespace JSSoft.Crema.Services.Users
                 }
                 this.CurrentUser = this.Users[userID];
                 this.CurrentUser.SetUserState(UserState.Online);
+                this.CurrentUserToken = authenticationToken;
             });
             this.ReleaseHandle.Reset();
         }
@@ -95,6 +96,7 @@ namespace JSSoft.Crema.Services.Users
                 await this.Service.UnsubscribeAsync();
             await this.Dispatcher.InvokeAsync(() =>
             {
+                this.CurrentUserToken = Guid.Empty;
                 this.CurrentUser = null;
                 this.Clear();
             });
@@ -158,6 +160,16 @@ namespace JSSoft.Crema.Services.Users
             var authentication = this.customAuthentications[signatureDate.ID];
             authentication.SignatureDate = signatureDate;
             return authentication;
+        }
+
+        public async Task<Authentication> AuthenticateAsync(Guid authenticationToken)
+        {
+            return await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.CurrentUserToken == authenticationToken)
+                    return this.CurrentUser.Authentication;
+                return null;
+            });
         }
 
         public Task<Authentication> AuthenticateAsync(SignatureDate signatureDate)
@@ -256,6 +268,8 @@ namespace JSSoft.Crema.Services.Users
         }
 
         public User CurrentUser { get; private set; }
+
+        public Guid CurrentUserToken { get; private set; }
 
         public IUserContextService Service { get; set; }
 

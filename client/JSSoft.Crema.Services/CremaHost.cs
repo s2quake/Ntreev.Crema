@@ -45,6 +45,7 @@ namespace JSSoft.Crema.Services
     class CremaHost : ICremaHost, IServiceProvider, ILogService, ICremaHostEventCallback, IDisposable
     {
         private readonly IServiceProvider container;
+        private readonly IComponentProvider componentProvider;
         private readonly IConfigurationPropertyProvider[] propertiesProviders;
         private readonly CremaSettings settings;
         private readonly AuthenticationCollection authentications = new();
@@ -59,10 +60,14 @@ namespace JSSoft.Crema.Services
         private Guid serviceToken;
 
         [ImportingConstructor]
-        public CremaHost(IServiceProvider container, [ImportMany] IEnumerable<IConfigurationPropertyProvider> propertiesProviders, CremaSettings settings)
+        public CremaHost(IServiceProvider container,
+            IComponentProvider componentProvider,
+            [ImportMany] IEnumerable<IConfigurationPropertyProvider> propertiesProviders, 
+            CremaSettings settings)
         {
             CremaLog.Attach(this);
             this.container = container;
+            this.componentProvider = componentProvider;
             this.propertiesProviders = propertiesProviders.ToArray();
             this.settings = settings;
             this.Dispatcher = new CremaDispatcher(this);
@@ -80,7 +85,7 @@ namespace JSSoft.Crema.Services
                 new DomainContextServiceHost(this.DomainContext),
                 new UserContextServiceHost(this.UserContext)
             };
-            this.clientContext = new ClientContext(this.hosts.ToArray());
+            this.clientContext = new ClientContext(this.componentProvider, this.hosts.ToArray());
             this.shutdownTimer = new(this);
             this.shutdownTimer.Done += ShutdownTimer_Done;
         }
@@ -210,9 +215,9 @@ namespace JSSoft.Crema.Services
 
         public async Task<Authentication> AuthenticateAsync(Guid authenticationToken)
         {
-            if (this.AuthenticationToken != authenticationToken)
-                throw new InvalidOperationException(Resources.Exception_InvalidToken);
-            return await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.CurrentUser.Authentication);
+            if (this.ServiceState != ServiceState.Open)
+                throw new InvalidOperationException();
+            return await this.UserContext.AuthenticateAsync(authenticationToken);
         }
 
         public async Task LogoutAsync(Authentication authentication)
@@ -323,6 +328,10 @@ namespace JSSoft.Crema.Services
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (this.ServiceState != ServiceState.Open)
+                    throw new InvalidOperationException();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.DebugMethod(authentication, this, nameof(CancelShutdownAsync));
@@ -332,6 +341,7 @@ namespace JSSoft.Crema.Services
                 {
                     this.shutdownTimer.Stop();
                     this.Sign(authentication, result);
+                    this.Info("Shutdown cancelled.");
                 });
             }
             catch (Exception e)

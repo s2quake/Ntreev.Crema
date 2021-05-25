@@ -207,14 +207,6 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task AuthenticateAsyncTestAsync_Fail1()
-        {
-            token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
-            await cremaHost.AuthenticateAsync(Guid.Empty);
-        }
-
-        [TestMethod]
         public async Task AuthenticateAsyncTestAsync2()
         {
             token = await cremaHost.OpenAsync();

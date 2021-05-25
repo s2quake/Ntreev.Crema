@@ -43,6 +43,7 @@ namespace JSSoft.Crema.ServiceHosts
         private readonly List<ServiceHostBase> hosts = new();
         private readonly IServiceProvider serviceProvider;
         private IServiceHostProvider[] hostProviders;
+        private IComponentProvider componentProvider;
         private ServerContext serverContext;
         private ServiceInfo serviceInfo;
         private ICremaHost cremaHost;
@@ -83,6 +84,7 @@ namespace JSSoft.Crema.ServiceHosts
                 this.OnOpening(EventArgs.Empty);
                 this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
                 this.hostProviders = (this.GetService(typeof(IEnumerable<IServiceHostProvider>)) as IEnumerable<IServiceHostProvider>).TopologicalSort().ToArray();
+                this.componentProvider = this.GetService(typeof(IComponentProvider)) as IComponentProvider;
                 this.serviceInfo.Port = this.Port;
                 this.serviceInfo.Timeout = this.Timeout;
                 this.serviceInfo.Version = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).ProductVersion;
@@ -237,7 +239,7 @@ namespace JSSoft.Crema.ServiceHosts
                     this.LogService.Info(Resources.ServiceStart, item.Name);
                 }
             });
-            this.serverContext = await Task.Run(() => new ServerContext(this.hosts.ToArray()) { Port = this.Port });
+            this.serverContext = await Task.Run(() => new ServerContext(this.componentProvider, this.hosts.ToArray()) { Port = this.Port });
             this.serviceToken = await this.serverContext.OpenAsync();
             await this.Dispatcher.InvokeAsync(() =>
             {

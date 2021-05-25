@@ -51,10 +51,9 @@ namespace JSSoft.Crema.Services.Random
 
         public static async Task<Authentication> LoginRandomAsync(this ICremaHost cremaHost, Authority authority)
         {
-            var users = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
-            var user = await users.Dispatcher.InvokeAsync(() => users.Random(item => item.Authority == authority));
-            var password = StringUtility.ToSecureString(user.Authority.ToString().ToLower());
-            var token = await cremaHost.LoginAsync(user.ID, password, false);
+            var name = $"{authority.ToString().ToLower()}{RandomUtility.Next(10)}";
+            var password = StringUtility.ToSecureString(authority.ToString().ToLower());
+            var token = await cremaHost.LoginAsync(name, password, false);
             return await cremaHost.AuthenticateAsync(token);
         }
     }

@@ -24,6 +24,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
   <Import Project="..\..\share\JSSoft.Crema.ServiceHosts.Data\JSSoft.Crema.ServiceHosts.Data.projitems" Label="Shared" />
   <Import Project="..\..\share\JSSoft.Crema.ServiceHosts.Domains\JSSoft.Crema.ServiceHosts.Domains.projitems" Label="Shared" />
   <Import Project="..\..\share\JSSoft.Crema.ServiceHosts.Users\JSSoft.Crema.ServiceHosts.Users.projitems" Label="Shared" />
+  <Import Project="..\..\share\JSSoft.Crema.ServiceHosts.Exceptions\JSSoft.Crema.ServiceHosts.Exceptions.projitems" Label="Shared" />
   <ItemGroup>
     <ProjectReference Include="..\..\common\JSSoft.Crema.Data\JSSoft.Crema.Data.csproj" />
     <ProjectReference Include="..\..\common\JSSoft.Crema.ServiceModel\JSSoft.Crema.ServiceModel.csproj" />
