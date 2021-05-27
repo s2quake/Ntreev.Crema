@@ -276,6 +276,7 @@ namespace JSSoft.Crema.Services
                 await this.Service.UnsubscribeAsync();
                 this.clientContext.Closed -= ClientContext_Closed;
                 await this.clientContext.CloseAsync(this.serviceToken, 0);
+                await this.WaitReleaseAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.authentications.Release(Authentication.SystemID);
@@ -645,8 +646,10 @@ namespace JSSoft.Crema.Services
 
         async Task ICremaHost.CloseAsync(Guid token)
         {
+            if (this.ServiceState != ServiceState.Open)
+                throw new InvalidOperationException();
             if (this.token != token)
-                throw new InvalidOperationException(Resources.Exception_InvalidToken);
+                throw new ArgumentException(Resources.Exception_InvalidToken, nameof(token));
             await this.CloseAsync();
             this.token = Guid.Empty;
         }
