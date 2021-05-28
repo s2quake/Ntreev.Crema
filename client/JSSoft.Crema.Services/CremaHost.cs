@@ -626,6 +626,12 @@ namespace JSSoft.Crema.Services
                 await this.WaitReleaseAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.AuthenticationToken = Guid.Empty;
+                    this.log?.Dispose();
+                    this.log = null;
+                    this.configs.Commit();
+                    this.configs = null;
+
                     this.authentications.Release(Authentication.SystemID);
                     this.serviceToken = Guid.Empty;
                     this.Address = string.Empty;

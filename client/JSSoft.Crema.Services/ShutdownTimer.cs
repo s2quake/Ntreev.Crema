@@ -85,7 +85,7 @@ namespace JSSoft.Crema.Services
                 {
                     var hostname = AddressUtility.GetIPAddress(address);
                     var port = AddressUtility.GetPort(address);
-                    using var client = new System.Net.Sockets.TcpClient(hostname, 4002);
+                    using var client = new System.Net.Sockets.TcpClient(hostname, port);
                     this.OnDone(EventArgs.Empty);
                     break;
                 }

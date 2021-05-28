@@ -273,6 +273,7 @@ namespace JSSoft.Crema.Services.Test
             await cremaHost.CloseAsync(Guid.Empty);
         }
 
+#if SERVER
         [TestMethod]
         public async Task ShutdownAsyncTestAsync1()
         {
@@ -298,6 +299,7 @@ namespace JSSoft.Crema.Services.Test
                 manualEvent.Set();
             }
         }
+#endif // SERVER
 
         [TestMethod]
         public async Task ShutdownAsyncTestAsync2()
