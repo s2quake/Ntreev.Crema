@@ -62,7 +62,7 @@ namespace JSSoft.Crema.Services
         [ImportingConstructor]
         public CremaHost(IServiceProvider container,
             IComponentProvider componentProvider,
-            [ImportMany] IEnumerable<IConfigurationPropertyProvider> propertiesProviders, 
+            [ImportMany] IEnumerable<IConfigurationPropertyProvider> propertiesProviders,
             CremaSettings settings)
         {
             CremaLog.Attach(this);
@@ -173,7 +173,7 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        public async Task<Guid> LoginAsync(string userID, SecureString password, bool force)
+        public async Task<Guid> LoginAsync(string userID, SecureString password)
         {
             try
             {
@@ -187,7 +187,7 @@ namespace JSSoft.Crema.Services
                     if (this.ServiceState != ServiceState.Open)
                         throw new InvalidOperationException(Resources.Exception_NotOpened);
                 });
-                var authenticationToken = await this.Service.LoginAsync(userID, UserContext.Encrypt(userID, password), force);
+                var authenticationToken = await this.Service.LoginAsync(userID, UserContext.Encrypt(userID, password));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.log = new LogService(this.Address.Replace(':', '_'), userID, AppUtility.UserAppDataPath)
@@ -231,16 +231,52 @@ namespace JSSoft.Crema.Services
 
         public async Task LogoutAsync(Authentication authentication)
         {
-            if (authentication is null)
-                throw new ArgumentNullException(nameof(authentication));
+            try
+            {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    if (this.ServiceState != ServiceState.Open)
+                        throw new InvalidOperationException(Resources.Exception_NotOpened);
+                    if (authentication.ID != this.UserID)
+                        throw new InvalidOperationException();
+                });
+                await this.Service.LogoutAsync();
+                await this.LogoutAsync();
+            }
+            catch (Exception e)
+            {
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.AuthenticationToken = Guid.Empty;
+                    this.log?.Dispose();
+                    this.log = null;
+                    this.configs = null;
+                });
+                CremaLog.Error(e);
+                throw;
+            }
+        }
+
+        public async Task LogoutAsync(string userID, SecureString password)
+        {
+            if (userID is null)
+                throw new ArgumentNullException(nameof(userID));
+            if (password is null)
+                throw new ArgumentNullException(nameof(password));
 
             await this.Dispatcher.InvokeAsync(() =>
             {
                 if (this.ServiceState != ServiceState.Open)
                     throw new InvalidOperationException(Resources.Exception_NotOpened);
             });
-            await this.UserContext.DisauthenticateAsync(authentication);
-            await this.LogoutAsync();
+            await this.Service.LogoutAsync(userID, UserContext.Encrypt(userID, password));
+            if (this.AuthenticationToken != Guid.Empty)
+            {
+                await this.LogoutAsync();
+            }
         }
 
         public async Task CloseAsync()
@@ -326,7 +362,7 @@ namespace JSSoft.Crema.Services
             {
                 if (authentication is null)
                     throw new ArgumentNullException(nameof(authentication));
-                
+
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     if (this.ServiceState != ServiceState.Open)
@@ -350,7 +386,6 @@ namespace JSSoft.Crema.Services
 
         private async Task LogoutAsync()
         {
-            await this.Service.LogoutAsync();
             await this.DomainContext.ReleaseAsync();
             await this.DataBaseContext.ReleaseAsync();
             await this.UserContext.ReleaseAsync();

@@ -51,11 +51,11 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             this.Dispatcher = application.Dispatcher;
         }
 
-        public async Task LoginAsync(string userID, SecureString password, bool force)
+        public async Task LoginAsync(string userID, SecureString password)
         {
             if (this.authentication != null)
                 throw new Exception("이미 로그인되어 있습니다.");
-            var token = await this.CremaHost.LoginAsync(userID, password, force);
+            var token = await this.CremaHost.LoginAsync(userID, password);
             var authentication = await this.CremaHost.AuthenticateAsync(token);
             await this.Dispatcher.InvokeAsync(() =>
             {
@@ -77,6 +77,13 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
                 this.authentication = null;
                 this.Release();
             });
+        }
+
+        public async Task LogoutAsync(string userID, SecureString password)
+        {
+            if (this.authentication != null)
+                throw new Exception("이미 로그인되어 있습니다.");
+            await this.CremaHost.LogoutAsync(userID, password);
         }
 
         public override ICremaHost CremaHost => this.cremaHost;

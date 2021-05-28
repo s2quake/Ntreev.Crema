@@ -230,7 +230,7 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        public async Task<Guid> LoginAsync(string userID, SecureString password, bool force)
+        public async Task<Guid> LoginAsync(string userID, SecureString password)
         {
             if (userID is null)
                 throw new ArgumentNullException(nameof(userID));
@@ -242,7 +242,7 @@ namespace JSSoft.Crema.Services
                 if (this.ServiceState != ServiceState.Open)
                     throw new InvalidOperationException();
             });
-            return await this.UserContext.LoginAsync(userID, password, force);
+            return await this.UserContext.LoginAsync(userID, password);
         }
 
         public async Task LogoutAsync(Authentication authentication)
@@ -256,6 +256,21 @@ namespace JSSoft.Crema.Services
                     throw new InvalidOperationException();
             });
             await this.UserContext.LogoutAsync(authentication);
+        }
+
+        public async Task LogoutAsync(string userID, SecureString password)
+        {
+            if (userID is null)
+                throw new ArgumentNullException(nameof(userID));
+            if (password is null)
+                throw new ArgumentNullException(nameof(password));
+
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.ServiceState != ServiceState.Open)
+                    throw new InvalidOperationException();
+            });
+            await this.UserContext.LogoutAsync(userID, password);
         }
 
         public async Task<Authentication> AuthenticateAsync(Guid authenticationToken)

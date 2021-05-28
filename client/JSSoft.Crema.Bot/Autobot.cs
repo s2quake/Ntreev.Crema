@@ -62,7 +62,7 @@ namespace JSSoft.Crema.Bot
             this.cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
             app.Address = this.address;
             this.token = await this.cremaHost.OpenAsync();
-            await this.cremaHost.LoginAsync(this.AutobotID, this.password, false);
+            await this.cremaHost.LoginAsync(this.AutobotID, this.password);
             var autheticator = this.app.GetService(typeof(Authenticator)) as Authenticator;
             await this.cremaHost.Dispatcher.InvokeAsync(() => this.cremaHost.Closed += CremaHost_Closed);
             return autheticator;

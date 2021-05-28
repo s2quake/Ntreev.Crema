@@ -103,7 +103,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task LoginAsyncTestAsync1()
         {
             token = await cremaHost.OpenAsync();
-            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
+            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
         }
 
         [TestMethod]
@@ -111,7 +111,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task LoginAsyncTestAsync_Fail1()
         {
             token = await cremaHost.OpenAsync();
-            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin1"), false);
+            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin1"));
         }
 
         [TestMethod]
@@ -119,7 +119,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task LoginAsyncTestAsync_Fail2()
         {
             token = await cremaHost.OpenAsync();
-            await cremaHost.LoginAsync(null, StringUtility.ToSecureString("admin"), false);
+            await cremaHost.LoginAsync(null, StringUtility.ToSecureString("admin"));
         }
 
         [TestMethod]
@@ -127,7 +127,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task LoginAsyncTestAsync_Fail3()
         {
             token = await cremaHost.OpenAsync();
-            await cremaHost.LoginAsync("admin", null, false);
+            await cremaHost.LoginAsync("admin", null);
         }
 
         [TestMethod]
@@ -135,23 +135,24 @@ namespace JSSoft.Crema.Services.Test
         public async Task LoginAsyncTestAsync_Fail4()
         {
             token = await cremaHost.OpenAsync();
-            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
-            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
+            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
+            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task LoginAsyncTestAsync_Fail5()
         {
-            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
+            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
         }
 
         [TestMethod]
         public async Task LoginAsyncTestAsync2()
         {
             token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
-            var authenticationToken2 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), true);
+            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
+            await cremaHost.LogoutAsync("admin", StringUtility.ToSecureString("admin"));
+            var authenticationToken2 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
             Assert.AreNotEqual(authenticationToken1, authenticationToken2);
         }
 
@@ -159,7 +160,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task LogoutAsyncTestAsync()
         {
             token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
+            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
             var authentication1 = await cremaHost.AuthenticateAsync(authenticationToken1);
             await cremaHost.LogoutAsync(authentication1);
         }
@@ -169,7 +170,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task LogoutAsyncTestAsync_Fail1()
         {
             token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
+            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
             var authentication1 = await cremaHost.AuthenticateAsync(authenticationToken1);
             await cremaHost.LogoutAsync(null);
         }
@@ -179,9 +180,10 @@ namespace JSSoft.Crema.Services.Test
         public async Task LogoutAsyncTestAsync_Fail2()
         {
             token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
+            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
             var authentication1 = await cremaHost.AuthenticateAsync(authenticationToken1);
-            var authenticationToken2 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), true);
+            await cremaHost.LogoutAsync("admin", StringUtility.ToSecureString("admin"));
+            var authenticationToken2 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
             var authentication2 = await cremaHost.AuthenticateAsync(authenticationToken2);
             await cremaHost.LogoutAsync(authentication1);
         }
@@ -191,7 +193,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task LogoutAsyncTestAsync_Fail3()
         {
             token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
+            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
             var authentication1 = await cremaHost.AuthenticateAsync(authenticationToken1);
             await cremaHost.CloseAsync(token);
             token = Guid.Empty;
@@ -202,7 +204,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task AuthenticateAsyncTestAsync1()
         {
             token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
+            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
             var authentication1 = await cremaHost.AuthenticateAsync(authenticationToken1);
         }
 
@@ -210,7 +212,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task AuthenticateAsyncTestAsync2()
         {
             token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
+            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
             var authentication = await cremaHost.AuthenticateAsync(Guid.Empty);
             Assert.AreEqual(null, authentication);
         }

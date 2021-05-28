@@ -351,7 +351,7 @@ namespace JSSoft.Crema.Services.Users
         protected override void OnDetached()
         {
             base.OnDetached();
-            this.Authentication.InvokeExpiredEvent(this.ID);
+            this.Authentication.InvokeExpiredEvent();
             this.Authentication = null;
         }
 

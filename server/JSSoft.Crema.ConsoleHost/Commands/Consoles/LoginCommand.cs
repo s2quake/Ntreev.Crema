@@ -20,10 +20,12 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Commands.Consoles;
+using JSSoft.Crema.ServiceModel;
 using JSSoft.Library;
 using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel.Composition;
+using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -62,12 +64,33 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 
         protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
+            var (userID, password) = this.GetInfo();
+            var force = this.Force;
+            try
+            {
+                await this.CommandContext.LoginAsync(userID, password);
+            }
+            catch (CremaException e)
+            {
+                if (e.Message == "b722d687-0a8d-4999-ad54-cf38c0c25d6f" && force == true)
+                {
+                    await this.CommandContext.LogoutAsync(userID, password);
+                    await this.CommandContext.LoginAsync(userID, password);
+                }
+                else
+                {
+                    throw e;
+                }
+            }
+        }
+
+        private (string userID, SecureString password) GetInfo()
+        {
             try
             {
                 var userID = this.UserID == string.Empty ? this.CommandContext.ReadString("UserID:") : this.UserID;
                 var password = this.Password == string.Empty ? this.CommandContext.ReadSecureString("Password:") : StringUtility.ToSecureString(this.Password);
-                var force = this.Force;
-                await this.CommandContext.LoginAsync(userID, password, force);
+                return (userID, password);
             }
             catch (OperationCanceledException e)
             {

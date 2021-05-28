@@ -15,7 +15,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
         public static async Task<Authentication> StartAsync(this ICremaHost cremaHost)
         {
             var token = await cremaHost.OpenAsync();
-            var authenticationToken = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"), false);
+            var authenticationToken = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
             var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
             authenticationToToken.Add(authentication, token);
             return authentication;

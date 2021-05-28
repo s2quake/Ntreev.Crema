@@ -53,7 +53,7 @@ namespace JSSoft.Crema.Services.Random
         {
             var name = $"{authority.ToString().ToLower()}{RandomUtility.Next(10)}";
             var password = StringUtility.ToSecureString(authority.ToString().ToLower());
-            var token = await cremaHost.LoginAsync(name, password, false);
+            var token = await cremaHost.LoginAsync(name, password);
             return await cremaHost.AuthenticateAsync(token);
         }
     }

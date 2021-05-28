@@ -100,7 +100,7 @@ namespace JSSoft.Crema.Services.Users
             this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskID));
         }
 
-        public async Task<Guid> LoginAsync(string userID, SecureString password, bool force)
+        public async Task<Guid> LoginAsync(string userID, SecureString password)
         {
             try
             {
@@ -110,7 +110,7 @@ namespace JSSoft.Crema.Services.Users
                     this.ValidateLogin(userID, password);
                     return this.Users[userID];
                 });
-                return await user.LoginAsync(password, force);
+                return await user.LoginAsync(password);
             }
             catch (Exception e)
             {
@@ -130,6 +130,25 @@ namespace JSSoft.Crema.Services.Users
                     return this.Users[authentication.ID];
                 });
                 await user.LogoutAsync(authentication);
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task<Guid> LogoutAsync(string userID, SecureString password)
+        {
+            try
+            {
+                this.ValidateExpired();
+                var user = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateLogout(userID, password);
+                    return this.Users[userID];
+                });
+                return await user.LogoutAsync(user.Authentication);
             }
             catch (Exception e)
             {
@@ -596,6 +615,17 @@ namespace JSSoft.Crema.Services.Users
             var user = this.Users[authentication.ID];
             if (user == null)
                 throw new UserNotFoundException(authentication.ID);
+        }
+
+        private void ValidateLogout(string userID, SecureString password)
+        {
+            if (userID is null)
+                throw new ArgumentNullException(nameof(userID));
+            if (password is null)
+                throw new ArgumentNullException(nameof(password));
+            var user = this.Users[userID];
+            if (user == null || user.VerifyPassword(password) == false)
+                throw new ArgumentException(Resources.Exception_WrongIDOrPassword);
         }
 
         private void ValidateSendMessage(Authentication authentication, string[] userIDs, string message)

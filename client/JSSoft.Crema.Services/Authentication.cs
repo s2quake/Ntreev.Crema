@@ -154,12 +154,7 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        internal void InvokeExpiredEvent(string userID)
-        {
-            this.InvokeExpiredEvent(userID, string.Empty);
-        }
-
-        internal void InvokeExpiredEvent(string _1, string _2)
+        internal void InvokeExpiredEvent()
         {
             lock (lockobj)
             {
@@ -173,9 +168,9 @@ namespace JSSoft.Crema.Services
             return this.Sign(DateTime.UtcNow);
         }
 
-        internal SignatureDate Sign(DateTime _)
+        internal SignatureDate Sign(DateTime dateTime)
         {
-            this.signatureDate = new SignatureDate(this.ID, DateTime.UtcNow);
+            this.signatureDate = new SignatureDate(this.ID, dateTime);
             return this.signatureDate;
         }
 

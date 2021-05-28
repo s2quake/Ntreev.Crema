@@ -81,9 +81,9 @@ namespace JSSoft.Crema.ServiceHosts
             };
         }
 
-        public async Task<ResultBase<Guid>> LoginAsync(string userID, byte[] password, bool force)
+        public async Task<ResultBase<Guid>> LoginAsync(string userID, byte[] password)
         {
-            this.authenticationToken = await this.CremaHost.LoginAsync(userID, ToSecureString(userID, password), force);
+            this.authenticationToken = await this.CremaHost.LoginAsync(userID, ToSecureString(userID, password));
             this.authentication = await this.CremaHost.AuthenticateAsync(this.authenticationToken);
             this.OwnerID = this.authentication.ID;
             this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(LoginAsync)}");
@@ -98,6 +98,19 @@ namespace JSSoft.Crema.ServiceHosts
         {
             var ownerID = this.OwnerID;
             await this.CremaHost.LogoutAsync(this.authentication);
+            this.authentication = null;
+            this.OwnerID = nameof(CremaHostService);
+            this.LogService.Debug($"[{ownerID}] {nameof(CremaHostService)} {nameof(LogoutAsync)}");
+            return new ResultBase()
+            {
+                SignatureDate = new SignatureDateProvider(ownerID)
+            };
+        }
+
+        public async Task<ResultBase> LogoutAsync(string userID, byte[] password)
+        {
+            var ownerID = this.OwnerID;
+            await this.CremaHost.LogoutAsync(userID, ToSecureString(userID, password));
             this.authentication = null;
             this.OwnerID = nameof(CremaHostService);
             this.LogService.Debug($"[{ownerID}] {nameof(CremaHostService)} {nameof(LogoutAsync)}");
@@ -160,7 +173,7 @@ namespace JSSoft.Crema.ServiceHosts
             var userContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
             var text = Encoding.UTF8.GetString(password);
             var pass = StringUtility.ToSecureString(StringUtility.Decrypt(text, userID));
-            var authenticationToken = await this.CremaHost.LoginAsync(userID, pass, false);
+            var authenticationToken = await this.CremaHost.LoginAsync(userID, pass);
             var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
             await this.CremaHost.LogoutAsync(authentication);
             result.Value = authenticationToken != Guid.Empty;

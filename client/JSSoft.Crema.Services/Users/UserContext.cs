@@ -180,7 +180,7 @@ namespace JSSoft.Crema.Services.Users
                     throw new ArgumentNullException(nameof(authentication));
                 if (authentication.ID != this.CurrentUser.ID)
                     throw new InvalidOperationException();
-                this.CurrentUser.Authentication.InvokeExpiredEvent(authentication.ID);
+                this.CurrentUser.Authentication.InvokeExpiredEvent();
             });
         }
 
