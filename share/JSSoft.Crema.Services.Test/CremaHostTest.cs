@@ -60,16 +60,9 @@ namespace JSSoft.Crema.Services.Test
         [TestCleanup]
         public async Task CleanupAsync()
         {
-            try
-            { 
             if (token != Guid.Empty)
                 await cremaHost.CloseAsync(token);
             token = Guid.Empty;
-            }
-            catch(Exception e)
-            {
-                int wer = 0;
-            }
         }
 
         [ClassCleanup]

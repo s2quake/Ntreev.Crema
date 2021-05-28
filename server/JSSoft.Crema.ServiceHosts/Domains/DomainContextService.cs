@@ -213,10 +213,10 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private async Task<DomainContextMetaData> AttachEventHandlersAsync()
         {
-            await this.UserContext.Dispatcher.InvokeAsync(() =>
-            {
-                this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
-            });
+            //await this.UserContext.Dispatcher.InvokeAsync(() =>
+            //{
+            //    this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
+            //});
             var metaData = await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
                 this.DomainContext.Domains.DomainsCreated += Domains_DomainsCreated;
@@ -262,25 +262,25 @@ namespace JSSoft.Crema.ServiceHosts.Domains
                 this.DomainContext.Domains.DomainPropertyChanged -= Domains_DomainPropertyChanged;
                 this.DomainContext.TaskCompleted -= DomainContext_TaskCompleted;
             });
-            await this.UserContext.Dispatcher.InvokeAsync(() =>
-            {
-                this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-            });
+            //await this.UserContext.Dispatcher.InvokeAsync(() =>
+            //{
+            //    this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+            //});
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(DetachEventHandlersAsync)}");
         }
 
-        private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
-        {
-            var signatureDate = this.authentication.SignatureDate;
-            var actionUserID = e.UserID;
-            var contains = e.Items.Any(item => item.ID == signatureDate.ID);
-            var closeInfo = (CloseInfo)e.MetaData;
-            if (actionUserID != signatureDate.ID && contains == true)
-            {
-                await this.DetachEventHandlersAsync();
-                this.authentication = null;
-            }
-        }
+        //private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
+        //{
+        //    var signatureDate = this.authentication.SignatureDate;
+        //    var actionUserID = e.UserID;
+        //    var contains = e.Items.Any(item => item.ID == signatureDate.ID);
+        //    var closeInfo = (CloseInfo)e.MetaData;
+        //    if (actionUserID != signatureDate.ID && contains == true)
+        //    {
+        //        await this.DetachEventHandlersAsync();
+        //        this.authentication = null;
+        //    }
+        //}
 
         private void Domains_DomainsCreated(object sender, DomainsCreatedEventArgs e)
         {

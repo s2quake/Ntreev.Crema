@@ -422,11 +422,6 @@ namespace JSSoft.Crema.Services.Domains
 
         #region IDomainContextEventCallback
 
-        void IDomainContextEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
-        {
-            // await this.CloseAsync(closeInfo);
-        }
-
         async void IDomainContextEventCallback.OnDomainsCreated(CallbackInfo callbackInfo, DomainMetaData[] metaDatas)
         {
             try

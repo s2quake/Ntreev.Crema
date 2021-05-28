@@ -89,9 +89,25 @@ namespace JSSoft.Crema.Services
             return $"{this.provider.ID}({this.provider.Name})";
         }
 
-        public string ID => this.provider.ID;
+        public string ID
+        {
+            get
+            {
+                if (this.isExpired == true)
+                    throw new InvalidOperationException();
+                return this.provider.ID;
+            }
+        }
 
-        public string Name => this.provider.Name;
+        public string Name
+        {
+            get
+            {
+                if (this.isExpired == true)
+                    throw new InvalidOperationException();
+                return this.provider.Name;
+            }
+        }
 
         public Authority Authority => this.provider.Authority;
 

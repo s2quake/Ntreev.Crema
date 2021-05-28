@@ -182,6 +182,9 @@ namespace JSSoft.Crema.Services
         {
             try
             {
+                if (message is null)
+                    throw new ArgumentNullException(nameof(message));
+
                 var waiter = await this.Dispatcher.InvokeAsync(() =>
                 {
                     if (this.ServiceState != ServiceState.Open)
@@ -227,6 +230,44 @@ namespace JSSoft.Crema.Services
             }
         }
 
+        public async Task<Guid> LoginAsync(string userID, SecureString password, bool force)
+        {
+            if (userID is null)
+                throw new ArgumentNullException(nameof(userID));
+            if (password is null)
+                throw new ArgumentNullException(nameof(password));
+
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.ServiceState != ServiceState.Open)
+                    throw new InvalidOperationException();
+            });
+            return await this.UserContext.LoginAsync(userID, password, force);
+        }
+
+        public async Task LogoutAsync(Authentication authentication)
+        {
+            if (authentication is null)
+                throw new ArgumentNullException(nameof(authentication));
+
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.ServiceState != ServiceState.Open)
+                    throw new InvalidOperationException();
+            });
+            await this.UserContext.LogoutAsync(authentication);
+        }
+
+        public async Task<Authentication> AuthenticateAsync(Guid authenticationToken)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.ServiceState != ServiceState.Open)
+                    throw new InvalidOperationException();
+            });
+            return await this.UserContext.AuthenticateAsync(authenticationToken);
+        }
+
         public async Task ShutdownAsync(Authentication authentication, ShutdownContext shutdownContext)
         {
             try
@@ -264,10 +305,11 @@ namespace JSSoft.Crema.Services
             {
                 if (authentication is null)
                     throw new ArgumentNullException(nameof(authentication));
-                if (this.ServiceState != ServiceState.Open)
-                    throw new InvalidOperationException();
+
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    if (this.ServiceState != ServiceState.Open)
+                        throw new InvalidOperationException();
                     this.DebugMethod(authentication, this, nameof(CancelShutdownAsync));
                     this.ValidateCancelShutdown(authentication);
                     this.shutdownTimer.Stop();
@@ -279,27 +321,6 @@ namespace JSSoft.Crema.Services
                 this.ErrorInternal(e);
                 throw;
             }
-        }
-
-        public Task<Guid> LoginAsync(string userID, SecureString password, bool force)
-        {
-            if (this.ServiceState != ServiceState.Open)
-                throw new InvalidOperationException();
-            return this.UserContext.LoginAsync(userID, password, force);
-        }
-
-        public Task<Authentication> AuthenticateAsync(Guid authenticationToken)
-        {
-            if (this.ServiceState != ServiceState.Open)
-                throw new InvalidOperationException();
-            return this.UserContext.AuthenticateAsync(authenticationToken);
-        }
-
-        public Task LogoutAsync(Authentication authentication)
-        {
-            if (this.ServiceState != ServiceState.Open)
-                throw new InvalidOperationException();
-            return this.UserContext.LogoutAsync(authentication);
         }
 
         public void Debug(object message)

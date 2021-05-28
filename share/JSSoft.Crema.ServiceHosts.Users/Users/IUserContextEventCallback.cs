@@ -28,9 +28,6 @@ namespace JSSoft.Crema.ServiceHosts.Users
     public interface IUserContextEventCallback
     {
         [OperationContract]
-        void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
-
-        [OperationContract]
         void OnUsersChanged(CallbackInfo callbackInfo, UserInfo[] userInfos);
 
         [OperationContract]

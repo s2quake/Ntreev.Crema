@@ -1123,11 +1123,6 @@ namespace JSSoft.Crema.Services.Data
 
         #region IDataBaseEventCallback
 
-        async void IDataBaseEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
-        {
-            await this.ReleaseAsync();
-        }
-
         async void IDataBaseEventCallback.OnTablesChanged(CallbackInfo callbackInfo, TableInfo[] tableInfos, string itemType)
         {
             try

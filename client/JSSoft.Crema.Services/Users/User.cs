@@ -348,6 +348,13 @@ namespace JSSoft.Crema.Services.Users
             this.Authentication = new Authentication(new UserAuthenticationProvider(this));
         }
 
+        protected override void OnDetached()
+        {
+            base.OnDetached();
+            this.Authentication.InvokeExpiredEvent(this.ID);
+            this.Authentication = null;
+        }
+
         #region IUser
 
         Task IUser.MoveAsync(Authentication authentication, string categoryPath)

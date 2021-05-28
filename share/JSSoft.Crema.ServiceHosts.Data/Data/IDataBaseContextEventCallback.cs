@@ -28,9 +28,6 @@ namespace JSSoft.Crema.ServiceHosts.Data
     public interface IDataBaseContextEventCallback
     {
         [OperationContract]
-        void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
-
-        [OperationContract]
         void OnDataBasesCreated(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseInfo[] dataBaseInfos, string comment);
 
         [OperationContract]

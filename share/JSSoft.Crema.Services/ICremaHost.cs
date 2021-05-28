@@ -36,6 +36,12 @@ namespace JSSoft.Crema.Services
 
         Task<Authentication> AuthenticateAsync(Guid authenticationToken);
 
+        Task CloseAsync(Guid token);
+
+        Task ShutdownAsync(Authentication authentication, ShutdownContext context);
+
+        Task CancelShutdownAsync(Authentication authentication);
+
         event EventHandler Opening;
 
         event EventHandler Opened;
@@ -45,12 +51,6 @@ namespace JSSoft.Crema.Services
         event EventHandler Closing;
 
         event ClosedEventHandler Closed;
-
-        Task CloseAsync(Guid token);
-
-        Task ShutdownAsync(Authentication authentication, ShutdownContext context);
-
-        Task CancelShutdownAsync(Authentication authentication);
 
         ServiceState ServiceState { get; }
     }

@@ -28,16 +28,9 @@ namespace JSSoft.Crema.ServiceHosts.Domains
     public interface IDomainContextEventCallback
     {
         [OperationContract]
-        void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
-
-        [OperationContract]
         void OnDomainsCreated(CallbackInfo callbackInfo, DomainMetaData[] metaDatas);
 
         [OperationContract]
-        // [ServiceKnownType(typeof(TableInfo))]
-        // [ServiceKnownType(typeof(TableInfo[]))]
-        // [ServiceKnownType(typeof(TypeInfo))]
-        // [ServiceKnownType(typeof(TypeInfo[]))]
         void OnDomainsDeleted(CallbackInfo callbackInfo, Guid[] domainIDs, bool[] IsCanceleds, object[] results);
 
         [OperationContract]

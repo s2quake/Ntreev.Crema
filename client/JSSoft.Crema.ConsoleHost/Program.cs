@@ -32,28 +32,11 @@ namespace JSSoft.Crema.ConsoleHost
         {
             try
             {
-                
-                
-                var c = System.Globalization.CultureInfo.CurrentCulture;
-                throw new ArgumentException(null, "wow");
-
-                
-
-
-                var e2 = new ArgumentException(null, paramName: null);
                 using var application = new CremaApplication();
                 await application.RunAsync(args);
             }
             catch (Exception e)
             {
-                BinaryFormatter d = new BinaryFormatter();
-                var stream = new MemoryStream();
-                d.Serialize(stream, e);
-
-                stream.Position = 0;
-
-                var e12 = d.Deserialize(stream);
-
                 Console.Error.WriteLine(e);
                 Environment.Exit(1);
             }

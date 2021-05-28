@@ -33,7 +33,7 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
     class PermissionExceptionSerializer : ExceptionSerializerBase<PermissionException>
     {
         public PermissionExceptionSerializer()
-            : base("ad1e60f0-2a38-4f19-98db-dad938834471")
+            : base("9e8a8b53-e97f-4a87-b4c5-6168ec75ad5a")
         {
         }
     }

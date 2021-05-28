@@ -177,12 +177,17 @@ namespace JSSoft.Crema.Services
         {
             try
             {
+                if (userID is null)
+                    throw new ArgumentNullException(nameof(userID));
+                if (password is null)
+                    throw new ArgumentNullException(nameof(password));
+
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     if (this.ServiceState != ServiceState.Open)
                         throw new InvalidOperationException(Resources.Exception_NotOpened);
                 });
-                this.AuthenticationToken = await this.Service.LoginAsync(userID, UserContext.Encrypt(userID, password), force);
+                var authenticationToken = await this.Service.LoginAsync(userID, UserContext.Encrypt(userID, password), force);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.log = new LogService(this.Address.Replace(':', '_'), userID, AppUtility.UserAppDataPath)
@@ -190,11 +195,12 @@ namespace JSSoft.Crema.Services
                         Verbose = this.settings.Verbose
                     };
                 });
-                await this.UserContext.InitializeAsync(userID, this.AuthenticationToken);
-                await this.DataBaseContext.InitializeAsync(this.AuthenticationToken);
-                await this.DomainContext.InitializeAsync(this.AuthenticationToken);
+                await this.UserContext.InitializeAsync(userID, authenticationToken);
+                await this.DataBaseContext.InitializeAsync(authenticationToken);
+                await this.DomainContext.InitializeAsync(authenticationToken);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.AuthenticationToken = authenticationToken;
                     this.configs = new UserConfiguration(this.GetConfigPath(userID), this.propertiesProviders);
                 });
                 return this.AuthenticationToken;
@@ -215,43 +221,26 @@ namespace JSSoft.Crema.Services
 
         public async Task<Authentication> AuthenticateAsync(Guid authenticationToken)
         {
-            if (this.ServiceState != ServiceState.Open)
-                throw new InvalidOperationException();
-            return await this.UserContext.AuthenticateAsync(authenticationToken);
-        }
-
-        public async Task LogoutAsync(Authentication authentication)
-        {
             await this.Dispatcher.InvokeAsync(() =>
             {
                 if (this.ServiceState != ServiceState.Open)
                     throw new InvalidOperationException(Resources.Exception_NotOpened);
             });
-            await this.Service.LogoutAsync();
-            await this.DomainContext.ReleaseAsync();
-            await this.DataBaseContext.ReleaseAsync();
-            await this.UserContext.ReleaseAsync();
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.AuthenticationToken = Guid.Empty;
-                this.log?.Dispose();
-                this.log = null;
-                this.configs.Commit();
-                this.configs = null;
-            });
+            return await this.UserContext.AuthenticateAsync(authenticationToken);
         }
 
-        public void SaveConfigs()
+        public async Task LogoutAsync(Authentication authentication)
         {
-            try
+            if (authentication is null)
+                throw new ArgumentNullException(nameof(authentication));
+
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                this.configs.Commit();
-            }
-            catch (Exception e)
-            {
-                CremaLog.Error(e);
-                throw;
-            }
+                if (this.ServiceState != ServiceState.Open)
+                    throw new InvalidOperationException(Resources.Exception_NotOpened);
+            });
+            await this.UserContext.DisauthenticateAsync(authentication);
+            await this.LogoutAsync();
         }
 
         public async Task CloseAsync()
@@ -273,6 +262,10 @@ namespace JSSoft.Crema.Services
                     this.OnClosing(EventArgs.Empty);
                     this.plugins.Release();
                 });
+                if (this.AuthenticationToken != Guid.Empty)
+                {
+                    await this.LogoutAsync();
+                }
                 await this.Service.UnsubscribeAsync();
                 this.clientContext.Closed -= ClientContext_Closed;
                 await this.clientContext.CloseAsync(this.serviceToken, 0);
@@ -309,6 +302,8 @@ namespace JSSoft.Crema.Services
                 var address = this.Address;
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    if (this.ServiceState != ServiceState.Open)
+                        throw new InvalidOperationException();
                     this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, isRestart, message);
                 });
                 var result = await this.Service.ShutdownAsync(milliseconds, isRestart, message);
@@ -331,10 +326,11 @@ namespace JSSoft.Crema.Services
             {
                 if (authentication is null)
                     throw new ArgumentNullException(nameof(authentication));
-                if (this.ServiceState != ServiceState.Open)
-                    throw new InvalidOperationException();
+                
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    if (this.ServiceState != ServiceState.Open)
+                        throw new InvalidOperationException();
                     this.DebugMethod(authentication, this, nameof(CancelShutdownAsync));
                 });
                 var result = await this.Service.CancelShutdownAsync();
@@ -352,10 +348,39 @@ namespace JSSoft.Crema.Services
             }
         }
 
+        private async Task LogoutAsync()
+        {
+            await this.Service.LogoutAsync();
+            await this.DomainContext.ReleaseAsync();
+            await this.DataBaseContext.ReleaseAsync();
+            await this.UserContext.ReleaseAsync();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.AuthenticationToken = Guid.Empty;
+                this.log?.Dispose();
+                this.log = null;
+                this.configs.Commit();
+                this.configs = null;
+            });
+        }
+
         private async void ShutdownTimer_Done(object sender, EventArgs e)
         {
             this.shutdownTimer.Stop();
             await this.OpenAsync();
+        }
+
+        public void SaveConfigs()
+        {
+            try
+            {
+                this.configs.Commit();
+            }
+            catch (Exception e)
+            {
+                CremaLog.Error(e);
+                throw;
+            }
         }
 
         public void Dispose()

@@ -128,7 +128,6 @@ namespace JSSoft.Crema.Services.Users
                 {
                     this.ValidateLogout(authentication);
                     return this.Users[authentication.ID];
-
                 });
                 await user.LogoutAsync(authentication);
             }

@@ -724,11 +724,6 @@ namespace JSSoft.Crema.Services.Data
 
         #region IDataBaseContextEventCallback
 
-        async void IDataBaseContextEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
-        {
-            await this.ReleaseAsync();
-        }
-
         async void IDataBaseContextEventCallback.OnDataBasesCreated(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseInfo[] dataBaseInfos, string comment)
         {
             try

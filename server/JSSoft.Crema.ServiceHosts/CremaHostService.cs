@@ -43,11 +43,25 @@ namespace JSSoft.Crema.ServiceHosts
         {
             this.LogService.Debug($"{nameof(CremaHostService)} Constructor");
             this.OwnerID = nameof(CremaHostService);
+            this.CremaHost.CloseRequested += CremaHost_CloseRequested;
+        }
+
+        private void CremaHost_CloseRequested(object sender, CloseRequestedEventArgs e)
+        {
+            if (this.authentication != null)
+            {
+                this.authentication = null;
+            }
         }
 
         public async Task DisposeAsync()
         {
-            await Task.Delay(1);
+            if (this.authentication != null)
+            {
+                await this.CremaHost.LogoutAsync(this.authentication);
+                this.authentication = null;
+            }
+            this.CremaHost.CloseRequested -= CremaHost_CloseRequested;
         }
 
         public async Task<ResultBase> SubscribeAsync(string version, string platformID, string culture)
@@ -186,15 +200,6 @@ namespace JSSoft.Crema.ServiceHosts
             this.LogService.Debug($"[{this.authentication}] {nameof(CremaHostService)}.{nameof(IsAliveAsync)} : {DateTime.Now}");
             await Task.Delay(1);
             return true;
-        }
-
-        private async void AuthenticationUtility_Disconnected(object sender, EventArgs e)
-        {
-            var authentication = sender as Authentication;
-            if (this.authentication != null && this.authentication == authentication)
-            {
-                await this.CremaHost.LogoutAsync(this.authentication);
-            }
         }
 
         private static SecureString ToSecureString(string userID, byte[] password)

@@ -305,12 +305,8 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void Users_UsersLoggedOut(object sender, Services.ItemsEventArgs<IUser> e)
         {
-            var signatureDate = this.authentication.SignatureDate;
-            var contains = e.Items.Any(item => item.ID == signatureDate.ID);
             var closeInfo = (CloseInfo)e.MetaData;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
-            var userID = signatureDate.ID;
-            var exceptionUserID = e.UserID;
             var userIDs = e.Items.Select(item => item.ID).ToArray();
             this.InvokeEvent(() => this.Callback?.OnUsersLoggedOut(callbackInfo, userIDs, closeInfo));
         }

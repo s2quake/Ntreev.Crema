@@ -172,6 +172,18 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
+        public async Task DisauthenticateAsync(Authentication authentication)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (authentication == null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.ID != this.CurrentUser.ID)
+                    throw new InvalidOperationException();
+                this.CurrentUser.Authentication.InvokeExpiredEvent(authentication.ID);
+            });
+        }
+
         public Task<Authentication> AuthenticateAsync(SignatureDate signatureDate)
         {
             return this.Dispatcher.InvokeAsync(() => this.Authenticate(signatureDate));
@@ -396,11 +408,6 @@ namespace JSSoft.Crema.Services.Users
         }
 
         #region IUserContextEventCallback
-
-        async void IUserContextEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
-        {
-            await this.ReleaseAsync();
-        }
 
         async void IUserContextEventCallback.OnUsersChanged(CallbackInfo callbackInfo, UserInfo[] userInfos)
         {
