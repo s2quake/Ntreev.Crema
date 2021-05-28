@@ -33,23 +33,20 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
     class TableNotFoundExceptionSerializer : ExceptionSerializerBase<TableNotFoundException>
     {
         public TableNotFoundExceptionSerializer()
-            : base(new Guid("1b5ab86e-1803-4ff1-8f49-79cc13d25f61"))
+            : base("1b5ab86e-1803-4ff1-8f49-79cc13d25f61")
         {
-
         }
 
-        public override Type[] PropertyTypes => new Type[] { typeof(string) };
-
-        protected override TableNotFoundException CreateInstance(object[] args)
+        protected override void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
         {
-            if (args[0] is string tableName)
-                return new TableNotFoundException(tableName);
-            throw new NotImplementedException();
+            base.GetSerializationInfo(properties, info);
+            info.AddValue(nameof(TableNotFoundException.TableName), properties[nameof(TableNotFoundException.TableName)]);
         }
 
-        protected override object[] SelectProperties(TableNotFoundException e)
+        protected override void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
         {
-            return new object[] { e.TableName };
+            base.GetProperties(info, properties);
+            properties[nameof(TableNotFoundException.TableName)] = info.GetString(nameof(TableNotFoundException.TableName));
         }
     }
 }

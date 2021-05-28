@@ -20,10 +20,19 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using System;
+using System.Runtime.Serialization;
 
 namespace JSSoft.Crema.ServiceModel
 {
     public class DispatcherExpiredException : Exception
     {
+        public DispatcherExpiredException()
+        {
+        }
+
+        protected DispatcherExpiredException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
     }
 }

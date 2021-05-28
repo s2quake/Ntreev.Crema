@@ -19,6 +19,9 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System;
+using System.Runtime.Serialization;
+
 namespace JSSoft.Crema.ServiceModel
 {
     public class ItemAlreadyExistsException : CremaException
@@ -26,7 +29,21 @@ namespace JSSoft.Crema.ServiceModel
         public ItemAlreadyExistsException(string itemPath)
             : base($"'{itemPath}' already exists.")
         {
+            this.ItemPath = itemPath ?? throw new ArgumentNullException(nameof(itemPath));
+        }
 
+        protected ItemAlreadyExistsException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            this.ItemPath = info.GetString(nameof(ItemPath));
+        }
+
+        public string ItemPath { get; }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue(nameof(ItemPath), this.ItemPath);
         }
     }
 }

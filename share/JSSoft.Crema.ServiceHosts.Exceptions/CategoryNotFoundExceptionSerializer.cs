@@ -25,6 +25,7 @@ using JSSoft.Crema.ServiceModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Runtime.Serialization;
 
 namespace JSSoft.Crema.ServiceHosts.Exceptions
 {
@@ -33,23 +34,20 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
     class CategoryNotFoundExceptionSerializer : ExceptionSerializerBase<CategoryNotFoundException>
     {
         public CategoryNotFoundExceptionSerializer()
-            : base(new Guid("91c59afa-bf96-4590-b99e-083159960cd3"))
+            : base("91c59afa-bf96-4590-b99e-083159960cd3")
         {
-
         }
 
-        public override Type[] PropertyTypes => new Type[] { typeof(string) };
-
-        protected override CategoryNotFoundException CreateInstance(object[] args)
+        protected override void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
         {
-            if (args[0] is string categoryPath)
-                return new CategoryNotFoundException(categoryPath);
-            throw new NotImplementedException();
+            base.GetSerializationInfo(properties, info);
+            info.AddValue(nameof(CategoryNotFoundException.CategoryPath), properties[nameof(CategoryNotFoundException.CategoryPath)]);
         }
 
-        protected override object[] SelectProperties(CategoryNotFoundException e)
+        protected override void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
         {
-            return new object[] { e.CategoryPath };
+            base.GetProperties(info, properties);
+            properties[nameof(CategoryNotFoundException.CategoryPath)] = info.GetString(nameof(CategoryNotFoundException.CategoryPath));
         }
     }
 }

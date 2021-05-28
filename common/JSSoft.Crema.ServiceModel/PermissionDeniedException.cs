@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System.Runtime.Serialization;
 using JSSoft.Crema.ServiceModel.Properties;
 
 namespace JSSoft.Crema.ServiceModel
@@ -28,13 +29,16 @@ namespace JSSoft.Crema.ServiceModel
         public PermissionDeniedException()
             : base(Resources.Exception_HaveNotPermission)
         {
-
         }
 
         public PermissionDeniedException(string message)
             : base(message)
         {
+        }
 
+        protected PermissionDeniedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
         }
     }
 }

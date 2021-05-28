@@ -32,30 +32,9 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
     [Export(typeof(IDataSerializer))]
     class PermissionExceptionSerializer : ExceptionSerializerBase<PermissionException>
     {
-        private static readonly PermissionException empty = new();
-
         public PermissionExceptionSerializer()
-            : base(new Guid("ad1e60f0-2a38-4f19-98db-dad938834471"))
+            : base("ad1e60f0-2a38-4f19-98db-dad938834471")
         {
-
-        }
-
-        public override Type[] PropertyTypes => new Type[] { typeof(string) };
-
-        public static readonly PermissionExceptionSerializer Default = new();
-
-        protected override PermissionException CreateInstance(object[] args)
-        {
-            if (args[0] is not string message)
-                return new PermissionException();
-            return new PermissionException(message);
-        }
-
-        protected override object[] SelectProperties(PermissionException e)
-        {
-            if (e.Message == empty.Message)
-                return new object[] { null };
-            return new object[] { e.Message };
         }
     }
 }

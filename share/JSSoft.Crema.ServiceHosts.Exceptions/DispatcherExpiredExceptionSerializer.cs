@@ -33,23 +33,8 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
     class DispatcherExpiredExceptionSerializer : ExceptionSerializerBase<DispatcherExpiredException>
     {
         public DispatcherExpiredExceptionSerializer()
-            : base(new Guid("99aa8e19-845e-4ae4-9989-3f5ac296b518"))
+            : base("99aa8e19-845e-4ae4-9989-3f5ac296b518")
         {
-
-        }
-
-        public override Type[] PropertyTypes => new Type[] { typeof(string) };
-
-        protected override DispatcherExpiredException CreateInstance(object[] args)
-        {
-            if (args[0] is string message)
-                return new DispatcherExpiredException();
-            throw new NotImplementedException();
-        }
-
-        protected override object[] SelectProperties(DispatcherExpiredException e)
-        {
-            return new object[] { string.Empty };
         }
     }
 }

@@ -31,23 +31,23 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
 {
     [Export(typeof(IExceptionDescriptor))]
     [Export(typeof(IDataSerializer))]
-    class DataBaseNotFoundExceptionSerializer : ExceptionSerializerBase<DataBaseNotFoundException>
+    class ItemNotFoundExceptionSerializer : ExceptionSerializerBase<ItemNotFoundException>
     {
-        public DataBaseNotFoundExceptionSerializer()
-            : base("9ce29873-8235-426c-873c-ff8577ceab7d")
+        public ItemNotFoundExceptionSerializer()
+            : base("646c50dd-8fbf-4588-8ae3-8099e3ebfda5")
         {
         }
         
         protected override void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
         {
             base.GetSerializationInfo(properties, info);
-            info.AddValue(nameof(DataBaseNotFoundException.DataBaseName), properties[nameof(DataBaseNotFoundException.DataBaseName)]);
+            info.AddValue(nameof(ItemNotFoundException.ItemPath), properties[nameof(ItemNotFoundException.ItemPath)]);
         }
 
         protected override void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
         {
             base.GetProperties(info, properties);
-            properties[nameof(DataBaseNotFoundException.DataBaseName)] = info.GetString(nameof(DataBaseNotFoundException.DataBaseName));
+            properties[nameof(ItemNotFoundException.ItemPath)] = info.GetString(nameof(ItemNotFoundException.ItemPath));
         }
     }
 }

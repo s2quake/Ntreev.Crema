@@ -19,6 +19,8 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System;
+using System.Runtime.Serialization;
 using JSSoft.Crema.ServiceModel.Properties;
 
 namespace JSSoft.Crema.ServiceModel
@@ -28,7 +30,21 @@ namespace JSSoft.Crema.ServiceModel
         public ItemNotFoundException(string itemPath)
             : base(string.Format(Resources.Exception_ItemNotFound_Format, itemPath))
         {
+            this.ItemPath = itemPath ?? throw new ArgumentNullException(nameof(itemPath));
+        }
 
+        protected ItemNotFoundException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            this.ItemPath = info.GetString(nameof(ItemPath));
+        }
+
+        public string ItemPath { get; }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue(nameof(ItemPath), this.ItemPath);
         }
     }
 }

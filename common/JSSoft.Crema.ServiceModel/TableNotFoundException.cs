@@ -20,6 +20,7 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using System;
+using System.Runtime.Serialization;
 using JSSoft.Crema.ServiceModel.Properties;
 
 namespace JSSoft.Crema.ServiceModel
@@ -32,6 +33,18 @@ namespace JSSoft.Crema.ServiceModel
             this.TableName = tableName ?? throw new ArgumentNullException(nameof(tableName));
         }
 
+        protected TableNotFoundException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            this.TableName = info.GetString(nameof(TableName));
+        }
+
         public string TableName { get; }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue(nameof(TableName), this.TableName);
+        }
     }
 }

@@ -32,28 +32,9 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
     [Export(typeof(IDataSerializer))]
     class CremaExceptionSerializer : ExceptionSerializerBase<CremaException>
     {
-        private static readonly CremaException empty = new();
-
         public CremaExceptionSerializer()
-            : base(new Guid("ad1e60f0-2a38-4f19-98db-dad938834471"))
+            : base("ad1e60f0-2a38-4f19-98db-dad938834471")
         {
-
-        }
-
-        public override Type[] PropertyTypes => new Type[] { typeof(string) };
-
-        protected override CremaException CreateInstance(object[] args)
-        {
-            if (args[0] is not string message)
-                return new CremaException();
-            return new CremaException(message);
-        }
-
-        protected override object[] SelectProperties(CremaException e)
-        {
-            if (e.Message == empty.Message)
-                return new object[] { null };
-            return new object[] { e.Message };
         }
     }
 }

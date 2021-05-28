@@ -33,23 +33,20 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
     class UserNotFoundExceptionSerializer : ExceptionSerializerBase<UserNotFoundException>
     {
         public UserNotFoundExceptionSerializer()
-            : base(new Guid("ca935ebd-c4d5-4071-a096-54e5170b8149"))
+            : base("ca935ebd-c4d5-4071-a096-54e5170b8149")
         {
-
         }
 
-        public override Type[] PropertyTypes => new Type[] { typeof(string) };
-
-        protected override UserNotFoundException CreateInstance(object[] args)
+        protected override void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
         {
-            if (args[0] is string userID)
-                return new UserNotFoundException(userID);
-            throw new NotImplementedException();
+            base.GetSerializationInfo(properties, info);
+            info.AddValue(nameof(UserNotFoundException.UserID), properties[nameof(UserNotFoundException.UserID)]);
         }
 
-        protected override object[] SelectProperties(UserNotFoundException e)
+        protected override void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
         {
-            return new object[] { e.UserID };
+            base.GetProperties(info, properties);
+            properties[nameof(UserNotFoundException.UserID)] = info.GetString(nameof(UserNotFoundException.UserID));
         }
     }
 }

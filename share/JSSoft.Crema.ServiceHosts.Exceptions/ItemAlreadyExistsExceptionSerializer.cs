@@ -31,23 +31,23 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
 {
     [Export(typeof(IExceptionDescriptor))]
     [Export(typeof(IDataSerializer))]
-    class DataBaseNotFoundExceptionSerializer : ExceptionSerializerBase<DataBaseNotFoundException>
+    class ItemAlreadyExistsExceptionSerializer : ExceptionSerializerBase<ItemAlreadyExistsException>
     {
-        public DataBaseNotFoundExceptionSerializer()
-            : base("9ce29873-8235-426c-873c-ff8577ceab7d")
+        public ItemAlreadyExistsExceptionSerializer()
+            : base("56259297-5fb6-4902-a1c9-f74924c400a3")
         {
         }
         
         protected override void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
         {
             base.GetSerializationInfo(properties, info);
-            info.AddValue(nameof(DataBaseNotFoundException.DataBaseName), properties[nameof(DataBaseNotFoundException.DataBaseName)]);
+            info.AddValue(nameof(ItemAlreadyExistsException.ItemPath), properties[nameof(ItemAlreadyExistsException.ItemPath)]);
         }
 
         protected override void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
         {
             base.GetProperties(info, properties);
-            properties[nameof(DataBaseNotFoundException.DataBaseName)] = info.GetString(nameof(DataBaseNotFoundException.DataBaseName));
+            properties[nameof(ItemAlreadyExistsException.ItemPath)] = info.GetString(nameof(ItemAlreadyExistsException.ItemPath));
         }
     }
 }

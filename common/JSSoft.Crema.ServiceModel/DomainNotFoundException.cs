@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.ServiceModel.Properties;
 using System;
+using System.Runtime.Serialization;
 
 namespace JSSoft.Crema.ServiceModel
 {
@@ -29,7 +30,21 @@ namespace JSSoft.Crema.ServiceModel
         public DomainNotFoundException(Guid domainID)
             : base(string.Format(Resources.Exception_DomainNotFound_Format, domainID))
         {
+            this.DomainID = domainID;
+        }
 
+        protected DomainNotFoundException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            this.DomainID = new Guid(info.GetString(nameof(DomainID)));
+        }
+
+        public Guid DomainID { get; }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue(nameof(DomainID), $"{this.DomainID}");
         }
     }
 }

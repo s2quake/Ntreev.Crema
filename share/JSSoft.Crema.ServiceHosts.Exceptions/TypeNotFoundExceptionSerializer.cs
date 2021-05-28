@@ -33,23 +33,20 @@ namespace JSSoft.Crema.ServiceHosts.Exceptions
     class TypeNotFoundExceptionSerializer : ExceptionSerializerBase<TypeNotFoundException>
     {
         public TypeNotFoundExceptionSerializer()
-            : base(new Guid("5dc06c2b-0b34-47b7-91d4-a4c1f6cff10c"))
+            : base("5dc06c2b-0b34-47b7-91d4-a4c1f6cff10c")
         {
-
         }
 
-        public override Type[] PropertyTypes => new Type[] { typeof(string) };
-
-        protected override TypeNotFoundException CreateInstance(object[] args)
+        protected override void GetSerializationInfo(IReadOnlyDictionary<string, object> properties, SerializationInfo info)
         {
-            if (args[0] is string typeName)
-                return new TypeNotFoundException(typeName);
-            throw new NotImplementedException();
+            base.GetSerializationInfo(properties, info);
+            info.AddValue(nameof(TypeNotFoundException.TypeName), properties[nameof(TypeNotFoundException.TypeName)]);
         }
 
-        protected override object[] SelectProperties(TypeNotFoundException e)
+        protected override void GetProperties(SerializationInfo info, IDictionary<string, object> properties)
         {
-            return new object[] { e.TypeName };
+            base.GetProperties(info, properties);
+            properties[nameof(TypeNotFoundException.TypeName)] = info.GetString(nameof(TypeNotFoundException.TypeName));
         }
     }
 }
