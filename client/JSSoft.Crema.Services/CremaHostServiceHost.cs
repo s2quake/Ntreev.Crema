@@ -48,7 +48,7 @@ namespace JSSoft.Crema.Services
             if (callback is CremaHost cremaHost)
             {
                 cremaHost.Service = null;
-                await cremaHost.ReleaseAsync();
+                await Task.Delay(1);
             }
         }
     }

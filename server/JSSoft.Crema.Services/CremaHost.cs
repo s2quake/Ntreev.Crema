@@ -189,8 +189,8 @@ namespace JSSoft.Crema.Services
                 {
                     if (this.ServiceState != ServiceState.Open)
                         throw new InvalidOperationException();
-                    this.ServiceState = ServiceState.Closing;
                     var closer = new InternalCloseRequestedEventArgs(reason);
+                    this.ServiceState = ServiceState.Closing;
                     this.OnCloseRequested(closer);
                     return closer.WhenAll();
                 });
@@ -241,6 +241,7 @@ namespace JSSoft.Crema.Services
             {
                 if (this.ServiceState != ServiceState.Open)
                     throw new InvalidOperationException();
+                this.Debug($"{this.GetType().Name}.{nameof(LoginAsync)} : {userID}");
             });
             return await this.UserContext.LoginAsync(userID, password);
         }
@@ -254,6 +255,7 @@ namespace JSSoft.Crema.Services
             {
                 if (this.ServiceState != ServiceState.Open)
                     throw new InvalidOperationException();
+                this.DebugMethod(authentication, this, nameof(LogoutAsync));
             });
             await this.UserContext.LogoutAsync(authentication);
         }
@@ -269,6 +271,7 @@ namespace JSSoft.Crema.Services
             {
                 if (this.ServiceState != ServiceState.Open)
                     throw new InvalidOperationException();
+                this.Debug($"{this.GetType().Name}.{nameof(LogoutAsync)} : {userID}");
             });
             await this.UserContext.LogoutAsync(userID, password);
         }
