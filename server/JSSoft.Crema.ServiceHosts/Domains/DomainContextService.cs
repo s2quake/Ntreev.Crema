@@ -188,15 +188,6 @@ namespace JSSoft.Crema.ServiceHosts.Domains
             return result;
         }
 
-        public async Task<bool> IsAliveAsync()
-        {
-            if (this.authentication == null)
-                return false;
-            this.LogService.Debug($"[{this.authentication}] {nameof(DomainContextService)}.{nameof(IsAliveAsync)} : {DateTime.Now}");
-            await Task.Delay(1);
-            return true;
-        }
-
         public IDomainContext DomainContext { get; }
 
         public IDataBaseContext DataBaseContext { get; }

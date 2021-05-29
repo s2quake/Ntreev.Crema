@@ -179,15 +179,6 @@ namespace JSSoft.Crema.ServiceHosts.Users
             return result;
         }
 
-        public async Task<bool> IsAliveAsync()
-        {
-            if (this.authentication == null)
-                return false;
-            this.LogService.Debug($"[{this.authentication}] {nameof(UserContextService)}.{nameof(IsAliveAsync)} : {DateTime.Now}");
-            await Task.Delay(1);
-            return true;
-        }
-
         public IUserContext UserContext { get; set; }
 
         private async Task<UserContextMetaData> AttachEventHandlersAsync()

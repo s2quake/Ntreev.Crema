@@ -91,8 +91,5 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         [OperationContract]
         Task<ResultBase<DataBaseMetaData>> CancelTransactionAsync(Guid transactionID);
-
-        [OperationContract]
-        Task<bool> IsAliveAsync();
     }
 }

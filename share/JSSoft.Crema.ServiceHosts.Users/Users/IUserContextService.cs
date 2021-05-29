@@ -66,8 +66,5 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         [OperationContract]
         Task<ResultBase> NotifyMessageAsync(string[] userIDs, string message);
-
-        [OperationContract]
-        Task<bool> IsAliveAsync();
     }
 }

@@ -61,26 +61,6 @@ namespace JSSoft.Crema.Services
             this.Initialize();
         }
 
-        public static async Task<bool> IsOnlineAsync(string address, string userID, SecureString password)
-        {
-            var serviceHost = new CremaHostServiceHost();
-            var clientContext = new ClientContext(serviceHost)
-            {
-                Host = AddressUtility.GetIPAddress(address),
-                Port = AddressUtility.GetPort(address)
-            };
-            var token = Guid.Empty;
-            try
-            {
-                token = await clientContext.OpenAsync();
-                return await serviceHost.IsOnlineAsync(userID, UserContext.Encrypt(userID, password));
-            }
-            finally
-            {
-                await clientContext.CloseAsync(token, 0);
-            }
-        }
-
         public static async Task<DataBaseInfo[]> GetDataBasesAsync(string address)
         {
             var serviceHost = new CremaHostServiceHost();
@@ -275,11 +255,6 @@ namespace JSSoft.Crema.Services
             public async Task<DataBaseInfo[]> GetDataBaseInfosAsync()
             {
                 return (await this.service.GetDataBaseInfosAsync()).Value;
-            }
-
-            public async Task<bool> IsOnlineAsync(string userID, byte[] password)
-            {
-                return (await this.service.IsOnlineAsync(userID, password)).Value;
             }
 
             protected override void OnServiceCreated(ICremaHostService service)

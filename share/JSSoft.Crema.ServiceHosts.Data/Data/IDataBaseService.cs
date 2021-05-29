@@ -172,8 +172,5 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         [OperationContract]
         Task<ResultBase<FindResultInfo[]>> FindTypeItemAsync(string itemPath, string text, FindOptions options);
-
-        [OperationContract]
-        Task<bool> IsAliveAsync();
     }
 }

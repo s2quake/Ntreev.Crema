@@ -47,9 +47,6 @@ namespace JSSoft.Crema.ServiceHosts
         Task<ResultBase<string>> GetVersionAsync();
 
         [OperationContract]
-        Task<ResultBase<bool>> IsOnlineAsync(string userID, byte[] password);
-
-        [OperationContract]
         Task<ResultBase<DataBaseInfo[]>> GetDataBaseInfosAsync();
 
         [OperationContract]
@@ -60,8 +57,5 @@ namespace JSSoft.Crema.ServiceHosts
 
         [OperationContract]
         Task<ResultBase> CancelShutdownAsync();
-
-        [OperationContract]
-        Task<bool> IsAliveAsync();
     }
 }

@@ -59,7 +59,6 @@ namespace JSSoft.Crema.Services
             [ImportMany] IEnumerable<IObjectSerializer> serializers,
             [ImportMany] IEnumerable<Lazy<IConfigurationPropertyProvider>> propertiesProviders)
         {
-            CremaLog.Attach(this);
             CremaLog.Debug("crema instance created.");
             this.container = container;
             this.settings = settings;
@@ -375,7 +374,6 @@ namespace JSSoft.Crema.Services
             this.Dispatcher = null;
             this.shutdownTimer.Dispose();
             this.OnDisposed(EventArgs.Empty);
-            CremaLog.Detach(this);
         }
 
         public void Sign(Authentication authentication)

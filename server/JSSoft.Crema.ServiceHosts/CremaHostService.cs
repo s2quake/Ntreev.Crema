@@ -167,20 +167,6 @@ namespace JSSoft.Crema.ServiceHosts
             };
         }
 
-        public async Task<ResultBase<bool>> IsOnlineAsync(string userID, byte[] password)
-        {
-            var result = new ResultBase<bool>();
-            var userContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            var text = Encoding.UTF8.GetString(password);
-            var pass = StringUtility.ToSecureString(StringUtility.Decrypt(text, userID));
-            var authenticationToken = await this.CremaHost.LoginAsync(userID, pass);
-            var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
-            await this.CremaHost.LogoutAsync(authentication);
-            result.Value = authenticationToken != Guid.Empty;
-            result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-            return result;
-        }
-
         public async Task<ResultBase> ShutdownAsync(int milliseconds, bool isRestart, string message)
         {
             this.shutdownContext = new ShutdownContext()
@@ -204,15 +190,6 @@ namespace JSSoft.Crema.ServiceHosts
             {
                 SignatureDate = this.authentication.SignatureDate
             };
-        }
-
-        public async Task<bool> IsAliveAsync()
-        {
-            if (this.authentication == null)
-                return false;
-            this.LogService.Debug($"[{this.authentication}] {nameof(CremaHostService)}.{nameof(IsAliveAsync)} : {DateTime.Now}");
-            await Task.Delay(1);
-            return true;
         }
 
         private static SecureString ToSecureString(string userID, byte[] password)

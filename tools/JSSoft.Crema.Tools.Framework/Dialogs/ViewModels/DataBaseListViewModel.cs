@@ -137,7 +137,6 @@ namespace JSSoft.Crema.Tools.Framework.Dialogs.ViewModels
         private static async Task<ResultBase<TResult>> InvokeServiceAsync<TResult>(Func<ResultBase<TResult>> func)
         {
             var result = await Task.Run(func);
-            result.Validate();
             return result;
         }
     }

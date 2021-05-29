@@ -66,8 +66,5 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         [OperationContract]
         Task<ResultBase<object>> DeleteDomainAsync(Guid domainID, bool force);
-
-        [OperationContract]
-        Task<bool> IsAliveAsync();
     }
 }
