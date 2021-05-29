@@ -408,10 +408,12 @@ namespace JSSoft.Crema.Commands.Consoles
             }
         }
 
-        private void DataBase_Unloaded(object sender, EventArgs e)
+        private async void DataBase_Unloaded(object sender, EventArgs e)
         {
             if (this.CommandContext.IsOnline == true)
-                this.CommandContext.Path = PathUtility.Separator;
+            {
+                await this.CommandContext.SetPathAsync(PathUtility.Separator);
+            }
         }
 
         private ICremaHost CremaHost { get; }

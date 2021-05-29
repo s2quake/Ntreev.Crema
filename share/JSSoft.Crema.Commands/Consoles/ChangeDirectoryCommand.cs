@@ -21,12 +21,14 @@
 
 using JSSoft.Library.Commands;
 using System.ComponentModel.Composition;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceUsageDescription("Resources")]
-    class ChangeDirectoryCommand : ConsoleCommandBase
+    class ChangeDirectoryCommand : ConsoleCommandAsyncBase
     {
         public ChangeDirectoryCommand()
             : base("cd")
@@ -47,16 +49,16 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             if (this.Path == string.Empty)
             {
-                this.CommandContext.Out.WriteLine(this.CommandContext.Path);
+                await this.Out.WriteAsync(this.CommandContext.Path);
             }
             else
             {
                 var authentication = this.CommandContext.GetAuthentication(this);
-                this.CommandContext.ChangeDirectory(authentication, this.Path);
+                await this.CommandContext.ChangeDirectoryAsync(authentication, this.Path);
             }
         }
     }

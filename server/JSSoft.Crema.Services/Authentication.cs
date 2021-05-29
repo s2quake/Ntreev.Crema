@@ -206,7 +206,7 @@ namespace JSSoft.Crema.Services
 
         internal readonly static Authentication System = new(new SystemAuthenticationProvider(), Guid.Parse("62E5A6E9-D4BE-438F-A188-D5842C0ED65E"));
 
-        #region wer
+        #region TemporaryAuthentication
 
         class TemporaryAuthentication : IDisposable
         {

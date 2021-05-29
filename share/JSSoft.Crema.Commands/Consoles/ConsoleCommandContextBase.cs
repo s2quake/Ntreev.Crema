@@ -32,6 +32,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
@@ -40,6 +41,7 @@ namespace JSSoft.Crema.Commands.Consoles
         private Authentication authentication;
         private IConsoleDrive drive;
         private readonly Dictionary<IConsoleDrive, string> drivePaths = new();
+
         private string path;
         private Authentication commission;
 
@@ -201,7 +203,7 @@ namespace JSSoft.Crema.Commands.Consoles
             }
         }
 
-        public void ChangeDirectory(Authentication authentication, string path)
+        public async Task ChangeDirectoryAsync(Authentication authentication, string path)
         {
             var segments = GetAbsolutePath(this.path, path);
             var allPaths = this.drive.GetPaths();
@@ -209,7 +211,7 @@ namespace JSSoft.Crema.Commands.Consoles
             if (allPaths.Contains(absolutePath) == false)
                 throw new ArgumentException($"No such directory : {absolutePath}");
 
-            this.Update(authentication, segments, absolutePath);
+            await this.UpdateAsync(authentication, segments, absolutePath);
             this.OnPathChanged(EventArgs.Empty);
         }
 
@@ -220,27 +222,47 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public bool IsOnline => this.authentication != null;
 
+        public async Task SetDriveAsync(IConsoleDrive value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+            if (this.DriveItems.Contains(value) == false)
+                throw new ItemNotFoundException(value.Name);
+            this.drive = value;
+
+            try
+            {
+                await this.ChangeDirectoryAsync(this.authentication, this.drivePaths[this.drive]);
+                // this.Path = this.drivePaths[this.drive];
+            }
+            catch
+            {
+                await this.ChangeDirectoryAsync(this.authentication, PathUtility.Separator);
+                throw;
+            }
+        }
+
         public IConsoleDrive Drive
         {
             get => this.drive;
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                if (this.DriveItems.Contains(value) == false)
-                    throw new ItemNotFoundException(value.Name);
-                this.drive = value;
+            // set
+            // {
+            //     if (value == null)
+            //         throw new ArgumentNullException(nameof(value));
+            //     if (this.DriveItems.Contains(value) == false)
+            //         throw new ItemNotFoundException(value.Name);
+            //     this.drive = value;
 
-                try
-                {
-                    this.Path = this.drivePaths[this.drive];
-                }
-                catch
-                {
-                    this.Path = PathUtility.Separator;
-                    throw;
-                }
-            }
+            //     try
+            //     {
+            //         this.Path = this.drivePaths[this.drive];
+            //     }
+            //     catch
+            //     {
+            //         this.Path = PathUtility.Separator;
+            //         throw;
+            //     }
+            // }
         }
 
         public IConsoleDrive[] DriveItems { get; }
@@ -248,7 +270,6 @@ namespace JSSoft.Crema.Commands.Consoles
         public string Path
         {
             get => this.path;
-            set => this.ChangeDirectory(this.authentication, value);
         }
 
         public string Prompt
@@ -402,18 +423,23 @@ namespace JSSoft.Crema.Commands.Consoles
 
         private void Authentication_Expired(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() => 
+            this.Dispatcher.InvokeAsync(() =>
             {
                 this.authentication = null;
                 this.Terminal?.CancelInput();
             });
         }
 
-        private void Update(Authentication authentication, string[] segments, string path)
+        private async Task UpdateAsync(Authentication authentication, string[] segments, string path)
         {
-            this.drive.SetPathAsync(authentication, path);
+            await this.drive.SetPathAsync(authentication, path);
             this.path = path;
             this.drivePaths[this.drive] = path;
+        }
+
+        internal Task SetPathAsync(string path)
+        {
+            return this.ChangeDirectoryAsync(this.authentication, path);
         }
     }
 }

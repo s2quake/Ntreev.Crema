@@ -19,13 +19,15 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System.Threading;
+using System.Threading.Tasks;
 using JSSoft.Library.Commands;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
     [ResourceUsageDescription("Resources")]
     // [UsageBrowsable(false)]
-    class ChangeDriveCommand : ConsoleCommandBase
+    class ChangeDriveCommand : ConsoleCommandAsyncBase
     {
         private readonly IConsoleDrive drive;
 
@@ -37,9 +39,9 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
-        protected override void OnExecute()
+        protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
-            this.CommandContext.Drive = this.drive;
+            return this.CommandContext.SetDriveAsync(this.drive);
         }
     }
 }
