@@ -34,7 +34,7 @@ namespace JSSoft.Crema.Bot
         private readonly AutobotService service;
         private readonly string address;
         private readonly SecureString password;
-        private AutobotCremaBootstrapper app = new() { Verbose = LogVerbose.None };
+        private AutobotCremaBootstrapper app = new() { Verbose = LogLevel.None };
         private ICremaHost cremaHost;
         private Guid token;
 

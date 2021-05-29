@@ -166,16 +166,16 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
             try
             {
                 this.ProgressMessage = Resources.Message_ConnectingToServer;
-                if (await CremaBootstrapper.IsOnlineAsync(address, userID, password) == true)
-                {
-                    if (await AppMessageBox.ShowQuestion(Resources.Message_SameIDConnected) == false)
-                    {
-                        this.ProgressMessage = string.Empty;
-                        this.EndProgress();
-                        this.HasError = false;
-                        return;
-                    }
-                }
+                //if (await CremaBootstrapper.IsOnlineAsync(address, userID, password) == true)
+                //{
+                //    if (await AppMessageBox.ShowQuestion(Resources.Message_SameIDConnected) == false)
+                //    {
+                //        this.ProgressMessage = string.Empty;
+                //        this.EndProgress();
+                //        this.HasError = false;
+                //        return;
+                //    }
+                //}
                 await this.OpenAsync(address, userID, password);
 
                 if (dataBaseName != string.Empty)
@@ -731,7 +731,7 @@ namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
         {
             this.settings.Address = address;
             await this.cremaHost.OpenAsync();
-            this.token = await this.cremaHost.LoginAsync(userID, password, false);
+            this.token = await this.cremaHost.LoginAsync(userID, password);
             this.address = address;
             this.UserID = userID;
             this.IsOpened = true;

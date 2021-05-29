@@ -34,10 +34,10 @@ namespace JSSoft.Crema.Services
 
         public LogServiceHost(string name, string path, bool isSingle)
         {
-            this.logService = new LogService(name, path, isSingle);
+            this.logService = new LogService(name, path);
         }
 
-        public void AddRedirection(TextWriter writer, LogVerbose verbose)
+        public void AddRedirection(TextWriter writer, LogLevel verbose)
         {
             this.logService.AddRedirection(writer, verbose);
         }
@@ -47,10 +47,10 @@ namespace JSSoft.Crema.Services
             this.logService.RemoveRedirection(writer);
         }
 
-        public LogVerbose Verbose
+        public LogLevel Verbose
         {
-            get => this.logService.Verbose;
-            set => this.logService.Verbose = value;
+            get => this.logService.LogLevel;
+            set => this.logService.LogLevel = value;
         }
 
         //public TextWriter RedirectionWriter

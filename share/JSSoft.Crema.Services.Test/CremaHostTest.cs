@@ -48,7 +48,7 @@ namespace JSSoft.Crema.Services.Test
         public static void ClassInit(TestContext context)
         {
             app = new CremaBootstrapper();
-            app.Initialize(context, nameof(ITableCategory_ComplexTest));
+            app.Initialize(context, nameof(CremaHostTest));
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
         }
 
@@ -314,7 +314,7 @@ namespace JSSoft.Crema.Services.Test
             try
             {
                 await cremaHost.ShutdownAsync(authentication, shutdownContext);
-                if (manualEvent.WaitOne(20000) == false)
+                if (manualEvent.WaitOne(30000) == false)
                     Assert.Fail();
             }
             finally

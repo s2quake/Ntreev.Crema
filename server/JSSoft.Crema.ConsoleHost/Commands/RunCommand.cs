@@ -101,7 +101,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             set;
         }
 
-        [CommandProperty]
+        [CommandPropertySwitch]
         public bool Verbose
         {
             get; set;
@@ -155,9 +155,9 @@ namespace JSSoft.Crema.ConsoleHost.Commands
 
         protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
-            CremaLog.Verbose = this.Verbose ? LogVerbose.Debug : LogVerbose.Info;
+            CremaLog.Verbose = this.Verbose ? LogLevel.Debug : LogLevel.Info;
             this.application.BasePath = this.Path;
-            this.application.Verbose = this.Verbose ? LogVerbose.Debug : LogVerbose.Info;
+            this.application.Verbose = this.Verbose ? LogLevel.Debug : LogLevel.Info;
             this.application.NoCache = this.NoCache;
             this.application.Culture = this.Culture;
             this.application.DataBaseList = this.DataBaseList;

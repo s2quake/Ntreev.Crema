@@ -59,7 +59,7 @@ namespace JSSoft.Crema.ApplicationHost
             this.commandContext.Out = new ConsoleWriter(this.terminal);
             this.terminal.CommandContext = this.commandContext;
             this.SetPrompt();
-            CremaLog.AddRedirection(this.writer, LogVerbose.Info);
+            CremaLog.AddRedirection(this.writer, LogLevel.Info);
         }
 
         public override void OnApplyTemplate()
@@ -106,7 +106,7 @@ namespace JSSoft.Crema.ApplicationHost
         {
             if (this.cremaHost.GetService(typeof(ILogService)) is ILogService logService)
             {
-                logService.AddRedirection(writer, LogVerbose.Info);
+                logService.AddRedirection(writer, LogLevel.Info);
             }
         }
 

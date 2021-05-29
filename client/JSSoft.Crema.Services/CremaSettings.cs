@@ -28,6 +28,6 @@ namespace JSSoft.Crema.Services
     {
         public string Address { get; set; }
 
-        public LogVerbose Verbose { get; set; } = LogVerbose.Info;
+        public LogLevel Verbose { get; set; } = LogLevel.Info;
     }
 }

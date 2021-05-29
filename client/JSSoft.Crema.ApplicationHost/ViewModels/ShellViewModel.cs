@@ -219,7 +219,6 @@ namespace JSSoft.Crema.ApplicationHost.ViewModels
         protected async override Task OnActivateAsync(CancellationToken cancellationToken)
         {
             await base.OnActivateAsync(cancellationToken);
-            this.CremaHost.Opened += (s, e) => this.UserConfigs.Update(this);
             this.CremaAppHost.Opened += CremaAppHost_Opened;
             this.CremaAppHost.Loaded += CremaAppHost_Loaded;
             this.CremaAppHost.Unloaded += CremaAppHost_Unloaded;
@@ -238,7 +237,7 @@ namespace JSSoft.Crema.ApplicationHost.ViewModels
 
         private void CremaAppHost_Opened(object sender, EventArgs e)
         {
-
+            this.UserConfigs.Update(this);
         }
 
         private void CremaAppHost_Loaded(object sender, EventArgs e)

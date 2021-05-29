@@ -129,10 +129,9 @@ namespace JSSoft.Crema.Services
                 this.RepositoryLocker = new RepositoryLocker(this);
                 this.RepositoryProvider = repositoryProviders.First(item => item.Name == this.settings.RepositoryModule);
                 this.Serializer = serializers.First(item => item.Name == this.settings.FileType);
-                this.log = new LogService("log", this.GetPath(CremaPath.Logs), false)
+                this.log = new LogService("repository", this.GetPath(CremaPath.Logs))
                 {
-                    Name = "repository",
-                    Verbose = settings.Verbose
+                    LogLevel = settings.Verbose
                 };
                 this.RepositoryDispatcher = new CremaDispatcher(this.RepositoryProvider);
                 await this.Dispatcher.InvokeAsync(() =>
@@ -416,10 +415,10 @@ namespace JSSoft.Crema.Services
 
         public bool NoCache => this.settings.NoCache;
 
-        public LogVerbose Verbose
+        public LogLevel Verbose
         {
-            get => this.log.Verbose;
-            set => this.log.Verbose = value;
+            get => this.log.LogLevel;
+            set => this.log.LogLevel = value;
         }
 
         public DataBaseContext DataBaseContext { get; private set; }
@@ -569,13 +568,13 @@ namespace JSSoft.Crema.Services
 
         #region ILogService
 
-        LogVerbose ILogService.Verbose
+        LogLevel ILogService.Verbose
         {
-            get => this.log.Verbose;
-            set => this.log.Verbose = value;
+            get => this.log.LogLevel;
+            set => this.log.LogLevel = value;
         }
 
-        void ILogService.AddRedirection(TextWriter writer, LogVerbose verbose)
+        void ILogService.AddRedirection(TextWriter writer, LogLevel verbose)
         {
             this.log.AddRedirection(writer, verbose);
         }

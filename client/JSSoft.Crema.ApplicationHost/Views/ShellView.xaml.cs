@@ -145,7 +145,7 @@ namespace JSSoft.Crema.ApplicationHost.Views
             if (this.cremaHost.GetService(typeof(ILogService)) is ILogService logService)
             {
                 this.redirectionWriter = new LogWriter() { TextBox = this.logView, };
-                logService.AddRedirection(this.redirectionWriter, LogVerbose.Debug);
+                logService.AddRedirection(this.redirectionWriter, LogLevel.Debug);
             }
         }
 

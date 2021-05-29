@@ -70,7 +70,7 @@ namespace JSSoft.Crema.Services
             Validate(serviceProvider, basePath, migrationModule, repositoryUrl, force);
 
             var repositoryMigrator = CremaBootstrapper.GetRepositoryMigrator(serviceProvider, migrationModule ?? "svn");
-            var logService = new LogService("migrate", basePath, true) { Verbose = LogVerbose.Info };
+            var logService = new LogService("migrate", basePath) { LogLevel = LogLevel.Info };
             var repositoryPath = Path.Combine(basePath, CremaString.Repository);
             var repositoryExisted = Directory.Exists(repositoryPath);
             try

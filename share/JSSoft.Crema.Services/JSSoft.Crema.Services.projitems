@@ -99,7 +99,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CremaLog.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ILogService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LogService.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)LogVerbose.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LogLevel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MessageEventArgs.cs" />
   </ItemGroup>
 </Project>

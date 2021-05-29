@@ -136,7 +136,7 @@ namespace JSSoft.Crema.Services
             this.OnDisposed(EventArgs.Empty);
         }
 
-        public LogVerbose Verbose
+        public LogLevel Verbose
         {
             get => this.settings.Verbose;
             set => this.settings.Verbose = value;

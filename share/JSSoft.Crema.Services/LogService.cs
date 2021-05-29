@@ -20,11 +20,10 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Library;
-using log4net;
-using log4net.Appender;
-using log4net.Core;
-using log4net.Layout;
-using log4net.Repository.Hierarchy;
+using NLog;
+using NLog.Config;
+using NLog.Layouts;
+using NLog.Targets;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,183 +35,54 @@ namespace JSSoft.Crema.Services
     class LogService : IDisposable
     {
         private const string conversionPattern = "%message%newline%exception";
-        private readonly ILog log;
-        private LogVerbose verbose = LogVerbose.Info | LogVerbose.Error | LogVerbose.Warn | LogVerbose.Fatal;
-        private ConsoleAppender consoleAppender;
-        private readonly RollingFileAppender rollingAppender;
-        private Hierarchy hierarchy;
-        //private TextWriter redirectionWriter;
-        //private TextWriterAppender textAppender;
-        private readonly Dictionary<TextWriter, TextWriterAppender> appendersByWriter = new();
+        private static readonly LoggingConfiguration configuration = new();
+        private readonly Dictionary<TextWriter, TextWriterTarget> targetByTextWriter = new();
+        private readonly LoggingRule consoleRule;
+        private ILogger log;
+        private LogLevel logLevel = LogLevel.Info;
+
+        static LogService()
+        {
+            LogManager.Configuration = configuration;
+            AppDomain.CurrentDomain.ProcessExit += (s, e) => LogManager.Shutdown();
+        }
 
         public LogService()
+            : this("global", Path.Combine(AppUtility.UserAppDataPath, "logs"))
         {
-            var repositoryName = AppUtility.ProductName;
-            var name = "global";
 
-            var repository = LogManager.GetAllRepositories().Where(item => item.Name == repositoryName).FirstOrDefault();
-            if (repository != null)
-                throw new InvalidOperationException();
-
-            this.hierarchy = (Hierarchy)LogManager.CreateRepository(repositoryName);
-
-            var xmlLayout = new XmlLayoutSchemaLog4j()
-            {
-                LocationInfo = true
-            };
-            xmlLayout.ActivateOptions();
-
-            this.rollingAppender = new RollingFileAppender()
-            {
-                AppendToFile = true,
-                File = Path.Combine(AppUtility.UserAppDataPath, "logs", "log"),
-                DatePattern = "_yyyy-MM-dd'.xml'",
-                Layout = xmlLayout,
-                Encoding = Encoding.UTF8,
-                MaxSizeRollBackups = 5,
-                MaximumFileSize = "1GB",
-                RollingStyle = RollingFileAppender.RollingMode.Date,
-                StaticLogFileName = false,
-                LockingModel = new RollingFileAppender.MinimalLock()
-            };
-            this.rollingAppender.ActivateOptions();
-
-            var patternLayout = new PatternLayout()
-            {
-                ConversionPattern = conversionPattern
-            };
-            patternLayout.ActivateOptions();
-
-            this.consoleAppender = new ConsoleAppender()
-            {
-                Layout = patternLayout
-            };
-            this.consoleAppender.SetVerbose(this.verbose);
-            this.consoleAppender.ActivateOptions();
-
-            this.hierarchy.Root.AddAppender(this.consoleAppender);
-            this.hierarchy.Root.AddAppender(this.rollingAppender);
-
-            this.hierarchy.Root.Level = Level.All;
-            this.hierarchy.Root.Additivity = false;
-            this.hierarchy.Configured = true;
-
-            this.log = log4net.LogManager.GetLogger(repositoryName, name);
-            this.Name = name;
         }
 
-        public LogService(string name, string path, bool isSingle)
+        public LogService(string name, string path)
         {
-            var repository = LogManager.GetAllRepositories().Where(item => item.Name == name).FirstOrDefault();
-            if (repository != null)
+            var fileName = Path.Combine(path, $"{name}.txt");
+            var archiveFileName = Path.Combine(path, $"{name}.{{#}}.txt");
+            var fileTarget = new FileTarget($"{name}_file")
             {
-                this.hierarchy = (Hierarchy)LogManager.GetRepository(name);
-            }
-            else
-            {
-                this.hierarchy = (Hierarchy)LogManager.CreateRepository(name);
-            }
-
-            var xmlLayout = new XmlLayoutSchemaLog4j()
-            {
-                LocationInfo = true
+                FileName = fileName,
+                ArchiveFileName = archiveFileName,
+                ArchiveEvery = FileArchivePeriod.Day,
             };
-            xmlLayout.ActivateOptions();
-
-            this.rollingAppender = new RollingFileAppender()
+            var consoleLayout = new SimpleLayout("${message}");
+            var consoleTarget = new ConsoleTarget($"{name}_console")
             {
-                AppendToFile = true,
-                File = Path.Combine(path, name),
-                DatePattern = "-yyyy-MM-dd'.log'",
-                Layout = xmlLayout,
-                Encoding = Encoding.UTF8,
-                MaxSizeRollBackups = 5,
-                MaximumFileSize = "1GB",
-                StaticLogFileName = false
+                Layout = consoleLayout,
             };
-
-            this.rollingAppender.File = isSingle == true ? Path.Combine(path, $"{name}-{DateTime.Now:yyyy-MM-d--HH-mm-ss}.log") : Path.Combine(path, name);
-            this.rollingAppender.RollingStyle = isSingle == true ? RollingFileAppender.RollingMode.Once : RollingFileAppender.RollingMode.Date;
-            this.rollingAppender.ActivateOptions();
-
-            var patternLayout = new PatternLayout()
+            var fileRule = new LoggingRule(name, GetLevel(this.logLevel), NLog.LogLevel.Fatal, fileTarget)
             {
-                ConversionPattern = conversionPattern
+                RuleName = $"{name}_file"
             };
-            patternLayout.ActivateOptions();
-
-            this.consoleAppender = new ConsoleAppender()
+            var consoleRule = new LoggingRule(name, GetLevel(this.logLevel), NLog.LogLevel.Fatal, consoleTarget)
             {
-                Layout = patternLayout
+                RuleName = $"{name}_console"
             };
-            this.consoleAppender.SetVerbose(this.verbose);
-            this.consoleAppender.ActivateOptions();
-
-            this.hierarchy.Root.AddAppender(this.consoleAppender);
-            this.hierarchy.Root.AddAppender(this.rollingAppender);
-
-            this.hierarchy.Root.Level = Level.All;
-            this.hierarchy.Configured = true;
-
-            this.log = log4net.LogManager.GetLogger(name, typeof(LogService));
+            configuration.LoggingRules.Add(fileRule);
+            configuration.LoggingRules.Add(consoleRule);
+            this.Refresh();
+            this.log = NLog.LogManager.GetLogger(name);
+            this.consoleRule = consoleRule;
             this.Name = name;
-        }
-
-        public LogService(string address, string userID, string path)
-        {
-            var repositoryName = $"{address}_{userID}";
-            var repository = LogManager.GetAllRepositories().Where(item => item.Name == repositoryName).FirstOrDefault();
-            if (repository != null)
-            {
-                //this.log = log4net.LogManager.GetLogger(repositoryName, name);
-                this.hierarchy = (Hierarchy)LogManager.GetRepository(repositoryName);
-            }
-            else
-            {
-                this.hierarchy = (Hierarchy)LogManager.CreateRepository(repositoryName);
-            }
-
-            var xmlLayout = new XmlLayoutSchemaLog4j()
-            {
-                LocationInfo = true
-            };
-            xmlLayout.ActivateOptions();
-
-            this.rollingAppender = new RollingFileAppender()
-            {
-                AppendToFile = true,
-                File = Path.Combine(path, @"logs", $"{repositoryName}"),
-                DatePattern = "_yyyy-MM-dd'.xml'",
-                Layout = xmlLayout,
-                Encoding = Encoding.UTF8,
-                MaxSizeRollBackups = 5,
-                MaximumFileSize = "1GB",
-                RollingStyle = RollingFileAppender.RollingMode.Date,
-                StaticLogFileName = false
-            };
-            this.rollingAppender.ActivateOptions();
-
-            var patternLayout = new PatternLayout()
-            {
-                ConversionPattern = conversionPattern
-            };
-            patternLayout.ActivateOptions();
-
-            this.consoleAppender = new ConsoleAppender()
-            {
-                Layout = patternLayout
-            };
-            this.consoleAppender.SetVerbose(this.verbose);
-            this.consoleAppender.ActivateOptions();
-
-            this.hierarchy.Root.AddAppender(this.consoleAppender);
-            this.hierarchy.Root.AddAppender(this.rollingAppender);
-
-            this.hierarchy.Root.Level = Level.All;
-            this.hierarchy.Configured = true;
-
-            this.log = log4net.LogManager.GetLogger(repositoryName, userID);
-            this.Name = userID;
+            this.FileName = fileName;
         }
 
         public override string ToString()
@@ -222,220 +92,130 @@ namespace JSSoft.Crema.Services
 
         public void Debug(object message)
         {
-            if (CremaLog.Dispatcher != null)
-            {
-                CremaLog.Dispatcher.InvokeAsync(() => this.log.Debug(message));
-            }
-            else
-            {
-                this.log.Debug(message);
-            }
+            this.log.Debug(message);
         }
 
         public void Info(object message)
         {
-            if (CremaLog.Dispatcher != null)
-            {
-                CremaLog.Dispatcher.InvokeAsync(() => this.log.Info(message));
-            }
-            else
-            {
-                this.log.Info(message);
-            }
+            this.log.Info(message);
         }
 
         public void Error(object message)
         {
-            if (CremaLog.Dispatcher != null)
+            if (message is Exception e)
             {
-                CremaLog.Dispatcher?.InvokeAsync(() =>
-                {
-                    if (message is Exception e)
-                    {
-                        this.log.Error(e.Message, e);
-                    }
-                    else
-                    {
-                        this.log.Error(message);
-                    }
-                });
+                this.log.Error(e, e.Message);
             }
             else
             {
-                if (message is Exception e)
-                {
-                    this.log.Error(e.Message, e);
-                }
-                else
-                {
-                    this.log.Error(message);
-                }
+                this.log.Error(message);
             }
         }
 
         public void Warn(object message)
         {
-            if (CremaLog.Dispatcher != null)
-            {
-                CremaLog.Dispatcher.InvokeAsync(() => this.log.Warn(message));
-            }
-            else
-            {
-                this.log.Warn(message);
-            }
+            this.log.Warn(message);
         }
 
         public void Fatal(object message)
         {
-            if (CremaLog.Dispatcher != null)
-            {
-                CremaLog.Dispatcher.InvokeAsync(() => this.log.Fatal(message));
-            }
-            else
-            {
-                this.log.Fatal(message);
-            }
+            this.log.Fatal(message);
         }
 
-        public void Dispose()
+        public void AddRedirection(TextWriter writer, LogLevel verbose)
         {
-            this.consoleAppender = null;
-            this.appendersByWriter.Clear();
-            this.hierarchy?.Shutdown();
-            this.hierarchy = null;
-        }
+            if (this.targetByTextWriter.ContainsKey(writer) == true)
+                throw new InvalidOperationException();
 
-        public void AddRedirection(TextWriter writer, LogVerbose verbose)
-        {
-            var patternLayout = new PatternLayout()
+            var name = $"{this.Name}_{writer.GetHashCode()}";
+            var target = new TextWriterTarget(writer)
             {
-                ConversionPattern = conversionPattern
+                Name = name,
+                Layout = new SimpleLayout("${message}")
             };
-            patternLayout.ActivateOptions();
-
-            var textAppender = new TextWriterAppender()
+            var rule = new LoggingRule(this.Name, GetLevel(verbose), NLog.LogLevel.Fatal, target)
             {
-                Layout = patternLayout,
-                Writer = writer,
+                RuleName = name
             };
-            textAppender.SetVerbose(verbose);
-            textAppender.ActivateOptions();
-            this.hierarchy.Root.AddAppender(textAppender);
-            this.appendersByWriter.Add(writer, textAppender);
+            configuration.LoggingRules.Add(rule);
+            this.targetByTextWriter.Add(writer, target);
+            this.Refresh();
         }
 
         public void RemoveRedirection(TextWriter writer)
         {
-            if (this.appendersByWriter.ContainsKey(writer) == false)
-                throw new ArgumentException("not found writer", nameof(writer));
-            var textAppender = this.appendersByWriter[writer];
-            this.hierarchy.Root.RemoveAppender(textAppender);
-            this.appendersByWriter.Remove(writer);
+            if (this.targetByTextWriter.ContainsKey(writer) == false)
+                throw new InvalidOperationException();
+
+            var target = this.targetByTextWriter[writer];
+            var name = $"{this.Name}_{writer.GetHashCode()}";
+            configuration.RemoveTarget(name);
+            configuration.RemoveRuleByName(name);
+            this.targetByTextWriter.Remove(writer);
+            this.Refresh();
         }
 
-        public LogVerbose Verbose
+        public void Dispose()
         {
-            get => this.verbose;
+            this.log = null;
+        }
+
+        public LogLevel LogLevel
+        {
+            get => this.logLevel;
             set
             {
-                if (this.verbose == value)
+                if (this.logLevel == value)
                     return;
-                this.verbose = value;
-                this.consoleAppender.SetVerbose(this.verbose);
-                this.consoleAppender.ActivateOptions();
+                this.logLevel = value;
+                this.consoleRule.SetLoggingLevels(GetLevel(value), NLog.LogLevel.Fatal);
+                this.Refresh();
             }
         }
-
-        //public TextWriter RedirectionWriter
-        //{
-        //    get { return this.redirectionWriter; }
-        //    set
-        //    {
-        //        if (this.redirectionWriter == value)
-        //            return;
-
-        //        var oldWriter = this.redirectionWriter;
-
-        //        this.redirectionWriter = value;
-
-        //        if (this.redirectionWriter != null)
-        //        {
-        //            var patternLayout = new PatternLayout()
-        //            {
-        //                ConversionPattern = conversionPattern
-        //            };
-        //            patternLayout.ActivateOptions();
-
-        //            this.textAppender = new TextWriterAppender()
-        //            {
-        //                Layout = patternLayout,
-        //                Writer = this.redirectionWriter,
-        //            };
-        //            this.textAppender.ActivateOptions();
-        //            this.hierarchy.Root.AddAppender(this.textAppender);
-        //        }
-        //        else
-        //        {
-        //            if (this.textAppender != null)
-        //            {
-        //                this.hierarchy.Root.RemoveAppender(this.textAppender);
-        //            }
-        //        }
-        //    }
-        //}
 
         public string Name { get; set; }
 
-        public string FileName
+        public string FileName { get; }
+
+        private static NLog.LogLevel GetLevel(LogLevel verbose)
         {
-            get
+            if (verbose == LogLevel.Debug)
+                return NLog.LogLevel.Debug;
+            else if (verbose == LogLevel.Info)
+                return NLog.LogLevel.Info;
+            else if (verbose == LogLevel.Error)
+                return NLog.LogLevel.Error;
+            else if (verbose == LogLevel.Warn)
+                return NLog.LogLevel.Warn;
+            else if (verbose == LogLevel.Fatal)
+                return NLog.LogLevel.Fatal;
+            return NLog.LogLevel.Off;
+        }
+
+        private void Refresh()
+        {
+            NLog.LogManager.Configuration = configuration.Reload();
+        }
+
+        #region TextWriterTarget
+
+        sealed class TextWriterTarget : TargetWithLayout
+        {
+            private readonly TextWriter textWriter;
+
+            public TextWriterTarget(TextWriter textWriter)
             {
-                if (this.rollingAppender == null)
-                    return string.Empty;
-                return this.rollingAppender.File;
+                this.textWriter = textWriter ?? throw new ArgumentNullException(nameof(textWriter));
+                this.OptimizeBufferReuse = true;
+            }
+
+            protected override void Write(LogEventInfo logEvent)
+            {
+                var logMessage = this.RenderLogEvent(Layout, logEvent);
+                this.textWriter.WriteLine(logMessage);
             }
         }
 
-        private void InitializeVerbose()
-        {
-
-        }
-    }
-
-    static class LogServiceExtensions
-    {
-        public static void SetVerbose(this AppenderSkeleton appender, LogVerbose verbose)
-        {
-            appender.ClearFilters();
-            foreach (var item in Enum.GetValues(typeof(LogVerbose)))
-            {
-                var member = (LogVerbose)item;
-                var level = GetLevel(member);
-                if (level == null || verbose.HasFlag(member) == false)
-                    continue;
-
-                appender.AddFilter(new log4net.Filter.LevelMatchFilter()
-                {
-                    AcceptOnMatch = true,
-                    LevelToMatch = level,
-                });
-            }
-            appender.AddFilter(new log4net.Filter.DenyAllFilter());
-        }
-
-        private static Level GetLevel(LogVerbose verbose)
-        {
-            if (verbose == LogVerbose.Debug)
-                return Level.Debug;
-            else if (verbose == LogVerbose.Info)
-                return Level.Info;
-            else if (verbose == LogVerbose.Error)
-                return Level.Error;
-            else if (verbose == LogVerbose.Warn)
-                return Level.Warn;
-            else if (verbose == LogVerbose.Fatal)
-                return Level.Fatal;
-            return null;
-        }
+        #endregion
     }
 }

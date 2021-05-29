@@ -68,7 +68,7 @@ namespace JSSoft.Crema.Commands.Consoles
                 }
                 else if (memberDescriptor.DescriptorName == "verbose")
                 {
-                    return Enum.GetNames(typeof(LogVerbose));
+                    return Enum.GetNames(typeof(LogLevel));
                 }
             }
             return base.GetCompletions(methodDescriptor, memberDescriptor, find);
@@ -84,7 +84,7 @@ namespace JSSoft.Crema.Commands.Consoles
             }
             else
             {
-                if (Enum.TryParse(verbose, true, out LogVerbose value) == true)
+                if (Enum.TryParse(verbose, true, out LogLevel value) == true)
                 {
                     logService.Verbose = value;
                 }

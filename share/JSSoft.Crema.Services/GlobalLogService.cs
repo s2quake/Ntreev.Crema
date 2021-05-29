@@ -52,7 +52,7 @@ namespace JSSoft.Crema.Services.Log
             CremaLog.Warn(message);
         }
 
-        public void AddRedirection(TextWriter writer, LogVerbose verbose)
+        public void AddRedirection(TextWriter writer, LogLevel verbose)
         {
             CremaLog.AddRedirection(writer, verbose);
         }
@@ -62,10 +62,10 @@ namespace JSSoft.Crema.Services.Log
             CremaLog.RemoveRedirection(writer);
         }
 
-        public LogVerbose Verbose
+        public LogLevel Verbose
         {
-            get => CremaLog.LogService.Verbose;
-            set => CremaLog.LogService.Verbose = value;
+            get => CremaLog.LogService.LogLevel;
+            set => CremaLog.LogService.LogLevel = value;
         }
 
         //public TextWriter RedirectionWriter

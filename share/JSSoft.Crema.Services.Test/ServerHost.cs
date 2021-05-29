@@ -29,32 +29,32 @@ namespace JSSoft.Crema.Services.Test
 
         public void Start()
         {
-            //this.errorList.Clear();
-            //this.manualEvent.Reset();
-            //this.process.StartInfo.FileName = this.ExecutablePath;
-            //this.process.StartInfo.Arguments = $"run \"{this.RepositoryPath}\" --port {this.Port} --startup-message {this.id}";
-            //this.process.StartInfo.WorkingDirectory = this.WorkingPath;
-            //this.process.StartInfo.RedirectStandardInput = true;
-            //this.process.StartInfo.UseShellExecute = false;
-            //this.process.StartInfo.RedirectStandardOutput = true;
-            //this.process.StartInfo.RedirectStandardError = true;
-            //this.process.StartInfo.CreateNoWindow = true;
-            //this.process.EnableRaisingEvents = true;
-            //this.process.Start();
-            //this.process.BeginOutputReadLine();
-            //this.process.BeginErrorReadLine();
-            //this.manualEvent.WaitOne();
-            //if (this.process.HasExited == true)
-            //{
-            //    throw new Exception(this.errorList.ToString());
-            //}
+            this.errorList.Clear();
+            this.manualEvent.Reset();
+            this.process.StartInfo.FileName = this.ExecutablePath;
+            this.process.StartInfo.Arguments = $"run \"{this.RepositoryPath}\" --port {this.Port} --startup-message {this.id}";
+            this.process.StartInfo.WorkingDirectory = this.WorkingPath;
+            this.process.StartInfo.RedirectStandardInput = true;
+            this.process.StartInfo.UseShellExecute = false;
+            this.process.StartInfo.RedirectStandardOutput = true;
+            this.process.StartInfo.RedirectStandardError = true;
+            this.process.StartInfo.CreateNoWindow = true;
+            this.process.EnableRaisingEvents = true;
+            this.process.Start();
+            this.process.BeginOutputReadLine();
+            this.process.BeginErrorReadLine();
+            this.manualEvent.WaitOne();
+            if (this.process.HasExited == true)
+            {
+                throw new Exception(this.errorList.ToString());
+            }
         }
 
         public void Stop()
         {
-            //this.process.StandardInput.Flush();
-            //this.process.StandardInput.WriteLine("exit");
-            //this.process.WaitForExit();
+            this.process.StandardInput.Flush();
+            this.process.StandardInput.WriteLine("exit");
+            this.process.WaitForExit();
         }
 
         private void Process_Exited(object sender, EventArgs e)
@@ -75,6 +75,5 @@ namespace JSSoft.Crema.Services.Test
             this.errorList.AppendLine(e.Data);
         }
     }
-
 }
 #endif

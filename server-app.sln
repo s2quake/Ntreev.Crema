@@ -100,8 +100,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{922B62F6-AB6
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.WindowsServiceHost", "server\JSSoft.Crema.WindowsServiceHost\JSSoft.Crema.WindowsServiceHost.csproj", "{173044A3-0D09-4251-BFA6-B9B563AB504B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ServerService.Test", "server\JSSoft.Crema.ServerService.Test\JSSoft.Crema.ServerService.Test.csproj", "{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}"
-EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		share\JSSoft.Crema.Commands.Spreadsheet\JSSoft.Crema.Commands.Spreadsheet.projitems*{05971a74-2d68-4781-9ceb-df2b48f8ba75}*SharedItemsImports = 13
@@ -111,6 +109,7 @@ Global
 		share\JSSoft.Crema.Bot\JSSoft.Crema.Bot.projitems*{35ad4803-bec1-4f3e-98ab-5c7961f2c261}*SharedItemsImports = 13
 		share\JSSoft.Crema.ServiceHosts.Data\JSSoft.Crema.ServiceHosts.Data.projitems*{377a848e-b9b8-48b1-8d03-db4d19aee894}*SharedItemsImports = 5
 		share\JSSoft.Crema.ServiceHosts.Domains\JSSoft.Crema.ServiceHosts.Domains.projitems*{377a848e-b9b8-48b1-8d03-db4d19aee894}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts.Exceptions\JSSoft.Crema.ServiceHosts.Exceptions.projitems*{377a848e-b9b8-48b1-8d03-db4d19aee894}*SharedItemsImports = 5
 		share\JSSoft.Crema.ServiceHosts.Users\JSSoft.Crema.ServiceHosts.Users.projitems*{377a848e-b9b8-48b1-8d03-db4d19aee894}*SharedItemsImports = 5
 		share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.projitems*{377a848e-b9b8-48b1-8d03-db4d19aee894}*SharedItemsImports = 5
 		share\JSSoft.Crema.Commands\JSSoft.Crema.Commands.projitems*{3d3128aa-908d-44c4-9efd-0e1a903f5287}*SharedItemsImports = 13
@@ -243,10 +242,6 @@ Global
 		{24C72B7A-46B8-4509-85AC-522643AED406}.Release|Any CPU.Build.0 = Release|Any CPU
 		{173044A3-0D09-4251-BFA6-B9B563AB504B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{173044A3-0D09-4251-BFA6-B9B563AB504B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -291,7 +286,6 @@ Global
 		{24ECBEE1-2859-4F09-969B-F382E6341814} = {4BB77DD8-CE06-403A-BB8C-E652E9284511}
 		{1F4A20AE-F955-4231-8636-27B7A38EB4B3} = {4BB77DD8-CE06-403A-BB8C-E652E9284511}
 		{173044A3-0D09-4251-BFA6-B9B563AB504B} = {8D8DC23A-F758-402E-ABA2-5C7C7268B378}
-		{6DFD74A2-08D6-44DA-AF00-8ECDAD35DCA0} = {8D8DC23A-F758-402E-ABA2-5C7C7268B378}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D0597CA1-B5A4-4E76-92FA-066003A1D135}

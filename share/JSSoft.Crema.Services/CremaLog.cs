@@ -27,22 +27,9 @@ using System.Linq;
 
 namespace JSSoft.Crema.Services
 {
-    /// <summary>
-    /// 로그를 기록할 수 있는 도구입니다. 
-    /// 이 정적 클래스는 전역으로 기록되는 로그이므로
-    /// 저장소별로 로그를 기록하기 위해서는 ICremaHost 에서 ILogService 형태의 서비스를 취득하여 사용하시기 바랍니다.
-    /// 전역 로그 파일은 AppData\Roaming\NtreevSoft\cremaservice
-    /// 서비스 실행시 전역 로그 파일은 C:\Windows\System32\config\systemprofile\AppData\Roaming\NtreevSoft\cremaservice
-    /// </summary>
     public static class CremaLog
     {
         private static LogService log;
-        private static readonly List<CremaHost> references = new();
-
-        static CremaLog()
-        {
-            AppDomain.CurrentDomain.ProcessExit += (s, e) => Release();
-        }
 
         public static void Debug(object message)
         {
@@ -99,7 +86,7 @@ namespace JSSoft.Crema.Services
             LogService.Fatal(string.Format(format, args));
         }
 
-        public static void AddRedirection(TextWriter writer, LogVerbose verbose)
+        public static void AddRedirection(TextWriter writer, LogLevel verbose)
         {
             LogService.AddRedirection(writer, verbose);
         }
@@ -109,22 +96,10 @@ namespace JSSoft.Crema.Services
             LogService.RemoveRedirection(writer);
         }
 
-        //public static TextWriter RedirectionWriter
-        //{
-        //    get => LogService.RedirectionWriter;
-        //    set => LogService.RedirectionWriter = value;
-        //}
-
-        public static LogVerbose Verbose
+        public static LogLevel Verbose
         {
-            get => LogService.Verbose;
-            set => LogService.Verbose = value;
-        }
-
-        private static void Release()
-        {
-            log?.Dispose();
-            log4net.LogManager.Shutdown();
+            get => LogService.LogLevel;
+            set => LogService.LogLevel = value;
         }
 
         internal static LogService LogService
@@ -136,32 +111,5 @@ namespace JSSoft.Crema.Services
                 return log;
             }
         }
-
-        internal static void Attach(CremaHost cremaHost)
-        {
-            lock (references)
-            {
-                if (references.Any() == false)
-                {
-                    //Dispatcher = new CremaDispatcher(typeof(CremaLog));
-                }
-                references.Add(cremaHost);
-            }
-        }
-
-        internal static void Detach(CremaHost cremaHost)
-        {
-            lock (references)
-            {
-                references.Remove(cremaHost);
-                if (references.Any() == false)
-                {
-                    //Dispatcher.Dispose();
-                    //Dispatcher = null;
-                }
-            }
-        }
-
-        internal static CremaDispatcher Dispatcher { get; private set; }
     }
 }

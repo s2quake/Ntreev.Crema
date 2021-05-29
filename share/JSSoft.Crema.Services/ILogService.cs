@@ -35,11 +35,11 @@ namespace JSSoft.Crema.Services
 
         void Fatal(object message);
 
-        void AddRedirection(TextWriter writer, LogVerbose verbose);
+        void AddRedirection(TextWriter writer, LogLevel verbose);
 
         void RemoveRedirection(TextWriter writer);
 
-        LogVerbose Verbose { get; set; }
+        LogLevel Verbose { get; set; }
 
         string Name { get; }
 

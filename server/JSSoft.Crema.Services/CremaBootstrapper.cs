@@ -113,7 +113,7 @@ namespace JSSoft.Crema.Services
             var repositoryProvider = GetRepositoryProvider(serviceProvider, repositoryModule);
             var serializer = GetSerializer(serviceProvider, fileType);
             var validationPath = Path.Combine(basePath, "validation");
-            var logService = new LogServiceHost("validation", validationPath, true) { Verbose = LogVerbose.Info, };
+            var logService = new LogServiceHost("validation", validationPath, true) { Verbose = LogLevel.Info, };
 
             var repositoryPath = CremaHost.GetPath(basePath, CremaPath.RepositoryDataBases);
             var items = repositoryProvider.GetRepositories(repositoryPath);
@@ -155,7 +155,7 @@ namespace JSSoft.Crema.Services
             var repositoryProvider = GetRepositoryProvider(serviceProvider, repositoryModule);
             var serializer = GetSerializer(serviceProvider, fileType);
             var upgradePath = Path.Combine(basePath, "upgrade");
-            var logService = new LogServiceHost("upgrade", upgradePath, true) { Verbose = LogVerbose.Info, };
+            var logService = new LogServiceHost("upgrade", upgradePath, true) { Verbose = LogLevel.Info, };
 
             var repositoryPath = CremaHost.GetPath(basePath, CremaPath.RepositoryDataBases);
             var items = repositoryProvider.GetRepositories(repositoryPath);
@@ -324,7 +324,7 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        public LogVerbose Verbose
+        public LogLevel Verbose
         {
             get => this.settings.Verbose;
             set => this.settings.Verbose = value;

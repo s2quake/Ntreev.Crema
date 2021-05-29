@@ -23,8 +23,7 @@ using System;
 
 namespace JSSoft.Crema.Services
 {
-    [Flags]
-    public enum LogVerbose
+    public enum LogLevel
     {
         None,
 
@@ -32,10 +31,10 @@ namespace JSSoft.Crema.Services
 
         Info = 2,
 
+        Warn = 3,
+
         Error = 4,
 
-        Warn = 8,
-
-        Fatal = 16,
+        Fatal = 5,
     }
 }

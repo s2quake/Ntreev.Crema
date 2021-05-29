@@ -120,7 +120,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
         protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             this.application.Culture = this.Culture;
-            this.application.Verbose = LogVerbose.None;
+            this.application.Verbose = LogLevel.None;
             this.application.Address = this.Address;
             // this.CommandContext.SetAddress(this.Address);
             // this.CommandContext.SetAddress(this.Address);

@@ -65,7 +65,6 @@ namespace JSSoft.Crema.Services
             [ImportMany] IEnumerable<IConfigurationPropertyProvider> propertiesProviders,
             CremaSettings settings)
         {
-            CremaLog.Attach(this);
             this.container = container;
             this.componentProvider = componentProvider;
             this.propertiesProviders = propertiesProviders.ToArray();
@@ -144,11 +143,15 @@ namespace JSSoft.Crema.Services
                     this.ServiceState = ServiceState.Opening;
                     this.OnOpening(EventArgs.Empty);
                 });
+                this.log = new LogService(address.Replace(':', '_'), AppUtility.UserAppDataPath)
+                {
+                    LogLevel = this.settings.Verbose
+                };
                 this.Address = address;
-                this.clientContext.Closed += ClientContext_Closed;
                 this.clientContext.Host = AddressUtility.GetIPAddress(address);
                 this.clientContext.Port = AddressUtility.GetPort(address);
                 this.serviceToken = await this.clientContext.OpenAsync();
+                this.clientContext.Closed += ClientContext_Closed;
                 this.ServiceInfo = await this.Service.GetServiceInfoAsync();
                 await this.Service.SubscribeAsync($"{version}", $"{platform}", $"{culture}");
                 await this.Dispatcher.InvokeAsync(() =>
@@ -209,6 +212,8 @@ namespace JSSoft.Crema.Services
                     this.OnClosed(new ClosedEventArgs(CloseReason.None));
                     CremaLog.Debug("Crema closed.");
                 });
+                this.log.Dispose();
+                this.log = null;
             }
             catch (Exception e)
             {
@@ -233,13 +238,6 @@ namespace JSSoft.Crema.Services
                     this.Debug($"{this.GetType().Name}.{nameof(LoginAsync)} : {userID}");
                 });
                 var authenticationToken = await this.Service.LoginAsync(userID, UserContext.Encrypt(userID, password));
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.log = new LogService(this.Address.Replace(':', '_'), userID, AppUtility.UserAppDataPath)
-                    {
-                        Verbose = this.settings.Verbose
-                    };
-                });
                 await this.UserContext.InitializeAsync(userID, authenticationToken);
                 await this.DataBaseContext.InitializeAsync(authenticationToken);
                 await this.DomainContext.InitializeAsync(authenticationToken);
@@ -255,8 +253,6 @@ namespace JSSoft.Crema.Services
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.AuthenticationToken = Guid.Empty;
-                    this.log?.Dispose();
-                    this.log = null;
                     this.configs = null;
                 });
                 CremaLog.Error(e);
@@ -287,8 +283,6 @@ namespace JSSoft.Crema.Services
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.AuthenticationToken = Guid.Empty;
-                    this.log?.Dispose();
-                    this.log = null;
                     this.configs = null;
                 });
                 CremaLog.Error(e);
@@ -445,7 +439,6 @@ namespace JSSoft.Crema.Services
             this.shutdownTimer.Dispose();
             this.OnDisposed(EventArgs.Empty);
             CremaLog.Debug("Crema disposed.");
-            CremaLog.Detach(this);
         }
 
         public void Sign(Authentication authentication, ResultBase result)
@@ -539,8 +532,6 @@ namespace JSSoft.Crema.Services
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.AuthenticationToken = Guid.Empty;
-                this.log?.Dispose();
-                this.log = null;
                 this.configs.Commit();
                 this.configs = null;
             });
@@ -653,13 +644,13 @@ namespace JSSoft.Crema.Services
 
         #region ILogService
 
-        LogVerbose ILogService.Verbose
+        LogLevel ILogService.Verbose
         {
-            get => this.Log.Verbose;
-            set => this.Log.Verbose = value;
+            get => this.Log.LogLevel;
+            set => this.Log.LogLevel = value;
         }
 
-        void ILogService.AddRedirection(TextWriter writer, LogVerbose verbose)
+        void ILogService.AddRedirection(TextWriter writer, LogLevel verbose)
         {
             this.log.AddRedirection(writer, verbose);
         }

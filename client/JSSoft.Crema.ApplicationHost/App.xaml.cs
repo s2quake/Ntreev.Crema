@@ -38,7 +38,7 @@ namespace JSSoft.Crema.ApplicationHost
     {
         static App()
         {
-            CremaLog.AddRedirection(Writer, LogVerbose.Debug);
+            CremaLog.AddRedirection(Writer, LogLevel.Debug);
         }
 
         public App()

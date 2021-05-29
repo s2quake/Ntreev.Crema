@@ -40,7 +40,7 @@ namespace JSSoft.Crema.Services
 
         public string FileType => FileUtility.ReadAllText(this.BasePath, CremaString.Repository, CremaString.File);
 
-        public LogVerbose Verbose { get; set; }
+        public LogLevel Verbose { get; set; }
 
         public bool NoCache { get; set; }
 

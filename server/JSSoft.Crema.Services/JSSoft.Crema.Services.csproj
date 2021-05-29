@@ -25,7 +25,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <DefineConstants>SERVER</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="log4net" Version="2.0.12" />
+    <PackageReference Include="NLog" Version="4.7.10" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
   </ItemGroup>
