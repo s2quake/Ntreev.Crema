@@ -48,8 +48,7 @@
             "args": [
                 "run",
                 "../repository",
-                "--prompt",
-                "--verbose"
+                "--prompt"
             ],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",

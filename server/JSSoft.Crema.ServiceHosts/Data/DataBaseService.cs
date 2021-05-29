@@ -61,6 +61,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         {
             var result = new ResultBase<DataBaseMetaData>();
             this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
+            this.authentication.Expired += Authentication_Expired;
             this.OwnerID = this.authentication.ID;
             await this.DataBasesContext.Dispatcher.InvokeAsync(() =>
             {
@@ -77,13 +78,16 @@ namespace JSSoft.Crema.ServiceHosts.Data
         public async Task<ResultBase> UnsubscribeAsync()
         {
             var result = new ResultBase();
-            await this.DetachEventHandlersAsync();
-            if (this.dataBase != null)
+            if (this.dataBase != null && this.authentication != null)
             {
-                result.TaskID = await (Task<Guid>)this.dataBase?.LeaveAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)this.dataBase.LeaveAsync(this.authentication);
+                this.dataBase = null;
             }
-            this.dataBase = null;
-            this.authentication = null;
+            if (this.authentication != null)
+            {
+                await this.DetachEventHandlersAsync();
+                this.authentication = null;
+            }
             result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(UnsubscribeAsync)} : {this.dataBaseName}");
             return result;
@@ -585,12 +589,21 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         public IDataBaseContext DataBasesContext { get; }
 
+        private async void Authentication_Expired(object sender, EventArgs e)
+        {
+            if (this.authentication != null)
+            {
+                await this.DetachEventHandlersAsync();
+                this.authentication = null;
+            }
+        }
+
         private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
             var actionUserID = e.UserID;
-            var contains = e.Items.Any(item => item.ID == this.authentication.ID);
+            var contains = e.Items.Any(item => item.ID == this.OwnerID);
             var closeInfo = (CloseInfo)e.MetaData;
-            if (actionUserID != this.authentication.ID && contains == true)
+            if (actionUserID != this.OwnerID && contains == true)
             {
                 await this.DetachEventHandlersAsync();
                 this.authentication = null;

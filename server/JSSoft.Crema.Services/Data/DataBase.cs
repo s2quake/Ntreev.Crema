@@ -1325,7 +1325,6 @@ namespace JSSoft.Crema.Services.Data
                 {
                     if (this.IsLoaded == true && this.VerifyAccess(authentication) == true)
                     {
-                        this.CremaHost.Sign(authentication);
                         this.authentications.Remove(authentication);
                         this.AuthenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
                         authentication.Expired -= Authentication_Expired;
@@ -1338,6 +1337,7 @@ namespace JSSoft.Crema.Services.Data
                     await this.DomainContext.DetachUsersAsync(authentication, this.ID);
                     await this.Dispatcher.InvokeAsync(() =>
                     {
+                        using var temporary = authentication.AllowTemporary();
                         this.authenticationLeft?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
                         this.DataBaseContext.InvokeItemsAuthenticationLeftEvent(authentication, new IDataBase[] { this });
                     });

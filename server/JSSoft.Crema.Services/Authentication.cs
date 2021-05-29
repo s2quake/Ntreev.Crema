@@ -183,6 +183,11 @@ namespace JSSoft.Crema.Services
                 throw new InvalidOperationException(Resources.Exception_Commissioned);
         }
 
+        internal IDisposable AllowTemporary()
+        {
+            return new TemporaryAuthentication(this);
+        }
+
         internal AuthenticationType Types
         {
             get
@@ -200,6 +205,25 @@ namespace JSSoft.Crema.Services
         internal bool IsSystem => this.Types.HasFlag(AuthenticationType.System);
 
         internal readonly static Authentication System = new(new SystemAuthenticationProvider(), Guid.Parse("62E5A6E9-D4BE-438F-A188-D5842C0ED65E"));
+
+        #region wer
+
+        class TemporaryAuthentication : IDisposable
+        {
+            private readonly Authentication authentication;
+            public TemporaryAuthentication(Authentication authentication)
+            {
+                this.authentication = authentication;
+                this.authentication.isExpired = false;
+            }
+
+            public void Dispose()
+            {
+                this.authentication.isExpired = true;
+            }
+        }
+
+        #endregion
 
         #region IAuthentication
 

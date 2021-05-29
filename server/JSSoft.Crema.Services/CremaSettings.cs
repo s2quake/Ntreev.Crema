@@ -31,7 +31,6 @@ namespace JSSoft.Crema.Services
 
         public CremaSettings()
         {
-
         }
 
         public string BasePath { get; set; }
