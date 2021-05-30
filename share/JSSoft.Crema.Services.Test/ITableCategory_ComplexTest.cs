@@ -63,7 +63,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task CategoryLockRenameTestAsync()
         {
             var newName = RandomUtility.NextIdentifier();
-            var categoryPath = new CategoryName(category.Path).ParentPath + newName;
+            var parentPath = category.Parent.Path;
+            var categoryPath = new CategoryName(parentPath, newName);
             await category.LockAsync(authentication, string.Empty);
             await category.RenameAsync(authentication, newName);
 

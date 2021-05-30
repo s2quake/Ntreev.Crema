@@ -203,7 +203,7 @@ namespace JSSoft.Crema.Services.Users
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
                 throw new PermissionDeniedException();
             base.ValidateDelete();
-            if (EnumerableUtility.Descendants<IItem, IUser>(this as IItem, item => item.Childs).Any() == true)
+            if (this.Items.Any() == true || this.Categories.Any() == true)
                 throw new InvalidOperationException(Resources.Exception_CannotDeletePathWithItems);
         }
 
