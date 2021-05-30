@@ -48,6 +48,15 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (name is null)
+                    throw new ArgumentNullException(nameof(name));
+                if (parentPath is null)
+                    throw new ArgumentNullException(nameof(parentPath));
+
                 this.ValidateExpired();
                 var categoryName = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -311,12 +320,33 @@ namespace JSSoft.Crema.Services.Users
 
         bool IUserCategoryCollection.Contains(string categoryPath)
         {
+            this.Dispatcher.VerifyAccess();
             return this.Contains(categoryPath);
         }
 
         IUserCategory IUserCategoryCollection.Root => this.Root;
 
-        IUserCategory IUserCategoryCollection.this[string categoryPath] => this[categoryPath];
+        IUserCategory IUserCategoryCollection.this[string categoryPath]
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return this[categoryPath];
+            }
+        }
+
+        #endregion
+
+        #region IReadOnlyCollection<IUserCategory>
+
+        int IReadOnlyCollection<IUserCategory>.Count
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return this.Count;
+            }
+        }
 
         #endregion
 
@@ -324,12 +354,20 @@ namespace JSSoft.Crema.Services.Users
 
         IEnumerator<IUserCategory> IEnumerable<IUserCategory>.GetEnumerator()
         {
-            return this.GetEnumerator();
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in this)
+            {
+                yield return item;
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in this)
+            {
+                yield return item;
+            }
         }
 
         #endregion

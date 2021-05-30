@@ -176,7 +176,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task LogoutAsyncTestAsync_Fail2()
         {
             token = await cremaHost.OpenAsync();
@@ -189,7 +189,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task LogoutAsyncTestAsync_Fail3()
         {
             token = await cremaHost.OpenAsync();
@@ -414,7 +414,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task CancelShutdownAsyncTestAsync_Fail2()
         {
             token = await cremaHost.OpenAsync();

@@ -19,37 +19,19 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
+using JSSoft.Library.Random;
+using System;
+using System.Threading.Tasks;
 
-namespace JSSoft.Crema.Services
+namespace JSSoft.Crema.Services.Random
 {
-    public interface IUserItem : IServiceProvider, IDispatcherObject, IExtendedProperties
+    public static class UserCategoryCollectionExtensions
     {
-        Task RenameAsync(Authentication authentication, string newName);
-
-        Task MoveAsync(Authentication authentication, string parentPath);
-
-        Task DeleteAsync(Authentication authentication);
-
-        string Name { get; }
-
-        string Path { get; }
-
-        IUserItem Parent { get; }
-
-        [DispatcherProperty(typeof(IUserContext))]
-        IEnumerable<IUserItem> Childs { get; }
-
-        [DispatcherEvent(typeof(IUserContext))]
-        event EventHandler Renamed;
-
-        [DispatcherEvent(typeof(IUserContext))]
-        event EventHandler Moved;
-
-        [DispatcherEvent(typeof(IUserContext))]
-        event EventHandler Deleted;
+        public static Task<IUserCategory> GetRandomUserCategoryAsync(this IUserCategoryCollection userCategoryCollection)
+        {
+            return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.Random());
+        }
     }
 }

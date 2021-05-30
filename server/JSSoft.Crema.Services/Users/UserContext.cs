@@ -157,10 +157,24 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
+        public Task<Guid> NotifyMessageAsync(Authentication authentication, string message)
+        {
+            return this.NotifyMessageAsync(authentication, new string[] { }, message);
+        }
+
         public async Task<Guid> NotifyMessageAsync(Authentication authentication, string[] userIDs, string message)
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (userIDs is null)
+                    throw new ArgumentNullException(nameof(userIDs));
+                if (message is null)
+                    throw new ArgumentNullException(nameof(message));
+
                 this.ValidateExpired();
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -209,23 +223,6 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        // public async Task<bool> IsAuthenticatedAsync(string userID)
-        // {
-        //     this.ValidateExpired();
-        //     return await this.Dispatcher.InvokeAsync(() =>
-        //     {
-        //         if (this.Users.Contains(userID) == false)
-        //             return false;
-
-        //         var user = this.Users[userID];
-
-        //         if (user.IsOnline == false)
-        //             return false;
-
-        //         return user.Authentication != null;
-        //     });
-        // }
-
         public Task<bool> IsOnlineUserAsync(string userID, SecureString password)
         {
             return this.Dispatcher.InvokeAsync(() =>
@@ -244,9 +241,12 @@ namespace JSSoft.Crema.Services.Users
 
         public UserContextMetaData GetMetaData(Authentication authentication)
         {
-            this.Dispatcher.VerifyAccess();
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
+            if (authentication.IsExpired == true)
+                throw new AuthenticationExpiredException(nameof(authentication));
+
+            this.Dispatcher.VerifyAccess();
 
             var metaData = new UserContextMetaData();
             {
@@ -319,69 +319,12 @@ namespace JSSoft.Crema.Services.Users
                 ModificationInfo = designedInfo,
                 BanInfo = (BanSerializationInfo)BanInfo.Empty,
             };
-
-#if DEBUG
-            var users = new List<UserSerializationInfo>
-            {
-                administrator
-            };
-            for (var i = 0; i < 10; i++)
-            {
-                var admin = new UserSerializationInfo()
-                {
-                    ID = "admin" + i,
-                    Name = "관리자" + i,
-                    CategoryName = "Administrators",
-                    Authority = Authority.Admin,
-                    Password = "admin".Encrypt(),
-                    CreationInfo = designedInfo,
-                    ModificationInfo = designedInfo,
-                    BanInfo = (BanSerializationInfo)BanInfo.Empty,
-                };
-
-                var member = new UserSerializationInfo()
-                {
-                    ID = "member" + i,
-                    Name = "구성원" + i,
-                    CategoryName = "Members",
-                    Authority = Authority.Member,
-                    Password = "member".Encrypt(),
-                    CreationInfo = designedInfo,
-                    ModificationInfo = designedInfo,
-                    BanInfo = (BanSerializationInfo)BanInfo.Empty,
-                };
-
-                var guest = new UserSerializationInfo()
-                {
-                    ID = "guest" + i,
-                    Name = "손님" + i,
-                    CategoryName = "Guests",
-                    Authority = Authority.Guest,
-                    Password = "guest".Encrypt(),
-                    CreationInfo = designedInfo,
-                    ModificationInfo = designedInfo,
-                    BanInfo = (BanSerializationInfo)BanInfo.Empty,
-                };
-
-                users.Add(admin);
-                users.Add(member);
-                users.Add(guest);
-            }
-
-            var serializationInfo = new UserContextSerializationInfo()
-            {
-                Version = CremaSchema.VersionValue,
-                Categories = new string[] { "/Administrators/", "/Members/", "/Guests/" },
-                Users = users.ToArray(),
-            };
-#else
             var serializationInfo = new UserContextSerializationInfo()
             {
                 Version = CremaSchema.VersionValue,
                 Categories = new string[] { },
                 Users = new UserSerializationInfo[] { administrator},
             };
-#endif
             serializationInfo.WriteToDirectory(repositoryPath, serializer);
         }
 
@@ -665,6 +608,7 @@ namespace JSSoft.Crema.Services.Users
 
         bool IUserContext.Contains(string itemPath)
         {
+            this.Dispatcher.VerifyAccess();
             return this.Contains(itemPath);
         }
 
@@ -672,7 +616,14 @@ namespace JSSoft.Crema.Services.Users
 
         IUserCategoryCollection IUserContext.Categories => this.Categories;
 
-        IUserItem IUserContext.this[string itemPath] => this[itemPath] as IUserItem;
+        IUserItem IUserContext.this[string itemPath]
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return this[itemPath] as IUserItem;
+            }
+        }
 
         IUserCategory IUserContext.Root => this.Root;
 
@@ -682,6 +633,7 @@ namespace JSSoft.Crema.Services.Users
 
         IEnumerator<IUserItem> IEnumerable<IUserItem>.GetEnumerator()
         {
+            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IUserItem;
@@ -690,6 +642,7 @@ namespace JSSoft.Crema.Services.Users
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
+            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IUserItem;

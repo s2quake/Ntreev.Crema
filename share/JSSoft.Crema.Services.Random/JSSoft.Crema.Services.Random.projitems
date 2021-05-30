@@ -26,8 +26,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)TableColumnExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeMemberExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableTemplateExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TypeTemplateExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeContextExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeTemplateExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserCategoryCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserContextExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaTypeCreator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaDataSetTypesCreator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaDataSetTagsCreator.cs" />

@@ -266,6 +266,8 @@ namespace JSSoft.Crema.Services
             {
                 if (authentication is null)
                     throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
 
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -326,6 +328,8 @@ namespace JSSoft.Crema.Services
             {
                 if (authentication is null)
                     throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
                 if (shutdownContext is null)
                     throw new ArgumentNullException(nameof(shutdownContext));
 
@@ -359,6 +363,8 @@ namespace JSSoft.Crema.Services
             {
                 if (authentication is null)
                     throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
 
                 await this.Dispatcher.InvokeAsync(() =>
                 {

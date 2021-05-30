@@ -19,34 +19,46 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Crema.Data.Xml.Schema;
 using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Users.Serializations;
 using JSSoft.Library;
 using JSSoft.Library.Random;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Random
 {
-    public static class CremaHostExtensions
+    public static class UserContextExtensions
     {
-        public static Task<IDataBase> CreateRandomDataBaseAsync(this ICremaHost cremaHost, Authentication authentication)
+        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext)
         {
-            var dataBaseName = RandomUtility.NextIdentifier();
-            var comment = RandomUtility.NextString();
-            if (cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
+            if (userContext.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
             {
-                return dataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
+                return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random());
             }
             throw new NotImplementedException();
         }
 
-        public static Task<IDataBase> GetRandomDataBaseAsync(this ICremaHost cremaHost)
+        public static Task<IUserCategory> GetRandomUserCategoryAsync(this IUserContext userContext)
         {
-            if (cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
+            if (userContext.GetService(typeof(IUserCategoryCollection)) is IUserCategoryCollection userCategoryCollection)
             {
-                return dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.Random());
+                return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.Random());
             }
             throw new NotImplementedException();
         }
+
+        public static Task<IUserItem> GetRandomUserItemAsync(this IUserContext userContext)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.Random());
+        }
+
+        public static Task<IUserItem> GetRandomUserItemAsync(this IUserContext userContext, Func<IUserItem, bool> predicate)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.Random(predicate));
+        }
+
     }
 }

@@ -20,24 +20,35 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using JSSoft.Crema.ServiceModel;
 
 namespace JSSoft.Crema.Services
 {
+    [DispatcherMethod(typeof(IUserContext), DeclaringType = typeof(IEnumerable<IUserCategory>), MethodName = nameof(IEnumerable<IUserCategory>.GetEnumerator))]
+    [DispatcherMethod(typeof(IUserContext), DeclaringType = typeof(IEnumerable), MethodName = nameof(IEnumerable.GetEnumerator))]
+    [DispatcherProperty(typeof(IUserContext), DeclaringType = typeof(IReadOnlyCollection<IUserCategory>), PropertyName = nameof(IReadOnlyCollection<IUserCategory>.Count))]
     public interface IUserCategoryCollection : IReadOnlyCollection<IUserCategory>, IEnumerable<IUserCategory>, IServiceProvider, IDispatcherObject
     {
+        [DispatcherMethod(typeof(IUserContext))]
         bool Contains(string categoryPath);
 
         IUserCategory Root { get; }
 
+        [DispatcherProperty(typeof(IUserContext))]
         IUserCategory this[string categoryPath] { get; }
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsCreatedEventHandler<IUserCategory> CategoriesCreated;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsRenamedEventHandler<IUserCategory> CategoriesRenamed;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsMovedEventHandler<IUserCategory> CategoriesMoved;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsDeletedEventHandler<IUserCategory> CategoriesDeleted;
     }
 }

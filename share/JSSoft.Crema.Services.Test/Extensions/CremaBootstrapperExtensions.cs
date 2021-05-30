@@ -1,4 +1,5 @@
-﻿using JSSoft.Library;
+﻿using JSSoft.Crema.Data;
+using JSSoft.Library;
 using JSSoft.Library.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -26,7 +27,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
         {
 #if SERVER
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory + "_repo", name);
-            CremaBootstrapper.CreateRepository(app, repositoryPath, "git", "xml");
+            CremaBootstrapper.CreateRepositoryInternal(app, repositoryPath, "git", "xml", string.Empty, (p,s) => UserContextExtensions.GenerateUserInfos(p, s), () => new CremaDataSet());
             app.BasePath = repositoryPath;
             repositoryPathByApp.Add(app, repositoryPath);
 #endif
@@ -95,5 +96,6 @@ namespace JSSoft.Crema.Services.Test.Extensions
             }
         }
 #endif
+
     }
 }

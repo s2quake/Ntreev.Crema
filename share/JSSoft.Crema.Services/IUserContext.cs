@@ -21,17 +21,22 @@
 
 using JSSoft.Crema.ServiceModel;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services
 {
+    [DispatcherMethod(typeof(IUserContext), DeclaringType = typeof(IEnumerable<IUserItem>), MethodName = nameof(IEnumerable<IUserItem>.GetEnumerator))]
+    [DispatcherMethod(typeof(IUserContext), DeclaringType = typeof(IEnumerable), MethodName = nameof(IEnumerable.GetEnumerator))]
     public interface IUserContext : IEnumerable<IUserItem>, IServiceProvider, IDispatcherObject
     {
+        [DispatcherMethod(typeof(IUserContext))]
         UserContextMetaData GetMetaData(Authentication authentication);
 
         Task NotifyMessageAsync(Authentication authentication, string[] userIDs, string message);
 
+        [DispatcherMethod(typeof(IUserContext))]
         bool Contains(string itemPath);
 
         IUserCollection Users { get; }
@@ -40,26 +45,25 @@ namespace JSSoft.Crema.Services
 
         IUserCategory Root { get; }
 
+        [DispatcherProperty(typeof(IUserContext))]
         IUserItem this[string itemPath] { get; }
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsCreatedEventHandler<IUserItem> ItemsCreated;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsRenamedEventHandler<IUserItem> ItemsRenamed;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsMovedEventHandler<IUserItem> ItemsMoved;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsDeletedEventHandler<IUserItem> ItemsDeleted;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsEventHandler<IUserItem> ItemsChanged;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event TaskCompletedEventHandler TaskCompleted;
-    }
-
-    public static class IUserContextExtensions
-    {
-        public static Task NotifyMessageAsync(this IUserContext userContext, Authentication authentication, string message)
-        {
-            return userContext.NotifyMessageAsync(authentication, new string[] { }, message);
-        }
     }
 }

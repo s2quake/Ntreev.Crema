@@ -11,6 +11,10 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)CreationTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaHostTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserCollectionTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserCategoryCollectionTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserContextTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserItemTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaHost_AssemblyInitializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\CremaBootstrapperExtensions.cs" />
@@ -21,6 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeCategoryExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeContextExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\UserContextExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableCategory_ComplexTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServerHost.cs" />
   </ItemGroup>

@@ -42,15 +42,96 @@ namespace JSSoft.Crema.Services.Users
 
         }
 
+        public async Task<Guid> LoginAsync(SecureString password)
+        {
+            try
+            {
+                if (password is null)
+                    throw new ArgumentNullException(nameof(password));
+
+                this.ValidateExpired();
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(Authentication.System, this, nameof(LoginAsync), this);
+                    this.ValidateLogin(password);
+                    var users = new User[] { this };
+                    var authentication = new Authentication(new UserAuthenticationProvider(this), Guid.NewGuid());
+                    var taskID = GuidUtility.FromName(this.ID);
+                    if (this.Authentication != null)
+                    {
+                        throw new CremaException("b722d687-0a8d-4999-ad54-cf38c0c25d6f");
+                    }
+                    this.Authentication = authentication;
+                    this.IsOnline = true;
+                    this.CremaHost.Sign(authentication);
+                    this.Container.InvokeUsersStateChangedEvent(this.Authentication, users);
+                    this.Container.InvokeUsersLoggedInEvent(this.Authentication, users);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                    return this.Authentication.Token;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task<Guid> LogoutAsync(Authentication authentication)
+        {
+            try
+            {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
+                this.ValidateExpired();
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(LogoutAsync), this);
+                    this.ValidateLogout(authentication);
+                    var users = new User[] { this };
+                    var taskID = Guid.NewGuid();
+                    this.CremaHost.Sign(authentication);
+                    this.Authentication.InvokeExpiredEvent(authentication.ID, string.Empty);
+                    this.Authentication = null;
+                    this.IsOnline = false;
+                    this.Container.InvokeUsersStateChangedEvent(authentication, users);
+                    this.Container.InvokeUsersLoggedOutEvent(authentication, users, CloseInfo.Empty);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                    return taskID;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
         public Task RenameAsync(Authentication authentication, string newName)
         {
-            throw new NotSupportedException();
+            if (authentication is null)
+                throw new ArgumentNullException(nameof(authentication));
+            if (authentication.IsExpired == true)
+                throw new AuthenticationExpiredException(nameof(authentication));
+            if (newName is null)
+                throw new ArgumentNullException(nameof(newName));
+            throw new NotImplementedException();
         }
 
         public async Task<Guid> MoveAsync(Authentication authentication, string categoryPath)
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (categoryPath is null)
+                    throw new ArgumentNullException(nameof(categoryPath));
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -87,6 +168,11 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
                 this.ValidateExpired();
                 var container = this.Container;
                 var repository = this.Repository;
@@ -122,30 +208,41 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        public async Task<Guid> LoginAsync(SecureString password)
+        public async Task<Guid> ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (password is null)
+                    throw new ArgumentNullException(nameof(password));
+
                 this.ValidateExpired();
-                return await this.Dispatcher.InvokeAsync(() =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(Authentication.System, this, nameof(LoginAsync), this);
-                    this.ValidateLogin(password);
-                    var users = new User[] { this };
-                    var authentication = new Authentication(new UserAuthenticationProvider(this), Guid.NewGuid());
-                    var taskID = GuidUtility.FromName(this.ID);
-                    if (this.Authentication != null)
-                    {
-                        throw new CremaException("b722d687-0a8d-4999-ad54-cf38c0c25d6f");
-                    }
-                    this.Authentication = authentication;
-                    this.IsOnline = true;
+                    this.CremaHost.DebugMethod(authentication, this, nameof(ChangeUserInfoAsync), this, userName, authority);
+                    this.ValidateUserInfoChange(authentication, password, newPassword, userName, authority);
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeUsersStateChangedEvent(this.Authentication, users);
-                    this.Container.InvokeUsersLoggedInEvent(this.Authentication, users);
-                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
-                    return this.Authentication.Token;
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var userInfo = base.UserInfo;
+                    return (items, userInfo);
                 });
+                var taskID = Guid.NewGuid();
+                var userSet = await this.ReadDataForChangeAsync(authentication);
+                using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeUserChangeAsync(authentication, tuple.userInfo, userContextSet, password, newPassword, userName, authority);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var userInfo = userContextSet.GetUserInfo(this.Path);
+                    this.CremaHost.Sign(authentication);
+                    this.Password = UserContext.StringToSecureString(userInfo.Password);
+                    base.UpdateUserInfo((UserInfo)userInfo);
+                    this.Container.InvokeUsersChangedEvent(authentication, tuple.items);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                });
+                return taskID;
             }
             catch (Exception e)
             {
@@ -154,23 +251,63 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        public async Task<Guid> LogoutAsync(Authentication authentication)
+        public async Task<Guid> SendMessageAsync(Authentication authentication, string message)
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (message is null)
+                    throw new ArgumentNullException(nameof(message));
+
                 this.ValidateExpired();
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(LogoutAsync), this);
-                    this.ValidateLogout(authentication);
-                    var users = new User[] { this };
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SendMessageAsync), this, message);
+                    this.ValidateSendMessage(authentication, message);
                     var taskID = Guid.NewGuid();
                     this.CremaHost.Sign(authentication);
-                    this.Authentication.InvokeExpiredEvent(authentication.ID, string.Empty);
-                    this.Authentication = null;
+                    this.Container.InvokeSendMessageEvent(authentication, this, message);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                    return taskID;
+                });
+
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task<Guid> KickAsync(Authentication authentication, string comment)
+        {
+            try
+            {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (comment is null)
+                    throw new ArgumentNullException(nameof(comment));
+
+                this.ValidateExpired();
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), this, comment);
+                    this.ValidateKick(authentication, comment);
+                    this.CremaHost.Sign(authentication);
+                    var taskID = Guid.NewGuid();
+                    var items = new User[] { this };
+                    var comments = Enumerable.Repeat(comment, items.Length).ToArray();
                     this.IsOnline = false;
-                    this.Container.InvokeUsersStateChangedEvent(authentication, users);
-                    this.Container.InvokeUsersLoggedOutEvent(authentication, users, CloseInfo.Empty);
+                    this.Authentication.InvokeExpiredEvent(authentication.ID, comment);
+                    this.Authentication = null;
+                    this.Container.InvokeUsersKickedEvent(authentication, items, comments);
+                    this.Container.InvokeUsersStateChangedEvent(authentication, items);
+                    this.Container.InvokeUsersLoggedOutEvent(authentication, items, new CloseInfo(CloseReason.Kicked, comment));
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                     return taskID;
                 });
@@ -186,6 +323,13 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (comment is null)
+                    throw new ArgumentNullException(nameof(comment));
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -229,6 +373,11 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -250,96 +399,6 @@ namespace JSSoft.Crema.Services.Users
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
-
-        public async Task<Guid> KickAsync(Authentication authentication, string comment)
-        {
-            try
-            {
-                this.ValidateExpired();
-                return await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), this, comment);
-                    this.ValidateKick(authentication, comment);
-                    this.CremaHost.Sign(authentication);
-                    var taskID = Guid.NewGuid();
-                    var items = new User[] { this };
-                    var comments = Enumerable.Repeat(comment, items.Length).ToArray();
-                    this.IsOnline = false;
-                    this.Authentication.InvokeExpiredEvent(authentication.ID, comment);
-                    this.Authentication = null;
-                    this.Container.InvokeUsersKickedEvent(authentication, items, comments);
-                    this.Container.InvokeUsersStateChangedEvent(authentication, items);
-                    this.Container.InvokeUsersLoggedOutEvent(authentication, items, new CloseInfo(CloseReason.Kicked, comment));
-                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
-                    return taskID;
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
-
-        public async Task<Guid> ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
-        {
-            try
-            {
-                this.ValidateExpired();
-                var tuple = await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(ChangeUserInfoAsync), this, userName, authority);
-                    this.ValidateUserInfoChange(authentication, password, newPassword, userName, authority);
-                    this.CremaHost.Sign(authentication);
-                    var items = EnumerableUtility.One(this).ToArray();
-                    var userInfo = base.UserInfo;
-                    return (items, userInfo);
-                });
-                var taskID = Guid.NewGuid();
-                var userSet = await this.ReadDataForChangeAsync(authentication);
-                using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
-                await this.Container.InvokeUserChangeAsync(authentication, tuple.userInfo, userContextSet, password, newPassword, userName, authority);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    var userInfo = userContextSet.GetUserInfo(this.Path);
-                    this.CremaHost.Sign(authentication);
-                    this.Password = UserContext.StringToSecureString(userInfo.Password);
-                    base.UpdateUserInfo((UserInfo)userInfo);
-                    this.Container.InvokeUsersChangedEvent(authentication, tuple.items);
-                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
-                });
-                return taskID;
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
-
-        public async Task<Guid> SendMessageAsync(Authentication authentication, string message)
-        {
-            try
-            {
-                this.ValidateExpired();
-                return await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(SendMessageAsync), this, message);
-                    this.ValidateSendMessage(authentication, message);
-                    var taskID = Guid.NewGuid();
-                    this.CremaHost.Sign(authentication);
-                    this.Container.InvokeSendMessageEvent(authentication, this, message);
-                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
-                    return taskID;
-                });
-
             }
             catch (Exception e)
             {
@@ -620,14 +679,14 @@ namespace JSSoft.Crema.Services.Users
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
                 throw new PermissionDeniedException();
 
-            if (this.IsOnline == true)
-                throw new InvalidOperationException(Resources.Exception_LoggedInUserCannotDelete);
+            if (base.UserInfo.ID == Authentication.AdminID)
+                throw new InvalidOperationException(Resources.Exception_AdminCannotDeleted);
 
             if (this.ID == authentication.ID)
                 throw new InvalidOperationException(Resources.Exception_CannotDeleteYourself);
 
-            if (base.UserInfo.ID == Authentication.AdminID)
-                throw new InvalidOperationException(Resources.Exception_AdminCannotDeleted);
+            if (this.IsOnline == true)
+                throw new InvalidOperationException(Resources.Exception_LoggedInUserCannotDelete);
 
             base.ValidateDelete();
         }
@@ -743,7 +802,14 @@ namespace JSSoft.Crema.Services.Users
 
         IUserItem IUserItem.Parent => this.Category;
 
-        IEnumerable<IUserItem> IUserItem.Childs => Enumerable.Empty<IUserItem>();
+        IEnumerable<IUserItem> IUserItem.Childs
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return Enumerable.Empty<IUserItem>();
+            }
+        }
 
         #endregion
 

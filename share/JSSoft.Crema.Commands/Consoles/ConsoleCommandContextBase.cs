@@ -220,7 +220,10 @@ namespace JSSoft.Crema.Commands.Consoles
             return this.commission;
         }
 
-        public bool IsOnline => this.authentication != null;
+        public Task SetPathAsync(string path)
+        {
+            return this.ChangeDirectoryAsync(this.authentication, path);
+        }
 
         public async Task SetDriveAsync(IConsoleDrive value)
         {
@@ -233,7 +236,6 @@ namespace JSSoft.Crema.Commands.Consoles
             try
             {
                 await this.ChangeDirectoryAsync(this.authentication, this.drivePaths[this.drive]);
-                // this.Path = this.drivePaths[this.drive];
             }
             catch
             {
@@ -242,35 +244,13 @@ namespace JSSoft.Crema.Commands.Consoles
             }
         }
 
-        public IConsoleDrive Drive
-        {
-            get => this.drive;
-            // set
-            // {
-            //     if (value == null)
-            //         throw new ArgumentNullException(nameof(value));
-            //     if (this.DriveItems.Contains(value) == false)
-            //         throw new ItemNotFoundException(value.Name);
-            //     this.drive = value;
+        public bool IsOnline => this.authentication != null;
 
-            //     try
-            //     {
-            //         this.Path = this.drivePaths[this.drive];
-            //     }
-            //     catch
-            //     {
-            //         this.Path = PathUtility.Separator;
-            //         throw;
-            //     }
-            // }
-        }
+        public IConsoleDrive Drive => this.drive;
 
         public IConsoleDrive[] DriveItems { get; }
 
-        public string Path
-        {
-            get => this.path;
-        }
+        public string Path => this.path;
 
         public string Prompt
         {
@@ -435,11 +415,6 @@ namespace JSSoft.Crema.Commands.Consoles
             await this.drive.SetPathAsync(authentication, path);
             this.path = path;
             this.drivePaths[this.drive] = path;
-        }
-
-        internal Task SetPathAsync(string path)
-        {
-            return this.ChangeDirectoryAsync(this.authentication, path);
         }
     }
 }

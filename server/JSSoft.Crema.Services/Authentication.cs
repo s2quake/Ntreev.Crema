@@ -204,6 +204,16 @@ namespace JSSoft.Crema.Services
 
         internal bool IsSystem => this.Types.HasFlag(AuthenticationType.System);
 
+        internal bool IsExpired
+        {
+            get
+            {
+                if (this.Parent != null && this.Parent.isExpired == true)
+                    return true;
+                return this.isExpired;
+            }
+        }
+
         internal readonly static Authentication System = new(new SystemAuthenticationProvider(), Guid.Parse("62E5A6E9-D4BE-438F-A188-D5842C0ED65E"));
 
         #region TemporaryAuthentication

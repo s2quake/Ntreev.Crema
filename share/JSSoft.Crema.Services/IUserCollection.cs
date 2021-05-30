@@ -20,36 +20,54 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using JSSoft.Crema.ServiceModel;
 
 namespace JSSoft.Crema.Services
 {
+    [DispatcherMethod(typeof(IUserContext), DeclaringType = typeof(IEnumerable<IUser>), MethodName = nameof(IEnumerable<IUser>.GetEnumerator))]
+    [DispatcherMethod(typeof(IUserContext), DeclaringType = typeof(IEnumerable), MethodName = nameof(IEnumerable.GetEnumerator))]
+    [DispatcherProperty(typeof(IUserContext), DeclaringType = typeof(IReadOnlyCollection<IUser>), PropertyName = nameof(IReadOnlyCollection<IUser>.Count))]
     public interface IUserCollection : IReadOnlyCollection<IUser>, IEnumerable<IUser>, IServiceProvider, IDispatcherObject
     {
+        [DispatcherMethod(typeof(IUserContext))]
         bool Contains(string userID);
 
+        [DispatcherProperty(typeof(IUserContext))]
         IUser this[string userID] { get; }
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsCreatedEventHandler<IUser> UsersCreated;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsMovedEventHandler<IUser> UsersMoved;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsRenamedEventHandler<IUser> UsersRenamed;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsDeletedEventHandler<IUser> UsersDeleted;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsEventHandler<IUser> UsersStateChanged;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsEventHandler<IUser> UsersChanged;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsEventHandler<IUser> UsersLoggedIn;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsEventHandler<IUser> UsersLoggedOut;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsEventHandler<IUser> UsersKicked;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event ItemsEventHandler<IUser> UsersBanChanged;
 
+        [DispatcherEvent(typeof(IUserContext))]
         event EventHandler<MessageEventArgs> MessageReceived;
     }
 }

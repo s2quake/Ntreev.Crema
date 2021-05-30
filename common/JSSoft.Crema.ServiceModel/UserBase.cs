@@ -168,6 +168,7 @@ namespace JSSoft.Crema.ServiceModel
 
         protected void ValidateMove(IAuthentication authentication, string categoryPath)
         {
+            NameValidator.ValidateCategoryPath(categoryPath);
             if (this.Category.Path == categoryPath)
                 throw new ArgumentException(Resources.Exception_CannotMoveToSameFolder, nameof(categoryPath));
             var category = this.Context.Categories[categoryPath];

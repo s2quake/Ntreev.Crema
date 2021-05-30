@@ -20,36 +20,20 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using JSSoft.Crema.ServiceModel;
+using System.Runtime.Serialization;
 
-namespace JSSoft.Crema.Services
+namespace JSSoft.Crema.ServiceModel
 {
-    public interface IUserItem : IServiceProvider, IDispatcherObject, IExtendedProperties
+    public class AuthenticationExpiredException : ArgumentException
     {
-        Task RenameAsync(Authentication authentication, string newName);
+        public AuthenticationExpiredException(string paramName)
+            : base("authentication has expired.", paramName)
+        {
+        }
 
-        Task MoveAsync(Authentication authentication, string parentPath);
-
-        Task DeleteAsync(Authentication authentication);
-
-        string Name { get; }
-
-        string Path { get; }
-
-        IUserItem Parent { get; }
-
-        [DispatcherProperty(typeof(IUserContext))]
-        IEnumerable<IUserItem> Childs { get; }
-
-        [DispatcherEvent(typeof(IUserContext))]
-        event EventHandler Renamed;
-
-        [DispatcherEvent(typeof(IUserContext))]
-        event EventHandler Moved;
-
-        [DispatcherEvent(typeof(IUserContext))]
-        event EventHandler Deleted;
+        protected AuthenticationExpiredException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
     }
 }

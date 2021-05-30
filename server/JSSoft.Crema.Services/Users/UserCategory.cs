@@ -41,6 +41,13 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (name is null)
+                    throw new ArgumentNullException(nameof(name));
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -77,6 +84,13 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (parentPath is null)
+                    throw new ArgumentNullException(nameof(parentPath));
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -113,6 +127,11 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
                 this.ValidateExpired();
                 var container = this.Container;
                 var repository = this.Repository;
@@ -182,12 +201,8 @@ namespace JSSoft.Crema.Services.Users
         public void ValidateDelete(Authentication authentication)
         {
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
-            {
                 throw new PermissionDeniedException();
-            }
-
             base.ValidateDelete();
-
             if (EnumerableUtility.Descendants<IItem, IUser>(this as IItem, item => item.Childs).Any() == true)
                 throw new InvalidOperationException(Resources.Exception_CannotDeletePathWithItems);
         }
@@ -339,6 +354,7 @@ namespace JSSoft.Crema.Services.Users
         {
             get
             {
+                this.Dispatcher.VerifyAccess();
                 foreach (var item in this.Categories)
                 {
                     yield return item;

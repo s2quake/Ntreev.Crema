@@ -75,6 +75,8 @@ namespace JSSoft.Crema.Services
 
         public object GetService(System.Type serviceType)
         {
+            if (serviceType is null)
+                throw new ArgumentNullException(nameof(serviceType));
             if (serviceType == typeof(ICremaHost))
                 return this;
             if (serviceType == typeof(IDataBaseContext))
@@ -248,6 +250,8 @@ namespace JSSoft.Crema.Services
         {
             if (authentication is null)
                 throw new ArgumentNullException(nameof(authentication));
+            if (authentication.IsExpired == true)
+                throw new AuthenticationExpiredException(nameof(authentication));
 
             await this.Dispatcher.InvokeAsync(() =>
             {
@@ -290,6 +294,8 @@ namespace JSSoft.Crema.Services
             {
                 if (authentication is null)
                     throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
                 if (shutdownContext is null)
                     throw new ArgumentNullException(nameof(shutdownContext));
 
@@ -321,6 +327,8 @@ namespace JSSoft.Crema.Services
             {
                 if (authentication is null)
                     throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
 
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -378,11 +386,15 @@ namespace JSSoft.Crema.Services
 
         public void Sign(Authentication authentication)
         {
+            if (authentication.IsExpired == true)
+                throw new AuthenticationExpiredException(nameof(authentication));
             authentication.Sign();
         }
 
         public void Sign(Authentication authentication, SignatureDate signatureDate)
         {
+            if (authentication.IsExpired == true)
+                throw new AuthenticationExpiredException(nameof(authentication));
             authentication.Sign(signatureDate.DateTime);
         }
 

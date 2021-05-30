@@ -20,36 +20,41 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using JSSoft.Crema.ServiceModel;
 
-namespace JSSoft.Crema.Services
+namespace JSSoft.Crema.ServiceModel
 {
-    public interface IUserItem : IServiceProvider, IDispatcherObject, IExtendedProperties
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Interface, AllowMultiple = true)]
+    public class DispatcherMethodAttribute : Attribute
     {
-        Task RenameAsync(Authentication authentication, string newName);
+        private Type ownerType;
 
-        Task MoveAsync(Authentication authentication, string parentPath);
+        public DispatcherMethodAttribute(Type ownerType)
+        {
+            this.ownerType = ownerType;
+            this.OwnerTypeName = ownerType.AssemblyQualifiedName;
+        }
 
-        Task DeleteAsync(Authentication authentication);
+        public DispatcherMethodAttribute(string ownerTypeName)
+        {
+            this.OwnerTypeName = ownerTypeName;
+        }
 
-        string Name { get; }
+        public string OwnerTypeName { get; }
 
-        string Path { get; }
+        public Type DeclaringType { get; set; }
 
-        IUserItem Parent { get; }
+        public string MethodName { get; set;}
 
-        [DispatcherProperty(typeof(IUserContext))]
-        IEnumerable<IUserItem> Childs { get; }
-
-        [DispatcherEvent(typeof(IUserContext))]
-        event EventHandler Renamed;
-
-        [DispatcherEvent(typeof(IUserContext))]
-        event EventHandler Moved;
-
-        [DispatcherEvent(typeof(IUserContext))]
-        event EventHandler Deleted;
+        internal Type OwnerType
+        {
+            get
+            {
+                if (this.ownerType == null)
+                {
+                    this.ownerType = Type.GetType(this.OwnerTypeName);
+                }
+                return this.ownerType;
+            }
+        }
     }
 }

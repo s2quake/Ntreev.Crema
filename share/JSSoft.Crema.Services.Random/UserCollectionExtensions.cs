@@ -19,38 +19,19 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
+using JSSoft.Library.Random;
 using System;
+using System.Threading.Tasks;
 
-namespace JSSoft.Crema.ServiceModel
+namespace JSSoft.Crema.Services.Random
 {
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Event)]
-    public class DispatcherScopeAttribute : Attribute
+    public static class UserCollectionExtensions
     {
-        private Type scopeType;
-
-        public DispatcherScopeAttribute(Type scopeType)
+        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection)
         {
-            this.scopeType = scopeType;
-            this.ScopeTypeName = scopeType.AssemblyQualifiedName;
-        }
-
-        public DispatcherScopeAttribute(string scopeTypeName)
-        {
-            this.ScopeTypeName = scopeTypeName;
-        }
-
-        public string ScopeTypeName { get; }
-
-        internal Type ScopeType
-        {
-            get
-            {
-                if (this.scopeType == null)
-                {
-                    this.scopeType = Type.GetType(this.ScopeTypeName);
-                }
-                return this.scopeType;
-            }
+            return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random());
         }
     }
 }
