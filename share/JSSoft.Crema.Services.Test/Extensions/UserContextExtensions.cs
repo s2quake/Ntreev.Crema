@@ -1,4 +1,5 @@
-﻿using JSSoft.Crema.Data;
+﻿#if SERVER
+using JSSoft.Crema.Data;
 using JSSoft.Crema.Data.Xml.Schema;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Extensions;
@@ -17,7 +18,6 @@ namespace JSSoft.Crema.Services.Test.Extensions
 {
     static class UserContextExtensions
     {
-#if SERVER
         public static void GenerateUserInfos(string repositoryPath, IObjectSerializer serializer)
         {
             var designedInfo = new SignatureDate(Authentication.SystemID, DateTime.UtcNow);
@@ -101,6 +101,6 @@ namespace JSSoft.Crema.Services.Test.Extensions
 
             serializationInfo.WriteToDirectory(repositoryPath, serializer);
         }
-#endif
     }
 }
+#endif
