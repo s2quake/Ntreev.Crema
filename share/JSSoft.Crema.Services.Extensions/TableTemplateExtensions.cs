@@ -48,7 +48,7 @@ namespace JSSoft.Crema.Services.Extensions
 
         public static Task AddColumnAsync(this ITableTemplate template, Authentication authentication, string name, string typeName)
         {
-            return AddColumnAsync(template, authentication, name, typeName);
+            return AddColumnAsync(template, authentication, name, typeName, string.Empty);
         }
 
         public static async Task AddColumnAsync(this ITableTemplate template, Authentication authentication, string name, string typeName, string comment)

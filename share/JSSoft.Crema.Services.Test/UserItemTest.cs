@@ -51,7 +51,7 @@ namespace JSSoft.Crema.Services.Test
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             authentication = await cremaHost.StartAsync();
             userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            userItem = await userContext.GetRandomUserItemAsync((item) => item != userContext.Root);
+            userItem = await userContext.GetRandomUserItemAsync((item) => item != userContext.Root && item.Parent != userContext.Root);
             expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
             await cremaHost.LogoutAsync(expiredAuthentication);
         }
@@ -142,6 +142,13 @@ namespace JSSoft.Crema.Services.Test
         {
             var rootItem = userContext.Root;
             await userItem.MoveAsync(authentication, "/qwerwqerwqerweq/wqerqwerwqerqwe/wqerqwerwqer/qwerqwer/");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public async Task MoveAsyncTestAsync_SameParent_Fail()
+        {
+            await userItem.MoveAsync(authentication, userItem.Parent.Path);
         }
 
         [TestMethod]
