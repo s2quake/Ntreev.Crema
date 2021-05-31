@@ -164,6 +164,10 @@ namespace JSSoft.Crema.Services.Random
                     var domain = template.Domain;
                     var typeContext = domain.GetService(typeof(ITypeContext)) as ITypeContext;
                     var type = typeContext.Types[dataType];
+                    if (type == null)
+                    {
+                        int weqr = 0;
+                    }
                     return await type.GetRandomStringAsync();
                 }
                 else

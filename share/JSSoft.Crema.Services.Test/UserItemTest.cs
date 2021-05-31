@@ -30,6 +30,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JSSoft.Library;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -268,6 +269,98 @@ namespace JSSoft.Crema.Services.Test
             {
                 await cremaHost.LogoutAsync(member);
             }
+        }
+
+        [TestMethod]
+        public void NameTest()
+        {
+            if (userItem is IUser)
+            {
+                Assert.IsTrue(IdentifierValidator.Verify(userItem.Name));
+            }
+            else
+            {
+                Assert.IsTrue(NameValidator.VerifyName(userItem.Name));
+            }
+        }
+
+        [TestMethod]
+        public void PathTest()
+        {
+            Assert.IsTrue(NameValidator.VerifyPath(userItem.Path));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void ChildTest_Dispatcher_Fail()
+        {
+            Assert.Fail($"{userItem.Childs}");
+        }
+
+        [TestMethod]
+        public void RenamedTest()
+        {
+            userItem.Dispatcher.Invoke(() =>
+            {
+                userItem.Renamed += UserItem_Renamed;
+                userItem.Renamed -= UserItem_Renamed;
+            });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void RenamedTest_Fail()
+        {
+            userItem.Renamed += UserItem_Renamed;
+        }
+
+        [TestMethod]
+        public void MovedTest()
+        {
+            userItem.Dispatcher.Invoke(() =>
+            {
+                userItem.Moved += UserItem_Moved;
+                userItem.Moved -= UserItem_Moved;
+            });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void MovedTest_Fail()
+        {
+            userItem.Moved += UserItem_Moved;
+        }
+
+        [TestMethod]
+        public void DeletedTest()
+        {
+            userItem.Dispatcher.Invoke(() =>
+            {
+                userItem.Deleted += UserItem_Deleted;
+                userItem.Deleted -= UserItem_Deleted;
+            });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void DeletedTest_Fail()
+        {
+            userItem.Deleted += UserItem_Deleted;
+        }
+
+        private void UserItem_Renamed(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void UserItem_Moved(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void UserItem_Deleted(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

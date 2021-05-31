@@ -80,6 +80,13 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ContainsTest_Null_Test()
+        {
+            userCategoryCollection.Contains(null);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void ContainsTest_Dispatcher_Fail()
         {
@@ -94,6 +101,14 @@ namespace JSSoft.Crema.Services.Test
             var categoryPath = userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection.Random().Path);
             var category = userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection[categoryPath]);
             Assert.AreEqual(categoryPath, category.Path);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void IndexerTest_Null_Fail()
+        {
+            var value = userCategoryCollection[null];
+            Assert.Fail($"{value}");
         }
 
         [TestMethod]

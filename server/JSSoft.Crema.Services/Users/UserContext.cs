@@ -608,6 +608,9 @@ namespace JSSoft.Crema.Services.Users
 
         bool IUserContext.Contains(string itemPath)
         {
+            if (itemPath is null)
+                throw new ArgumentNullException(nameof(itemPath));
+
             this.Dispatcher.VerifyAccess();
             return this.Contains(itemPath);
         }
@@ -620,6 +623,9 @@ namespace JSSoft.Crema.Services.Users
         {
             get
             {
+                if (itemPath is null)
+                    throw new ArgumentNullException(nameof(itemPath));
+
                 this.Dispatcher.VerifyAccess();
                 return this[itemPath] as IUserItem;
             }

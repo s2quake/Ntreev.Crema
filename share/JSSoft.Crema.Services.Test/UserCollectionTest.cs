@@ -80,6 +80,13 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ContainsTest_Null_Test()
+        {
+            userCollection.Contains(null);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void ContainsTest_Dispatcher_Fail()
         {
@@ -103,6 +110,14 @@ namespace JSSoft.Crema.Services.Test
             var userID = userCollection.Dispatcher.Invoke(() => userCollection.Random().ID);
             var user = userCollection[userID];
             Assert.Fail();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void IndexerTest_Null_Fail()
+        {
+            var value = userCollection[null];
+            Assert.Fail($"{value}");
         }
 
         [TestMethod]

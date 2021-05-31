@@ -142,14 +142,7 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public void ContainsTest_Null_Fail()
         {
-            try
-            {
-                userContext.Dispatcher.Invoke(() => userContext.Contains(null));
-            }
-            catch (Exception e)
-            {
-                throw e.InnerException;
-            }
+            userContext.Contains(null);
         }
 
         [TestMethod]
@@ -190,6 +183,14 @@ namespace JSSoft.Crema.Services.Test
             var itemPath = userContext.Dispatcher.Invoke(() => userContext.Random().Path);
             var item = userContext.Dispatcher.Invoke(() => userContext[itemPath]);
             Assert.AreEqual(itemPath, item.Path);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void IndexerTest_Null_Fail()
+        {
+            var value = userContext[null];
+            Assert.Fail($"{value}");
         }
 
         [TestMethod]

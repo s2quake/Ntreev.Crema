@@ -628,6 +628,9 @@ namespace JSSoft.Crema.Services.Users
 
         bool IUserCollection.Contains(string userID)
         {
+            if (userID is null)
+                throw new ArgumentNullException(nameof(userID));
+
             this.Dispatcher.VerifyAccess();
             return base.Contains(userID);
         }
@@ -636,6 +639,9 @@ namespace JSSoft.Crema.Services.Users
         {
             get
             {
+                if (userID is null)
+                    throw new ArgumentNullException(nameof(userID));
+
                 this.Dispatcher.VerifyAccess();
                 return this[userID];
             }
