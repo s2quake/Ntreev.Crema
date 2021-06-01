@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)UserCategoryCollectionTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserContextTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserItemTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaHost_AssemblyInitializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\CremaBootstrapperExtensions.cs" />

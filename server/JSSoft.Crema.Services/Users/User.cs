@@ -216,8 +216,6 @@ namespace JSSoft.Crema.Services.Users
                     throw new ArgumentNullException(nameof(authentication));
                 if (authentication.IsExpired == true)
                     throw new AuthenticationExpiredException(nameof(authentication));
-                if (password is null)
-                    throw new ArgumentNullException(nameof(password));
 
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>

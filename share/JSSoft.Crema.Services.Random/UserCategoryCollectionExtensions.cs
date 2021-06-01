@@ -33,5 +33,10 @@ namespace JSSoft.Crema.Services.Random
         {
             return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.Random());
         }
+
+        public static Task<IUserCategory> GetRandomUserCategoryAsync(this IUserCategoryCollection userCategoryCollection, Func<IUserCategory, bool> predicate)
+        {
+            return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.Random(predicate));
+        }
     }
 }

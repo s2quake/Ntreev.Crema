@@ -180,8 +180,23 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task DeleteAsyncTestAsync_Item()
         {
-            var userItem = await userContext.GetRandomUserItemAsync((item) => item is IUser user && user.ID != authentication.ID);
+            var userItem = await userContext.GetRandomUserItemAsync(Predicate);
             await userItem.DeleteAsync(authentication);
+
+            bool Predicate(IUserItem userItem)
+            {
+                if (userItem is IUser user)
+                {
+                    if (user.ID == Authentication.AdminID)
+                        return false;
+                    if (user.ID == authentication.ID)
+                        return false;
+                    if (user.UserState == UserState.Online)
+                        return false;
+                    return true;
+                }
+                return false;
+            }
         }
 
         [TestMethod]

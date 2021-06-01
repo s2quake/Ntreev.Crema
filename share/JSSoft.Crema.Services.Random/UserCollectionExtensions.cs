@@ -33,5 +33,10 @@ namespace JSSoft.Crema.Services.Random
         {
             return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random());
         }
+
+        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, Func<IUser, bool> predicate)
+        {
+            return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(predicate));
+        }
     }
 }
