@@ -27,6 +27,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeCategoryExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeContextExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\UserContextExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\UserExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableCategory_ComplexTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServerHost.cs" />
   </ItemGroup>

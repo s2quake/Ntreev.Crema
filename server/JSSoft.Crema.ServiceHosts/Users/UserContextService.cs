@@ -122,13 +122,34 @@ namespace JSSoft.Crema.ServiceHosts.Users
             return result;
         }
 
-        public async Task<ResultBase<UserInfo>> ChangeUserInfoAsync(string userID, byte[] password, byte[] newPassword, string userName, Authority? authority)
+        public async Task<ResultBase<UserInfo>> SetUserNameAsync(string userID, byte[] password, string userName)
+        {
+            var result = new ResultBase<UserInfo>();
+            var p1 = password == null ? null : ToSecureString(userID, password);
+            var user = await this.GetUserAsync(userID);
+            result.TaskID = await (Task<Guid>)user.SetUserNameAsync(this.authentication, p1, userName);
+            result.Value = await user.Dispatcher.InvokeAsync(() => user.UserInfo);
+            result.SignatureDate = this.authentication.SignatureDate;
+            return result;
+        }
+
+        public async Task<ResultBase<UserInfo>> SetPasswordAsync(string userID, byte[] password, byte[] newPassword)
         {
             var result = new ResultBase<UserInfo>();
             var p1 = password == null ? null : ToSecureString(userID, password);
             var p2 = newPassword == null ? null : ToSecureString(userID, newPassword);
             var user = await this.GetUserAsync(userID);
-            result.TaskID = await (Task<Guid>)user.ChangeUserInfoAsync(this.authentication, p1, p2, userName, authority);
+            result.TaskID = await (Task<Guid>)user.SetPasswordAsync(this.authentication, p1, p2);
+            result.Value = await user.Dispatcher.InvokeAsync(() => user.UserInfo);
+            result.SignatureDate = this.authentication.SignatureDate;
+            return result;
+        }
+
+        public async Task<ResultBase<UserInfo>> ResetPasswordAsync(string userID)
+        {
+            var result = new ResultBase<UserInfo>();
+            var user = await this.GetUserAsync(userID);
+            result.TaskID = await (Task<Guid>)user.ResetPasswordAsync(this.authentication);
             result.Value = await user.Dispatcher.InvokeAsync(() => user.UserInfo);
             result.SignatureDate = this.authentication.SignatureDate;
             return result;

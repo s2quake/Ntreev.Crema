@@ -50,7 +50,13 @@ namespace JSSoft.Crema.ServiceHosts.Users
         Task<ResultBase> DeleteUserItemAsync(string itemPath);
 
         [OperationContract]
-        Task<ResultBase<UserInfo>> ChangeUserInfoAsync(string userID, byte[] password, byte[] newPassword, string userName, Authority? authority);
+        Task<ResultBase<UserInfo>> SetUserNameAsync(string userID, byte[] password, string userName);
+
+        [OperationContract]
+        Task<ResultBase<UserInfo>> SetPasswordAsync(string userID, byte[] password, byte[] newPassword);
+
+        [OperationContract]
+        Task<ResultBase<UserInfo>> ResetPasswordAsync(string userID);
 
         [OperationContract]
         Task<ResultBase> KickAsync(string userID, string comment);

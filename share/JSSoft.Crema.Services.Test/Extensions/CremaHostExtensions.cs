@@ -21,6 +21,22 @@ namespace JSSoft.Crema.Services.Test.Extensions
             return authentication;
         }
 
+        public static async Task<Authentication> StartRandomAsync(this ICremaHost cremaHost)
+        {
+            var token = await cremaHost.OpenAsync();
+            var authentication = await cremaHost.LoginRandomAsync();
+            tokenByAuthentication.Add(authentication, token);
+            return authentication;
+        }
+
+        public static async Task<Authentication> StartRandomAsync(this ICremaHost cremaHost, Authority authority)
+        {
+            var token = await cremaHost.OpenAsync();
+            var authentication = await cremaHost.LoginRandomAsync(authority);
+            tokenByAuthentication.Add(authentication, token);
+            return authentication;
+        }
+
         public static async Task StopAsync(this ICremaHost cremaHost, Authentication authentication)
         {
             var token = tokenByAuthentication[authentication];
@@ -41,7 +57,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
             {
                 var user = await userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(item => item.UserState == UserState.None && item.Authority == authority));
                 var name = user.ID;
-                var password = StringUtility.ToSecureString(authority.ToString().ToLower());
+                var password = user.GetPassword();
                 var token = await cremaHost.LoginAsync(name, password);
                 return await cremaHost.AuthenticateAsync(token);
             }

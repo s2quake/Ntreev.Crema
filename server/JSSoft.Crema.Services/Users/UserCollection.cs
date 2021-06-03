@@ -162,14 +162,50 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        public Task InvokeUserChangeAsync(Authentication authentication, UserInfo userInfo, UserContextSet userContextSet, SecureString password, SecureString newPassword, string userName, Authority? authority)
+        public Task InvokeUserNameSetAsync(Authentication authentication, UserInfo userInfo, UserContextSet userContextSet, string userName)
         {
-            var message = EventMessageBuilder.ChangeUserInfo(authentication, userInfo.ID, userInfo.Name);
+            var message = EventMessageBuilder.SetUserName(authentication, userInfo.ID, userName);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    this.Repository.ModifyUser(userContextSet, userInfo.Path, password, newPassword, userName, authority);
+                    this.Repository.ModifyUser(userContextSet, userInfo.Path, userName);
+                    this.Repository.Commit(authentication, message);
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
+        }
+
+        public Task InvokeUserPasswordSetAsync(Authentication authentication, UserInfo userInfo, UserContextSet userContextSet, SecureString password)
+        {
+            var message = EventMessageBuilder.SetPassword(authentication, userInfo.ID, userInfo.Name);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    this.Repository.ModifyUser(userContextSet, userInfo.Path, password);
+                    this.Repository.Commit(authentication, message);
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
+        }
+
+        public Task InvokeUserPasswordResetAsync(Authentication authentication, UserInfo userInfo, UserContextSet userContextSet, SecureString password)
+        {
+            var message = EventMessageBuilder.ResetPassword(authentication, userInfo.ID, userInfo.Name);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    this.Repository.ModifyUser(userContextSet, userInfo.Path, password);
                     this.Repository.Commit(authentication, message);
                 }
                 catch
@@ -250,7 +286,7 @@ namespace JSSoft.Crema.Services.Users
         public void InvokeUsersChangedEvent(Authentication authentication, User[] users)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersChangedEvent), users);
-            var message = EventMessageBuilder.ChangeUserInfo(authentication, users);
+            var message = EventMessageBuilder.SetUserName(authentication, users);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
             this.OnUsersChanged(new ItemsEventArgs<IUser>(authentication, users));

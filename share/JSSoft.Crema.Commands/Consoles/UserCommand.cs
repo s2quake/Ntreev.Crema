@@ -99,7 +99,7 @@ namespace JSSoft.Crema.Commands.Consoles
             var password2 = this.CommandContext.ReadSecureString("Password2:");
             ConsoleCommandContextBase.Validate(password1, password2);
             var authentication = this.CommandContext.GetAuthentication(this);
-            await user.ChangeUserInfoAsync(authentication, null, password1, null, null);
+            await user.SetPasswordAsync(authentication, null, password1);
         }
 
         [CommandMethod]
@@ -107,8 +107,9 @@ namespace JSSoft.Crema.Commands.Consoles
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
+            var password = this.CommandContext.ReadSecureString("Password:");
             var newValue = newName ?? this.CommandContext.ReadString("NewName:");
-            await user.ChangeUserInfoAsync(authentication, null, null, newValue, null);
+            await user.SetUserNameAsync(authentication, password, newValue);
         }
 
         [CommandMethod]
@@ -117,14 +118,6 @@ namespace JSSoft.Crema.Commands.Consoles
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
             await user.MoveAsync(authentication, categoryPath);
-        }
-
-        [CommandMethod("authority")]
-        public async Task SetAuthorityAsync([CommandCompletion(nameof(GetUserIDsAsync))] string userID, Authority authority)
-        {
-            var user = await this.GetUserAsync(userID);
-            var authentication = this.CommandContext.GetAuthentication(this);
-            await user.ChangeUserInfoAsync(authentication, null, null, null, authority);
         }
 
         [CommandMethod]

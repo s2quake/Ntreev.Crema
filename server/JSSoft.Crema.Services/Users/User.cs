@@ -208,7 +208,138 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        public async Task<Guid> ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
+        // [Obsolete]
+        // public async Task<Guid> ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
+        // {
+        //     try
+        //     {
+        //         if (authentication is null)
+        //             throw new ArgumentNullException(nameof(authentication));
+        //         if (authentication.IsExpired == true)
+        //             throw new AuthenticationExpiredException(nameof(authentication));
+
+        //         this.ValidateExpired();
+        //         var tuple = await this.Dispatcher.InvokeAsync(() =>
+        //         {
+        //             this.CremaHost.DebugMethod(authentication, this, nameof(ChangeUserInfoAsync), this, userName, authority);
+        //             this.ValidateUserInfoChange(authentication, password, newPassword, userName, authority);
+        //             this.CremaHost.Sign(authentication);
+        //             var items = EnumerableUtility.One(this).ToArray();
+        //             var userInfo = base.UserInfo;
+        //             return (items, userInfo);
+        //         });
+        //         var taskID = Guid.NewGuid();
+        //         var userSet = await this.ReadDataForChangeAsync(authentication);
+        //         using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+        //         await this.Container.InvokeUserChangeAsync(authentication, tuple.userInfo, userContextSet, password, newPassword, userName, authority);
+        //         await this.Dispatcher.InvokeAsync(() =>
+        //         {
+        //             var userInfo = userContextSet.GetUserInfo(this.Path);
+        //             this.CremaHost.Sign(authentication);
+        //             this.Password = UserContext.StringToSecureString(userInfo.Password);
+        //             base.UpdateUserInfo((UserInfo)userInfo);
+        //             this.Container.InvokeUsersChangedEvent(authentication, tuple.items);
+        //             this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+        //         });
+        //         return taskID;
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         this.CremaHost.Error(e);
+        //         throw;
+        //     }
+        // }
+
+        public async Task<Guid> SetUserNameAsync(Authentication authentication, SecureString password, string userName)
+        {
+            try
+            {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (password is null)
+                    throw new ArgumentNullException(nameof(password));
+                if (userName is null)
+                    throw new ArgumentNullException(nameof(userName));
+
+                this.ValidateExpired();
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetUserNameAsync), this);
+                    this.ValidateSetUserName(authentication, password, userName);
+                    this.CremaHost.Sign(authentication);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var userInfo = base.UserInfo;
+                    return (items, userInfo);
+                });
+                var taskID = Guid.NewGuid();
+                var userSet = await this.ReadDataForChangeAsync(authentication);
+                using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeUserNameSetAsync(authentication, tuple.userInfo, userContextSet, userName);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var userInfo = userContextSet.GetUserInfo(this.Path);
+                    this.CremaHost.Sign(authentication);
+                    base.UpdateUserInfo((UserInfo)userInfo);
+                    this.Container.InvokeUsersChangedEvent(authentication, tuple.items);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                });
+                return taskID;
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task<Guid> SetPasswordAsync(Authentication authentication, SecureString password, SecureString newPassword)
+        {
+            try
+            {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (password is null)
+                    throw new ArgumentNullException(nameof(password));
+                if (newPassword is null)
+                    throw new ArgumentNullException(nameof(newPassword));
+
+                this.ValidateExpired();
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetPasswordAsync), this);
+                    this.ValidateSetPassword(authentication, password, newPassword);
+                    this.CremaHost.Sign(authentication);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var userInfo = base.UserInfo;
+                    return (items, userInfo);
+                });
+                var taskID = Guid.NewGuid();
+                var userSet = await this.ReadDataForChangeAsync(authentication);
+                using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeUserPasswordSetAsync(authentication, tuple.userInfo, userContextSet, newPassword);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var userInfo = userContextSet.GetUserInfo(this.Path);
+                    this.CremaHost.Sign(authentication);
+                    this.Password = UserContext.StringToSecureString(userInfo.Password);
+                    base.UpdateUserInfo((UserInfo)userInfo);
+                    this.Container.InvokeUsersChangedEvent(authentication, tuple.items);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                });
+                return taskID;
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task<Guid> ResetPasswordAsync(Authentication authentication)
         {
             try
             {
@@ -220,17 +351,18 @@ namespace JSSoft.Crema.Services.Users
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(ChangeUserInfoAsync), this, userName, authority);
-                    this.ValidateUserInfoChange(authentication, password, newPassword, userName, authority);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetPasswordAsync), this);
+                    this.ValidateResetPassword(authentication);
                     this.CremaHost.Sign(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
                     var userInfo = base.UserInfo;
                     return (items, userInfo);
                 });
+                var password = $"{this.UserInfo.Authority}".ToLower();
                 var taskID = Guid.NewGuid();
                 var userSet = await this.ReadDataForChangeAsync(authentication);
                 using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
-                await this.Container.InvokeUserChangeAsync(authentication, tuple.userInfo, userContextSet, password, newPassword, userName, authority);
+                await this.Container.InvokeUserPasswordResetAsync(authentication, tuple.userInfo, userContextSet, password.ToSecureString());
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var userInfo = userContextSet.GetUserInfo(this.Path);
@@ -604,6 +736,7 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
+        [Obsolete]
         private void ValidateUserInfoChange(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
         {
             if (this.ID != authentication.ID)
@@ -644,6 +777,35 @@ namespace JSSoft.Crema.Services.Users
                 if (authority.HasValue == true)
                     throw new ArgumentException(Resources.Exception_CannotChangeYourAuthority);
             }
+        }
+
+        private void ValidateSetUserName(Authentication authentication, SecureString password, string userName)
+        {
+            if (this.ID != authentication.ID)
+                throw new InvalidOperationException("cannot set user name");
+            if (this.VerifyPassword(password) == false)
+                throw new ArgumentException(Resources.Exception_IncorrectPassword, nameof(password));
+            if (userName == string.Empty)
+                throw new ArgumentException(Resources.Exception_EmptyStringIsNotAllowed);
+        }
+
+        private void ValidateSetPassword(Authentication authentication, SecureString password, SecureString newPassword)
+        {
+            if (base.UserInfo.ID != authentication.ID)
+                throw new InvalidOperationException();
+            if (this.VerifyPassword(password) == false)
+                throw new ArgumentException("wrong password", nameof(password));
+            if (this.VerifyPassword(newPassword) == true)
+                throw new ArgumentException(Resources.Exception_CannotChangeToOldPassword, nameof(newPassword));
+        }
+
+        private void ValidateResetPassword(Authentication authentication)
+        {
+            if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
+                throw new PermissionDeniedException();
+
+            if (base.UserInfo.ID != authentication.ID && base.UserInfo.ID == Authentication.AdminID)
+                throw new PermissionDeniedException(Resources.Exception_AdminCanChangeAdminInfo);
         }
 
         private void ValidateSendMessage(Authentication authentication, string message)
@@ -753,9 +915,19 @@ namespace JSSoft.Crema.Services.Users
             return this.DeleteAsync(authentication);
         }
 
-        Task IUser.ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
+        Task IUser.SetUserNameAsync(Authentication authentication, SecureString password, string userName)
         {
-            return this.ChangeUserInfoAsync(authentication, password, newPassword, userName, authority);
+            return this.SetUserNameAsync(authentication, password, userName);
+        }
+
+        Task IUser.SetPasswordAsync(Authentication authentication, SecureString password, SecureString newPassword)
+        {
+            return this.SetPasswordAsync(authentication, password, newPassword);
+        }
+
+        Task IUser.ResetPasswordAsync(Authentication authentication)
+        {
+            return this.ResetPasswordAsync(authentication);
         }
 
         Task IUser.KickAsync(Authentication authentication, string comment)

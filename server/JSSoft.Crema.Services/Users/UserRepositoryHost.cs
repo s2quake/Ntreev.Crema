@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Users.Serializations;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security;
@@ -135,10 +136,22 @@ namespace JSSoft.Crema.Services.Users
             userContextSet.DeleteUser(userPath);
         }
 
-        public void ModifyUser(UserContextSet userContextSet, string userPath, SecureString password, SecureString newPassword, string userName, Authority? authority)
+        public void ModifyUser(UserContextSet userContextSet, string userPath, SecureString password)
         {
             this.Dispatcher.VerifyAccess();
-            userContextSet.ModifyUser(userPath, password, newPassword, userName, authority);
+            userContextSet.ModifyUser(userPath, password);
+        }
+
+        public void ModifyUser(UserContextSet userContextSet, string userPath, string userName)
+        {
+            this.Dispatcher.VerifyAccess();
+            userContextSet.ModifyUser(userPath, userName);
+        }
+
+        public void ModifyUser(UserContextSet userContextSet, string userPath, Authority authority)
+        {
+            this.Dispatcher.VerifyAccess();
+            userContextSet.ModifyUser(userPath, authority);
         }
 
         public void BanUser(UserContextSet userContextSet, string userPath, string comment)

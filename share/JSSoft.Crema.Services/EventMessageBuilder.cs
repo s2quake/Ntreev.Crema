@@ -915,17 +915,49 @@ namespace JSSoft.Crema.Services
             return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string ChangeUserInfo(Authentication authentication, string userID, string userName)
+        public static string SetUserName(Authentication authentication, string userID, string userName)
         {
             return string.Format(EventResources.ChangeUserInfo, authentication.ID, authentication.Name, userID, userName);
         }
 
-        public static string ChangeUserInfo(Authentication authentication, IUser[] items)
+        public static string SetUserName(Authentication authentication, IUser[] items)
         {
             var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                var message = ChangeUserInfo(authentication, items[i].ID, items[i].UserName);
+                var message = SetUserName(authentication, items[i].ID, items[i].UserName);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string SetPassword(Authentication authentication, string userID, string userName)
+        {
+            return string.Format(EventResources.ChangeUserInfo, authentication.ID, authentication.Name, userID, userName);
+        }
+
+        public static string SetPassword(Authentication authentication, IUser[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = SetPassword(authentication, items[i].ID, items[i].UserName);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string ResetPassword(Authentication authentication, string userID, string userName)
+        {
+            return string.Format(EventResources.ChangeUserInfo, authentication.ID, authentication.Name, userID, userName);
+        }
+
+        public static string ResetPassword(Authentication authentication, IUser[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = ResetPassword(authentication, items[i].ID, items[i].UserName);
                 messageList.Add(message);
             }
             return string.Join(Environment.NewLine, messageList);

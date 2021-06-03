@@ -32,7 +32,11 @@ namespace JSSoft.Crema.Services
 
         Task DeleteAsync(Authentication authentication);
 
-        Task ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority);
+        Task SetUserNameAsync(Authentication authentication, SecureString password, string userName);
+
+        Task SetPasswordAsync(Authentication authentication, SecureString password, SecureString newPassword);
+
+        Task ResetPasswordAsync(Authentication authentication);
 
         Task SendMessageAsync(Authentication authentication, string message);
 

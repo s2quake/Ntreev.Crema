@@ -173,6 +173,7 @@ namespace JSSoft.Crema.Services.Users
             this.Repository.DeleteRange(repositoryPaths);
         }
 
+        [Obsolete]
         public void ModifyUser(string userPath, SecureString password, SecureString newPassword, string userName, Authority? authority)
         {
             var userInfo = this.users[userPath];
@@ -182,6 +183,33 @@ namespace JSSoft.Crema.Services.Users
                 userInfo.Name = userName;
             if (authority.HasValue)
                 userInfo.Authority = authority.Value;
+            userInfo.ModificationInfo = this.signatureDateProvider.Provide();
+            this.users[userPath] = userInfo;
+            this.Serialize();
+        }
+
+        public void ModifyUser(string userPath, SecureString password)
+        {
+            var userInfo = this.users[userPath];
+            userInfo.Password = UserContext.SecureStringToString(password).Encrypt();
+            userInfo.ModificationInfo = this.signatureDateProvider.Provide();
+            this.users[userPath] = userInfo;
+            this.Serialize();
+        }
+
+        public void ModifyUser(string userPath, string userName)
+        {
+            var userInfo = this.users[userPath];
+            userInfo.Name = userName;
+            userInfo.ModificationInfo = this.signatureDateProvider.Provide();
+            this.users[userPath] = userInfo;
+            this.Serialize();
+        }
+
+        public void ModifyUser(string userPath, Authority authority)
+        {
+            var userInfo = this.users[userPath];
+            userInfo.Authority = authority;
             userInfo.ModificationInfo = this.signatureDateProvider.Provide();
             this.users[userPath] = userInfo;
             this.Serialize();
