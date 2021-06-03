@@ -870,7 +870,7 @@ namespace JSSoft.Crema.Services.Users
             if (comment == null)
                 throw new ArgumentNullException(nameof(comment));
             if (comment == string.Empty)
-                throw new ArgumentNullException(nameof(comment), Resources.Exception_EmptyStringIsNotAllowed);
+                throw new ArgumentException(nameof(comment), Resources.Exception_EmptyStringIsNotAllowed);
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
                 throw new PermissionDeniedException();
             if (this.IsBanned == true)
@@ -894,7 +894,7 @@ namespace JSSoft.Crema.Services.Users
             if (comment == null)
                 throw new ArgumentNullException(nameof(comment));
             if (comment == string.Empty)
-                throw new ArgumentNullException(nameof(comment), Resources.Exception_EmptyStringIsNotAllowed);
+                throw new ArgumentException(nameof(comment), Resources.Exception_EmptyStringIsNotAllowed);
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
                 throw new PermissionDeniedException();
             if (this.IsOnline == false)

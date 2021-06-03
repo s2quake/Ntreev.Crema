@@ -191,6 +191,8 @@ namespace JSSoft.Crema.Services.Users
                 throw new PermissionDeniedException();
             if (this.Parent.Path == parentPath)
                 throw new ArgumentException(Resources.Exception_CannotMoveToSamePath, nameof(parentPath));
+            if (parentPath == string.Empty)
+                throw new ArgumentException(Resources.Exception_EmptyStringIsNotAllowed);
             var parent = this.Container[parentPath];
             if (parent == null)
                 throw new CategoryNotFoundException(parentPath);

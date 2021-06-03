@@ -320,6 +320,9 @@ namespace JSSoft.Crema.Services.Users
 
         bool IUserCategoryCollection.Contains(string categoryPath)
         {
+            if (categoryPath is null)
+                    throw new ArgumentNullException(nameof(categoryPath));
+                    
             this.Dispatcher.VerifyAccess();
             return this.Contains(categoryPath);
         }
@@ -330,6 +333,9 @@ namespace JSSoft.Crema.Services.Users
         {
             get
             {
+                if (categoryPath is null)
+                    throw new ArgumentNullException(nameof(categoryPath));
+
                 this.Dispatcher.VerifyAccess();
                 return this[categoryPath];
             }

@@ -1,4 +1,5 @@
 ﻿using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Random;
 using JSSoft.Library;
 using JSSoft.Library.Random;
 using System;
@@ -55,13 +56,24 @@ namespace JSSoft.Crema.Services.Test.Extensions
         {
             if (cremaHost.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
             {
-                var user = await userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(item => item.UserState == UserState.None && item.Authority == authority));
+                var user = await userCollection.GetRandomUserAsync(item => Predicate(item, authority));
                 var name = user.ID;
                 var password = user.GetPassword();
                 var token = await cremaHost.LoginAsync(name, password);
                 return await cremaHost.AuthenticateAsync(token);
             }
             throw new NotImplementedException();
+
+            static bool Predicate(IUser user, Authority authority)
+            {
+                if (user.BanInfo.Path != string.Empty)
+                    return false;
+                if (user.UserState == UserState.Online)
+                    return false;
+                if (user.Authority != authority)
+                    return false;
+                return true;
+            }
         }
     }
 }

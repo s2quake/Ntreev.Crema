@@ -31,6 +31,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using JSSoft.Library;
+using JSSoft.Crema.Services.Extensions;
+using JSSoft.Library.IO;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -219,6 +221,8 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task SetUserNameAsyncTestAsync()
         {
+            var authentication = await cremaHost.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var password = user.GetPassword();
             var userName = RandomUtility.NextName();
             var dateTime = DateTime.UtcNow;
@@ -390,6 +394,505 @@ namespace JSSoft.Crema.Services.Test
         public async Task ResetPasswordAsyncTestAsync_Admin_Fail()
         {
             await user.ResetPasswordAsync(adminAuthentication);
+        }
+
+        [TestMethod]
+        public async Task SendMessageAsyncTestAsync()
+        {
+            var message = RandomUtility.NextString();
+            await user.SendMessageAsync(authentication, message);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task SendMessageAsyncTestAsync_Null_Arg0_Fail()
+        {
+            var message = RandomUtility.NextString();
+            await user.SendMessageAsync(null, message);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task SendMessageAsyncTestAsync_Null_Arg1_Fail()
+        {
+            await user.SendMessageAsync(authentication, null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public async Task SendMessageAsyncTestAsync_Empty_Arg1_Fail()
+        {
+            await user.SendMessageAsync(authentication, string.Empty);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
+        public async Task SendMessageAsyncTestAsync_Expired_Fail()
+        {
+            await user.SendMessageAsync(expiredAuthentication, null);
+        }
+
+        [TestMethod]
+        public async Task KickAsyncTestAsync_Admin()
+        {
+            var message = RandomUtility.NextString();
+            var adminAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+            var adminUser = await userCollection.GetUserAsync(adminAuthentication.ID);
+            await adminUser.KickAsync(authentication, message);
+        }
+
+        [TestMethod]
+        public async Task KickAsyncTestAsync_Member()
+        {
+            var message = RandomUtility.NextString();
+            var memberAuthentication = await cremaHost.LoginRandomAsync(Authority.Member);
+            var memberUser = await userCollection.GetUserAsync(memberAuthentication.ID);
+            await memberUser.KickAsync(authentication, message);
+        }
+
+        [TestMethod]
+        public async Task KickAsyncTestAsync_Guest()
+        {
+            var message = RandomUtility.NextString();
+            var guestAuthentication = await cremaHost.LoginRandomAsync(Authority.Guest);
+            var guestUser = await userCollection.GetUserAsync(guestAuthentication.ID);
+            await guestUser.KickAsync(authentication, message);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task KickAsyncTestAsync_Null_Arg0_Fail()
+        {
+            var message = RandomUtility.NextString();
+            await adminUser.KickAsync(null, message);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task KickAsyncTestAsync_Null_Arg1_Fail()
+        {
+            await adminUser.KickAsync(authentication, null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public async Task KickAsyncTestAsync_Empty_Arg1_Fail()
+        {
+            await adminUser.KickAsync(authentication, string.Empty);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
+        public async Task KickAsyncTestAsync_Expired_Fail()
+        {
+            var message = RandomUtility.NextString();
+            await adminUser.KickAsync(expiredAuthentication, message);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task KickAsyncTestAsync_PermissionDenied_Member_Fail()
+        {
+            var message = RandomUtility.NextString();
+            await user.KickAsync(memberAuthentication, message);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task KickAsyncTestAsync_PermissionDenied_Guest_Fail()
+        {
+            var message = RandomUtility.NextString();
+            await user.KickAsync(guestAuthentication, message);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task KickAsyncTestAsync_Offline_Fail()
+        {
+            var message = RandomUtility.NextString();
+            var user = await userCollection.GetRandomUserAsync(item => item.UserState == UserState.None);
+            await user.KickAsync(authentication, message);
+        }
+
+        [TestMethod]
+        public async Task BanAsyncTestAsync_Online_Member()
+        {
+            var message = RandomUtility.NextString();
+            var memberAuthentication = await cremaHost.LoginRandomAsync(Authority.Member);
+            var memberUser = await userCollection.GetUserAsync(memberAuthentication.ID);
+            await memberUser.BanAsync(authentication, message);
+            Assert.AreEqual(UserState.None, memberUser.UserState);
+            Assert.AreNotEqual(string.Empty, memberUser.BanInfo.Path);
+        }
+
+        [TestMethod]
+        public async Task BanAsyncTestAsync_Offline_Member()
+        {
+            var message = RandomUtility.NextString();
+            var memberUser = await userCollection.GetRandomUserAsync(Predicate);
+            await memberUser.BanAsync(authentication, message);
+            Assert.AreEqual(UserState.None, memberUser.UserState);
+            Assert.AreNotEqual(string.Empty, memberUser.BanInfo.Path);
+
+            static bool Predicate(IUser user)
+            {
+                if (user.UserState == UserState.Online)
+                    return false;
+                if (user.Authority != Authority.Member)
+                    return false;
+                if (user.BanInfo.Path != string.Empty)
+                    return false;
+                return true;
+            }
+        }
+
+        [TestMethod]
+        public async Task BanAsyncTestAsync_Online_Guest()
+        {
+            var message = RandomUtility.NextString();
+            var guestAuthentication = await cremaHost.LoginRandomAsync(Authority.Guest);
+            var guestUser = await userCollection.GetUserAsync(guestAuthentication.ID);
+            await guestUser.BanAsync(authentication, message);
+            Assert.AreEqual(UserState.None, guestUser.UserState);
+            Assert.AreNotEqual(string.Empty, guestUser.BanInfo.Path);
+        }
+
+        [TestMethod]
+        public async Task BanAsyncTestAsync_Offline_Guest()
+        {
+            var message = RandomUtility.NextString();
+            var guestUser = await userCollection.GetRandomUserAsync(Predicate);
+            await guestUser.BanAsync(authentication, message);
+            Assert.AreEqual(UserState.None, guestUser.UserState);
+            Assert.AreNotEqual(string.Empty, guestUser.BanInfo.Path);
+
+            static bool Predicate(IUser user)
+            {
+                if (user.UserState == UserState.Online)
+                    return false;
+                if (user.Authority != Authority.Guest)
+                    return false;
+                if (user.BanInfo.Path != string.Empty)
+                    return false;
+                return true;
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task BanAsyncTestAsync_Null_Arg0_Fail()
+        {
+            var message = RandomUtility.NextString();
+            await memberUser.BanAsync(null, message);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task BanAsyncTestAsync_Null_Arg1_Fail()
+        {
+            await memberUser.BanAsync(authentication, null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public async Task BanAsyncTestAsync_Empty_Arg1_Fail()
+        {
+            await memberUser.BanAsync(authentication, string.Empty);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
+        public async Task BanAsyncTestAsync_Expired_Fail()
+        {
+            var message = RandomUtility.NextString();
+            await memberUser.BanAsync(expiredAuthentication, message);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task BanAsyncTestAsync_AlreadyBanned_Fail()
+        {
+            var message = RandomUtility.NextString();
+            var memberUser = await userCollection.GetRandomUserAsync(Predicate);
+            await memberUser.BanAsync(authentication, message);
+            await memberUser.BanAsync(authentication, message);
+
+            static bool Predicate(IUser user)
+            {
+                if (user.BanInfo.IsBanned == true)
+                    return false;
+                if (user.UserState == UserState.Online)
+                    return false;
+                if (user.Authority == Authority.Admin)
+                    return false;
+                return true;
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task BanAsyncTestAsync_PermissionDenied_Admin_Fail()
+        {
+            var message = RandomUtility.NextString();
+            await adminUser.BanAsync(authentication, message);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task BanAsyncTestAsync_PermissionDenied_Member_Fail()
+        {
+            var message = RandomUtility.NextString();
+            await memberUser.BanAsync(memberAuthentication, message);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task BanAsyncTestAsync_PermissionDenied_Guest_Fail()
+        {
+            var message = RandomUtility.NextString();
+            await memberUser.BanAsync(guestAuthentication, message);
+        }
+
+        [TestMethod]
+        public async Task UnbanAsyncTestAsync_Member()
+        {
+            var message = RandomUtility.NextString();
+            var memberAuthentication = await cremaHost.LoginRandomAsync(Authority.Member);
+            var memberUser = await userCollection.GetUserAsync(memberAuthentication.ID);
+            await memberUser.BanAsync(authentication, message);
+            await memberUser.UnbanAsync(authentication);
+            Assert.AreEqual(string.Empty, memberUser.BanInfo.Path);
+        }
+
+        [TestMethod]
+        public async Task UnbanAsyncTestAsync_Guest()
+        {
+            var message = RandomUtility.NextString();
+            var guestAuthentication = await cremaHost.LoginRandomAsync(Authority.Guest);
+            var guestUser = await userCollection.GetUserAsync(guestAuthentication.ID);
+            await guestUser.BanAsync(authentication, message);
+            await guestUser.UnbanAsync(authentication);
+            Assert.AreEqual(string.Empty, guestUser.BanInfo.Path);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task UnbanAsyncTestAsync_Null_Arg0_Fail()
+        {
+            await memberUser.UnbanAsync(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
+        public async Task UnbanAsyncTestAsync_Expired_Fail()
+        {
+            await memberUser.UnbanAsync(expiredAuthentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task UnbanAsyncTestAsync_Member_Fail()
+        {
+            await memberUser.UnbanAsync(memberAuthentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task UnbanAsyncTestAsync_Guest_Fail()
+        {
+            await memberUser.UnbanAsync(guestAuthentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task UnbanAsyncTestAsync_Unbanned_Fail()
+        {
+            await memberUser.UnbanAsync(authentication);
+        }
+
+        [TestMethod]
+        public void IDTest()
+        {
+            Assert.AreEqual(Authentication.AdminID, user.ID);
+        }
+
+        [TestMethod]
+        public void UserNameTest()
+        {
+            Assert.AreEqual(Authentication.AdminName, user.UserName);
+        }
+
+        [TestMethod]
+        public void PathTest()
+        {
+            NameValidator.ValidateItemPath(user.Path);
+        }
+
+        [TestMethod]
+        public void AuthorityTest()
+        {
+            Assert.AreEqual(Authority.Admin, user.Authority);
+        }
+
+        [TestMethod]
+        public void CategoryTest()
+        {
+            Assert.IsNotNull(user.Category);
+        }
+
+        [TestMethod]
+        public void UserInfoTest()
+        {
+            Assert.AreEqual(Authentication.AdminID, user.UserInfo.ID);
+            Assert.AreEqual(user.Path, user.UserInfo.Path);
+            Assert.AreEqual(user.Category.Path.Trim(PathUtility.SeparatorChar), user.UserInfo.CategoryName);
+            Assert.AreNotEqual(SignatureDate.Empty, user.UserInfo.CreationInfo);
+            Assert.AreEqual(user.Authority, user.UserInfo.Authority);
+        }
+
+        [TestMethod]
+        public void UserStateTest()
+        {
+            Assert.AreEqual(UserState.Online, user.UserState);
+        }
+
+        [TestMethod]
+        public void BanInfoTest()
+        {
+            Assert.AreEqual(string.Empty, user.BanInfo.Path);
+            Assert.AreEqual(string.Empty, user.BanInfo.Comment);
+            Assert.AreEqual(SignatureDate.Empty, user.BanInfo.SignatureDate);
+        }
+
+        [TestMethod]
+        public void RenamedTest()
+        {
+            user.Dispatcher.Invoke(() =>
+            {
+                user.Renamed += User_Renamed;
+                user.Renamed -= User_Renamed;
+            });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void RenamedTest_Fail()
+        {
+            user.Renamed += User_Renamed;
+        }
+
+        [TestMethod]
+        public void MovedTest()
+        {
+            user.Dispatcher.Invoke(() =>
+            {
+                user.Moved += User_Moved;
+                user.Moved -= User_Moved;
+            });
+        }
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void MovedTest_Fail()
+        {
+            user.Moved += User_Moved;
+        }
+
+        private void User_Moved(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [TestMethod]
+        public void DeletedTest()
+        {
+            user.Dispatcher.Invoke(() =>
+            {
+                user.Deleted += User_Deleted;
+                user.Deleted -= User_Deleted;
+            });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void DeletedTest_Fail()
+        {
+            user.Deleted += User_Deleted;
+        }
+
+        [TestMethod]
+        public void UserInfoChangedTest()
+        {
+            user.Dispatcher.Invoke(() =>
+            {
+                user.UserInfoChanged += User_UserInfoChanged;
+                user.UserInfoChanged -= User_UserInfoChanged;
+            });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void UserInfoChangedTest_Fail()
+        {
+            user.UserInfoChanged += User_UserInfoChanged;
+        }
+
+        [TestMethod]
+        public void UserStateChangedTest()
+        {
+            user.Dispatcher.Invoke(() =>
+            {
+                user.UserStateChanged += User_UserStateChanged;
+                user.UserStateChanged -= User_UserStateChanged;
+            });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void UserStateChangedTest_Fail()
+        {
+            user.UserStateChanged += User_UserStateChanged;
+        }
+
+        [TestMethod]
+        public void UserBanInfoChangedTest()
+        {
+            user.Dispatcher.Invoke(() =>
+            {
+                user.UserBanInfoChanged += User_UserBanInfoChanged;
+                user.UserBanInfoChanged -= User_UserBanInfoChanged;
+            });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void UserBanInfoChangedTest_Fail()
+        {
+            user.UserBanInfoChanged += User_UserBanInfoChanged;
+        }
+
+        private void User_Renamed(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void User_Deleted(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void User_UserInfoChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void User_UserStateChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void User_UserBanInfoChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

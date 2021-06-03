@@ -25,9 +25,14 @@ namespace JSSoft.Crema.Services.Extensions
 {
     public static class UserCollectionExtensions
     {
-        public static Task<bool> ContainsAsync(this IUserCollection users, string userID)
+        public static Task<bool> ContainsAsync(this IUserCollection userCollection, string userID)
         {
-            return users.Dispatcher.InvokeAsync(() => users.Contains(userID));
+            return userCollection.Dispatcher.InvokeAsync(() => userCollection.Contains(userID));
+        }
+
+        public static Task<IUser> GetUserAsync(this IUserCollection userCollection, string userID)
+        {
+            return userCollection.Dispatcher.InvokeAsync(() => userCollection[userID]);
         }
     }
 }
