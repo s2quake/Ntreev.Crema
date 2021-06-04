@@ -93,47 +93,7 @@ namespace JSSoft.Crema.Services.Random
             }
         }
 
-        public static async Task GenerateCategoriesAsync(this IUserContext context, Authentication authentication, int tryCount)
-        {
-            for (var i = 0; i < tryCount; i++)
-            {
-                await context.GenerateCategoryAsync(authentication);
-            }
-        }
-
-        public static async Task<bool> GenerateCategoryAsync(this IUserContext context, Authentication authentication)
-        {
-            if (RandomUtility.Within(50) == true)
-            {
-                await context.Root.AddNewCategoryAsync(authentication, RandomUtility.NextIdentifier());
-            }
-            else
-            {
-                var category = context.Categories.Random();
-                if (GetLevel(category, (i) => i.Parent) > 4)
-                    return false;
-                await category.AddNewCategoryAsync(authentication, RandomUtility.NextIdentifier());
-            }
-            return true;
-        }
-
-        public static async Task GenerateUsersAsync(this IUserContext context, Authentication authentication, int tryCount)
-        {
-            for (var i = 0; i < tryCount; i++)
-            {
-                await context.GenerateUserAsync(authentication);
-            }
-        }
-
-        public static async Task<bool> GenerateUserAsync(this IUserContext context, Authentication authentication)
-        {
-            var category = context.Categories.Random();
-            var newID = NameUtility.GenerateNewName("Test", context.Users.Select(item => item.ID).ToArray());
-            var newName = newID.Replace("Test", "테스트");
-            await category.AddNewUserAsync(authentication, newID, null, newName, Authority.Member);
-            return true;
-        }
-
+      
         public static async Task GenerateCategoriesAsync(this ITableContext context, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
@@ -623,7 +583,7 @@ namespace JSSoft.Crema.Services.Random
             return tags.Random();
         }
 
-        private static int GetLevel<T>(T category, Func<T, T> parentFunc)
+        public static int GetLevel<T>(T category, Func<T, T> parentFunc)
         {
             int level = 0;
 

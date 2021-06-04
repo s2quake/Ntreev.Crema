@@ -29,6 +29,8 @@ using JSSoft.Crema.ServiceModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using JSSoft.Crema.Services.Extensions;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -121,190 +123,382 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void UsersCreatedTest()
+        public async Task UsersCreatedTestAsync()
         {
-            userCollection.Dispatcher.Invoke(() =>
+            var userID = string.Empty;
+            var userName = string.Empty;
+            var userContext = userCollection.GetService(typeof(IUserContext)) as IUserContext;
+            await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersCreated += UserCollection_UsersCreated;
+            });
+            var user1 = await userContext.GenerateUserAsync(authentication);
+            Assert.AreEqual(userID, user1.ID);
+            Assert.AreEqual(userName, user1.UserName);
+
+            await userCollection.Dispatcher.InvokeAsync(() =>
+            {
                 userCollection.UsersCreated -= UserCollection_UsersCreated;
             });
+            var user2 = await userContext.GenerateUserAsync(authentication);
+            Assert.AreNotEqual(userID, user2.ID);
+            Assert.AreNotEqual(userName, user2.UserName);
+
+            void UserCollection_UsersCreated(object sender, ItemsCreatedEventArgs<IUser> e)
+            {
+                var user = e.Items.Single();
+                userID = user.ID;
+                userName = user.UserName;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersCreated_Dispatcher_Faile()
+        public void UsersCreated_Dispatcher_Fail()
         {
-            userCollection.UsersCreated += UserCollection_UsersCreated;
+            userCollection.UsersCreated += (s, e) => { };
         }
 
         [TestMethod]
-        public void UsersMovedTest()
+        public async Task UsersMovedTestAsync()
         {
-            userCollection.Dispatcher.Invoke(() =>
+            var userCategoryCollection = userCollection.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            var user = await userCollection.GetRandomUserAsync();
+            var category = await userCategoryCollection.GetRandomUserCategoryAsync(item => item != user.Category);
+            var oldCategory = user.Category;
+            var path = string.Empty;
+            var categoryPath = string.Empty;
+            await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersMoved += UserCollection_UsersMoved;
+            });
+            await user.MoveAsync(authentication, category.Path);
+            Assert.AreEqual(path, user.Path);
+            Assert.AreEqual(categoryPath, user.Category.Path);
+            await userCollection.Dispatcher.InvokeAsync(() =>
+            {
                 userCollection.UsersMoved -= UserCollection_UsersMoved;
             });
-        }
+            await user.MoveAsync(authentication, oldCategory.Path);
+            Assert.AreNotEqual(path, user.Path);
+            Assert.AreNotEqual(categoryPath, user.Category.Path);
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersMoved_Dispatcher_Faile()
-        {
-            userCollection.UsersMoved += UserCollection_UsersMoved;
-        }
-
-        [TestMethod]
-        public void UsersRenamedTest()
-        {
-            userCollection.Dispatcher.Invoke(() =>
+            void UserCollection_UsersMoved(object sender, ItemsMovedEventArgs<IUser> e)
             {
-                userCollection.UsersRenamed += UserCollection_UsersRenamed;
-                userCollection.UsersRenamed -= UserCollection_UsersRenamed;
-            });
+                var user = e.Items.Single();
+                path = user.Path;
+                categoryPath = user.Category.Path;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersRenamed_Dispatcher_Faile()
+        public void UsersMoved_Dispatcher_Fail()
         {
-            userCollection.UsersRenamed += UserCollection_UsersRenamed;
+            userCollection.UsersMoved += (s, e) => { };
         }
 
         [TestMethod]
-        public void UsersDeletedTest()
+        public async Task UsersDeletedTestAsync()
         {
-            userCollection.Dispatcher.Invoke(() =>
+            var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
+            var userPath = user.Path;
+            await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersDeleted += UserCollection_UsersDeleted;
+            });
+            await user.DeleteAsync(authentication);
+            Assert.AreEqual(string.Empty, userPath);
+            Assert.IsNull(user.Category);
+            await userCollection.Dispatcher.InvokeAsync(() =>
+            {
                 userCollection.UsersDeleted -= UserCollection_UsersDeleted;
             });
+            var user1 = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
+            var userPath1 = user1.Path;
+            await user1.DeleteAsync(authentication);
+            Assert.AreNotEqual(string.Empty, userPath1);
+
+            void UserCollection_UsersDeleted(object sender, ItemsDeletedEventArgs<IUser> e)
+            {
+                userPath = string.Empty;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersDeleted_Dispatcher_Faile()
+        public void UsersDeleted_Dispatcher_Fail()
         {
-            userCollection.UsersDeleted += UserCollection_UsersDeleted;
+            userCollection.UsersDeleted += (s, e) => { };
         }
 
         [TestMethod]
-        public void UsersStateChangedTest()
+        public async Task UsersStateChangedTestAsync()
         {
-            userCollection.Dispatcher.Invoke(() =>
+            var userState = UserState.None;
+            var user = await userCollection.GetRandomUserAsync(item => item.UserState == UserState.None);
+            await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersStateChanged += UserCollection_UsersStateChanged;
+            });
+            var password = user.GetPassword();
+            var token = await cremaHost.LoginAsync(user.ID, password);
+            var authentication = await cremaHost.AuthenticateAsync(token);
+            Assert.AreEqual(userState, user.UserState);
+            await userCollection.Dispatcher.InvokeAsync(() =>
+            {
                 userCollection.UsersStateChanged -= UserCollection_UsersStateChanged;
             });
+            await cremaHost.LogoutAsync(authentication);
+            Assert.AreNotEqual(userState, user.UserState);
+
+            void UserCollection_UsersStateChanged(object sender, ItemsEventArgs<IUser> e)
+            {
+                var user = e.Items.Single();
+                userState = user.UserState;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersStateChanged_Dispatcher_Faile()
+        public void UsersStateChanged_Dispatcher_Fail()
         {
-            userCollection.UsersStateChanged += UserCollection_UsersStateChanged;
+            userCollection.UsersStateChanged += (s, e) => { };
         }
 
         [TestMethod]
-        public void UsersChangedTest()
+        public async Task UsersChangedTestAsync()
         {
-            userCollection.Dispatcher.Invoke(() =>
+            var authentication = await cremaHost.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
+            var userName = user.UserName;
+            await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersChanged += UserCollection_UsersChanged;
+            });
+            var password = user.GetPassword();
+            await user.SetUserNameAsync(authentication, password, RandomUtility.NextName());
+            Assert.AreEqual(userName, user.UserName);
+            await userCollection.Dispatcher.InvokeAsync(() =>
+            {
                 userCollection.UsersChanged -= UserCollection_UsersChanged;
             });
+            await user.SetUserNameAsync(authentication, password, $"{RandomUtility.NextName()}{RandomUtility.Next(100)}");
+            Assert.AreNotEqual(userName, user.UserName);
+
+            void UserCollection_UsersChanged(object sender, ItemsEventArgs<IUser> e)
+            {
+                var user = e.Items.Single();
+                userName = user.UserName;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersChanged_Dispatcher_Faile()
+        public void UsersChanged_Dispatcher_Fail()
         {
-            userCollection.UsersChanged += UserCollection_UsersChanged;
+            userCollection.UsersChanged += (s, e) => { };
         }
 
         [TestMethod]
-        public void UsersLoggedInTest()
+        public async Task UsersLoggedInTestAsync()
         {
-            userCollection.Dispatcher.Invoke(() =>
+            var userID = string.Empty;
+            await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersLoggedIn += UserCollection_UsersLoggedIn;
+            });
+            var authentication1 = await cremaHost.LoginRandomAsync();
+            Assert.AreEqual(userID, authentication1.ID);
+            await userCollection.Dispatcher.InvokeAsync(() =>
+            {
                 userCollection.UsersLoggedIn -= UserCollection_UsersLoggedIn;
             });
+            var authentication2 = await cremaHost.LoginRandomAsync();
+            Assert.AreEqual(userID, authentication1.ID);
+            Assert.AreNotEqual(userID, authentication2.ID);
+
+            void UserCollection_UsersLoggedIn(object sender, ItemsEventArgs<IUser> e)
+            {
+                var user = e.Items.Single();
+                userID = user.ID;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersLoggedIn_Dispatcher_Faile()
+        public void UsersLoggedIn_Dispatcher_Fail()
         {
-            userCollection.UsersLoggedIn += UserCollection_UsersLoggedIn;
+            userCollection.UsersLoggedIn += (s, e) => { };
         }
 
         [TestMethod]
-        public void UsersLoggedOutTest()
+        public async Task UsersLoggedOutTestAsync()
         {
-            userCollection.Dispatcher.Invoke(() =>
+            var authentication1 = await cremaHost.LoginRandomAsync();
+            var authentication2 = await cremaHost.LoginRandomAsync();
+            var user1 = await userCollection.GetUserAsync(authentication1.ID);
+            var user2 = await userCollection.GetUserAsync(authentication2.ID);
+            var userID = string.Empty;
+            await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersLoggedOut += UserCollection_UsersLoggedOut;
+            });
+            await cremaHost.LogoutAsync(authentication1);
+            Assert.AreEqual(userID, user1.ID);
+            await userCollection.Dispatcher.InvokeAsync(() =>
+            {
                 userCollection.UsersLoggedOut -= UserCollection_UsersLoggedOut;
             });
+            await cremaHost.LogoutAsync(authentication2);
+            Assert.AreEqual(userID, user1.ID);
+            Assert.AreNotEqual(userID, user2.ID);
+
+            void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
+            {
+                var user = e.Items.Single();
+                userID = user.ID;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersLoggedOut_Dispatcher_Faile()
+        public void UsersLoggedOut_Dispatcher_Fail()
         {
-            userCollection.UsersLoggedOut += UserCollection_UsersLoggedOut;
+            userCollection.UsersLoggedOut += (s, e) => { };
         }
 
         [TestMethod]
-        public void UsersKickedTest()
+        public async Task UsersKickedTestAsync()
         {
-            userCollection.Dispatcher.Invoke(() =>
+            var authentication1 = await cremaHost.LoginRandomAsync();
+            var user1 = await userCollection.GetUserAsync(authentication1.ID);
+            var authentication2 = await cremaHost.LoginRandomAsync();
+            var user2 = await userCollection.GetUserAsync(authentication2.ID);
+            var userID = string.Empty;
+            var message = RandomUtility.NextString();
+            var comment = string.Empty;
+            await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersKicked += UserCollection_UsersKicked;
+            });
+            await user1.KickAsync(authentication, message);
+            Assert.AreEqual(userID, user1.ID);
+            Assert.AreEqual(message, comment);
+            await userCollection.Dispatcher.InvokeAsync(() =>
+            {
                 userCollection.UsersKicked -= UserCollection_UsersKicked;
             });
+            await user2.KickAsync(authentication, RandomUtility.NextString());
+            Assert.AreEqual(userID, user1.ID);
+            Assert.AreEqual(message, comment);
+            Assert.AreNotEqual(userID, user2.ID);
+
+            void UserCollection_UsersKicked(object sender, ItemsEventArgs<IUser> e)
+            {
+                var user = e.Items.Single();
+                userID = user.ID;
+                comment = (e.MetaData as string[]).Single();
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersKicked_Dispatcher_Faile()
+        public void UsersKicked_Dispatcher_Fail()
         {
-            userCollection.UsersKicked += UserCollection_UsersKicked;
+            userCollection.UsersKicked += (s, e) => { };
         }
 
         [TestMethod]
-        public void UsersBanChangedTest()
+        public async Task UsersBanChangedTestAsync()
         {
-            userCollection.Dispatcher.Invoke(() =>
+            var user1 = await userCollection.GetRandomUserAsync(item => item.Authority != Authority.Admin && item.BanInfo.IsBanned == false);
+            var actualUserID = string.Empty;
+            var actualMessage = string.Empty;
+            var actualBanType = BanChangeType.Unban;
+            var expectedMessage = RandomUtility.NextString();
+            await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersBanChanged += UserCollection_UsersBanChanged;
+            });
+            await user1.BanAsync(authentication, expectedMessage);
+            Assert.AreEqual(user1.ID, actualUserID);
+            Assert.AreEqual(expectedMessage, actualMessage);
+            Assert.AreEqual(BanChangeType.Ban, actualBanType);
+            var user2 = await userCollection.GetRandomUserAsync(item => item.Authority != Authority.Admin && item.BanInfo.IsBanned == false);
+            await userCollection.Dispatcher.InvokeAsync(() =>
+            {
                 userCollection.UsersBanChanged -= UserCollection_UsersBanChanged;
             });
+            await user2.BanAsync(authentication, RandomUtility.NextString());
+            Assert.AreEqual(user1.ID, actualUserID);
+            Assert.AreEqual(expectedMessage, actualMessage);
+            Assert.AreEqual(BanChangeType.Ban, actualBanType);
+            Assert.AreNotEqual(actualUserID, user2.ID);
+
+            void UserCollection_UsersBanChanged(object sender, ItemsEventArgs<IUser> e)
+            {
+                var user = e.Items.Single();
+                var metaData = e.MetaData as object[];
+                actualUserID = user.ID;
+                actualBanType = (BanChangeType)metaData[0];
+                actualMessage = (metaData[1] as string[]).Single();
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersBanChanged_Dispatcher_Faile()
+        public void UsersBanChanged_Dispatcher_Fail()
         {
-            userCollection.UsersBanChanged += UserCollection_UsersBanChanged;
+            userCollection.UsersBanChanged += (s, e) => { };
         }
 
         [TestMethod]
-        public void MessageReceivedTest()
+        public async Task MessageReceivedTest()
         {
-            userCollection.Dispatcher.Invoke(() =>
+            var authentication1 = await cremaHost.LoginRandomAsync();
+            var authentication2 = await cremaHost.LoginRandomAsync();
+            var user1 = await userCollection.GetUserAsync(authentication1.ID);
+            var user2 = await userCollection.GetUserAsync(authentication2.ID);
+            var actualMessage = string.Empty;
+            var actualMessageType = MessageType.Notification;
+            var actualUserID = string.Empty;
+            var actualSenderID = string.Empty;
+            var expectedMessage = RandomUtility.NextString();
+            await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.MessageReceived += UserCollection_MessageReceived;
+            });
+            await user2.SendMessageAsync(authentication1, expectedMessage);
+            Assert.AreEqual(expectedMessage, actualMessage);
+            Assert.AreEqual(MessageType.None, actualMessageType);
+            Assert.AreEqual(user2.ID, actualUserID);
+            Assert.AreEqual(user1.ID, actualSenderID);
+            await userCollection.Dispatcher.InvokeAsync(() =>
+            {
                 userCollection.MessageReceived -= UserCollection_MessageReceived;
             });
+            await user1.SendMessageAsync(authentication2, RandomUtility.NextString());
+            Assert.AreEqual(expectedMessage, actualMessage);
+            Assert.AreEqual(MessageType.None, actualMessageType);
+            Assert.AreEqual(user2.ID, actualUserID);
+            Assert.AreEqual(user1.ID, actualSenderID);
+
+            void UserCollection_MessageReceived(object sender, MessageEventArgs e)
+            {
+                var user = e.Items.Single();
+                actualUserID = user.ID;
+                actualSenderID = e.UserID;
+                actualMessage = e.Message;
+                actualMessageType = e.MessageType;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void MessageReceived_Dispatcher_Faile()
+        public void MessageReceived_Dispatcher_Fail()
         {
-            userCollection.MessageReceived += UserCollection_MessageReceived;
+            userCollection.MessageReceived += (s, e) => { };
         }
 
         [TestMethod]
@@ -353,61 +547,6 @@ namespace JSSoft.Crema.Services.Test
             {
                 Assert.Fail();
             }
-        }
-
-        private void UserCollection_UsersCreated(object sender, ItemsCreatedEventArgs<IUser> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserCollection_UsersMoved(object sender, ItemsMovedEventArgs<IUser> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserCollection_UsersRenamed(object sender, ItemsRenamedEventArgs<IUser> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserCollection_UsersDeleted(object sender, ItemsDeletedEventArgs<IUser> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserCollection_UsersStateChanged(object sender, ItemsEventArgs<IUser> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserCollection_UsersChanged(object sender, ItemsEventArgs<IUser> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserCollection_UsersLoggedIn(object sender, ItemsEventArgs<IUser> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserCollection_UsersKicked(object sender, ItemsEventArgs<IUser> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserCollection_UsersBanChanged(object sender, ItemsEventArgs<IUser> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserCollection_MessageReceived(object sender, MessageEventArgs e)
-        {
-            throw new NotImplementedException();
         }
     }
 }

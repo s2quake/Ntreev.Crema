@@ -132,7 +132,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void CategoriesCreated_Dispatcher_Faile()
+        public void CategoriesCreated_Dispatcher_Fail()
         {
             userCategoryCollection.CategoriesCreated += UserCategoryCollection_CategoriesCreated;
         }
@@ -149,7 +149,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void CategoriesRenamed_Dispatcher_Faile()
+        public void CategoriesRenamed_Dispatcher_Fail()
         {
             userCategoryCollection.CategoriesRenamed += UserCategoryCollection_CategoriesRenamed;
         }
@@ -166,7 +166,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void CategoriesMoved_Dispatcher_Faile()
+        public void CategoriesMoved_Dispatcher_Fail()
         {
             userCategoryCollection.CategoriesMoved += UserCategoryCollection_CategoriesMoved;
         }
@@ -183,7 +183,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void CategoriesDeleted_Dispatcher_Faile()
+        public void CategoriesDeleted_Dispatcher_Fail()
         {
             userCategoryCollection.CategoriesDeleted += UserCategoryCollection_CategoriesDeleted;
         }

@@ -38,7 +38,6 @@ namespace JSSoft.Crema.Services.Users
         IUserCollection
     {
         private ItemsCreatedEventHandler<IUser> usersCreated;
-        private ItemsRenamedEventHandler<IUser> usersRenamed;
         private ItemsMovedEventHandler<IUser> usersMoved;
         private ItemsDeletedEventHandler<IUser> usersDeleted;
         private ItemsEventHandler<IUser> usersStateChanged;
@@ -419,20 +418,6 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        public event ItemsRenamedEventHandler<IUser> UsersRenamed
-        {
-            add
-            {
-                this.Dispatcher.VerifyAccess();
-                this.usersRenamed += value;
-            }
-            remove
-            {
-                this.Dispatcher.VerifyAccess();
-                this.usersRenamed -= value;
-            }
-        }
-
         public event ItemsMovedEventHandler<IUser> UsersMoved
         {
             add
@@ -576,11 +561,6 @@ namespace JSSoft.Crema.Services.Users
         protected virtual void OnUsersCreated(ItemsCreatedEventArgs<IUser> e)
         {
             this.usersCreated?.Invoke(this, e);
-        }
-
-        protected virtual void OnUsersRenamed(ItemsRenamedEventArgs<IUser> e)
-        {
-            this.usersRenamed?.Invoke(this, e);
         }
 
         protected virtual void OnUsersMoved(ItemsMovedEventArgs<IUser> e)

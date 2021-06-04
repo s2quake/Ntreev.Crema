@@ -44,9 +44,6 @@ namespace JSSoft.Crema.Services
         event ItemsMovedEventHandler<IUser> UsersMoved;
 
         [DispatcherEvent(typeof(IUserContext))]
-        event ItemsRenamedEventHandler<IUser> UsersRenamed;
-
-        [DispatcherEvent(typeof(IUserContext))]
         event ItemsDeletedEventHandler<IUser> UsersDeleted;
 
         [DispatcherEvent(typeof(IUserContext))]

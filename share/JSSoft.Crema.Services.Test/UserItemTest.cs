@@ -309,7 +309,7 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public void ChildTest_Dispatcher_Fail()
         {
-            Assert.Fail($"{userItem.Childs}");
+            Assert.Fail($"{userItem.Childs.Any()}");
         }
 
         [TestMethod]
