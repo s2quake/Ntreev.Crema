@@ -125,30 +125,31 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersCreatedTestAsync()
         {
-            var userID = string.Empty;
-            var userName = string.Empty;
+            var actualUserID = string.Empty;
+            var actualUserName = string.Empty;
             var userContext = userCollection.GetService(typeof(IUserContext)) as IUserContext;
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersCreated += UserCollection_UsersCreated;
             });
             var user1 = await userContext.GenerateUserAsync(authentication);
-            Assert.AreEqual(userID, user1.ID);
-            Assert.AreEqual(userName, user1.UserName);
-
+            Assert.AreEqual(user1.ID, actualUserID);
+            Assert.AreEqual(user1.UserName, actualUserName);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersCreated -= UserCollection_UsersCreated;
             });
             var user2 = await userContext.GenerateUserAsync(authentication);
-            Assert.AreNotEqual(userID, user2.ID);
-            Assert.AreNotEqual(userName, user2.UserName);
+            Assert.AreEqual(user1.ID, actualUserID);
+            Assert.AreEqual(user1.UserName, actualUserName);
+            Assert.AreNotEqual(user2.ID, actualUserID);
+            Assert.AreNotEqual(user2.UserName, actualUserName);
 
             void UserCollection_UsersCreated(object sender, ItemsCreatedEventArgs<IUser> e)
             {
                 var user = e.Items.Single();
-                userID = user.ID;
-                userName = user.UserName;
+                actualUserID = user.ID;
+                actualUserName = user.UserName;
             }
         }
 
@@ -166,28 +167,28 @@ namespace JSSoft.Crema.Services.Test
             var user = await userCollection.GetRandomUserAsync();
             var category = await userCategoryCollection.GetRandomUserCategoryAsync(item => item != user.Category);
             var oldCategory = user.Category;
-            var path = string.Empty;
-            var categoryPath = string.Empty;
+            var actualPath = string.Empty;
+            var actualCategoryPath = string.Empty;
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersMoved += UserCollection_UsersMoved;
             });
             await user.MoveAsync(authentication, category.Path);
-            Assert.AreEqual(path, user.Path);
-            Assert.AreEqual(categoryPath, user.Category.Path);
+            Assert.AreEqual(user.Path, actualPath);
+            Assert.AreEqual(user.Category.Path, actualCategoryPath);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersMoved -= UserCollection_UsersMoved;
             });
             await user.MoveAsync(authentication, oldCategory.Path);
-            Assert.AreNotEqual(path, user.Path);
-            Assert.AreNotEqual(categoryPath, user.Category.Path);
+            Assert.AreNotEqual(user.Path, actualPath);
+            Assert.AreNotEqual(user.Category.Path, actualCategoryPath);
 
             void UserCollection_UsersMoved(object sender, ItemsMovedEventArgs<IUser> e)
             {
                 var user = e.Items.Single();
-                path = user.Path;
-                categoryPath = user.Category.Path;
+                actualPath = user.Path;
+                actualCategoryPath = user.Category.Path;
             }
         }
 
@@ -202,26 +203,26 @@ namespace JSSoft.Crema.Services.Test
         public async Task UsersDeletedTestAsync()
         {
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
-            var userPath = user.Path;
+            var actualUserPath = user.Path;
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersDeleted += UserCollection_UsersDeleted;
             });
             await user.DeleteAsync(authentication);
-            Assert.AreEqual(string.Empty, userPath);
+            Assert.AreEqual(string.Empty, actualUserPath);
             Assert.IsNull(user.Category);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersDeleted -= UserCollection_UsersDeleted;
             });
-            var user1 = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
-            var userPath1 = user1.Path;
-            await user1.DeleteAsync(authentication);
-            Assert.AreNotEqual(string.Empty, userPath1);
+            var user2 = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
+            var userPath2 = user2.Path;
+            await user2.DeleteAsync(authentication);
+            Assert.AreNotEqual(string.Empty, userPath2);
 
             void UserCollection_UsersDeleted(object sender, ItemsDeletedEventArgs<IUser> e)
             {
-                userPath = string.Empty;
+                actualUserPath = string.Empty;
             }
         }
 
@@ -235,7 +236,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersStateChangedTestAsync()
         {
-            var userState = UserState.None;
+            var actualState = UserState.None;
             var user = await userCollection.GetRandomUserAsync(item => item.UserState == UserState.None);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
@@ -244,18 +245,18 @@ namespace JSSoft.Crema.Services.Test
             var password = user.GetPassword();
             var token = await cremaHost.LoginAsync(user.ID, password);
             var authentication = await cremaHost.AuthenticateAsync(token);
-            Assert.AreEqual(userState, user.UserState);
+            Assert.AreEqual(user.UserState, actualState);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersStateChanged -= UserCollection_UsersStateChanged;
             });
             await cremaHost.LogoutAsync(authentication);
-            Assert.AreNotEqual(userState, user.UserState);
+            Assert.AreNotEqual(user.UserState, actualState);
 
             void UserCollection_UsersStateChanged(object sender, ItemsEventArgs<IUser> e)
             {
                 var user = e.Items.Single();
-                userState = user.UserState;
+                actualState = user.UserState;
             }
         }
 
@@ -271,25 +272,25 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await cremaHost.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
-            var userName = user.UserName;
+            var actualUserName = user.UserName;
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersChanged += UserCollection_UsersChanged;
             });
             var password = user.GetPassword();
             await user.SetUserNameAsync(authentication, password, RandomUtility.NextName());
-            Assert.AreEqual(userName, user.UserName);
+            Assert.AreEqual(user.UserName, actualUserName);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersChanged -= UserCollection_UsersChanged;
             });
             await user.SetUserNameAsync(authentication, password, $"{RandomUtility.NextName()}{RandomUtility.Next(100)}");
-            Assert.AreNotEqual(userName, user.UserName);
+            Assert.AreNotEqual(user.UserName, actualUserName);
 
             void UserCollection_UsersChanged(object sender, ItemsEventArgs<IUser> e)
             {
                 var user = e.Items.Single();
-                userName = user.UserName;
+                actualUserName = user.UserName;
             }
         }
 
@@ -303,25 +304,25 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersLoggedInTestAsync()
         {
-            var userID = string.Empty;
+            var actualUserID = string.Empty;
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersLoggedIn += UserCollection_UsersLoggedIn;
             });
             var authentication1 = await cremaHost.LoginRandomAsync();
-            Assert.AreEqual(userID, authentication1.ID);
+            Assert.AreEqual(authentication1.ID, actualUserID);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersLoggedIn -= UserCollection_UsersLoggedIn;
             });
             var authentication2 = await cremaHost.LoginRandomAsync();
-            Assert.AreEqual(userID, authentication1.ID);
-            Assert.AreNotEqual(userID, authentication2.ID);
+            Assert.AreEqual(authentication1.ID, actualUserID);
+            Assert.AreNotEqual(authentication2.ID, actualUserID);
 
             void UserCollection_UsersLoggedIn(object sender, ItemsEventArgs<IUser> e)
             {
                 var user = e.Items.Single();
-                userID = user.ID;
+                actualUserID = user.ID;
             }
         }
 
@@ -339,25 +340,25 @@ namespace JSSoft.Crema.Services.Test
             var authentication2 = await cremaHost.LoginRandomAsync();
             var user1 = await userCollection.GetUserAsync(authentication1.ID);
             var user2 = await userCollection.GetUserAsync(authentication2.ID);
-            var userID = string.Empty;
+            var actualUserID = string.Empty;
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersLoggedOut += UserCollection_UsersLoggedOut;
             });
             await cremaHost.LogoutAsync(authentication1);
-            Assert.AreEqual(userID, user1.ID);
+            Assert.AreEqual(user1.ID, actualUserID);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersLoggedOut -= UserCollection_UsersLoggedOut;
             });
             await cremaHost.LogoutAsync(authentication2);
-            Assert.AreEqual(userID, user1.ID);
-            Assert.AreNotEqual(userID, user2.ID);
+            Assert.AreEqual(user1.ID, actualUserID);
+            Assert.AreNotEqual(user2.ID, actualUserID);
 
             void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
             {
                 var user = e.Items.Single();
-                userID = user.ID;
+                actualUserID = user.ID;
             }
         }
 
@@ -375,30 +376,30 @@ namespace JSSoft.Crema.Services.Test
             var user1 = await userCollection.GetUserAsync(authentication1.ID);
             var authentication2 = await cremaHost.LoginRandomAsync();
             var user2 = await userCollection.GetUserAsync(authentication2.ID);
-            var userID = string.Empty;
-            var message = RandomUtility.NextString();
-            var comment = string.Empty;
+            var actualUserID = string.Empty;
+            var actualMessage = string.Empty;
+            var expectedMessage = RandomUtility.NextString();
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersKicked += UserCollection_UsersKicked;
             });
-            await user1.KickAsync(authentication, message);
-            Assert.AreEqual(userID, user1.ID);
-            Assert.AreEqual(message, comment);
+            await user1.KickAsync(authentication, expectedMessage);
+            Assert.AreEqual(user1.ID, actualUserID);
+            Assert.AreEqual(expectedMessage, actualMessage);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersKicked -= UserCollection_UsersKicked;
             });
             await user2.KickAsync(authentication, RandomUtility.NextString());
-            Assert.AreEqual(userID, user1.ID);
-            Assert.AreEqual(message, comment);
-            Assert.AreNotEqual(userID, user2.ID);
+            Assert.AreEqual(user1.ID, actualUserID);
+            Assert.AreEqual(expectedMessage, actualMessage);
+            Assert.AreNotEqual(user2.ID, actualUserID);
 
             void UserCollection_UsersKicked(object sender, ItemsEventArgs<IUser> e)
             {
                 var user = e.Items.Single();
-                userID = user.ID;
-                comment = (e.MetaData as string[]).Single();
+                actualUserID = user.ID;
+                actualMessage = (e.MetaData as string[]).Single();
             }
         }
 
