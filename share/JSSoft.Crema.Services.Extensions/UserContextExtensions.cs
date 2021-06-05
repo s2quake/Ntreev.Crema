@@ -19,6 +19,8 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Extensions
@@ -28,6 +30,75 @@ namespace JSSoft.Crema.Services.Extensions
         public static Task NotifyMessageAsync(this IUserContext userContext, Authentication authentication, string message)
         {
             return userContext.NotifyMessageAsync(authentication, new string[] { }, message);
+        }
+
+        public static Task<bool> ContainsUserItemAsync(this IUserContext userContext, string itemPath)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.Contains(itemPath));
+        }
+
+        public static Task<bool> ContainsUserAsync(this IUserContext userContext, string userID)
+        {
+            if (userContext.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
+            {
+                return userCollection.ContainsAsync(userID);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<bool> ContainsUserCategoryAsync(this IUserContext userContext, string categoryPath)
+        {
+            if (userContext.GetService(typeof(IUserCategoryCollection)) is IUserCategoryCollection userCategoryCollection)
+            {
+                return userCategoryCollection.ContainsAsync(categoryPath);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<IUserItem> GetUserItemAsync(this IUserContext userContext, string itemPath)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext[itemPath]);
+        }
+
+        public static Task<IUserItem[]> GetUserItemsAsync(this IUserContext userContext)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.ToArray());
+        }
+
+        public static Task<IUser> GetUserAsync(this IUserContext userContext, string userID)
+        {
+            if (userContext.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
+            {
+                return userCollection.Dispatcher.InvokeAsync(() => userCollection[userID]);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<IUser[]> GetUsersAsync(this IUserContext userContext)
+        {
+            if (userContext.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
+            {
+                return userCollection.Dispatcher.InvokeAsync(() => userCollection.ToArray());
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<IUserCategory> GetUserCategoryAsync(this IUserContext userContext, string categoryPath)
+        {
+            if (userContext.GetService(typeof(IUserCategoryCollection)) is IUserCategoryCollection userCategoryCollection)
+            {
+                return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection[categoryPath]);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<IUserCategory[]> GetUserCategoriesAsync(this IUserContext userContext)
+        {
+            if (userContext.GetService(typeof(IUserCategoryCollection)) is IUserCategoryCollection userCategoryCollection)
+            {
+                return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.ToArray());
+            }
+            throw new NotImplementedException();
         }
     }
 }

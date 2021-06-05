@@ -41,9 +41,11 @@ namespace JSSoft.Crema.Javascript.Methods.User
 
         protected override async Task OnExecuteAsync(string userID, string comment = null)
         {
-            var user = await this.CremaHost.GetUserAsync(userID);
+            var user = await this.UserContext.GetUserAsync(userID);
             var authentication = this.Context.GetAuthentication(this);
             await user.BanAsync(authentication, comment);
         }
+
+        private IUserContext UserContext => this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
     }
 }

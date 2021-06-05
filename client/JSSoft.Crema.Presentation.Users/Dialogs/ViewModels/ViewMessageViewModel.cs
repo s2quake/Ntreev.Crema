@@ -93,7 +93,7 @@ namespace JSSoft.Crema.Presentation.Users.Dialogs.ViewModels
 
             var dialog = await this.userContext.Dispatcher.InvokeAsync(() =>
             {
-                var user = this.userContext.Users[this.sendUserID];
+                var user = this.userCollection[this.sendUserID];
                 return new SendMessageViewModel(this.authentication, user);
             });
             if (dialog != null)

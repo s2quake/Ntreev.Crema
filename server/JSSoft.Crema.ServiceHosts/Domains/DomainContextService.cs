@@ -206,7 +206,7 @@ namespace JSSoft.Crema.ServiceHosts.Domains
         {
             //await this.UserContext.Dispatcher.InvokeAsync(() =>
             //{
-            //    this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
+            //    this.UserContext.Users.UsersLoggedOut += UserCollection_UsersLoggedOut;
             //});
             var metaData = await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
@@ -255,12 +255,12 @@ namespace JSSoft.Crema.ServiceHosts.Domains
             });
             //await this.UserContext.Dispatcher.InvokeAsync(() =>
             //{
-            //    this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+            //    this.UserContext.Users.UsersLoggedOut -= UserCollection_UsersLoggedOut;
             //});
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(DetachEventHandlersAsync)}");
         }
 
-        //private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
+        //private async void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         //{
         //    var signatureDate = this.authentication.SignatureDate;
         //    var actionUserID = e.UserID;

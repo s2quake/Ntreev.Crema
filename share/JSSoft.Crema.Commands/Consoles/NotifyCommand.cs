@@ -52,9 +52,9 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public override string[] GetCompletions(CommandCompletionContext completionContext)
         {
-            return this.UserContext.Dispatcher.Invoke(() =>
+            return this.UserCollection.Dispatcher.Invoke(() =>
             {
-                var query = from item in this.UserContext.Users
+                var query = from item in this.UserCollection
                             select item.ID;
                 return query.ToArray();
             });
@@ -67,5 +67,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         private IUserContext UserContext => this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+
+        private IUserCollection UserCollection => this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
     }
 }

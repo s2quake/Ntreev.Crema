@@ -70,7 +70,7 @@ namespace JSSoft.Crema.Presentation.Users
             {
                 if (domainUser.GetService(typeof(IUserContext)) is IUserContext userContext)
                 {
-                    var user = await userContext.Dispatcher.InvokeAsync(() => userContext.Users[descriptor.DomainUserInfo.UserID]);
+                    var user = await userContext.Dispatcher.InvokeAsync(() => userCollection[descriptor.DomainUserInfo.UserID]);
                     var dialog = await user.Dispatcher.InvokeAsync(() => new SendMessageViewModel(authentication, user));
                     if (dialog != null)
                         return await dialog.ShowDialogAsync() == true;

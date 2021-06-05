@@ -45,22 +45,6 @@ namespace JSSoft.Crema.Services.Random
             }
         }
 
-        public static async Task GenerateAsync(this IUserContext context, Authentication authentication)
-        {
-            if (RandomUtility.Within(25) == true)
-                await context.GenerateCategoryAsync(authentication);
-            else
-                await context.GenerateUserAsync(authentication);
-        }
-
-        public static async Task GenerateAsync(this IUserContext context, Authentication authentication, int tryCount)
-        {
-            for (var i = 0; i < tryCount; i++)
-            {
-                await context.GenerateAsync(authentication);
-            }
-        }
-
         public static Task GenerateAsync(this ITypeContext context, Authentication authentication)
         {
             if (RandomUtility.Within(25) == true)

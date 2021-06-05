@@ -30,6 +30,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <ProjectReference Include="..\..\common\JSSoft.Crema.ServiceModel\JSSoft.Crema.ServiceModel.csproj" />
     <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj" />
     <ProjectReference Include="..\JSSoft.Crema.Services\JSSoft.Crema.Services.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Services.Extensions\JSSoft.Crema.Services.Extensions.csproj" />
     <ProjectReference Include="..\..\..\JSSoft.Communication\JSSoft.Communication\JSSoft.Communication.csproj" />
   </ItemGroup>
 </Project>

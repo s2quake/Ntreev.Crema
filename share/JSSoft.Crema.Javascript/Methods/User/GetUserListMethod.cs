@@ -20,6 +20,7 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Extensions;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -39,9 +40,11 @@ namespace JSSoft.Crema.Javascript.Methods.User
 
         }
 
-        protected override Task<string[]> OnExecuteAsync()
+        protected override async Task<string[]> OnExecuteAsync()
         {
-            return this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users.Select(item => item.ID).ToArray());
+            var query = from item in await this.UserContext.GetUsersAsync()
+                        select item.ID;
+            return query.ToArray();
         }
 
         private IUserContext UserContext => this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;

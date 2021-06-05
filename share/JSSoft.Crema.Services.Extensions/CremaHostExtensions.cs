@@ -78,23 +78,23 @@ namespace JSSoft.Crema.Services.Extensions
             return await domain.Users.ContainsAsync(userID);
         }
 
-        public static async Task<bool> ContainsUserAsync(this ICremaHost cremaHost, string userID)
-        {
-            if (cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
-            {
-                return await userContext.Users.ContainsAsync(userID);
-            }
-            throw new NotImplementedException();
-        }
+        // public static async Task<bool> ContainsUserAsync(this ICremaHost cremaHost, string userID)
+        // {
+        //     if (cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
+        //     {
+        //         return await userCollection.ContainsAsync(userID);
+        //     }
+        //     throw new NotImplementedException();
+        // }
 
-        public static async Task<bool> ContainsUserItemAsync(this ICremaHost cremaHost, string categoryPath)
-        {
-            if (cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
-            {
-                return await userContext.Categories.ContainsAsync(categoryPath);
-            }
-            throw new NotImplementedException();
-        }
+        // public static async Task<bool> ContainsUserItemAsync(this ICremaHost cremaHost, string categoryPath)
+        // {
+        //     if (cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
+        //     {
+        //         return await userContext.Categories.ContainsAsync(categoryPath);
+        //     }
+        //     throw new NotImplementedException();
+        // }
 
         public static Task<IDataBase[]> GetDataBasesAsync(this ICremaHost cremaHost)
         {
@@ -239,46 +239,46 @@ namespace JSSoft.Crema.Services.Extensions
             throw new NotImplementedException();
         }
 
-        public static Task<IUser> GetUserAsync(this ICremaHost cremaHost, string userID)
-        {
-            if (cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
-            {
-                return userContext.Dispatcher.InvokeAsync(() =>
-                {
-                    if (userContext.Users.Contains(userID) == false)
-                        throw new UserNotFoundException(userID);
-                    return userContext.Users[userID];
-                });
-            }
-            throw new NotImplementedException();
-        }
+        // public static Task<IUser> GetUserAsync(this ICremaHost cremaHost, string userID)
+        // {
+        //     if (cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
+        //     {
+        //         return userContext.Dispatcher.InvokeAsync(() =>
+        //         {
+        //             if (userCollection.Contains(userID) == false)
+        //                 throw new UserNotFoundException(userID);
+        //             return userCollection[userID];
+        //         });
+        //     }
+        //     throw new NotImplementedException();
+        // }
 
-        public static Task<IUserCategory> GetUserCategoryAsync(this ICremaHost cremaHost, string categoryPath)
-        {
-            if (cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
-            {
-                return userContext.Dispatcher.InvokeAsync(() =>
-                {
-                    if (userContext.Categories.Contains(categoryPath) == false)
-                        throw new CategoryNotFoundException(categoryPath);
-                    return userContext.Categories[categoryPath];
-                });
-            }
-            throw new NotImplementedException();
-        }
+        // public static Task<IUserCategory> GetUserCategoryAsync(this ICremaHost cremaHost, string categoryPath)
+        // {
+        //     if (cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
+        //     {
+        //         return userContext.Dispatcher.InvokeAsync(() =>
+        //         {
+        //             if (userContext.Categories.Contains(categoryPath) == false)
+        //                 throw new CategoryNotFoundException(categoryPath);
+        //             return userContext.Categories[categoryPath];
+        //         });
+        //     }
+        //     throw new NotImplementedException();
+        // }
 
-        public static Task<IUserItem> GetUserItemAsync(this ICremaHost cremaHost, string userItemPath)
-        {
-            if (cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
-            {
-                return userContext.Dispatcher.InvokeAsync(() =>
-                {
-                    if (userContext.Contains(userItemPath) == false)
-                        throw new ItemNotFoundException(userItemPath);
-                    return userContext[userItemPath];
-                });
-            }
-            throw new NotImplementedException();
-        }
+        // public static Task<IUserItem> GetUserItemAsync(this ICremaHost cremaHost, string userItemPath)
+        // {
+        //     if (cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
+        //     {
+        //         return userContext.Dispatcher.InvokeAsync(() =>
+        //         {
+        //             if (userContext.Contains(userItemPath) == false)
+        //                 throw new ItemNotFoundException(userItemPath);
+        //             return userContext[userItemPath];
+        //         });
+        //     }
+        //     throw new NotImplementedException();
+        // }
     }
 }

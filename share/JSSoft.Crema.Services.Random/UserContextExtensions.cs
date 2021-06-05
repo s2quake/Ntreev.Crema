@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.Data.Xml.Schema;
 using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library;
 using JSSoft.Library.Random;
 using System;
@@ -34,18 +35,28 @@ namespace JSSoft.Crema.Services.Random
     {
         public static Task<IUser> GetRandomUserAsync(this IUserContext userContext)
         {
+            return GetRandomUserAsync(userContext, item => true);
+        }
+
+        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, Func<IUser, bool> predicate)
+        {
             if (userContext.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
             {
-                return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random());
+                return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(predicate));
             }
             throw new NotImplementedException();
         }
 
         public static Task<IUserCategory> GetRandomUserCategoryAsync(this IUserContext userContext)
         {
+            return GetRandomUserCategoryAsync(userContext, item => true);
+        }
+
+        public static Task<IUserCategory> GetRandomUserCategoryAsync(this IUserContext userContext, Func<IUserCategory, bool> predicate)
+        {
             if (userContext.GetService(typeof(IUserCategoryCollection)) is IUserCategoryCollection userCategoryCollection)
             {
-                return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.Random());
+                return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.Random(predicate));
             }
             throw new NotImplementedException();
         }
@@ -60,36 +71,60 @@ namespace JSSoft.Crema.Services.Random
             return userContext.Dispatcher.InvokeAsync(() => userContext.Random(predicate));
         }
 
-        public static async Task GenerateCategoriesAsync(this IUserContext userContext, Authentication authentication, int count)
+        public static async Task<IUserItem> GenerateAsync(this IUserContext context, Authentication authentication)
         {
-            for (var i = 0; i < count; i++)
-            {
-                await userContext.GenerateCategoryAsync(authentication);
-            }
+            if (RandomUtility.Within(25) == true)
+                return (await context.GenerateCategoryAsync(authentication)) as IUserItem;
+            else
+                return (await context.GenerateUserAsync(authentication)) as IUserItem;
         }
 
-        public static async Task<bool> GenerateCategoryAsync(this IUserContext userContext, Authentication authentication)
+        public static async Task<IUserItem[]> GenerateManyAsync(this IUserContext context, Authentication authentication, int count)
+        {
+            var itemList = new List<IUserItem>(count);
+            for (var i = 0; i < count; i++)
+            {
+                var item = await context.GenerateAsync(authentication);
+                itemList.Add(item);
+            }
+            return itemList.ToArray();
+        }
+
+        public static async Task<IUserCategory[]> GenerateCategoriesAsync(this IUserContext userContext, Authentication authentication, int count)
+        {
+            var itemList = new List<IUserCategory>(count);
+            for (var i = 0; i < count; i++)
+            {
+                var item = await userContext.GenerateCategoryAsync(authentication);
+                itemList.Add(item);
+            }
+            return itemList.ToArray();
+        }
+
+        public static async Task<IUserCategory> GenerateCategoryAsync(this IUserContext userContext, Authentication authentication)
         {
             if (RandomUtility.Within(50) == true)
             {
-                await userContext.Root.AddNewCategoryAsync(authentication, RandomUtility.NextIdentifier());
+                return await userContext.Root.AddNewCategoryAsync(authentication, RandomUtility.NextIdentifier());
             }
             else
             {
                 var category = await userContext.GetRandomUserCategoryAsync();
                 // if (GetLevel(category, (i) => i.Parent) > 4)
                 //     return false;
-                await category.AddNewCategoryAsync(authentication, RandomUtility.NextIdentifier());
+                return await category.AddNewCategoryAsync(authentication, RandomUtility.NextIdentifier());
             }
-            return true;
         }
 
-        public static async Task GenerateUsersAsync(this IUserContext userContext, Authentication authentication, int count)
+        public static async Task<IUser[]> GenerateUsersAsync(this IUserContext userContext, Authentication authentication, int count)
         {
+            var itemList = new List<IUser>(count);
             for (var i = 0; i < count; i++)
             {
-                await userContext.GenerateUserAsync(authentication);
+                var item = await userContext.GenerateUserAsync(authentication);
+                itemList.Add(item);
             }
+            return itemList.ToArray();
         }
 
         public static async Task<IUser> GenerateUserAsync(this IUserContext userContext, Authentication authentication)
@@ -108,12 +143,11 @@ namespace JSSoft.Crema.Services.Random
             return GenerateUserIDAsync(userContext, "user");
         }
 
-        public static Task<string> GenerateUserIDAsync(this IUserContext userContext, string name)
+        public static async Task<string> GenerateUserIDAsync(this IUserContext userContext, string name)
         {
-            return userContext.Dispatcher.InvokeAsync(() =>
-            {
-                return NameUtility.GenerateNewName(name, userContext.Users.Select(item => item.ID).ToArray());
-            });
+            var query = from item in await userContext.GetUsersAsync()
+                        select item.ID;
+            return NameUtility.GenerateNewName(name, query);
         }
     }
 }

@@ -39,10 +39,6 @@ namespace JSSoft.Crema.Services
         [DispatcherMethod(typeof(IUserContext))]
         bool Contains(string itemPath);
 
-        IUserCollection Users { get; }
-
-        IUserCategoryCollection Categories { get; }
-
         IUserCategory Root { get; }
 
         [DispatcherProperty(typeof(IUserContext))]

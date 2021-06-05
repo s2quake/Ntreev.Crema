@@ -39,21 +39,21 @@ namespace JSSoft.Crema.Javascript.Methods.ListenerHosts.Users
 
         protected override void OnSubscribe()
         {
-            if (this.cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
+            if (this.cremaHost.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
             {
-                userContext.Dispatcher.Invoke(() => userContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
+                userCollection.Dispatcher.Invoke(() => userCollection.UsersLoggedOut += UserCollection_UsersLoggedOut);
             }
         }
 
         protected override void OnUnsubscribe()
         {
-            if (this.cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
+            if (this.cremaHost.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
             {
-                userContext.Dispatcher.Invoke(() => userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
+                userCollection.Dispatcher.Invoke(() => userCollection.UsersLoggedOut -= UserCollection_UsersLoggedOut);
             }
         }
 
-        private void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
+        private void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
             this.Invoke(null);
         }

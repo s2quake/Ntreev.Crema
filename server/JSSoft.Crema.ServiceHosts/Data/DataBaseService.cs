@@ -41,7 +41,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         public DataBaseService(CremaService service, IDataBaseEventCallback callback)
             : base(service, callback)
         {
-            this.UserContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            this.UserCollection = this.CremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
             this.DomainContext = this.CremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
             this.DataBasesContext = this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
 
@@ -585,7 +585,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         public IDomainContext DomainContext { get; }
 
-        public IUserContext UserContext { get; }
+        public IUserCollection UserCollection { get; }
 
         public IDataBaseContext DataBasesContext { get; }
 
@@ -598,7 +598,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
             }
         }
 
-        private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
+        private async void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
             var actionUserID = e.UserID;
             var contains = e.Items.Any(item => item.ID == this.OwnerID);
@@ -843,9 +843,9 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         private async Task<DataBaseMetaData> AttachEventHandlersAsync()
         {
-            await this.UserContext.Dispatcher.InvokeAsync(() =>
+            await this.UserCollection.Dispatcher.InvokeAsync(() =>
             {
-                this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
+                this.UserCollection.UsersLoggedOut += UserCollection_UsersLoggedOut;
             });
             var metaData = await this.dataBase.Dispatcher.InvokeAsync(() =>
             {
@@ -903,9 +903,9 @@ namespace JSSoft.Crema.ServiceHosts.Data
                     this.dataBase.Unloaded -= DataBase_Unloaded;
                 });
             }
-            await this.UserContext.Dispatcher.InvokeAsync(() =>
+            await this.UserCollection.Dispatcher.InvokeAsync(() =>
             {
-                this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+                this.UserCollection.UsersLoggedOut -= UserCollection_UsersLoggedOut;
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(DetachEventHandlersAsync)}");
         }

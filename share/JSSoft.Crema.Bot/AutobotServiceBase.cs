@@ -22,6 +22,7 @@
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
 using JSSoft.Crema.Services.Extensions;
+using JSSoft.Crema.Services.Random;
 using JSSoft.Library;
 using JSSoft.Library.Random;
 using System;
@@ -79,17 +80,17 @@ namespace JSSoft.Crema.Bot
                 var autobotIDList = new List<string>(count + 1) { masterBotID };
                 var autobotPasswordList = new List<SecureString>(count + 1) { masterBotPassword };
                 var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-                if (await userContext.Users.ContainsAsync(masterBotID) == false)
+                if (await userContext.ContainsUserAsync(masterBotID) == false)
                 {
-                    var category = userContext.Categories.Random();
+                    var category = await userContext.GetRandomUserCategoryAsync();
                     await category.AddNewUserAsync(authentication, masterBotID, masterBotPassword, masterBotName, Authority.Admin);
                 }
                 for (var i = 0; i < count; i++)
                 {
                     var info = this.GetRandomUserInfo();
-                    if (await userContext.Users.ContainsAsync(info.ID) == false)
+                    if (await userContext.ContainsUserAsync(info.ID) == false)
                     {
-                        var category = userContext.Categories.Random();
+                        var category = await userContext.GetRandomUserCategoryAsync();
                         await category.AddNewUserAsync(authentication, info.ID, info.Password, info.Name, info.Authority);
                     }
                     autobotIDList.Add(info.ID);

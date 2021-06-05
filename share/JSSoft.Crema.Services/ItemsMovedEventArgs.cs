@@ -23,21 +23,21 @@ namespace JSSoft.Crema.Services
 {
     public class ItemsMovedEventArgs<T> : ItemsEventArgs<T>
     {
-        public ItemsMovedEventArgs(Authentication authentication, T[] items, string[] oldPaths, string[] oldCategoryPaths)
-            : this(authentication, items, oldPaths, oldCategoryPaths, null)
+        public ItemsMovedEventArgs(Authentication authentication, T[] items, string[] oldPaths, string[] oldParentPaths)
+            : this(authentication, items, oldPaths, oldParentPaths, null)
         {
 
         }
 
-        public ItemsMovedEventArgs(Authentication authentication, T[] items, string[] oldPaths, string[] oldCategoryPaths, object metaData)
+        public ItemsMovedEventArgs(Authentication authentication, T[] items, string[] oldPaths, string[] oldParentPaths, object metaData)
             : base(authentication, items, metaData)
         {
             this.OldPaths = oldPaths;
-            this.OldCategoryPaths = oldCategoryPaths;
+            this.OldParentPaths = oldParentPaths;
         }
 
         public string[] OldPaths { get; }
 
-        public string[] OldCategoryPaths { get; }
+        public string[] OldParentPaths { get; }
     }
 }

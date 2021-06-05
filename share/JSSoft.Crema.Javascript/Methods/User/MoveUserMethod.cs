@@ -42,10 +42,12 @@ namespace JSSoft.Crema.Javascript.Methods.User
         [ReturnParameterName("userPath")]
         protected override async Task<string> OnExecuteAsync(string userID, string parentPath)
         {
-            var user = await this.CremaHost.GetUserAsync(userID);
+            var user = await this.UserContext.GetUserAsync(userID);
             var authentication = this.Context.GetAuthentication(this);
             await user.MoveAsync(authentication, parentPath);
             return user.Path;
         }
+
+        private IUserContext UserContext => this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
     }
 }

@@ -57,13 +57,13 @@ namespace JSSoft.Crema.Services.Data
             this.CremaHost.Debug(Resources.Message_TableContextInitialize);
             this.BasePath = Path.Combine(dataBase.BasePath, CremaSchema.TableDirectory);
             this.Initialize(tableInfos);
-            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
+            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut += UserCollection_UsersLoggedOut);
             this.CremaHost.Debug(Resources.Message_TableContextIsCreated);
         }
 
         public void Dispose()
         {
-            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
+            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut -= UserCollection_UsersLoggedOut);
             this.dataBase = null;
         }
 
@@ -563,7 +563,7 @@ namespace JSSoft.Crema.Services.Data
             this.itemsLockChanged?.Invoke(this, e);
         }
 
-        private void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
+        private void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
             var userIDs = e.Items.Select(item => item.ID).ToArray();
             this.Dispatcher.InvokeAsync(() =>

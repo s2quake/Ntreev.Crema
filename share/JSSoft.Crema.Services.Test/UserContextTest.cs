@@ -29,6 +29,8 @@ using JSSoft.Crema.ServiceModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using JSSoft.Crema.Services.Extensions;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -160,29 +162,20 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void UsersTest()
-        {
-            Assert.IsNotNull(userContext.Users);
-        }
-
-        [TestMethod]
-        public void CategoriesTest()
-        {
-            Assert.IsNotNull(userContext.Categories);
-        }
-
-        [TestMethod]
         public void RootTest()
         {
             Assert.IsNotNull(userContext.Root);
         }
 
         [TestMethod]
-        public void IndexerTest()
+        public async Task IndexerTestAsync()
         {
-            var itemPath = userContext.Dispatcher.Invoke(() => userContext.Random().Path);
-            var item = userContext.Dispatcher.Invoke(() => userContext[itemPath]);
-            Assert.AreEqual(itemPath, item.Path);
+            await userContext.Dispatcher.InvokeAsync(() =>
+            {
+                var itemPath = userContext.Random().Path;
+                var item = userContext[itemPath];
+                Assert.AreEqual(itemPath, item.Path);
+            });
         }
 
         [TestMethod]
@@ -203,107 +196,275 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void ItemsCreatedTest()
+        public async Task ItemsCreatedTestAsync()
         {
-            userContext.Dispatcher.Invoke(() =>
+            var actualPath = string.Empty;
+            await userContext.Dispatcher.InvokeAsync(() =>
             {
                 userContext.ItemsCreated += UserContext_ItemsCreated;
+            });
+            var userItem1 = await userContext.GenerateAsync(authentication);
+            Assert.AreEqual(userItem1.Path, actualPath);
+            await userContext.Dispatcher.InvokeAsync(() =>
+            {
                 userContext.ItemsCreated -= UserContext_ItemsCreated;
             });
+            var userItem2 = await userContext.GenerateAsync(authentication);
+            Assert.AreEqual(userItem1.Path, actualPath);
+            Assert.AreNotEqual(userItem2.Path, actualPath);
+
+            void UserContext_ItemsCreated(object sender, ItemsCreatedEventArgs<IUserItem> e)
+            {
+                var userItem = e.Items.Single();
+                actualPath = userItem.Path;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void ItemsCreatedTest_Dispatcher_Fail()
         {
-            userContext.ItemsCreated += UserContext_ItemsCreated;
+            userContext.ItemsCreated += (s, e) => { };
         }
 
         [TestMethod]
-        public void ItemsRenamedTest()
+        public async Task ItemsRenamedTestAsync()
         {
-            userContext.Dispatcher.Invoke(() => userContext.ItemsRenamed += UserContext_ItemsRenamed);
+            var category = await userContext.GetRandomUserCategoryAsync(item => item.Parent != null);
+            var actualName = string.Empty;
+            var actualPath = string.Empty;
+            var actualOldName = string.Empty;
+            var actualOldPath = string.Empty;
+            var expectedName = RandomUtility.NextName();
+            var expectedOldName = category.Name;
+            var expectedOldPath = category.Path;
+            await userContext.Dispatcher.InvokeAsync(() =>
+            {
+                userContext.ItemsRenamed += UserContext_ItemsRenamed;
+            });
+            await category.RenameAsync(authentication, expectedName);
+            Assert.AreEqual(expectedName, actualName);
+            Assert.AreEqual(category.Path, actualPath);
+            Assert.AreEqual(expectedOldName, actualOldName);
+            Assert.AreEqual(expectedOldPath, actualOldPath);
+            await userContext.Dispatcher.InvokeAsync(() =>
+            {
+                userContext.ItemsRenamed -= UserContext_ItemsRenamed;
+            });
+            await category.RenameAsync(authentication, RandomUtility.NextName());
+            Assert.AreEqual(expectedName, actualName);
+            Assert.AreNotEqual(category.Path, actualPath);
+            Assert.AreEqual(expectedOldName, actualOldName);
+            Assert.AreEqual(expectedOldPath, actualOldPath);
+
+            void UserContext_ItemsRenamed(object sender, ItemsRenamedEventArgs<IUserItem> e)
+            {
+                var userItem = e.Items.Single();
+                actualName = userItem.Name;
+                actualPath = userItem.Path;
+                actualOldName = e.OldNames.Single();
+                actualOldPath = e.OldPaths.Single();
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void ItemsRenamedTest_Dispatcher_Fail()
         {
-            userContext.ItemsRenamed += UserContext_ItemsRenamed;
+            userContext.ItemsRenamed += (s, e) => { };
         }
 
         [TestMethod]
-        public void ItemsMovedTest()
+        public async Task ItemsMovedTestAsync()
         {
-            userContext.Dispatcher.Invoke(() =>
+            var userItem = await userContext.GetRandomUserItemAsync(PredicateItem);
+            var parentItem1 = await userContext.GetRandomUserItemAsync(item => PredicateParentItem(item, userItem));
+            var actualPath = string.Empty;
+            var actualOldPath = string.Empty;
+            var actualOldParentPath = string.Empty;
+            var expectedOldPath = userItem.Path;
+            var expectedOldParentPath = userItem.Parent.Path;
+            await userContext.Dispatcher.InvokeAsync(() =>
             {
                 userContext.ItemsMoved += UserContext_ItemsMoved;
+            });
+            await userItem.MoveAsync(authentication, parentItem1.Path);
+            Assert.AreEqual(userItem.Path, actualPath);
+            Assert.AreEqual(expectedOldPath, actualOldPath);
+            Assert.AreEqual(expectedOldParentPath, actualOldParentPath);
+            var parentItem2 = await userContext.GetRandomUserItemAsync(item => PredicateParentItem(item, userItem));
+            await userContext.Dispatcher.InvokeAsync(() =>
+            {
                 userContext.ItemsMoved -= UserContext_ItemsMoved;
             });
+            await userItem.MoveAsync(authentication, parentItem2.Path);
+            Assert.AreNotEqual(userItem.Path, actualPath);
+            Assert.AreEqual(expectedOldPath, actualOldPath);
+            Assert.AreEqual(expectedOldParentPath, actualOldParentPath);
+
+            void UserContext_ItemsMoved(object sender, ItemsMovedEventArgs<IUserItem> e)
+            {
+                var userItem = e.Items.Single();
+                actualPath = userItem.Path;
+                actualOldPath = e.OldPaths.Single();
+                actualOldParentPath = e.OldParentPaths.Single();
+            }
+
+            bool PredicateItem(IUserItem userItem)
+            {
+                if (userItem.Childs.Any() == true)
+                    return false;
+                if (userItem.Parent == null)
+                    return false;
+                return true;
+            }
+
+            bool PredicateParentItem(IUserItem userItem, IUserItem targetItem)
+            {
+                if (userItem is not IUserCategory category)
+                    return false;
+                if (targetItem.Parent == category)
+                    return false;
+                if (targetItem == userItem)
+                    return false;
+                if (category.Parent == null)
+                    return false;
+                return true;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void ItemsMovedTest_Dispatcher_Fail()
         {
-            userContext.ItemsMoved += UserContext_ItemsMoved;
+            userContext.ItemsMoved += (s, e) => { };
         }
 
         [TestMethod]
-        public void ItemsDeletedTest()
+        public async Task ItemsDeletedTestAsync()
         {
-            userContext.Dispatcher.Invoke(() =>
+            var userItem1 = await userContext.GetRandomUserItemAsync(Predicate);
+            var actualPath = string.Empty;
+            var expectedPath = userItem1.Path;
+            await userContext.Dispatcher.InvokeAsync(() =>
             {
                 userContext.ItemsDeleted += UserContext_ItemsDeleted;
+            });
+            await userItem1.DeleteAsync(authentication);
+            Assert.AreEqual(expectedPath, actualPath);
+            await userContext.Dispatcher.InvokeAsync(() =>
+            {
                 userContext.ItemsDeleted -= UserContext_ItemsDeleted;
             });
+            var userItem2 = await userContext.GetRandomUserItemAsync(Predicate);
+            await userItem2.DeleteAsync(authentication);
+            Assert.AreEqual(expectedPath, actualPath);
+
+            void UserContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<IUserItem> e)
+            {
+                var userItem = e.Items.Single();
+                actualPath = e.ItemPaths.Single();
+            }
+
+            static bool Predicate(IUserItem userItem)
+            {
+                if (userItem is IUser user)
+                {
+                    if (user.ID == Authentication.AdminID)
+                        return false;
+                    if (user.UserState == UserState.Online)
+                        return false;
+                }
+                if (userItem is IUserCategory)
+                {
+                    if (userItem.Parent == null)
+                        return false;
+                    if (userItem.Childs.Any() == true)
+                        return false;
+                }
+                return true;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void ItemsDeletedTest_Dispatcher_Fail()
         {
-            userContext.ItemsDeleted += UserContext_ItemsDeleted;
+            userContext.ItemsDeleted += (s, e) => { };
         }
 
         [TestMethod]
-        public void ItemsChangedTest()
+        public async Task ItemsChangedTestAsync()
         {
-            userContext.Dispatcher.Invoke(() =>
+            var authentication = await cremaHost.LoginRandomAsync();
+            var user = await userContext.GetUserAsync(authentication.ID);
+            var password = user.GetPassword();
+            var actualPath = string.Empty;
+            var expectedName = RandomUtility.NextName();
+            await userContext.Dispatcher.InvokeAsync(() =>
             {
                 userContext.ItemsChanged += UserContext_ItemsChanged;
+            });
+            await user.SetUserNameAsync(authentication, password, expectedName);
+            Assert.AreEqual(user.Path, actualPath);
+            await userContext.Dispatcher.InvokeAsync(() =>
+            {
                 userContext.ItemsChanged -= UserContext_ItemsChanged;
             });
+            await user.SetUserNameAsync(authentication, password, RandomUtility.NextName());
+            Assert.AreEqual(user.Path, actualPath);
+
+            void UserContext_ItemsChanged(object sender, ItemsEventArgs<IUserItem> e)
+            {
+                var userItem = e.Items.Single();
+                actualPath = userItem.Path;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void ItemsChangedTest_Dispatcher_Fail()
         {
-            userContext.ItemsChanged += UserContext_ItemsChanged;
+            userContext.ItemsChanged += (s, e) => { };
         }
 
         [TestMethod]
-        public void TaskCompletedTest()
+        public async Task TaskCompletedTestAsync()
         {
-            userContext.Dispatcher.Invoke(() =>
+            var authentication = await cremaHost.LoginRandomAsync();
+            var user = await userContext.GetUserAsync(authentication.ID);
+            var password = user.GetPassword();
+            var actualTaskID = Guid.Empty;
+            await userContext.Dispatcher.InvokeAsync(() =>
             {
                 userContext.TaskCompleted += UserContext_TaskCompleted;
+            });
+            var expectedTaskID = await (user.SetUserNameAsync(authentication, password, RandomUtility.NextName()) as Task<Guid>);
+            Assert.AreEqual(expectedTaskID, actualTaskID);
+            await userContext.Dispatcher.InvokeAsync(() =>
+            {
                 userContext.TaskCompleted -= UserContext_TaskCompleted;
             });
+            expectedTaskID = await (user.SetUserNameAsync(authentication, password, RandomUtility.NextName()) as Task<Guid>);
+            Assert.AreNotEqual(expectedTaskID, actualTaskID);
+
+            void UserContext_TaskCompleted(object sender, TaskCompletedEventArgs e)
+            {
+                actualTaskID = e.TaskIDs.Single();
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void TaskCompletedTest_Dispatcher_Fail()
         {
-            userContext.TaskCompleted += UserContext_TaskCompleted;
+            userContext.TaskCompleted += (s, e) => { };
         }
 
         [TestMethod]
-        public void GetEnumeratorTest()
+        public async Task GetEnumeratorTestAsync()
         {
-            userContext.Dispatcher.Invoke(() =>
+            await userContext.Dispatcher.InvokeAsync(() =>
             {
                 var enumerator = (userContext as IEnumerable).GetEnumerator();
                 while (enumerator.MoveNext())
@@ -325,9 +486,9 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void GetGenericEnumeratorTest()
+        public async Task GetGenericEnumeratorTest()
         {
-            userContext.Dispatcher.Invoke(() =>
+            await userContext.Dispatcher.InvokeAsync(() =>
             {
                 var enumerator = (userContext as IEnumerable<IUserItem>).GetEnumerator();
                 while (enumerator.MoveNext())
@@ -346,36 +507,6 @@ namespace JSSoft.Crema.Services.Test
             {
                 Assert.Fail();
             }
-        }
-
-        private void UserContext_ItemsCreated(object sender, ItemsCreatedEventArgs<IUserItem> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserContext_ItemsRenamed(object sender, ItemsRenamedEventArgs<IUserItem> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserContext_ItemsMoved(object sender, ItemsMovedEventArgs<IUserItem> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<IUserItem> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserContext_ItemsChanged(object sender, ItemsEventArgs<IUserItem> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserContext_TaskCompleted(object sender, TaskCompletedEventArgs e)
-        {
-            throw new NotImplementedException();
         }
     }
 }

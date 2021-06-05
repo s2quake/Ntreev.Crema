@@ -23,6 +23,7 @@ using JSSoft.Crema.Data;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
 using JSSoft.Crema.Services.Extensions;
+using JSSoft.Crema.Services.Random;
 using JSSoft.Library;
 using JSSoft.Library.Random;
 using System;
@@ -123,7 +124,8 @@ namespace JSSoft.Crema.Bot.Tasks
                     return;
             }
             var userContext = type.GetService(typeof(IUserContext)) as IUserContext;
-            var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random().ID);
+            var member = await userContext.GetRandomUserAsync();
+            var memberID = member.ID;
             var accessType = RandomUtility.NextEnum<AccessType>();
             await type.AddAccessMemberAsync(authentication, memberID, accessType);
         }
@@ -138,7 +140,8 @@ namespace JSSoft.Crema.Bot.Tasks
                     return;
             }
             var userContext = type.GetService(typeof(IUserContext)) as IUserContext;
-            var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random().ID);
+            var member = await userContext.GetRandomUserAsync();
+            var memberID = member.ID;
             await type.RemoveAccessMemberAsync(authentication, memberID);
         }
 

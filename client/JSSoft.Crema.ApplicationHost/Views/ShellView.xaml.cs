@@ -137,8 +137,8 @@ namespace JSSoft.Crema.ApplicationHost.Views
             {
                 await userContext.Dispatcher.InvokeAsync(() =>
                 {
-                    userContext.Users.UsersKicked += Users_UsersKicked;
-                    userContext.Users.UsersBanChanged += Users_UsersBanChanged;
+                    userCollection.UsersKicked += UserCollection_UsersKicked;
+                    userCollection.UsersBanChanged += UserCollection_UsersBanChanged;
                 });
             }
 
@@ -176,7 +176,7 @@ namespace JSSoft.Crema.ApplicationHost.Views
             var i = Application.Current.Windows.Count;
         }
 
-        private void Users_UsersKicked(object sender, ItemsEventArgs<IUser> e)
+        private void UserCollection_UsersKicked(object sender, ItemsEventArgs<IUser> e)
         {
             var userID = this.cremaAppHost.UserID;
             var userIDs = e.Items.Select(item => item.ID).ToArray();
@@ -199,7 +199,7 @@ namespace JSSoft.Crema.ApplicationHost.Views
             });
         }
 
-        private async void Users_UsersBanChanged(object sender, ItemsEventArgs<IUser> e)
+        private async void UserCollection_UsersBanChanged(object sender, ItemsEventArgs<IUser> e)
         {
             foreach (var item in e.Items)
             {

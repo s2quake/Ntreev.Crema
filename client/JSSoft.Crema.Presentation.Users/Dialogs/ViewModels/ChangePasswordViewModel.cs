@@ -77,7 +77,7 @@ namespace JSSoft.Crema.Presentation.Users.Dialogs.ViewModels
             {
                 try
                 {
-                    var user = await userContext.Dispatcher.InvokeAsync(() => userContext.Users[userID]);
+                    var user = await userContext.Dispatcher.InvokeAsync(() => userCollection[userID]);
                     return await user.Dispatcher.InvokeAsync(() =>
                     {
                         return new ChangePasswordViewModel(authentication, user);

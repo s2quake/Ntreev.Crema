@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library;
 using JSSoft.Library.ObjectModel;
 using System;
@@ -40,6 +41,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
             : base(service, callback)
         {
             this.UserContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            this.UserCollection = this.CremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
             this.LogService.Debug($"{nameof(UserContextService)} Constructor");
         }
 
@@ -202,21 +204,23 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         public IUserContext UserContext { get; set; }
 
+        public IUserCollection UserCollection { get; set; }
+
         private async Task<UserContextMetaData> AttachEventHandlersAsync()
         {
             var metaData = await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
-                this.UserContext.Users.UsersStateChanged += Users_UsersStateChanged;
-                this.UserContext.Users.UsersChanged += Users_UsersChanged;
+                this.UserCollection.UsersStateChanged += UserCollection_UsersStateChanged;
+                this.UserCollection.UsersChanged += UserCollection_UsersChanged;
                 this.UserContext.ItemsCreated += UserContext_ItemsCreated;
                 this.UserContext.ItemsRenamed += UserContext_ItemsRenamed;
                 this.UserContext.ItemsMoved += UserContext_ItemsMoved;
                 this.UserContext.ItemsDeleted += UserContext_ItemsDeleted;
-                this.UserContext.Users.UsersLoggedIn += Users_UsersLoggedIn;
-                this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
-                this.UserContext.Users.UsersKicked += Users_UsersKicked;
-                this.UserContext.Users.UsersBanChanged += Users_UsersBanChanged;
-                this.UserContext.Users.MessageReceived += UserContext_MessageReceived;
+                this.UserCollection.UsersLoggedIn += UserCollection_UsersLoggedIn;
+                this.UserCollection.UsersLoggedOut += UserCollection_UsersLoggedOut;
+                this.UserCollection.UsersKicked += UserCollection_UsersKicked;
+                this.UserCollection.UsersBanChanged += UserCollection_UsersBanChanged;
+                this.UserCollection.MessageReceived += UserContext_MessageReceived;
                 this.UserContext.TaskCompleted += UserContext_TaskCompleted;
                 return this.UserContext.GetMetaData(this.authentication);
             });
@@ -228,23 +232,23 @@ namespace JSSoft.Crema.ServiceHosts.Users
         {
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
-                this.UserContext.Users.UsersStateChanged -= Users_UsersStateChanged;
-                this.UserContext.Users.UsersChanged -= Users_UsersChanged;
+                this.UserCollection.UsersStateChanged -= UserCollection_UsersStateChanged;
+                this.UserCollection.UsersChanged -= UserCollection_UsersChanged;
                 this.UserContext.ItemsCreated -= UserContext_ItemsCreated;
                 this.UserContext.ItemsRenamed -= UserContext_ItemsRenamed;
                 this.UserContext.ItemsMoved -= UserContext_ItemsMoved;
                 this.UserContext.ItemsDeleted -= UserContext_ItemsDeleted;
-                this.UserContext.Users.UsersLoggedIn -= Users_UsersLoggedIn;
-                this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                this.UserContext.Users.UsersKicked -= Users_UsersKicked;
-                this.UserContext.Users.UsersBanChanged -= Users_UsersBanChanged;
-                this.UserContext.Users.MessageReceived -= UserContext_MessageReceived;
+                this.UserCollection.UsersLoggedIn -= UserCollection_UsersLoggedIn;
+                this.UserCollection.UsersLoggedOut -= UserCollection_UsersLoggedOut;
+                this.UserCollection.UsersKicked -= UserCollection_UsersKicked;
+                this.UserCollection.UsersBanChanged -= UserCollection_UsersBanChanged;
+                this.UserCollection.MessageReceived -= UserContext_MessageReceived;
                 this.UserContext.TaskCompleted -= UserContext_TaskCompleted;
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(UserContextService)} {nameof(DetachEventHandlersAsync)}");
         }
 
-        private void Users_UsersStateChanged(object sender, Services.ItemsEventArgs<IUser> e)
+        private void UserCollection_UsersStateChanged(object sender, Services.ItemsEventArgs<IUser> e)
         {
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
@@ -253,7 +257,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
             this.InvokeEvent(() => this.Callback?.OnUsersStateChanged(callbackInfo, userIDs, states));
         }
 
-        private void Users_UsersChanged(object sender, Services.ItemsEventArgs<IUser> e)
+        private void UserCollection_UsersChanged(object sender, Services.ItemsEventArgs<IUser> e)
         {
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
@@ -307,7 +311,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
             this.InvokeEvent(() => this.Callback?.OnMessageReceived(callbackInfo, userIDs, message, messageType));
         }
 
-        private void Users_UsersLoggedIn(object sender, Services.ItemsEventArgs<IUser> e)
+        private void UserCollection_UsersLoggedIn(object sender, Services.ItemsEventArgs<IUser> e)
         {
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
@@ -315,7 +319,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
             this.InvokeEvent(() => this.Callback?.OnUsersLoggedIn(callbackInfo, userIDs));
         }
 
-        private void Users_UsersLoggedOut(object sender, Services.ItemsEventArgs<IUser> e)
+        private void UserCollection_UsersLoggedOut(object sender, Services.ItemsEventArgs<IUser> e)
         {
             var closeInfo = (CloseInfo)e.MetaData;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
@@ -323,7 +327,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
             this.InvokeEvent(() => this.Callback?.OnUsersLoggedOut(callbackInfo, userIDs, closeInfo));
         }
 
-        private void Users_UsersKicked(object sender, ItemsEventArgs<IUser> e)
+        private void UserCollection_UsersKicked(object sender, ItemsEventArgs<IUser> e)
         {
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
@@ -332,7 +336,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
             this.InvokeEvent(() => this.Callback?.OnUsersKicked(callbackInfo, userIDs, comments));
         }
 
-        private void Users_UsersBanChanged(object sender, ItemsEventArgs<IUser> e)
+        private void UserCollection_UsersBanChanged(object sender, ItemsEventArgs<IUser> e)
         {
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
@@ -377,37 +381,10 @@ namespace JSSoft.Crema.ServiceHosts.Users
             return secureString;
         }
 
-        private Task<IUserItem> GetUserItemAsync(string itemPath)
-        {
-            return this.UserContext.Dispatcher.InvokeAsync(() =>
-            {
-                var item = this.UserContext[itemPath];
-                if (item == null)
-                    throw new ItemNotFoundException(itemPath);
-                return item;
-            });
-        }
+        private Task<IUserItem> GetUserItemAsync(string itemPath) => this.UserContext.GetUserItemAsync(itemPath);
 
-        private Task<IUser> GetUserAsync(string userID)
-        {
-            return this.UserContext.Dispatcher.InvokeAsync(() =>
-            {
-                var user = this.UserContext.Users[userID];
-                if (user == null)
-                    throw new UserNotFoundException(userID);
-                return user;
-            });
-        }
+        private Task<IUser> GetUserAsync(string userID) => this.UserContext.GetUserAsync(userID);
 
-        private Task<IUserCategory> GetCategoryAsync(string categoryPath)
-        {
-            return this.UserContext.Dispatcher.InvokeAsync(() =>
-            {
-                var category = this.UserContext.Categories[categoryPath];
-                if (category == null)
-                    throw new CategoryNotFoundException(categoryPath);
-                return category;
-            });
-        }
+        private Task<IUserCategory> GetCategoryAsync(string categoryPath) => this.UserContext.GetUserCategoryAsync(categoryPath);
     }
 }

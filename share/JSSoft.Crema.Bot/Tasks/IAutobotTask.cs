@@ -22,6 +22,7 @@
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
 using JSSoft.Crema.Services.Extensions;
+using JSSoft.Crema.Services.Random;
 using JSSoft.Library.Random;
 using System;
 using System.ComponentModel.Composition;
@@ -59,17 +60,17 @@ namespace JSSoft.Crema.Bot.Tasks
                         {
                             if (RandomUtility.Within(50) == true)
                             {
-                                var user = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random());
+                                var user = await userContext.GetRandomUserAsync();
                                 context.Push(user);
                             }
                             else if (RandomUtility.Within(50) == true)
                             {
-                                var category = await userContext.Dispatcher.InvokeAsync(() => userContext.Categories.Random());
+                                var category = await userContext.GetRandomUserCategoryAsync();
                                 context.Push(category);
                             }
                             else
                             {
-                                var userItem = await userContext.Dispatcher.InvokeAsync(() => userContext.Random());
+                                var userItem = await userContext.GetRandomUserItemAsync();
                                 context.Push(userItem);
                             }
                         }
@@ -96,7 +97,8 @@ namespace JSSoft.Crema.Bot.Tasks
                     return;
                 if (autobot.GetService(typeof(IUserContext)) is IUserContext userContext)
                 {
-                    var banInfo = await userContext.Dispatcher.InvokeAsync(() => userContext.Users[autobot.AutobotID].BanInfo);
+                    var autobotUser = await userContext.GetUserAsync(autobot.AutobotID);
+                    var banInfo = autobotUser.BanInfo;
                     if (banInfo.IsBanned == true)
                         return;
                 }
@@ -136,9 +138,9 @@ namespace JSSoft.Crema.Bot.Tasks
             var info = autobotService.GetRandomUserInfo();
             if (autobot.GetService(typeof(IUserContext)) is IUserContext userContext)
             {
-                if (await userContext.Users.ContainsAsync(info.ID) == false)
+                if (await userContext.ContainsUserAsync(info.ID) == false)
                 {
-                    var category = userContext.Categories.Random();
+                    var category = await userContext.GetRandomUserCategoryAsync();
                     await category.AddNewUserAsync(authentication, info.ID, info.Password, info.Name, info.Authority);
                 }
                 await autobotService.CreateAutobotAsync(authentication, info.ID, info.Password);

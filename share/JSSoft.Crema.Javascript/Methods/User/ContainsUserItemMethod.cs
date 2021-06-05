@@ -41,7 +41,9 @@ namespace JSSoft.Crema.Javascript.Methods.User
 
         protected override Task<bool> OnExecuteAsync(string userItemPath)
         {
-            return this.CremaHost.ContainsUserItemAsync(userItemPath);
+            return this.UserContext.ContainsUserItemAsync(userItemPath);
         }
+
+        private IUserContext UserContext => this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
     }
 }

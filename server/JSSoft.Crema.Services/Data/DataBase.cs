@@ -63,7 +63,7 @@ namespace JSSoft.Crema.Services.Data
             this.Serializer = this.CremaHost.Serializer;
             base.Name = name;
             this.cachePath = this.CremaHost.GetPath(CremaPath.Caches, DataBaseContext.DataBasesString);
-            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
+            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut += UserCollection_UsersLoggedOut);
             this.Initialize();
         }
 
@@ -75,7 +75,7 @@ namespace JSSoft.Crema.Services.Data
             this.Serializer = this.CremaHost.Serializer;
             base.Name = name;
             this.cachePath = this.CremaHost.GetPath(CremaPath.Caches, DataBaseContext.DataBasesString);
-            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
+            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut += UserCollection_UsersLoggedOut);
             base.DataBaseInfo = (DataBaseInfo)dataBaseInfo;
             this.Initialize();
         }
@@ -498,7 +498,7 @@ namespace JSSoft.Crema.Services.Data
                 });
                 var taskID = Guid.NewGuid();
                 await this.DataBaseContext.InvokeDataBaseDeleteAsync(authentication, tuple.DataBaseInfo);
-                await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
+                await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users.UsersLoggedOut -= UserCollection_UsersLoggedOut);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     base.DataBaseState = DataBaseState.None;
@@ -653,7 +653,7 @@ namespace JSSoft.Crema.Services.Data
 
         public async Task DisposeAsync()
         {
-            await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
+            await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users.UsersLoggedOut -= UserCollection_UsersLoggedOut);
             if (this.IsLoaded == true)
             {
                 await this.WriteCacheAsync();
@@ -1283,7 +1283,7 @@ namespace JSSoft.Crema.Services.Data
             this.metaData.LockInfo = base.LockInfo;
         }
 
-        private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
+        private async void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {

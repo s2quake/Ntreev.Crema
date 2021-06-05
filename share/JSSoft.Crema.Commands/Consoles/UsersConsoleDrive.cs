@@ -54,12 +54,14 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public Task<IUser> GetUserAsync(string userID)
         {
-            return this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users[userID]);
+            return this.UserContext.GetUserAsync(userID);
         }
 
-        public Task<string[]> GetUserListAsync()
+        public async Task<string[]> GetUserListAsync()
         {
-            return this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users.Select(item => item.ID).ToArray());
+            var query = from item in await this.UserContext.GetUsersAsync()
+                        select item.ID;
+            return query.ToArray();
         }
 
         public string Path { get; private set; }
@@ -164,26 +166,21 @@ namespace JSSoft.Crema.Commands.Consoles
             }
         }
 
-        private Task<IUserItem> GetObjectAsync(string path)
+        private async Task<IUserItem> GetObjectAsync(string path)
         {
-            return this.UserContext.Dispatcher.InvokeAsync(GetObject);
-
-            IUserItem GetObject()
+            if (NameValidator.VerifyCategoryPath(path) == true)
             {
-                if (NameValidator.VerifyCategoryPath(path) == true)
-                {
-                    return this.UserContext[path];
-                }
-                else
-                {
-                    var itemName = new ItemName(path);
-                    var category = this.UserContext.Categories[itemName.CategoryPath];
-                    if (category.Categories.ContainsKey(itemName.Name) == true)
-                        return category.Categories[itemName.Name] as IUserItem;
-                    if (category.Users.ContainsKey(itemName.Name) == true)
-                        return category.Users[itemName.Name] as IUserItem;
-                    return null;
-                }
+                return await this.UserContext.GetUserItemAsync(path);
+            }
+            else
+            {
+                var itemName = new ItemName(path);
+                var category = await this.UserContext.GetUserCategoryAsync(itemName.CategoryPath);
+                if (category.Categories.ContainsKey(itemName.Name) == true)
+                    return category.Categories[itemName.Name] as IUserItem;
+                if (category.Users.ContainsKey(itemName.Name) == true)
+                    return category.Users[itemName.Name] as IUserItem;
+                return null;
             }
         }
 

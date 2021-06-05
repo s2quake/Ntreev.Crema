@@ -23,6 +23,7 @@ using JSSoft.Crema.Commands.Consoles.Properties;
 using JSSoft.Crema.Commands.Consoles.Serializations;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library;
 using JSSoft.Library.Commands;
 using System;
@@ -205,79 +206,52 @@ namespace JSSoft.Crema.Commands.Consoles
 
         private Task<IUser> GetUserAsync(string userID)
         {
-            return this.UserContext.Dispatcher.InvokeAsync(() =>
-            {
-                var user = this.UserContext.Users[userID];
-                if (user == null)
-                    throw new UserNotFoundException(userID);
-                return user;
-            });
+            return this.UserContext.GetUserAsync(userID);
         }
 
         private Task<IUserCategory> GetCategoryAsync(string categoryPath)
         {
-            return this.UserContext.Dispatcher.InvokeAsync(() =>
-            {
-                var category = this.UserContext.Categories[categoryPath];
-                if (category == null)
-                    throw new CategoryNotFoundException(categoryPath);
-                return category;
-            });
+            return this.UserContext.GetUserCategoryAsync(categoryPath);
         }
 
-        private Task<string[]> GetUserIDsAsync()
+        private async Task<string[]> GetUserIDsAsync()
         {
-            return this.UserContext.Dispatcher.InvokeAsync(() =>
-            {
-                var query = from item in this.UserContext.Users
-                            orderby item.ID
-                            select item.ID;
-                return query.ToArray();
-            });
+            var query = from item in await this.UserContext.GetUsersAsync()
+                        orderby item.ID
+                        select item.ID;
+            return query.ToArray();
         }
 
-        private Task<string[]> GetCategoryPathsAsync()
+        private async Task<string[]> GetCategoryPathsAsync()
         {
-            return this.UserContext.Dispatcher.InvokeAsync(() =>
-            {
-                var query = from item in this.UserContext.Categories
-                            orderby item.Path
-                            select item.Path;
-                return query.ToArray();
-            });
+            var query = from item in await this.UserContext.GetUserCategoriesAsync()
+                        orderby item.Path
+                        select item.Path;
+            return query.ToArray();
         }
 
-        private Task<string[]> GetOnlineUserIDsAsync()
+        private async Task<string[]> GetOnlineUserIDsAsync()
         {
-            return this.UserContext.Dispatcher.InvokeAsync(() =>
-            {
-                var query = from item in this.UserContext.Users
-                            where item.UserState.HasFlag(UserState.Online)
-                            select item.ID;
-                return query.ToArray();
-            });
+            var query = from item in await this.UserContext.GetUsersAsync()
+                        where item.UserState.HasFlag(UserState.Online)
+                        select item.ID;
+            return query.ToArray();
         }
 
-        private Task<string[]> GetUnbannedUserIDsAsync()
+        private async Task<string[]> GetUnbannedUserIDsAsync()
         {
-            return this.UserContext.Dispatcher.InvokeAsync(() =>
-            {
-                var query = from item in this.UserContext.Users
-                            where item.BanInfo.Path != item.Path
-                            select item.ID;
-                return query.ToArray();
-            });
+            var query = from item in await this.UserContext.GetUsersAsync()
+                        where item.BanInfo.Path != item.Path
+                        select item.ID;
+            return query.ToArray();
         }
 
-        private Task<string[]> GetBannedUserIDsAsync()
+        private async Task<string[]> GetBannedUserIDsAsync()
         {
-            return this.UserContext.Dispatcher.InvokeAsync(() =>
-            {
-                var query = from item in this.UserContext.Users
-                            where item.BanInfo.Path == item.Path
-                            select item.ID;
-                return query.ToArray();
-            });
+            var query = from item in await this.UserContext.GetUsersAsync()
+                        where item.BanInfo.Path == item.Path
+                        select item.ID;
+            return query.ToArray();
         }
 
         private static string FormatUserID(string userID, BanInfo banInfo, UserState userState)

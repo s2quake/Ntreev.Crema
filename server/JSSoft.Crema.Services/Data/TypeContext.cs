@@ -56,13 +56,13 @@ namespace JSSoft.Crema.Services.Data
             this.repository = dataBase.Repository;
             this.BasePath = Path.Combine(dataBase.BasePath, CremaSchema.TypeDirectory);
             this.Initialize(typeInfos);
-            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
+            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut += UserCollection_UsersLoggedOut);
             this.CremaHost.Debug("TypeContext is created.");
         }
 
         public void Dispose()
         {
-            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
+            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut -= UserCollection_UsersLoggedOut);
             this.dataBase = null;
         }
 
@@ -549,7 +549,7 @@ namespace JSSoft.Crema.Services.Data
             return this.DataBase.TableContext.Tables;
         }
 
-        private void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
+        private void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
             var userIDs = e.Items.Select(item => item.ID).ToArray();
             this.CremaHost.Dispatcher.InvokeAsync(() =>

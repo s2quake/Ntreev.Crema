@@ -101,7 +101,7 @@ namespace JSSoft.Crema.Presentation.Users.BrowserItems.ViewModels
             {
                 var viewModel = await userContext.Dispatcher.InvokeAsync(() =>
                 {
-                    userContext.Users.MessageReceived += Users_MessageReceived;
+                    userCollection.MessageReceived += Users_MessageReceived;
                     return new UserCategoryTreeViewItemViewModel(this.authenticator, userContext.Root, this);
                 });
                 this.Items.Add(viewModel);

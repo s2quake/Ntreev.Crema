@@ -41,6 +41,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         {
             this.DataBaseContext = this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
             this.UserContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            this.UserCollection = this.CremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
 
             this.LogService.Debug($"{nameof(DataBaseContextService)} Constructor");
         }
@@ -69,9 +70,9 @@ namespace JSSoft.Crema.ServiceHosts.Data
         {
             var result = new ResultBase();
             await this.DetachEventHandlersAsync();
-            await this.UserContext.Dispatcher.InvokeAsync(() =>
+            await this.UserCollection.Dispatcher.InvokeAsync(() =>
             {
-                this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+                this.UserCollection.UsersLoggedOut -= UserCollection_UsersLoggedOut;
             });
             this.authentication = null;
             result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
@@ -268,7 +269,9 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         public IUserContext UserContext { get; }
 
-        private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
+        public IUserCollection UserCollection { get; }
+
+        private async void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
             var signatureDate = this.authentication.SignatureDate;
             var actionUserID = e.UserID;
@@ -416,9 +419,9 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         private async Task<DataBaseContextMetaData> AttachEventHandlersAsync()
         {
-            await this.UserContext.Dispatcher.InvokeAsync(() =>
+            await this.UserCollection.Dispatcher.InvokeAsync(() =>
             {
-                this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
+                this.UserCollection.UsersLoggedOut += UserCollection_UsersLoggedOut;
             });
             var metaData = await this.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
@@ -461,9 +464,9 @@ namespace JSSoft.Crema.ServiceHosts.Data
                 this.DataBaseContext.ItemsLockChanged -= DataBaseContext_ItemsLockChanged;
                 this.DataBaseContext.TaskCompleted -= DataBaseContext_TaskCompleted;
             });
-            await this.UserContext.Dispatcher.InvokeAsync(() =>
+            await this.UserCollection.Dispatcher.InvokeAsync(() =>
             {
-                this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+                this.UserCollection.UsersLoggedOut -= UserCollection_UsersLoggedOut;
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(DetachEventHandlersAsync)}");
         }
