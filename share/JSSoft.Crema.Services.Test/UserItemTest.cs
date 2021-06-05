@@ -183,7 +183,7 @@ namespace JSSoft.Crema.Services.Test
             var userItem = await userContext.GetRandomUserItemAsync(Predicate);
             await userItem.DeleteAsync(authentication);
 
-            bool Predicate(IUserItem userItem)
+            static bool Predicate(IUserItem userItem)
             {
                 if (userItem is IUser user)
                 {
@@ -195,6 +195,8 @@ namespace JSSoft.Crema.Services.Test
                         return false;
                     return true;
                 }
+                if (userItem == UserItemTest.userItem)
+                    return false;
                 return false;
             }
         }
@@ -202,8 +204,19 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task DeleteAsyncTestAsync_Category()
         {
-            var userItem = await userContext.GetRandomUserItemAsync((item) => item is IUserCategory && item.Childs.Any() == false);
+            var userItem = await userContext.GetRandomUserItemAsync(Predicate);
             await userItem.DeleteAsync(authentication);
+
+            static bool Predicate(IUserItem userItem)
+            {
+                if (userItem is not IUserCategory category)
+                    return false;
+                if (userItem.Childs.Any() == true)
+                    return false;
+                if (userItem == UserItemTest.userItem)
+                    return false;
+                return true;
+            }
         }
 
         [TestMethod]

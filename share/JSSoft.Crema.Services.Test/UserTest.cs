@@ -52,6 +52,8 @@ namespace JSSoft.Crema.Services.Test
         private static IUser memberUser;
         private static IUser guestUser;
         private static IUser otherUser;
+        private static IUser expiredUser;
+        private static IUser[] exceptUsers = new IUser[] { user, adminUser, memberUser, guestUser, otherUser, expiredUser };
 
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
@@ -70,6 +72,7 @@ namespace JSSoft.Crema.Services.Test
             memberUser = await userCollection.Dispatcher.InvokeAsync(() => userCollection[memberAuthentication.ID]);
             guestUser = await userCollection.Dispatcher.InvokeAsync(() => userCollection[guestAuthentication.ID]);
             otherUser = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
+            expiredUser = await userCollection.GetUserAsync(expiredAuthentication.ID);
             await cremaHost.LogoutAsync(expiredAuthentication);
         }
 
@@ -158,6 +161,8 @@ namespace JSSoft.Crema.Services.Test
                 if (user.ID == authentication.ID)
                     return false;
                 if (user.UserState == UserState.Online)
+                    return false;
+                if (exceptUsers.Contains(user) == true)
                     return false;
                 return true;
             }

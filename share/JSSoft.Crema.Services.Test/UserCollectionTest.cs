@@ -202,7 +202,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersDeletedTestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
+            var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID && item.UserState == UserState.None);
             var actualUserPath = user.Path;
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
@@ -215,7 +215,7 @@ namespace JSSoft.Crema.Services.Test
             {
                 userCollection.UsersDeleted -= UserCollection_UsersDeleted;
             });
-            var user2 = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
+            var user2 = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID && item.UserState == UserState.None);
             var userPath2 = user2.Path;
             await user2.DeleteAsync(authentication);
             Assert.AreNotEqual(string.Empty, userPath2);
@@ -237,7 +237,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task UsersStateChangedTestAsync()
         {
             var actualState = UserState.None;
-            var user = await userCollection.GetRandomUserAsync(item => item.UserState == UserState.None);
+            var user = await userCollection.GetRandomUserAsync(item => item.UserState == UserState.None && item.BanInfo.IsBanned == false);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersStateChanged += UserCollection_UsersStateChanged;

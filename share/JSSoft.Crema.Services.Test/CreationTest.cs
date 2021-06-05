@@ -117,7 +117,7 @@ namespace JSSoft.Crema.Services.Test
             }
         }
 
-        [TestMethod]
+        //[TestMethod]
         public async Task GenerateStandardTestAsync()
         {
             var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);

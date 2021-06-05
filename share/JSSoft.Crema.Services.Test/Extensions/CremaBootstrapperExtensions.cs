@@ -26,14 +26,14 @@ namespace JSSoft.Crema.Services.Test.Extensions
         public static void Initialize(this CremaBootstrapper app, TestContext context, string name)
         {
 #if SERVER
-            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory + "_repo", name);
-            CremaBootstrapper.CreateRepositoryInternal(app, repositoryPath, "git", "xml", string.Empty, (p,s) => UserContextExtensions.GenerateUserInfos(p, s), () => new CremaDataSet());
+            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", name);
+            CremaBootstrapper.CreateRepositoryInternal(app, repositoryPath, "git", "xml", string.Empty, (p, s) => UserContextExtensions.GenerateUserInfos(p, s), () => new CremaDataSet());
             app.BasePath = repositoryPath;
             repositoryPathByApp.Add(app, repositoryPath);
 #endif
 #if CLIENT
             var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory + "_repo", name);
+            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", name);
             var solutionPath = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
             var executablePath = Path.Combine(solutionPath, "server", "JSSoft.Crema.ConsoleHost", "bin", "Debug", "netcoreapp3.1", "cremaserver.exe");
             var port = ReservePort();
