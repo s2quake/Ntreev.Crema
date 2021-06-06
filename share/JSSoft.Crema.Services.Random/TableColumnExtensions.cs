@@ -171,6 +171,7 @@ namespace JSSoft.Crema.Services.Random
                     }
                     catch (System.NullReferenceException e)
                     {
+                        System.Diagnostics.Debugger.Launch();
                         int qwr = 0;
                         throw e;
                     }
