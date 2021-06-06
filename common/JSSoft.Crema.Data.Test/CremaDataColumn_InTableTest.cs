@@ -265,7 +265,7 @@ namespace JSSoft.Crema.Data.Test
         [ExpectedException(typeof(FormatException))]
         public void SetDefaultValue_Fail()
         {
-            var column = this.RandomOrDefault(item => item.DataType != typeof(string));
+            var column = this.RandomOrDefault(item => item.DataType != typeof(string) && item.AutoIncrement == false);
             column.DefaultValue = RandomUtility.NextWord();
         }
 
