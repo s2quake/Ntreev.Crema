@@ -51,9 +51,8 @@ namespace JSSoft.Crema.Services.Test
         private static IUser adminUser;
         private static IUser memberUser;
         private static IUser guestUser;
-        private static IUser otherUser;
         private static IUser expiredUser;
-        private static IUser[] exceptUsers = new IUser[] { user, adminUser, memberUser, guestUser, otherUser, expiredUser };
+        private static IUser[] exceptUsers = new IUser[] { user, adminUser, memberUser, guestUser, expiredUser };
 
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
@@ -71,7 +70,6 @@ namespace JSSoft.Crema.Services.Test
             adminUser = await userCollection.Dispatcher.InvokeAsync(() => userCollection[adminAuthentication.ID]);
             memberUser = await userCollection.Dispatcher.InvokeAsync(() => userCollection[memberAuthentication.ID]);
             guestUser = await userCollection.Dispatcher.InvokeAsync(() => userCollection[guestAuthentication.ID]);
-            otherUser = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
             expiredUser = await userCollection.GetUserAsync(expiredAuthentication.ID);
             await cremaHost.LogoutAsync(expiredAuthentication);
         }
@@ -291,9 +289,19 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task SetUserNameAsyncTestAsync_OtherUser_Fail()
         {
+            var otherUser = await userCollection.GetRandomUserAsync(Predicate);
             var password = otherUser.GetPassword();
             var userName = RandomUtility.NextName();
             await otherUser.SetUserNameAsync(authentication, password, userName);
+
+            static bool Predicate(IUser user)
+            {
+                if (user.ID == Authentication.AdminID)
+                    return false;
+                if (exceptUsers.Contains(user) == true)
+                    return false;
+                return true;
+            }
         }
 
         [TestMethod]

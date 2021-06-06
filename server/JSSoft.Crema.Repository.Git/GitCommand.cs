@@ -21,15 +21,47 @@
 
 using JSSoft.Crema.Services;
 using JSSoft.Library;
+using System;
+using System.ComponentModel;
 
 namespace JSSoft.Crema.Repository.Git
 {
-    class GitCommand : CommandHost
+    class GitCommand : CommandHostBase
     {
         public GitCommand(string basePath, string commandName)
             : base(GitCommand.ExecutablePath ?? "git", basePath, commandName)
         {
+        }
 
+        public string ReadLine()
+        {
+            return this.Run();
+        }
+
+        public string[] ReadLines()
+        {
+            return this.ReadLines(false);
+        }
+
+        public string[] ReadLines(bool removeEmptyLine)
+        {
+            if (this.Run() is string text)
+                return text.Split(new string[] { Environment.NewLine }, removeEmptyLine == true ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None);
+            return null;
+        }
+
+        public bool TryRun()
+        {
+            this.RunProcess();
+            return this.ExitCode == 0;
+        }
+
+        public string Run()
+        {
+            this.RunProcess();
+            if (this.ExitCode != 0)
+                throw new System.Exception(this.ErrorMessage);
+            return this.Message;
         }
 
         public string Run(ILogService logService)
@@ -39,5 +71,23 @@ namespace JSSoft.Crema.Repository.Git
         }
 
         public static string ExecutablePath { get; set; }
+
+        /// <summary>
+        /// 윈도우 경우 원인을 알 수 없는 예외 및 에러 코드가 발생
+        /// 같은 명령라인으로 다시 실행하면 잘됨.
+        /// </summary>
+        private void RunProcess()
+        {
+            try
+            {
+                this.InvokeRun();
+                if (this.ExitCode != 0)
+                    this.InvokeRun();
+            }
+            catch (Win32Exception)
+            {
+                this.InvokeRun();
+            }
+        }
     }
 }

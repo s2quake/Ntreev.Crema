@@ -161,14 +161,19 @@ namespace JSSoft.Crema.Services.Random
                 var dataType = tableColumn.DataType;
                 if (CremaDataTypeUtility.IsBaseType(dataType) == false)
                 {
-                    var domain = template.Domain;
-                    var typeContext = domain.GetService(typeof(ITypeContext)) as ITypeContext;
-                    var type = typeContext.Types[dataType];
-                    if (type == null)
+                    try
                     {
-                        int weqr = 0;
+                        var domain = template.Domain;
+                        var dataBase = domain.GetService(typeof(IDataBase)) as IDataBase;
+                        var typeContext = dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
+                        var type = typeContext.Types[dataType];
+                        return await type.GetRandomStringAsync();
                     }
-                    return await type.GetRandomStringAsync();
+                    catch (System.NullReferenceException e)
+                    {
+                        int qwr = 0;
+                        throw e;
+                    }
                 }
                 else
                 {
