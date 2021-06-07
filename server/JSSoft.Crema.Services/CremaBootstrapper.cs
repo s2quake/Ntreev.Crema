@@ -59,7 +59,7 @@ namespace JSSoft.Crema.Services
 
         public static void CreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, string dataBaseUrl)
         {
-            CreateRepositoryInternal(serviceProvider, basePath, repositoryModule, fileType, dataBaseUrl, (usersPath, serializer) => UserContext.GenerateDefaultUserInfos(usersPath, serializer), () => new CremaDataSet());
+            CreateRepositoryInternal(serviceProvider, basePath, repositoryModule, fileType, dataBaseUrl, UserContext.GenerateDefaultUserInfos, () => new CremaDataSet());
         }
 
         public static void ValidateRepository(IServiceProvider serviceProvider, string basePath, params string[] dataBaseNames)
@@ -411,7 +411,7 @@ namespace JSSoft.Crema.Services
         }
 
         internal static void CreateRepositoryInternal(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, string dataBaseUrl
-            , Action<string, IObjectSerializer> userInfoGenerator
+            , Action<IObjectSerializer, string> userInfoGenerator
             , Func<CremaDataSet> dataSetGenerator)
         {
             ValidateCreateRepository(serviceProvider, basePath, repositoryModule, fileType, dataBaseUrl);
@@ -428,7 +428,7 @@ namespace JSSoft.Crema.Services
                 var usersPath = DirectoryUtility.Prepare(tempPath, CremaString.Users);
                 var dataBasesRepo = DirectoryUtility.Prepare(repositoryPath, CremaString.DataBases);
 
-                userInfoGenerator(usersPath, serializer);
+                userInfoGenerator(serializer, usersPath);
                 repositoryProvider.InitializeRepository(usersRepo, usersPath, new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion });
 
                 if (dataBaseUrl == string.Empty)

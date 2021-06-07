@@ -27,7 +27,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
         {
 #if SERVER
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", name);
-            CremaBootstrapper.CreateRepositoryInternal(app, repositoryPath, "git", "xml", string.Empty, (p, s) => UserContextExtensions.GenerateUserInfos(p, s), () => new CremaDataSet());
+            CremaBootstrapper.CreateRepositoryInternal(app, repositoryPath, "git", "xml", string.Empty, UserContextExtensions.GenerateUserInfos, () => new CremaDataSet());
             app.BasePath = repositoryPath;
             repositoryPathByApp.Add(app, repositoryPath);
 #endif

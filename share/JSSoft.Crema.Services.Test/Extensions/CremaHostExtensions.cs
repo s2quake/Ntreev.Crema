@@ -1,4 +1,5 @@
 ﻿using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Extensions;
 using JSSoft.Crema.Services.Random;
 using JSSoft.Library;
 using JSSoft.Library.Random;
@@ -34,6 +35,11 @@ namespace JSSoft.Crema.Services.Test.Extensions
         {
             var token = await cremaHost.OpenAsync();
             var authentication = await cremaHost.LoginRandomAsync(authority);
+            var count = RandomUtility.Next(10, 50);
+            for (var i = 0; i < count; i++)
+            {
+                await cremaHost.LoginRandomAsync();
+            }
             tokenByAuthentication.Add(authentication, token);
             return authentication;
         }
@@ -44,6 +50,20 @@ namespace JSSoft.Crema.Services.Test.Extensions
             await cremaHost.LogoutAsync(authentication);
             await cremaHost.CloseAsync(token);
             tokenByAuthentication.Remove(authentication);
+        }
+
+        public static async Task<Authentication> LoginAgainAsync(this ICremaHost cremaHost, Authentication authentication)
+        {
+            if (cremaHost.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
+            {
+                var user = await userCollection.GetUserAsync(authentication.ID);
+                var name = user.ID;
+                var password = user.GetPassword();
+                await cremaHost.LogoutAsync(authentication);
+                var token = await cremaHost.LoginAsync(name, password);
+                return await cremaHost.AuthenticateAsync(token);
+            }
+            throw new NotImplementedException();
         }
 
         public static Task<Authentication> LoginRandomAsync(this ICremaHost cremaHost)

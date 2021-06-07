@@ -305,7 +305,7 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        public static void GenerateDefaultUserInfos(string repositoryPath, IObjectSerializer serializer)
+        public static void GenerateDefaultUserInfos(IObjectSerializer serializer, string repositoryPath)
         {
             var designedInfo = new SignatureDate(Authentication.SystemID, DateTime.UtcNow);
             var administrator = new UserSerializationInfo()

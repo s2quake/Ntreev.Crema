@@ -12,13 +12,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test.Extensions
 {
     static class UserContextExtensions
     {
-        public static void GenerateUserInfos(string repositoryPath, IObjectSerializer serializer)
+        public static void GenerateUserInfos(IObjectSerializer serializer, string repositoryPath)
         {
             var designedInfo = new SignatureDate(Authentication.SystemID, DateTime.UtcNow);
             var administrator = new UserSerializationInfo()
@@ -32,74 +33,104 @@ namespace JSSoft.Crema.Services.Test.Extensions
                 ModificationInfo = designedInfo,
                 BanInfo = (BanSerializationInfo)BanInfo.Empty,
             };
-
-            var users = new List<UserSerializationInfo>
+            var categoryPaths = RandomUtility.NextCategoryPaths(4, 50);
+            var usersByID = new Dictionary<string, UserSerializationInfo>() { { administrator.ID, administrator } };
+            var count = RandomUtility.Next(100, 200);
+            var authorities = new Authority[] { Authority.Guest, Authority.Member, Authority.Admin };
+            var userNameByAuthority = new Dictionary<Authority, string>
             {
-                administrator
+                { Authority.Guest, "손님" },
+                { Authority.Member, "구성원" },
+                { Authority.Admin, "관리자" },
             };
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < count; i++)
             {
-                var admin = new UserSerializationInfo()
+                var authority = authorities.Random();
+                var name = authority.ToString().ToLower();
+                var userID = NameUtility.GenerateNewName(name, usersByID.Keys);
+                var password = name.Encrypt();
+                var userName = Regex.Replace(userID, $"{name}(\\d+)", $"{userNameByAuthority[authority]}$1");
+                var info = new UserSerializationInfo()
                 {
-                    ID = "admin" + i,
-                    Name = "관리자" + i,
-                    CategoryName = "Administrators",
-                    Authority = Authority.Admin,
-                    Password = "admin".Encrypt(),
+                    ID = userID,
+                    Name = userName,
+                    CategoryPath = categoryPaths.Random(),
+                    Authority = authority,
+                    Password = password,
                     CreationInfo = designedInfo,
                     ModificationInfo = designedInfo,
                     BanInfo = (BanSerializationInfo)BanInfo.Empty,
                 };
-
-                var member = new UserSerializationInfo()
-                {
-                    ID = "member" + i,
-                    Name = "구성원" + i,
-                    CategoryName = "Members",
-                    Authority = Authority.Member,
-                    Password = "member".Encrypt(),
-                    CreationInfo = designedInfo,
-                    ModificationInfo = designedInfo,
-                    BanInfo = (BanSerializationInfo)BanInfo.Empty,
-                };
-
-                var guest = new UserSerializationInfo()
-                {
-                    ID = "guest" + i,
-                    Name = "손님" + i,
-                    CategoryName = "Guests",
-                    Authority = Authority.Guest,
-                    Password = "guest".Encrypt(),
-                    CreationInfo = designedInfo,
-                    ModificationInfo = designedInfo,
-                    BanInfo = (BanSerializationInfo)BanInfo.Empty,
-                };
-
-                users.Add(admin);
-                users.Add(member);
-                users.Add(guest);
-            }
-
-            var categoryList = new List<string>
-            {
-                "/Administrators/",
-                "/Members/",
-                "/Guests/",
-                "/etc/"
-            };
-            for (var i = 0; i < 10; i++)
-            {
-                categoryList.Add($"/etc{RandomUtility.NextCategoryPath(1)}");
+                usersByID.Add(userID, info);
             }
 
             var serializationInfo = new UserContextSerializationInfo()
             {
                 Version = CremaSchema.VersionValue,
-                Categories = categoryList.ToArray(),
-                Users = users.ToArray(),
+                Categories = categoryPaths.ToArray(),
+                Users = usersByID.Values.ToArray(),
             };
 
             serializationInfo.WriteToDirectory(repositoryPath, serializer);
+        }
+
+        private static UserSerializationInfo CreateUser(int index, Authority authority, SignatureDate signatureDate)
+        {
+            switch (authority)
+            {
+                case Authority.Guest:
+                    return CreateGuest(index, signatureDate);
+                case Authority.Member:
+                    return CreateMember(index, signatureDate);
+                case Authority.Admin:
+                    return CreateAdmin(index, signatureDate);
+            }
+            throw new NotImplementedException();
+        }
+
+        private static UserSerializationInfo CreateAdmin(int index, SignatureDate signatureDate)
+        {
+            return new UserSerializationInfo()
+            {
+                ID = "admin" + index,
+                Name = "관리자" + index,
+                CategoryName = "Administrators",
+                Authority = Authority.Admin,
+                Password = "admin".Encrypt(),
+                CreationInfo = signatureDate,
+                ModificationInfo = signatureDate,
+                BanInfo = (BanSerializationInfo)BanInfo.Empty,
+            };
+        }
+
+        private static UserSerializationInfo CreateMember(int index, SignatureDate signatureDate)
+        {
+            return new UserSerializationInfo()
+            {
+                ID = "member" + index,
+                Name = "구성원" + index,
+                CategoryName = "Members",
+                Authority = Authority.Member,
+                Password = "member".Encrypt(),
+                CreationInfo = signatureDate,
+                ModificationInfo = signatureDate,
+                BanInfo = (BanSerializationInfo)BanInfo.Empty,
+            };
+        }
+
+        private static UserSerializationInfo CreateGuest(int index, SignatureDate signatureDate)
+        {
+            return new UserSerializationInfo()
+            {
+                ID = "guest" + index,
+                Name = "손님" + index,
+                CategoryName = "Guests",
+                Authority = Authority.Guest,
+                Password = "guest".Encrypt(),
+                CreationInfo = signatureDate,
+                ModificationInfo = signatureDate,
+                BanInfo = (BanSerializationInfo)BanInfo.Empty,
+            };
         }
     }
 }
