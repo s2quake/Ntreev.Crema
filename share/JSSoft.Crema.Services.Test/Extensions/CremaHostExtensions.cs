@@ -16,10 +16,18 @@ namespace JSSoft.Crema.Services.Test.Extensions
     {
         private static readonly Dictionary<Authentication, Guid> tokenByAuthentication = new();
 
-        public static async Task<Authentication> StartAsync(this ICremaHost cremaHost)
+        public static Task<Authentication> StartAsync(this ICremaHost cremaHost)
+        {
+            return StartAsync(cremaHost, Authentication.AdminID);
+        }
+
+        public static async Task<Authentication> StartAsync(this ICremaHost cremaHost, string userID)
         {
             var token = await cremaHost.OpenAsync();
-            var authenticationToken = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
+            var userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            var user = await userCollection.GetUserAsync(userID);
+            var password = user.GetPassword();
+            var authenticationToken = await cremaHost.LoginAsync(userID, password);
             var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
             tokenByAuthentication.Add(authentication, token);
             return authentication;

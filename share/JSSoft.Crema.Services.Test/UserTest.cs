@@ -82,7 +82,7 @@ namespace JSSoft.Crema.Services.Test
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        public async Task MoveAsyncTestAsync()
+        public async Task MoveAsync_TestAsync()
         {
             var userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
@@ -93,7 +93,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task MoveAsyncTest_Null_Arg0_FailAsync()
+        public async Task MoveAsync_Null_Arg0_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync();
             await user.MoveAsync(null, "/");
@@ -101,7 +101,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task MoveAsyncTest_Null_Arg1_FailAsync()
+        public async Task MoveAsync_Null_Arg1_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync();
@@ -110,7 +110,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task MoveAsyncTest_InvalidPath_Arg1_FailAsync()
+        public async Task MoveAsync_InvalidPath_Arg1_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync();
@@ -120,7 +120,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(CategoryNotFoundException))]
-        public async Task MoveAsyncTest_NotExistsPath_Arg1_FailAsync()
+        public async Task MoveAsync_NotExistsPath_Arg1_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync();
@@ -132,7 +132,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task MoveAsyncTest_Expired_FailAsync()
+        public async Task MoveAsync_Expired_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync();
             await user.MoveAsync(expiredAuthentication, null);
@@ -140,7 +140,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task MoveAsyncTest_PermissionDenied_Member_FailAsync()
+        public async Task MoveAsync_PermissionDenied_Member_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var user = await userCollection.GetRandomUserAsync();
@@ -151,7 +151,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task MoveAsyncTest_PermissionDenied_Guest_FailAsync()
+        public async Task MoveAsync_PermissionDenied_Guest_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var user = await userCollection.GetRandomUserAsync();
@@ -161,7 +161,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task DeleteAsyncTestAsync()
+        public async Task DeleteAsync_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(UserState.None, item => item.ID != Authentication.AdminID && item.ID != authentication.ID);
@@ -170,7 +170,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task DeleteAsyncTest_Null_FailAsync()
+        public async Task DeleteAsync_Null_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync();
             await user.DeleteAsync(null);
@@ -178,7 +178,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task DeleteAsyncTest_Expired_FailAsync()
+        public async Task DeleteAsync_Expired_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync();
             await user.DeleteAsync(expiredAuthentication);
@@ -186,7 +186,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsyncTest_PermissionDenied_AdminID_FailAsync()
+        public async Task DeleteAsync_PermissionDenied_AdminID_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var admin = await userCollection.GetUserAsync(Authentication.AdminID);
@@ -195,7 +195,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task DeleteAsyncTest_PermissionDenied_Member_FailAsync()
+        public async Task DeleteAsync_PermissionDenied_Member_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var user = await userCollection.GetRandomUserAsync();
@@ -204,7 +204,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task DeleteAsyncTest_PermissionDenied_Guest_FailAsync()
+        public async Task DeleteAsync_PermissionDenied_Guest_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var user = await userCollection.GetRandomUserAsync();
@@ -213,7 +213,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsyncTest_Online_FailAsync()
+        public async Task DeleteAsync_Online_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != Authentication.AdminID && item.ID != authentication.ID);
@@ -221,7 +221,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task SetUserNameAsyncTestAsync()
+        public async Task SetUserNameAsync_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -235,7 +235,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetUserNameAsyncTest_Null_Arg0_FailAsync()
+        public async Task SetUserNameAsync_Null_Arg0_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -246,7 +246,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetUserNameAsyncTest_Null_Arg1_FailAsync()
+        public async Task SetUserNameAsync_Null_Arg1_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -256,7 +256,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SetUserNameAsyncTest_WrongPassword_Arg1_FailAsync()
+        public async Task SetUserNameAsync_WrongPassword_Arg1_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -267,7 +267,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetUserNameAsyncTest_Null_Arg2_FailAsync()
+        public async Task SetUserNameAsync_Null_Arg2_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -277,7 +277,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SetUserNameAsyncTest_Empty_Arg2_FailAsync()
+        public async Task SetUserNameAsync_Empty_Arg2_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -287,7 +287,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task SetUserNameAsyncTest_Expired_FailAsync()
+        public async Task SetUserNameAsync_Expired_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -298,7 +298,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task SetUserNameAsyncTest_OtherUser_FailAsync()
+        public async Task SetUserNameAsync_OtherUser_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var otherUser = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != Authentication.AdminID);
@@ -308,7 +308,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task SetPasswordAsyncTestAsync()
+        public async Task SetPasswordAsync_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -323,7 +323,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetPasswordAsyncTest_Null_Arg0_FailAsync()
+        public async Task SetPasswordAsync_Null_Arg0_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -334,7 +334,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetPasswordAsyncTest_Null_Arg1_FailAsync()
+        public async Task SetPasswordAsync_Null_Arg1_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -344,7 +344,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetPasswordAsyncTest_Null_Arg2_FailAsync()
+        public async Task SetPasswordAsync_Null_Arg2_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -354,7 +354,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task SetPasswordAsyncTest_Expired_FailAsync()
+        public async Task SetPasswordAsync_Expired_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -365,7 +365,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SetPasswordAsyncTest_WrongPassword_Arg1_FailAsync()
+        public async Task SetPasswordAsync_WrongPassword_Arg1_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -376,7 +376,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SetPasswordAsyncTest_SamePassword_Arg1_FailAsync()
+        public async Task SetPasswordAsync_SamePassword_Arg1_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -387,7 +387,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task SetPasswordAsyncTest_Other_FailAsync()
+        public async Task SetPasswordAsync_Other_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
@@ -397,7 +397,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task ResetPasswordAsyncTestAsync()
+        public async Task ResetPasswordAsync_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
@@ -406,7 +406,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ResetPasswordAsyncTest_Null_FailAsync()
+        public async Task ResetPasswordAsync_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
@@ -415,7 +415,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task ResetPasswordAsyncTest_Expired_FailAsync()
+        public async Task ResetPasswordAsync_Expired_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
@@ -424,7 +424,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task ResetPasswordAsyncTest_Admin_FailAsync()
+        public async Task ResetPasswordAsync_Admin_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetUserAsync(Authentication.AdminID);
@@ -432,7 +432,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task SendMessageAsyncTestAsync()
+        public async Task SendMessageAsync_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
@@ -442,7 +442,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SendMessageAsyncTest_Null_Arg0_FailAsync()
+        public async Task SendMessageAsync_Null_Arg0_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
@@ -452,7 +452,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SendMessageAsyncTest_Null_Arg1_FailAsync()
+        public async Task SendMessageAsync_Null_Arg1_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
@@ -461,7 +461,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SendMessageAsyncTest_Empty_Arg1_FailAsync()
+        public async Task SendMessageAsync_Empty_Arg1_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
@@ -470,7 +470,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task SendMessageAsyncTest_Expired_FailAsync()
+        public async Task SendMessageAsync_Expired_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
@@ -479,7 +479,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task SendMessageAsyncTest_Offline_FailAsync()
+        public async Task SendMessageAsync_Offline_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetRandomUserAsync(UserState.None, item => item.ID != authentication.ID);
@@ -488,7 +488,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task KickAsyncTestAsync_Admin()
+        public async Task KickAsync_Admin_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(Authority.Admin, UserState.Online, item => item.ID != authentication.ID);
@@ -497,7 +497,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task KickAsyncTestAsync_Member()
+        public async Task KickAsync_Member_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(Authority.Member, UserState.Online, item => item.ID != authentication.ID);
@@ -506,7 +506,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task KickAsyncTestAsync_Guest()
+        public async Task KickAsync_Guest_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(Authority.Guest, UserState.Online, item => item.ID != authentication.ID);
@@ -516,7 +516,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task KickAsyncTest_Null_Arg0_FailAsync()
+        public async Task KickAsync_Null_Arg0_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
@@ -526,7 +526,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task KickAsyncTest_Null_Arg1_FailAsync()
+        public async Task KickAsync_Null_Arg1_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
@@ -535,7 +535,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task KickAsyncTest_Empty_Arg1_FailAsync()
+        public async Task KickAsync_Empty_Arg1_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
@@ -544,7 +544,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task KickAsyncTest_Expired_FailAsync()
+        public async Task KickAsync_Expired_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
@@ -554,7 +554,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task KickAsyncTest_PermissionDenied_Member_FailAsync()
+        public async Task KickAsync_PermissionDenied_Member_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Member);
             var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
@@ -564,7 +564,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task KickAsyncTest_PermissionDenied_Guest_FailAsync()
+        public async Task KickAsync_PermissionDenied_Guest_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Guest);
             var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
@@ -574,7 +574,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task KickAsyncTest_Offline_FailAsync()
+        public async Task KickAsync_Offline_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(UserState.None, item => item.ID != authentication.ID);
@@ -584,7 +584,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task KickAsyncTest_Self_FailAsync()
+        public async Task KickAsync_Self_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -593,7 +593,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task BanAsyncTestAsync_Online_Member()
+        public async Task BanAsync_Online_Member_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
@@ -604,7 +604,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task BanAsyncTestAsync_Offline_Member()
+        public async Task BanAsync_Offline_Member_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
@@ -615,7 +615,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task BanAsyncTestAsync_Online_Guest()
+        public async Task BanAsync_Online_Guest_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
@@ -626,7 +626,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task BanAsyncTestAsync_Offline_Guest()
+        public async Task BanAsync_Offline_Guest_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
@@ -638,7 +638,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task BanAsyncTest_Null_Arg0_FailAsync()
+        public async Task BanAsync_Null_Arg0_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(item => item.Authority == Authority.Member);
@@ -648,7 +648,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task BanAsyncTest_Null_Arg1_FailAsync()
+        public async Task BanAsync_Null_Arg1_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(Authority.Member);
@@ -657,7 +657,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task BanAsyncTest_Empty_Arg1_FailAsync()
+        public async Task BanAsync_Empty_Arg1_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(Authority.Member);
@@ -666,7 +666,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task BanAsyncTest_Expired_FailAsync()
+        public async Task BanAsync_Expired_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync(Authority.Member);
             var message = RandomUtility.NextString();
@@ -675,7 +675,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task BanAsyncTest_AlreadyBanned_FailAsync()
+        public async Task BanAsync_AlreadyBanned_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
@@ -686,7 +686,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task BanAsyncTest_PermissionDenied_Admin_FailAsync()
+        public async Task BanAsync_PermissionDenied_Admin_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(Authority.Admin, item => item.ID != authentication.ID);
@@ -696,7 +696,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task BanAsyncTest_PermissionDenied_MemberAuthentication_FailAsync()
+        public async Task BanAsync_PermissionDenied_MemberAuthentication_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var user = await userCollection.GetRandomUserAsync(item => item.Authority != Authority.Admin && item.ID != authentication.ID);
@@ -706,7 +706,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task BanAsyncTest_PermissionDenied_GuestAuthentication_FailAsync()
+        public async Task BanAsync_PermissionDenied_GuestAuthentication_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var user = await userCollection.GetRandomUserAsync(item => item.Authority != Authority.Admin && item.ID != authentication.ID);
@@ -715,7 +715,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task UnbanAsyncTestAsync_Member()
+        public async Task UnbanAsync_Member_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(Authority.Member, item => item.ID != authentication.ID && item.BanInfo.IsBanned);
@@ -724,7 +724,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task UnbanAsyncTestAsync_Guest()
+        public async Task UnbanAsync_Guest_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(Authority.Guest, item => item.ID != authentication.ID && item.BanInfo.IsBanned);
@@ -734,7 +734,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task UnbanAsyncTest_Null_Arg0_FailAsync()
+        public async Task UnbanAsync_Null_Arg0_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync(Authority.Member);
             await user.UnbanAsync(null);
@@ -742,7 +742,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task UnbanAsyncTest_Expired_FailAsync()
+        public async Task UnbanAsync_Expired_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync(Authority.Member);
             await user.UnbanAsync(expiredAuthentication);
@@ -750,7 +750,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task UnbanAsyncTest_Member_FailAsync()
+        public async Task UnbanAsync_Member_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var user = await userCollection.GetRandomUserAsync(Authority.Member, item => item.ID != authentication.ID);
@@ -759,7 +759,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task UnbanAsyncTest_Guest_FailAsync()
+        public async Task UnbanAsync_Guest_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var user = await userCollection.GetRandomUserAsync(Authority.Member);
@@ -768,7 +768,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task UnbanAsyncTest_Unbanned_FailAsync()
+        public async Task UnbanAsync_Unbanned_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(Authority.Member, item => item.BanInfo.IsNotBanned);
@@ -776,42 +776,42 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task IDTestAsync()
+        public async Task ID_TestAsync()
         {
             var user = await userCollection.GetUserAsync(Authentication.AdminID);
             Assert.AreEqual(Authentication.AdminID, user.ID);
         }
 
         [TestMethod]
-        public async Task UserNameTestAsync()
+        public async Task UserName_TestAsync()
         {
             var user = await userCollection.GetUserAsync(Authentication.AdminID);
             Assert.AreEqual(Authentication.AdminName, user.UserName);
         }
 
         [TestMethod]
-        public async Task PathTestAsync()
+        public async Task Path_TestAsync()
         {
             var user = await userCollection.GetUserAsync(Authentication.AdminID);
             NameValidator.ValidateItemPath(user.Path);
         }
 
         [TestMethod]
-        public async Task AuthorityTestAsync()
+        public async Task Authority_TestAsync()
         {
             var user = await userCollection.GetUserAsync(Authentication.AdminID);
             Assert.AreEqual(Authority.Admin, user.Authority);
         }
 
         [TestMethod]
-        public async Task CategoryTestAsync()
+        public async Task Category_TestAsync()
         {
             var user = await userCollection.GetUserAsync(Authentication.AdminID);
             Assert.IsNotNull(user.Category);
         }
 
         [TestMethod]
-        public async Task UserInfoTestAsync()
+        public async Task UserInfo_TestAsync()
         {
             var user = await userCollection.GetUserAsync(Authentication.AdminID);
             Assert.AreEqual(Authentication.AdminID, user.UserInfo.ID);
@@ -822,7 +822,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task UserStateTestAsync()
+        public async Task UserState_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -830,7 +830,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task BanInfoTestAsync()
+        public async Task BanInfo_TestAsync()
         {
             var user = await userCollection.GetUserAsync(Authentication.AdminID);
             Assert.AreEqual(string.Empty, user.BanInfo.Path);
@@ -839,7 +839,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task RenamedTestAsync()
+        public async Task Renamed_TestAsync()
         {
             var user = await userCollection.GetRandomUserAsync();
             await user.Dispatcher.InvokeAsync(() =>
@@ -856,14 +856,14 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task RenamedTest_FailAsync()
+        public async Task Renamed_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync();
             user.Renamed += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task MovedTestAsync()
+        public async Task Moved_TestAsync()
         {
             var userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
@@ -893,14 +893,14 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task MovedTest_FailAsync()
+        public async Task Moved_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync();
             user.Moved += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task DeletedTestAsync()
+        public async Task Deleted_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(UserState.None, item => item.ID != Authentication.AdminID && item.ID != authentication.ID);
@@ -926,14 +926,14 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeletedTest_FailAsync()
+        public async Task Deleted_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync();
             user.Deleted += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task UserInfoChangedTestAsync()
+        public async Task UserInfoChanged_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -965,14 +965,14 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task UserInfoChangedTest_FailAsync()
+        public async Task UserInfoChanged_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync();
             user.UserInfoChanged += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task UserStateChangedTestAsync()
+        public async Task UserStateChanged_TestAsync()
         {
             var user = await userCollection.GetRandomUserAsync(UserState.None, item => item.BanInfo.IsNotBanned == true);
             var actualUserState = UserState.None;
@@ -1001,14 +1001,14 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task UserStateChangedTest_FailAsync()
+        public async Task UserStateChanged_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync();
             user.UserStateChanged += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task UserBanInfoChangedTestAsync()
+        public async Task UserBanInfoChanged_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(UserState.None, item => item.Authority != Authority.Admin && item.BanInfo.IsNotBanned);
@@ -1043,7 +1043,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task UserBanInfoChangedTest_FailAsync()
+        public async Task UserBanInfoChanged_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync();
             user.UserBanInfoChanged += (s, e) => { };

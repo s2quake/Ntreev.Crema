@@ -72,7 +72,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task OpenAsyncTestAsync()
+        public async Task OpenAsync_TestAsync()
         {
             cremaHost.Opening += CremaHost_Opening;
             cremaHost.Opened += CremaHost_Opened;
@@ -93,62 +93,72 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task OpenAsyncTestAsync_Fail()
+        public async Task OpenAsync_OpenTwice_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
             await cremaHost.OpenAsync();
         }
 
         [TestMethod]
-        public async Task LoginAsyncTestAsync1()
+        public async Task LoginAsync_TestAsync()
         {
+            var userID = Authentication.AdminID;
+            var password = Authentication.AdminID.ToSecureString();
             token = await cremaHost.OpenAsync();
-            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
+            await cremaHost.LoginAsync(userID, password);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task LoginAsyncTestAsync_Fail1()
+        public async Task LoginAsyncTestAsync_InvalidPassword_FailAsync()
         {
+            var userID = Authentication.AdminID;
+            var password = Authentication.SystemID.ToSecureString();
             token = await cremaHost.OpenAsync();
-            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin1"));
+            await cremaHost.LoginAsync(userID, password);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task LoginAsyncTestAsync_Fail2()
+        public async Task LoginAsync_Null_Arg0_TestFailAsync()
         {
+            var password = Authentication.AdminID.ToSecureString();
             token = await cremaHost.OpenAsync();
-            await cremaHost.LoginAsync(null, StringUtility.ToSecureString("admin"));
+            await cremaHost.LoginAsync(null, password);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task LoginAsyncTestAsync_Fail3()
+        public async Task LoginAsync_Null_Arg1_TestFailAsync()
         {
+            var userID = Authentication.AdminID;
             token = await cremaHost.OpenAsync();
-            await cremaHost.LoginAsync("admin", null);
+            await cremaHost.LoginAsync(userID, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(CremaException))]
-        public async Task LoginAsyncTestAsync_Fail4()
+        public async Task LoginAsync_LoginTwice_TestFailAsync()
         {
+            var userID = Authentication.AdminID;
+            var password = Authentication.AdminID.ToSecureString();
             token = await cremaHost.OpenAsync();
-            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
-            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
+            await cremaHost.LoginAsync(userID, password);
+            await cremaHost.LoginAsync(userID, password);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task LoginAsyncTestAsync_Fail5()
+        public async Task LoginAsync_Not_Open_Login_TestFailAsync()
         {
-            await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
+            var userID = Authentication.AdminID;
+            var password = Authentication.AdminID.ToSecureString();
+            await cremaHost.LoginAsync(userID, password);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task LoginAsyncTest_BannedUser_FailAsync()
+        public async Task LoginAsync_BannedUser_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
             var userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
@@ -158,78 +168,91 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task LoginAsyncTestAsync2()
+        public async Task LoginAsync_Login_Logout_Login_TestAsync()
         {
+            var userID = Authentication.AdminID;
+            var password = Authentication.AdminID.ToSecureString();
             token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
-            await cremaHost.LogoutAsync("admin", StringUtility.ToSecureString("admin"));
-            var authenticationToken2 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
+            var authenticationToken1 = await cremaHost.LoginAsync(userID, password);
+            await cremaHost.LogoutAsync(userID, password);
+            var authenticationToken2 = await cremaHost.LoginAsync(userID, password);
             Assert.AreNotEqual(authenticationToken1, authenticationToken2);
         }
 
         [TestMethod]
-        public async Task LogoutAsyncTestAsync()
+        public async Task LogoutAsync_TestAsync()
         {
+            var userID = Authentication.AdminID;
+            var password = Authentication.AdminID.ToSecureString();
             token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
-            var authentication1 = await cremaHost.AuthenticateAsync(authenticationToken1);
-            await cremaHost.LogoutAsync(authentication1);
+            var authenticationToken = await cremaHost.LoginAsync(userID, password);
+            var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
+            await cremaHost.LogoutAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task LogoutAsyncTestAsync_Fail1()
+        public async Task LogoutAsync_Null_Arg0_TestFailAsync()
         {
+            var userID = Authentication.AdminID;
+            var password = Authentication.AdminID.ToSecureString();
             token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
-            var authentication1 = await cremaHost.AuthenticateAsync(authenticationToken1);
+            var authenticationToken = await cremaHost.LoginAsync(userID, password);
+            var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
             await cremaHost.LogoutAsync(null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task LogoutAsyncTestAsync_Fail2()
+        public async Task LogoutAsync_Expired_TestFailAsync()
         {
+            var userID = Authentication.AdminID;
+            var password = Authentication.AdminID.ToSecureString();
             token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
+            var authenticationToken1 = await cremaHost.LoginAsync(userID, password);
             var authentication1 = await cremaHost.AuthenticateAsync(authenticationToken1);
-            await cremaHost.LogoutAsync("admin", StringUtility.ToSecureString("admin"));
-            var authenticationToken2 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
+            await cremaHost.LogoutAsync(userID, password);
+            var authenticationToken2 = await cremaHost.LoginAsync(userID, password);
             var authentication2 = await cremaHost.AuthenticateAsync(authenticationToken2);
             await cremaHost.LogoutAsync(authentication1);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task LogoutAsyncTestAsync_Fail3()
+        public async Task LogoutAsync_Closed_Expired_TestFailAsync()
         {
-            token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
-            var authentication1 = await cremaHost.AuthenticateAsync(authenticationToken1);
+            var userID = Authentication.AdminID;
+            var password = Authentication.AdminID.ToSecureString();
+            var token = await cremaHost.OpenAsync();
+            var authenticationToken1 = await cremaHost.LoginAsync(userID, password);
+            var authentication = await cremaHost.AuthenticateAsync(authenticationToken1);
             await cremaHost.CloseAsync(token);
-            token = Guid.Empty;
-            await cremaHost.LogoutAsync(authentication1);
+            await cremaHost.LogoutAsync(authentication);
         }
 
         [TestMethod]
-        public async Task AuthenticateAsyncTestAsync1()
+        public async Task AuthenticateAsync_TestAsync()
         {
+            var userID = Authentication.AdminID;
+            var password = Authentication.AdminID.ToSecureString();
             token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
-            var authentication1 = await cremaHost.AuthenticateAsync(authenticationToken1);
+            var authenticationToken = await cremaHost.LoginAsync(userID, password);
+            var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
         }
 
         [TestMethod]
-        public async Task AuthenticateAsyncTestAsync2()
+        public async Task AuthenticateAsync_InvalidToken_TestAsync()
         {
+            var userID = Authentication.AdminID;
+            var password = Authentication.AdminID.ToSecureString();
             token = await cremaHost.OpenAsync();
-            var authenticationToken1 = await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
+            var authenticationToken = await cremaHost.LoginAsync(userID, password);
             var authentication = await cremaHost.AuthenticateAsync(Guid.Empty);
             Assert.AreEqual(null, authentication);
         }
 
         [TestMethod]
-        public async Task CloseAsync1()
+        public async Task CloseAsync_TestAsync()
         {
             token = await cremaHost.OpenAsync();
             cremaHost.Closing += CremaHost_Closing;
@@ -251,7 +274,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task CloseAsync2()
+        public async Task CloseAsync_CloseRequest_TestAsync()
         {
             token = await cremaHost.OpenAsync();
             cremaHost.CloseRequested += CremaHost_CloseRequested;
@@ -271,7 +294,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task CloseAsync_Fail1()
+        public async Task CloseAsync_InvalidToken_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
             await cremaHost.CloseAsync(Guid.Empty);
@@ -279,14 +302,14 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task CloseAsync_Fail2()
+        public async Task CloseAsync_NotOpen_TestFailAsync()
         {
             await cremaHost.CloseAsync(Guid.Empty);
         }
 
 #if SERVER
         [TestMethod]
-        public async Task ShutdownAsyncTestAsync1()
+        public async Task ShutdownAsync_TestAsync()
         {
             token = await cremaHost.OpenAsync();
             var manualEvent = new ManualResetEvent(false);
@@ -313,7 +336,7 @@ namespace JSSoft.Crema.Services.Test
 #endif // SERVER
 
         [TestMethod]
-        public async Task ShutdownAsyncTestAsync2()
+        public async Task ShutdownAsync_Restart_TestAsync()
         {
             token = await cremaHost.OpenAsync();
             var isClosed = false;
@@ -349,7 +372,17 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ShutdownAsyncTestAsync_Fail1()
+        public async Task ShutdownAsync_Null_Arg0_TestFailAsync()
+        {
+            var shutdownContext = new ShutdownContext() { IsRestart = true };
+            token = await cremaHost.OpenAsync();
+            var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+            await cremaHost.ShutdownAsync(null, shutdownContext);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task ShutdownAsync_Null_Arg1_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
@@ -358,16 +391,25 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task ShutdownAsyncTestAsync_Fail2()
+        public async Task ShutdownAsync_Member_PermissionDenied_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
-            var authentication1 = await cremaHost.LoginRandomAsync(Authority.Member);
-            await cremaHost.ShutdownAsync(authentication1, ShutdownContext.None);
+            var authentication = await cremaHost.LoginRandomAsync(Authority.Member);
+            await cremaHost.ShutdownAsync(authentication, ShutdownContext.None);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task ShutdownAsync_Guest_PermissionDenied_TestFailAsync()
+        {
+            token = await cremaHost.OpenAsync();
+            var authentication = await cremaHost.LoginRandomAsync(Authority.Guest);
+            await cremaHost.ShutdownAsync(authentication, ShutdownContext.None);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public async Task ShutdownAsyncTestAsync_Fail3()
+        public async Task ShutdownAsync_Invalid_Milliseconds_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication1 = await cremaHost.LoginRandomAsync(Authority.Admin);
@@ -380,7 +422,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ShutdownAsyncTestAsync_Fail4()
+        public async Task ShutdownAsync_Null_Message_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication1 = await cremaHost.LoginRandomAsync(Authority.Admin);
@@ -392,52 +434,61 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task CancelShutdownAsyncTestAsync1()
+        public async Task CancelShutdownAsync_TestAsync()
         {
             token = await cremaHost.OpenAsync();
-            var authentication1 = await cremaHost.LoginRandomAsync(Authority.Admin);
+            var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
             var shutdownContext = new ShutdownContext()
             {
                 Milliseconds = 5000
             };
-            await cremaHost.ShutdownAsync(authentication1, shutdownContext);
-            await cremaHost.CancelShutdownAsync(authentication1);
+            await cremaHost.ShutdownAsync(authentication, shutdownContext);
+            await cremaHost.CancelShutdownAsync(authentication);
             await Task.Delay(1000);
             Assert.AreEqual(ServiceState.Open, cremaHost.ServiceState);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task CancelShutdownAsyncTestAsync2()
+        public async Task CancelShutdownAsync_Not_Shutdown_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
-            var authentication1 = await cremaHost.LoginRandomAsync(Authority.Admin);
+            var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+            await cremaHost.CancelShutdownAsync(authentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task CancelShutdownAsync_Member_PermissionDenied_TestFailAsync()
+        {
+            token = await cremaHost.OpenAsync();
+            var authentication1 = await cremaHost.LoginRandomAsync(Authority.Member);
             await cremaHost.CancelShutdownAsync(authentication1);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task CancelShutdownAsyncTestAsync_Fail1()
+        public async Task CancelShutdownAsync_Guest_PermissionDenied_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
-            var authentication1 = await cremaHost.LoginRandomAsync(Authority.Member);
+            var authentication1 = await cremaHost.LoginRandomAsync(Authority.Guest);
             await cremaHost.CancelShutdownAsync(authentication1);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task CancelShutdownAsyncTestAsync_Fail2()
+        public async Task CancelShutdownAsync_Not_Open_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
-            var authentication1 = await cremaHost.LoginRandomAsync(Authority.Member);
+            var authentication = await cremaHost.LoginRandomAsync(Authority.Member);
             await cremaHost.CloseAsync(token);
             token = Guid.Empty;
-            await cremaHost.CancelShutdownAsync(authentication1);
+            await cremaHost.CancelShutdownAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task CancelShutdownAsyncTestAsync_Fail3()
+        public async Task CancelShutdownAsync_Null_Arg0_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
             await cremaHost.CancelShutdownAsync(null);

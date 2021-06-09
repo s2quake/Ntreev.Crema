@@ -65,7 +65,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task RenameAsyncTestAsync()
+        public async Task RenameAsync_TestAsync()
         {
             if (userItem.Path.EndsWith("/") == true)
             {
@@ -86,27 +86,27 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task RenameAsyncTestAsync_Null_Arg0_Fail()
+        public async Task RenameAsync_Null_Arg0_TestFailAsync()
         {
             await userItem.RenameAsync(null, RandomUtility.NextName());
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task RenameAsyncTestAsync_Null_Arg1_Fail()
+        public async Task RenameAsync_Null_Arg1_TestFailAsync()
         {
             await userItem.RenameAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task RenameAsyncTestAsync_Expired_Fail()
+        public async Task RenameAsync_Expired_TestFailAsync()
         {
             await userItem.RenameAsync(expiredAuthentication, RandomUtility.NextName());
         }
 
         [TestMethod]
-        public async Task MoveAsyncTestAsync()
+        public async Task MoveAsync_TestAsync()
         {
             var rootItem = userContext.Root;
             await userItem.MoveAsync(authentication, rootItem.Path);
@@ -115,7 +115,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task MoveAsyncTestAsync_Null_Arg0_Fail()
+        public async Task MoveAsync_Null_Arg0_TestFailAsync()
         {
             var rootItem = userContext.Root;
             await userItem.MoveAsync(null, rootItem.Path);
@@ -123,7 +123,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task MoveAsyncTestAsync_Null_Arg1_Fail()
+        public async Task MoveAsync_Null_Arg1_TestFailAsync()
         {
             var rootItem = userContext.Root;
             await userItem.MoveAsync(authentication, null);
@@ -131,7 +131,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task MoveAsyncTestAsync_Empty_Arg1_Fail()
+        public async Task MoveAsync_Empty_Arg1_TestFailAsync()
         {
             var rootItem = userContext.Root;
             await userItem.MoveAsync(authentication, string.Empty);
@@ -139,7 +139,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(CategoryNotFoundException))]
-        public async Task MoveAsyncTestAsync_CategoryNotFound_Fail()
+        public async Task MoveAsync_CategoryNotFound_TestFailAsync()
         {
             var rootItem = userContext.Root;
             await userItem.MoveAsync(authentication, "/qwerwqerwqerweq/wqerqwerwqerqwe/wqerqwerwqer/qwerqwer/");
@@ -147,14 +147,14 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task MoveAsyncTestAsync_SameParent_Fail()
+        public async Task MoveAsync_SameParent_TestFailAsync()
         {
             await userItem.MoveAsync(authentication, userItem.Parent.Path);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task MoveAsyncTestAsync_Expired_Fail()
+        public async Task MoveAsync_Expired_TestFailAsync()
         {
             var rootItem = userContext.Root;
             await userItem.MoveAsync(expiredAuthentication, rootItem.Path);
@@ -162,7 +162,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task MoveAsyncTestAsync_PermissionDenied_Fail()
+        public async Task MoveAsync_PermissionDenied_TestFailAsync()
         {
             var member1 = await cremaHost.LoginRandomAsync(Authority.Member);
             var userItem = await userContext.GetRandomUserItemAsync((item) => item != userContext.Root);
@@ -178,7 +178,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task DeleteAsyncTestAsync_Item()
+        public async Task DeleteAsync_Item_TestAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync(Predicate);
             await userItem.DeleteAsync(authentication);
@@ -202,7 +202,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task DeleteAsyncTestAsync_Category()
+        public async Task DeleteAsync_Category_TestAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync(Predicate);
             await userItem.DeleteAsync(authentication);
@@ -221,7 +221,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task DeleteAsyncTestAsync_Null_Arg0_Fail()
+        public async Task DeleteAsync_Null_Arg0_TestFailAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync();
             await userItem.DeleteAsync(null);
@@ -229,7 +229,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task DeleteAsyncTestAsync_Expired_Fail()
+        public async Task DeleteAsync_Expired_TestFailAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync();
             await userItem.DeleteAsync(expiredAuthentication);
@@ -237,7 +237,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task DeleteAsyncTestAsync_PermissionDenied_Fail()
+        public async Task DeleteAsync_PermissionDenied_TestFailAsync()
         {
             var member1 = await cremaHost.LoginRandomAsync(Authority.Member);
             var userItem = await userContext.GetRandomUserItemAsync((item) => item is IUser);
@@ -253,7 +253,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsyncTestAsync_HasChild_Fail()
+        public async Task DeleteAsync_HasChild_TestFailAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync((item) => item is IUserCategory && item.Childs.Any() == true);
             await userItem.DeleteAsync(authentication);
@@ -261,7 +261,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsyncTestAsync_Self_Fail()
+        public async Task DeleteAsync_Self_TestFailAsync()
         {
             var member = await cremaHost.LoginRandomAsync(Authority.Admin);
             try
@@ -277,7 +277,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsyncTestAsync_Admin_Fail()
+        public async Task DeleteAsync_Admin_TestFailAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync((item) => item is IUser user && user.ID == authentication.ID);
             await userItem.DeleteAsync(authentication);
@@ -285,7 +285,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsyncTestAsync_Online_Fail()
+        public async Task DeleteAsync_Online_TestFailAsync()
         {
             var member = await cremaHost.LoginRandomAsync();
             try
@@ -300,7 +300,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void NameTest()
+        public void Name_Test()
         {
             if (userItem is IUser)
             {
@@ -313,20 +313,20 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void PathTest()
+        public void Path_Test()
         {
             Assert.IsTrue(NameValidator.VerifyPath(userItem.Path));
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ChildTest_Dispatcher_Fail()
+        public void Child_Dispatcher_TestFail()
         {
             Assert.Fail($"{userItem.Childs.Any()}");
         }
 
         [TestMethod]
-        public void RenamedTest()
+        public void Renamed_Test()
         {
             userItem.Dispatcher.Invoke(() =>
             {
@@ -337,13 +337,13 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void RenamedTest_Fail()
+        public void Renamed_TestFail()
         {
             userItem.Renamed += UserItem_Renamed;
         }
 
         [TestMethod]
-        public void MovedTest()
+        public void Moved_Test()
         {
             userItem.Dispatcher.Invoke(() =>
             {
@@ -354,13 +354,13 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void MovedTest_Fail()
+        public void Moved_TestFail()
         {
             userItem.Moved += UserItem_Moved;
         }
 
         [TestMethod]
-        public void DeletedTest()
+        public void Deleted_Test()
         {
             userItem.Dispatcher.Invoke(() =>
             {
@@ -371,7 +371,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void DeletedTest_Fail()
+        public void Deleted_TestFail()
         {
             userItem.Deleted += UserItem_Deleted;
         }

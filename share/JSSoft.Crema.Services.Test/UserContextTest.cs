@@ -97,28 +97,28 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task NotifyMessageAsyncTestAsync_Null_Arg0_Fail()
+        public async Task NotifyMessageAsync_Null_Arg0_TestFailAsync()
         {
             await userContext.NotifyMessageAsync(null, new string[] { }, RandomUtility.NextString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task NotifyMessageAsyncTestAsync_Null_Arg1_Fail()
+        public async Task NotifyMessageAsync_Null_Arg1_TestFailAsync()
         {
             await userContext.NotifyMessageAsync(authentication, null, RandomUtility.NextString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task NotifyMessageAsyncTestAsync_Null_Arg2_Fail()
+        public async Task NotifyMessageAsync_Null_Arg2_TestFailAsync()
         {
             await userContext.NotifyMessageAsync(authentication, new string[] { }, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task NotifyMessageAsyncTestAsync_Expired_Fail()
+        public async Task NotifyMessageAsync_Expired_TestFailAsync()
         {
             await userContext.NotifyMessageAsync(expiredAuthentication, new string[] { }, RandomUtility.NextString());
         }
