@@ -45,10 +45,10 @@ namespace JSSoft.Crema.Services.Test
         private static Guid token;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public static async Task ClassInitializeAsync(TestContext context)
         {
             app = new CremaBootstrapper();
-            app.Initialize(context, nameof(CremaHostTest));
+            app.Initialize(context);
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
         }
 
@@ -144,6 +144,17 @@ namespace JSSoft.Crema.Services.Test
         public async Task LoginAsyncTestAsync_Fail5()
         {
             await cremaHost.LoginAsync("admin", StringUtility.ToSecureString("admin"));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task LoginAsyncTest_BannedUser_FailAsync()
+        {
+            token = await cremaHost.OpenAsync();
+            var userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            var user = await userCollection.GetRandomUserAsync(item => item.BanInfo.IsBanned == true);
+            var password = user.GetPassword();
+            await cremaHost.LoginAsync(user.ID, password);
         }
 
         [TestMethod]

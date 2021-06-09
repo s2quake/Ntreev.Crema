@@ -1,11 +1,13 @@
 ﻿using JSSoft.Crema.Data;
 using JSSoft.Library;
 using JSSoft.Library.IO;
+using JSSoft.Library.Random;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test.Extensions
 {
@@ -23,13 +25,16 @@ namespace JSSoft.Crema.Services.Test.Extensions
 
         private static readonly Dictionary<Authentication, Guid> authenticationToToken = new();
 
-        public static void Initialize(this CremaBootstrapper app, TestContext context, string name)
+        public static void Initialize(this CremaBootstrapper app, TestContext context)
         {
 #if SERVER
-            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", name);
-            CremaBootstrapper.CreateRepositoryInternal(app, repositoryPath, "git", "xml", string.Empty, UserContextExtensions.GenerateUserInfos, () => new CremaDataSet());
+            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", context.FullyQualifiedTestClassName);
+            var userInfos = UserContextExtensions.GenerateUserInfos(RandomUtility.Next(500, 1000), RandomUtility.Next(100, 1000));
+            var dataSet = new CremaDataSet();
+            CremaBootstrapper.CreateRepositoryInternal(app, repositoryPath, "git", "xml", string.Empty, userInfos, dataSet);
             app.BasePath = repositoryPath;
             repositoryPathByApp.Add(app, repositoryPath);
+            context.SetUserInfos(userInfos);
 #endif
 #if CLIENT
             var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;

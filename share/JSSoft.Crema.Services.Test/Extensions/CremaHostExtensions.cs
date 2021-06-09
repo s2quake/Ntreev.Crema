@@ -3,8 +3,10 @@ using JSSoft.Crema.Services.Extensions;
 using JSSoft.Crema.Services.Random;
 using JSSoft.Library;
 using JSSoft.Library.Random;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,11 +37,6 @@ namespace JSSoft.Crema.Services.Test.Extensions
         {
             var token = await cremaHost.OpenAsync();
             var authentication = await cremaHost.LoginRandomAsync(authority);
-            var count = RandomUtility.Next(10, 50);
-            for (var i = 0; i < count; i++)
-            {
-                await cremaHost.LoginRandomAsync();
-            }
             tokenByAuthentication.Add(authentication, token);
             return authentication;
         }
@@ -94,6 +91,17 @@ namespace JSSoft.Crema.Services.Test.Extensions
                     return false;
                 return true;
             }
+        }
+
+        public static async Task<Authentication[]> LoginRandomManyAsync(this ICremaHost cremaHost, int count)
+        {
+            var authenticationList = new List<Authentication>(count);
+            for (var i = 0; i < count; i++)
+            {
+                var authentication = await cremaHost.LoginRandomAsync();
+                authenticationList.Add(authentication);
+            }
+            return authenticationList.ToArray();
         }
     }
 }

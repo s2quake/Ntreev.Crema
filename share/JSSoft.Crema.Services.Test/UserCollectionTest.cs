@@ -46,7 +46,7 @@ namespace JSSoft.Crema.Services.Test
         public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
-            app.Initialize(context, nameof(UserCollectionTest));
+            app.Initialize(context);
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             authentication = await cremaHost.StartAsync();
             userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;

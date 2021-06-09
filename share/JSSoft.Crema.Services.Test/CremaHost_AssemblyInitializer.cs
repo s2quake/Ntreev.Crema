@@ -70,7 +70,7 @@ namespace JSSoft.Crema.Services.Test
         public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
-            app.Initialize(context, nameof(CremaHost_AssemblyInitializer));
+            app.Initialize(context);
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             authentication = await cremaHost.StartAsync();
         }

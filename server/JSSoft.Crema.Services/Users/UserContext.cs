@@ -305,9 +305,9 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        public static void GenerateDefaultUserInfos(IObjectSerializer serializer, string repositoryPath)
+        public static UserContextSerializationInfo GenerateDefaultUserInfos()
         {
-            var designedInfo = new SignatureDate(Authentication.SystemID, DateTime.UtcNow);
+            var signatureDate = new SignatureDate(Authentication.SystemID, DateTime.UtcNow);
             var administrator = new UserSerializationInfo()
             {
                 ID = Authentication.AdminID,
@@ -315,8 +315,8 @@ namespace JSSoft.Crema.Services.Users
                 CategoryName = string.Empty,
                 Authority = Authority.Admin,
                 Password = Authentication.AdminID.Encrypt(),
-                CreationInfo = designedInfo,
-                ModificationInfo = designedInfo,
+                CreationInfo = signatureDate,
+                ModificationInfo = signatureDate,
                 BanInfo = (BanSerializationInfo)BanInfo.Empty,
             };
             var serializationInfo = new UserContextSerializationInfo()
@@ -325,7 +325,7 @@ namespace JSSoft.Crema.Services.Users
                 Categories = new string[] { },
                 Users = new UserSerializationInfo[] { administrator},
             };
-            serializationInfo.WriteToDirectory(repositoryPath, serializer);
+            return serializationInfo;
         }
 
         public static string SecureStringToString(SecureString value)

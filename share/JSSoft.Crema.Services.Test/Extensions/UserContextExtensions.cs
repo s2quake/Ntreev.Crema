@@ -19,9 +19,9 @@ namespace JSSoft.Crema.Services.Test.Extensions
 {
     static class UserContextExtensions
     {
-        public static void GenerateUserInfos(IObjectSerializer serializer, string repositoryPath)
+        public static UserContextSerializationInfo GenerateUserInfos(int userCount, int categoryCount)
         {
-            var designedInfo = new SignatureDate(Authentication.SystemID, DateTime.UtcNow);
+            var signatureDate = new SignatureDate(Authentication.SystemID, DateTime.UtcNow);
             var administrator = new UserSerializationInfo()
             {
                 ID = Authentication.AdminID,
@@ -29,13 +29,12 @@ namespace JSSoft.Crema.Services.Test.Extensions
                 CategoryName = string.Empty,
                 Authority = Authority.Admin,
                 Password = Authentication.AdminID.Encrypt(),
-                CreationInfo = designedInfo,
-                ModificationInfo = designedInfo,
+                CreationInfo = signatureDate,
+                ModificationInfo = signatureDate,
                 BanInfo = (BanSerializationInfo)BanInfo.Empty,
             };
-            var categoryPaths = RandomUtility.NextCategoryPaths(4, 50);
+            var categoryPaths = RandomUtility.NextCategoryPaths(3, categoryCount);
             var usersByID = new Dictionary<string, UserSerializationInfo>() { { administrator.ID, administrator } };
-            var count = RandomUtility.Next(100, 200);
             var authorities = new Authority[] { Authority.Guest, Authority.Member, Authority.Admin };
             var userNameByAuthority = new Dictionary<Authority, string>
             {
@@ -43,23 +42,31 @@ namespace JSSoft.Crema.Services.Test.Extensions
                 { Authority.Member, "구성원" },
                 { Authority.Admin, "관리자" },
             };
-            for (var i = 0; i < count; i++)
+            for (var i = 0; i < userCount; i++)
             {
                 var authority = authorities.Random();
                 var name = authority.ToString().ToLower();
                 var userID = NameUtility.GenerateNewName(name, usersByID.Keys);
                 var password = name.Encrypt();
                 var userName = Regex.Replace(userID, $"{name}(\\d+)", $"{userNameByAuthority[authority]}$1");
+                var categoryPath = categoryPaths.Random();
+                var isBanned = authority != Authority.Admin && RandomUtility.Within(10);
+                var banInfo = isBanned == true ? new BanInfo()
+                {
+                    Path = categoryPath + userID,
+                    SignatureDate = signatureDate,
+                    Comment = RandomUtility.NextString(),
+                } : BanInfo.Empty;
                 var info = new UserSerializationInfo()
                 {
                     ID = userID,
                     Name = userName,
-                    CategoryPath = categoryPaths.Random(),
+                    CategoryPath = categoryPath,
                     Authority = authority,
                     Password = password,
-                    CreationInfo = designedInfo,
-                    ModificationInfo = designedInfo,
-                    BanInfo = (BanSerializationInfo)BanInfo.Empty,
+                    CreationInfo = signatureDate,
+                    ModificationInfo = signatureDate,
+                    BanInfo = (BanSerializationInfo)banInfo,
                 };
                 usersByID.Add(userID, info);
             }
@@ -71,7 +78,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
                 Users = usersByID.Values.ToArray(),
             };
 
-            serializationInfo.WriteToDirectory(repositoryPath, serializer);
+            return serializationInfo;
         }
 
         private static UserSerializationInfo CreateUser(int index, Authority authority, SignatureDate signatureDate)

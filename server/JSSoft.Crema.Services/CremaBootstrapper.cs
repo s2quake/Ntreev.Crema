@@ -24,6 +24,7 @@ using JSSoft.Crema.Data.Xml.Schema;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Properties;
 using JSSoft.Crema.Services.Users;
+using JSSoft.Crema.Services.Users.Serializations;
 using JSSoft.Library;
 using JSSoft.Library.IO;
 using JSSoft.Library.Linq;
@@ -59,7 +60,7 @@ namespace JSSoft.Crema.Services
 
         public static void CreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, string dataBaseUrl)
         {
-            CreateRepositoryInternal(serviceProvider, basePath, repositoryModule, fileType, dataBaseUrl, UserContext.GenerateDefaultUserInfos, () => new CremaDataSet());
+            CreateRepositoryInternal(serviceProvider, basePath, repositoryModule, fileType, dataBaseUrl, UserContext.GenerateDefaultUserInfos(), new CremaDataSet());
         }
 
         public static void ValidateRepository(IServiceProvider serviceProvider, string basePath, params string[] dataBaseNames)
@@ -411,8 +412,8 @@ namespace JSSoft.Crema.Services
         }
 
         internal static void CreateRepositoryInternal(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, string dataBaseUrl
-            , Action<IObjectSerializer, string> userInfoGenerator
-            , Func<CremaDataSet> dataSetGenerator)
+            , UserContextSerializationInfo userContextSerializationInfo
+            , CremaDataSet dataSet)
         {
             ValidateCreateRepository(serviceProvider, basePath, repositoryModule, fileType, dataBaseUrl);
             var repositoryProvider = GetRepositoryProvider(serviceProvider, repositoryModule);
@@ -428,13 +429,12 @@ namespace JSSoft.Crema.Services
                 var usersPath = DirectoryUtility.Prepare(tempPath, CremaString.Users);
                 var dataBasesRepo = DirectoryUtility.Prepare(repositoryPath, CremaString.DataBases);
 
-                userInfoGenerator(serializer, usersPath);
+                userContextSerializationInfo.WriteToDirectory(usersPath, serializer);
                 repositoryProvider.InitializeRepository(usersRepo, usersPath, new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion });
 
                 if (dataBaseUrl == string.Empty)
                 {
                     var dataBasesPath = DirectoryUtility.Prepare(tempPath, CremaString.DataBases);
-                    var dataSet = dataSetGenerator();
                     dataSet.WriteToDirectory(dataBasesPath);
                     FileUtility.WriteAllText($"{CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}", dataBasesPath, ".version");
                     repositoryProvider.InitializeRepository(dataBasesRepo, dataBasesPath);

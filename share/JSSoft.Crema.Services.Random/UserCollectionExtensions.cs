@@ -31,12 +31,44 @@ namespace JSSoft.Crema.Services.Random
     {
         public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection)
         {
-            return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random());
+            return GetRandomUserAsync(userCollection, DefaultPredicate);
         }
 
         public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, Func<IUser, bool> predicate)
         {
             return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(predicate));
         }
+
+        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, Authority authority)
+        {
+            return GetRandomUserAsync(userCollection, authority, DefaultPredicate);
+        }
+
+        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, Authority authority, Func<IUser, bool> predicate)
+        {
+            return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(item => item.Authority == authority && predicate(item) == true));
+        }
+
+        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, Authority authority, UserState userState)
+        {
+            return GetRandomUserAsync(userCollection, authority, userState, DefaultPredicate);
+        }
+
+        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, Authority authority, UserState userState, Func<IUser, bool> predicate)
+        {
+            return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(item => item.Authority == authority && item.UserState == userState && predicate(item) == true));
+        }
+
+        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, UserState userState)
+        {
+            return GetRandomUserAsync(userCollection, userState, DefaultPredicate);
+        }
+
+        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, UserState userState, Func<IUser, bool> predicate)
+        {
+            return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(item => item.UserState == userState && predicate(item) == true));
+        }
+
+        private static bool DefaultPredicate(IUser _) => true;
     }
 }

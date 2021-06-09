@@ -47,6 +47,9 @@ namespace JSSoft.Crema.ServiceModel
         [IgnoreDataMember]
         public bool IsBanned => this.Path != string.Empty;
 
+        [IgnoreDataMember]
+        public bool IsNotBanned => this.Path == string.Empty;
+
         public static bool operator ==(BanInfo x, BanInfo y)
         {
             return ((x.Path == y.Path) &&

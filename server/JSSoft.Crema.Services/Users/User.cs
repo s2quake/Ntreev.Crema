@@ -900,7 +900,7 @@ namespace JSSoft.Crema.Services.Users
             if (this.IsOnline == false)
                 throw new InvalidOperationException(Resources.Exception_OfflineUserCannotKicked);
             if (authentication.ID == this.ID)
-                throw new PermissionDeniedException(Resources.Exception_CannotKickYourself);
+                throw new InvalidOperationException(Resources.Exception_CannotKickYourself);
         }
 
         #region IUser

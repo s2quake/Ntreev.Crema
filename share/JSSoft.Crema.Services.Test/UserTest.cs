@@ -41,80 +41,89 @@ namespace JSSoft.Crema.Services.Test
     {
         private static CremaBootstrapper app;
         private static ICremaHost cremaHost;
+        private static Guid token;
+        private static IUserCategoryCollection userCategoryCollection;
         private static IUserCollection userCollection;
-        private static Authentication authentication;
-        private static Authentication adminAuthentication;
-        private static Authentication memberAuthentication;
-        private static Authentication guestAuthentication;
         private static Authentication expiredAuthentication;
-        private static IUser user;
-        private static IUser adminUser;
-        private static IUser memberUser;
-        private static IUser guestUser;
-        private static IUser expiredUser;
-        private static IUser[] exceptUsers = new IUser[] { user, adminUser, memberUser, guestUser, expiredUser };
 
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
-            app.Initialize(context, nameof(UserTest));
+            app.Initialize(context);
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            authentication = await cremaHost.StartAsync();
-            adminAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-            memberAuthentication = await cremaHost.LoginRandomAsync(Authority.Member);
-            guestAuthentication = await cremaHost.LoginRandomAsync(Authority.Guest);
-            expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+            token = await cremaHost.OpenAsync();
+            userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
-            user = await userCollection.Dispatcher.InvokeAsync(() => userCollection[authentication.ID]);
-            adminUser = await userCollection.Dispatcher.InvokeAsync(() => userCollection[adminAuthentication.ID]);
-            memberUser = await userCollection.Dispatcher.InvokeAsync(() => userCollection[memberAuthentication.ID]);
-            guestUser = await userCollection.Dispatcher.InvokeAsync(() => userCollection[guestAuthentication.ID]);
-            expiredUser = await userCollection.GetUserAsync(expiredAuthentication.ID);
+            expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
             await cremaHost.LogoutAsync(expiredAuthentication);
+            await context.LoginRandomManyAsync(cremaHost);
         }
 
         [ClassCleanup]
         public static async Task ClassCleanupAsync()
         {
-            await cremaHost.StopAsync(authentication);
+            await cremaHost.CloseAsync(token);
             app.Release();
         }
+
+        [TestInitialize]
+        public async Task TestInitializeAsync()
+        {
+            await this.TestContext.InitializeAsync(cremaHost);
+        }
+
+        [TestCleanup]
+        public async Task TestCleanupAsync()
+        {
+            await this.TestContext.ReleaseAsync();
+        }
+
+        public TestContext TestContext { get; set; }
 
         [TestMethod]
         public async Task MoveAsyncTestAsync()
         {
             var userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync();
             var category = await userCategoryCollection.GetRandomUserCategoryAsync((item) => item != user.Category);
             await user.MoveAsync(authentication, category.Path);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task MoveAsyncTestAsync_Null_Arg0_Fail()
+        public async Task MoveAsyncTest_Null_Arg0_FailAsync()
         {
+            var user = await userCollection.GetRandomUserAsync();
             await user.MoveAsync(null, "/");
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task MoveAsyncTestAsync_Null_Arg1_Fail()
+        public async Task MoveAsyncTest_Null_Arg1_FailAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync();
             await user.MoveAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task MoveAsyncTestAsync_InvalidPath_Arg1_Fail()
+        public async Task MoveAsyncTest_InvalidPath_Arg1_FailAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync();
             var categoryPath = RandomUtility.NextInvalidCategoryPath();
             await user.MoveAsync(authentication, categoryPath);
         }
 
         [TestMethod]
         [ExpectedException(typeof(CategoryNotFoundException))]
-        public async Task MoveAsyncTestAsync_NotExistsPath_Arg1_Fail()
+        public async Task MoveAsyncTest_NotExistsPath_Arg1_FailAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync();
             var userCategoryColleciton = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             var category = await userCategoryColleciton.GetRandomUserCategoryAsync(item => item.Path != user.Category.Path);
             var categoryPath = new CategoryName(category.Path, RandomUtility.NextName());
@@ -123,108 +132,98 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task MoveAsyncTestAsync_Expired_Fail()
+        public async Task MoveAsyncTest_Expired_FailAsync()
         {
+            var user = await userCollection.GetRandomUserAsync();
             await user.MoveAsync(expiredAuthentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task MoveAsyncTestAsync_PermissionDenied_Member_Fail()
+        public async Task MoveAsyncTest_PermissionDenied_Member_FailAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
+            var user = await userCollection.GetRandomUserAsync();
             var userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             var category = await userCategoryCollection.GetRandomUserCategoryAsync((item) => item != user.Category);
-            await user.MoveAsync(memberAuthentication, category.Path);
+            await user.MoveAsync(authentication, category.Path);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task MoveAsyncTestAsync_PermissionDenied_Guest_Fail()
+        public async Task MoveAsyncTest_PermissionDenied_Guest_FailAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
+            var user = await userCollection.GetRandomUserAsync();
             var userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             var category = await userCategoryCollection.GetRandomUserCategoryAsync((item) => item != user.Category);
-            await user.MoveAsync(guestAuthentication, category.Path);
+            await user.MoveAsync(authentication, category.Path);
         }
 
         [TestMethod]
         public async Task DeleteAsyncTestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync(item => Predicate(item, authentication));
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(UserState.None, item => item.ID != Authentication.AdminID && item.ID != authentication.ID);
             await user.DeleteAsync(authentication);
-
-            static bool Predicate(IUser user, Authentication authentication)
-            {
-                if (user.ID == Authentication.AdminID)
-                    return false;
-                if (user.ID == authentication.ID)
-                    return false;
-                if (user.UserState == UserState.Online)
-                    return false;
-                if (exceptUsers.Contains(user) == true)
-                    return false;
-                return true;
-            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task DeleteAsyncTestAsync_Null_Fail()
+        public async Task DeleteAsyncTest_Null_FailAsync()
         {
+            var user = await userCollection.GetRandomUserAsync();
             await user.DeleteAsync(null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task DeleteAsyncTestAsync_Expired_Fail()
+        public async Task DeleteAsyncTest_Expired_FailAsync()
         {
+            var user = await userCollection.GetRandomUserAsync();
             await user.DeleteAsync(expiredAuthentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsyncTestAsync_PermissionDenied_AdminID_Fail()
+        public async Task DeleteAsyncTest_PermissionDenied_AdminID_FailAsync()
         {
-            var admin = await userCollection.Dispatcher.InvokeAsync(() => userCollection[Authentication.AdminID]);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var admin = await userCollection.GetUserAsync(Authentication.AdminID);
             await admin.DeleteAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task DeleteAsyncTestAsync_PermissionDenied_Member_Fail()
+        public async Task DeleteAsyncTest_PermissionDenied_Member_FailAsync()
         {
-            await user.DeleteAsync(memberAuthentication);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
+            var user = await userCollection.GetRandomUserAsync();
+            await user.DeleteAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task DeleteAsyncTestAsync_PermissionDenied_Guest_Fail()
+        public async Task DeleteAsyncTest_PermissionDenied_Guest_FailAsync()
         {
-            await user.DeleteAsync(guestAuthentication);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
+            var user = await userCollection.GetRandomUserAsync();
+            await user.DeleteAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsyncTestAsync_Online_Fail()
+        public async Task DeleteAsyncTest_Online_FailAsync()
         {
-            var user = await userCollection.GetRandomUserAsync(item => Predicate(item, authentication));
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != Authentication.AdminID && item.ID != authentication.ID);
             await user.DeleteAsync(authentication);
-
-            static bool Predicate(IUser user, Authentication authentication)
-            {
-                if (user.ID == Authentication.AdminID)
-                    return false;
-                if (user.ID == authentication.ID)
-                    return false;
-                if (user.UserState == UserState.None)
-                    return false;
-                return true;
-            }
         }
 
         [TestMethod]
         public async Task SetUserNameAsyncTestAsync()
         {
-            var authentication = await cremaHost.LoginRandomAsync();
+            var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
             var password = user.GetPassword();
             var userName = RandomUtility.NextName();
@@ -236,8 +235,10 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetUserNameAsyncTestAsync_Null_Arg0_Fail()
+        public async Task SetUserNameAsyncTest_Null_Arg0_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var password = $"{user.Authority}".ToLower().ToSecureString();
             var userName = RandomUtility.NextName();
             await user.SetUserNameAsync(null, password, userName);
@@ -245,16 +246,20 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetUserNameAsyncTestAsync_Null_Arg1_Fail()
+        public async Task SetUserNameAsyncTest_Null_Arg1_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var userName = RandomUtility.NextName();
             await user.SetUserNameAsync(authentication, null, userName);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SetUserNameAsyncTestAsync_WrongPassword_Arg1_Fail()
+        public async Task SetUserNameAsyncTest_WrongPassword_Arg1_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var password = user.GetNextPassword();
             var userName = RandomUtility.NextName();
             await user.SetUserNameAsync(authentication, password, userName);
@@ -262,24 +267,30 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetUserNameAsyncTestAsync_Null_Arg2_Fail()
+        public async Task SetUserNameAsyncTest_Null_Arg2_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var password = $"{user.Authority}".ToLower().ToSecureString();
             await user.SetUserNameAsync(authentication, password, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SetUserNameAsyncTestAsync_Empty_Arg2_Fail()
+        public async Task SetUserNameAsyncTest_Empty_Arg2_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var password = user.GetPassword();
             await user.SetUserNameAsync(authentication, password, string.Empty);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task SetUserNameAsyncTestAsync_Expired_Fail()
+        public async Task SetUserNameAsyncTest_Expired_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var password = user.GetPassword();
             var userName = RandomUtility.NextName();
             await user.SetUserNameAsync(expiredAuthentication, password, userName);
@@ -287,27 +298,20 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task SetUserNameAsyncTestAsync_OtherUser_Fail()
+        public async Task SetUserNameAsyncTest_OtherUser_FailAsync()
         {
-            var otherUser = await userCollection.GetRandomUserAsync(Predicate);
+            var authentication = await TestContext.LoginRandomAsync();
+            var otherUser = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != Authentication.AdminID);
             var password = otherUser.GetPassword();
             var userName = RandomUtility.NextName();
             await otherUser.SetUserNameAsync(authentication, password, userName);
-
-            static bool Predicate(IUser user)
-            {
-                if (user.ID == Authentication.AdminID)
-                    return false;
-                if (exceptUsers.Contains(user) == true)
-                    return false;
-                return true;
-            }
         }
 
         [TestMethod]
         public async Task SetPasswordAsyncTestAsync()
         {
-            var user = await userCollection.Dispatcher.InvokeAsync(() => userCollection[authentication.ID]);
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var password1 = user.GetPassword();
             var password2 = user.GetNextPassword();
             var dateTime = DateTime.UtcNow;
@@ -319,8 +323,10 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetPasswordAsyncTestAsync_Null_Arg0_Fail()
+        public async Task SetPasswordAsyncTest_Null_Arg0_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var password1 = user.GetPassword();
             var password2 = user.GetNextPassword();
             await user.SetPasswordAsync(null, password1, password2);
@@ -328,25 +334,30 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetPasswordAsyncTestAsync_Null_Arg1_Fail()
+        public async Task SetPasswordAsyncTest_Null_Arg1_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var password2 = user.GetNextPassword();
             await user.SetPasswordAsync(authentication, null, password2);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetPasswordAsyncTestAsync_Null_Arg2_Fail()
+        public async Task SetPasswordAsyncTest_Null_Arg2_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var password1 = user.GetPassword();
             await user.SetPasswordAsync(authentication, password1, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task SetPasswordAsyncTestAsync_Expired_Fail()
+        public async Task SetPasswordAsyncTest_Expired_FailAsync()
         {
-            var user = await userCollection.Dispatcher.InvokeAsync(() => userCollection[expiredAuthentication.SignatureDate.ID]);
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var password1 = user.GetPassword();
             var password2 = user.GetNextPassword();
             await user.SetPasswordAsync(expiredAuthentication, password1, password2);
@@ -354,9 +365,10 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SetPasswordAsyncTestAsync_WrongPassword_Arg1_Fail()
+        public async Task SetPasswordAsyncTest_WrongPassword_Arg1_FailAsync()
         {
-            var user = await userCollection.Dispatcher.InvokeAsync(() => userCollection[authentication.ID]);
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var password1 = user.GetNextPassword();
             var password2 = user.GetNextPassword();
             await user.SetPasswordAsync(authentication, password1, password2);
@@ -364,9 +376,10 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SetPasswordAsyncTestAsync_SamePassword_Arg1_Fail()
+        public async Task SetPasswordAsyncTest_SamePassword_Arg1_FailAsync()
         {
-            var user = await userCollection.Dispatcher.InvokeAsync(() => userCollection[authentication.ID]);
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             var password1 = user.GetPassword();
             var password2 = user.GetPassword();
             await user.SetPasswordAsync(authentication, password1, password2);
@@ -374,8 +387,9 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task SetPasswordAsyncTestAsync_Other_Fail()
+        public async Task SetPasswordAsyncTest_Other_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
             var password1 = user.GetPassword();
             var password2 = user.GetNextPassword();
@@ -385,377 +399,421 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task ResetPasswordAsyncTestAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
             await user.ResetPasswordAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ResetPasswordAsyncTestAsync_Null_Fail()
+        public async Task ResetPasswordAsyncTest_Null_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
             await user.ResetPasswordAsync(null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task ResetPasswordAsyncTestAsync_Expired_Fail()
+        public async Task ResetPasswordAsyncTest_Expired_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
             await user.ResetPasswordAsync(expiredAuthentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task ResetPasswordAsyncTestAsync_Admin_Fail()
+        public async Task ResetPasswordAsyncTest_Admin_FailAsync()
         {
-            await user.ResetPasswordAsync(adminAuthentication);
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetUserAsync(Authentication.AdminID);
+            await user.ResetPasswordAsync(authentication);
         }
 
         [TestMethod]
         public async Task SendMessageAsyncTestAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
             var message = RandomUtility.NextString();
             await user.SendMessageAsync(authentication, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SendMessageAsyncTestAsync_Null_Arg0_Fail()
+        public async Task SendMessageAsyncTest_Null_Arg0_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
             var message = RandomUtility.NextString();
             await user.SendMessageAsync(null, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SendMessageAsyncTestAsync_Null_Arg1_Fail()
+        public async Task SendMessageAsyncTest_Null_Arg1_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
             await user.SendMessageAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SendMessageAsyncTestAsync_Empty_Arg1_Fail()
+        public async Task SendMessageAsyncTest_Empty_Arg1_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
             await user.SendMessageAsync(authentication, string.Empty);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task SendMessageAsyncTestAsync_Expired_Fail()
+        public async Task SendMessageAsyncTest_Expired_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
             await user.SendMessageAsync(expiredAuthentication, null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task SendMessageAsyncTest_Offline_FailAsync()
+        {
+            var authentication = await TestContext.LoginRandomAsync();
+            var user = await userCollection.GetRandomUserAsync(UserState.None, item => item.ID != authentication.ID);
+            var message = RandomUtility.NextString();
+            await user.SendMessageAsync(authentication, message);
         }
 
         [TestMethod]
         public async Task KickAsyncTestAsync_Admin()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(Authority.Admin, UserState.Online, item => item.ID != authentication.ID);
             var message = RandomUtility.NextString();
-            var adminAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-            var adminUser = await userCollection.GetUserAsync(adminAuthentication.ID);
-            await adminUser.KickAsync(authentication, message);
+            await user.KickAsync(authentication, message);
         }
 
         [TestMethod]
         public async Task KickAsyncTestAsync_Member()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(Authority.Member, UserState.Online, item => item.ID != authentication.ID);
             var message = RandomUtility.NextString();
-            var memberAuthentication = await cremaHost.LoginRandomAsync(Authority.Member);
-            var memberUser = await userCollection.GetUserAsync(memberAuthentication.ID);
-            await memberUser.KickAsync(authentication, message);
+            await user.KickAsync(authentication, message);
         }
 
         [TestMethod]
         public async Task KickAsyncTestAsync_Guest()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(Authority.Guest, UserState.Online, item => item.ID != authentication.ID);
             var message = RandomUtility.NextString();
-            var guestAuthentication = await cremaHost.LoginRandomAsync(Authority.Guest);
-            var guestUser = await userCollection.GetUserAsync(guestAuthentication.ID);
-            await guestUser.KickAsync(authentication, message);
+            await user.KickAsync(authentication, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task KickAsyncTestAsync_Null_Arg0_Fail()
+        public async Task KickAsyncTest_Null_Arg0_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
             var message = RandomUtility.NextString();
-            await adminUser.KickAsync(null, message);
+            await user.KickAsync(null, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task KickAsyncTestAsync_Null_Arg1_Fail()
+        public async Task KickAsyncTest_Null_Arg1_FailAsync()
         {
-            await adminUser.KickAsync(authentication, null);
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
+            await user.KickAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task KickAsyncTestAsync_Empty_Arg1_Fail()
+        public async Task KickAsyncTest_Empty_Arg1_FailAsync()
         {
-            await adminUser.KickAsync(authentication, string.Empty);
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
+            await user.KickAsync(authentication, string.Empty);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task KickAsyncTestAsync_Expired_Fail()
+        public async Task KickAsyncTest_Expired_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
             var message = RandomUtility.NextString();
-            await adminUser.KickAsync(expiredAuthentication, message);
+            await user.KickAsync(expiredAuthentication, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task KickAsyncTestAsync_PermissionDenied_Member_Fail()
+        public async Task KickAsyncTest_PermissionDenied_Member_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Member);
+            var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
             var message = RandomUtility.NextString();
-            await user.KickAsync(memberAuthentication, message);
+            await user.KickAsync(authentication, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task KickAsyncTestAsync_PermissionDenied_Guest_Fail()
+        public async Task KickAsyncTest_PermissionDenied_Guest_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Guest);
+            var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
             var message = RandomUtility.NextString();
-            await user.KickAsync(guestAuthentication, message);
+            await user.KickAsync(authentication, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task KickAsyncTestAsync_Offline_Fail()
+        public async Task KickAsyncTest_Offline_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(UserState.None, item => item.ID != authentication.ID);
             var message = RandomUtility.NextString();
-            var user = await userCollection.GetRandomUserAsync(item => item.UserState == UserState.None);
+            await user.KickAsync(authentication, message);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task KickAsyncTest_Self_FailAsync()
+        {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetUserAsync(authentication.ID);
+            var message = RandomUtility.NextString();
             await user.KickAsync(authentication, message);
         }
 
         [TestMethod]
         public async Task BanAsyncTestAsync_Online_Member()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
-            var memberAuthentication = await cremaHost.LoginRandomAsync(Authority.Member);
-            var memberUser = await userCollection.GetUserAsync(memberAuthentication.ID);
-            await memberUser.BanAsync(authentication, message);
-            Assert.AreEqual(UserState.None, memberUser.UserState);
-            Assert.AreNotEqual(string.Empty, memberUser.BanInfo.Path);
+            var user = await userCollection.GetRandomUserAsync(Authority.Member, UserState.Online, item => item.ID != authentication.ID && item.BanInfo.IsNotBanned);
+            await user.BanAsync(authentication, message);
+            Assert.AreEqual(UserState.None, user.UserState);
+            Assert.AreNotEqual(string.Empty, user.BanInfo.Path);
         }
 
         [TestMethod]
         public async Task BanAsyncTestAsync_Offline_Member()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
-            var memberUser = await userCollection.GetRandomUserAsync(Predicate);
-            await memberUser.BanAsync(authentication, message);
-            Assert.AreEqual(UserState.None, memberUser.UserState);
-            Assert.AreNotEqual(string.Empty, memberUser.BanInfo.Path);
-
-            static bool Predicate(IUser user)
-            {
-                if (user.UserState == UserState.Online)
-                    return false;
-                if (user.Authority != Authority.Member)
-                    return false;
-                if (user.BanInfo.Path != string.Empty)
-                    return false;
-                return true;
-            }
+            var user = await userCollection.GetRandomUserAsync(Authority.Member, UserState.None, item => item.ID != authentication.ID && item.BanInfo.IsNotBanned);
+            await user.BanAsync(authentication, message);
+            Assert.AreEqual(UserState.None, user.UserState);
+            Assert.AreNotEqual(string.Empty, user.BanInfo.Path);
         }
 
         [TestMethod]
         public async Task BanAsyncTestAsync_Online_Guest()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
-            var guestAuthentication = await cremaHost.LoginRandomAsync(Authority.Guest);
-            var guestUser = await userCollection.GetUserAsync(guestAuthentication.ID);
-            await guestUser.BanAsync(authentication, message);
-            Assert.AreEqual(UserState.None, guestUser.UserState);
-            Assert.AreNotEqual(string.Empty, guestUser.BanInfo.Path);
+            var user = await userCollection.GetRandomUserAsync(Authority.Guest, UserState.Online, item => item.ID != authentication.ID && item.BanInfo.IsNotBanned);
+            await user.BanAsync(authentication, message);
+            Assert.AreEqual(UserState.None, user.UserState);
+            Assert.AreNotEqual(string.Empty, user.BanInfo.Path);
         }
 
         [TestMethod]
         public async Task BanAsyncTestAsync_Offline_Guest()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
-            var guestUser = await userCollection.GetRandomUserAsync(Predicate);
-            await guestUser.BanAsync(authentication, message);
-            Assert.AreEqual(UserState.None, guestUser.UserState);
-            Assert.AreNotEqual(string.Empty, guestUser.BanInfo.Path);
-
-            static bool Predicate(IUser user)
-            {
-                if (user.UserState == UserState.Online)
-                    return false;
-                if (user.Authority != Authority.Guest)
-                    return false;
-                if (user.BanInfo.Path != string.Empty)
-                    return false;
-                return true;
-            }
+            var user = await userCollection.GetRandomUserAsync(Authority.Guest, UserState.None, item => item.ID != authentication.ID && item.BanInfo.IsNotBanned);
+            await user.BanAsync(authentication, message);
+            Assert.AreEqual(UserState.None, user.UserState);
+            Assert.AreNotEqual(string.Empty, user.BanInfo.Path);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task BanAsyncTestAsync_Null_Arg0_Fail()
+        public async Task BanAsyncTest_Null_Arg0_FailAsync()
         {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(item => item.Authority == Authority.Member);
             var message = RandomUtility.NextString();
-            await memberUser.BanAsync(null, message);
+            await user.BanAsync(null, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task BanAsyncTestAsync_Null_Arg1_Fail()
+        public async Task BanAsyncTest_Null_Arg1_FailAsync()
         {
-            await memberUser.BanAsync(authentication, null);
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(Authority.Member);
+            await user.BanAsync(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task BanAsyncTestAsync_Empty_Arg1_Fail()
+        public async Task BanAsyncTest_Empty_Arg1_FailAsync()
         {
-            await memberUser.BanAsync(authentication, string.Empty);
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(Authority.Member);
+            await user.BanAsync(authentication, string.Empty);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task BanAsyncTestAsync_Expired_Fail()
+        public async Task BanAsyncTest_Expired_FailAsync()
         {
+            var user = await userCollection.GetRandomUserAsync(Authority.Member);
             var message = RandomUtility.NextString();
-            await memberUser.BanAsync(expiredAuthentication, message);
+            await user.BanAsync(expiredAuthentication, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task BanAsyncTestAsync_AlreadyBanned_Fail()
+        public async Task BanAsyncTest_AlreadyBanned_FailAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
-            var memberUser = await userCollection.GetRandomUserAsync(Predicate);
-            await memberUser.BanAsync(authentication, message);
-            await memberUser.BanAsync(authentication, message);
-
-            static bool Predicate(IUser user)
-            {
-                if (user.BanInfo.IsBanned == true)
-                    return false;
-                if (user.UserState == UserState.Online)
-                    return false;
-                if (user.Authority == Authority.Admin)
-                    return false;
-                return true;
-            }
+            var user = await userCollection.GetRandomUserAsync(UserState.None, item => item.Authority != Authority.Admin && item.BanInfo.IsNotBanned);
+            await user.BanAsync(authentication, message);
+            await user.BanAsync(authentication, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task BanAsyncTestAsync_PermissionDenied_Admin_Fail()
+        public async Task BanAsyncTest_PermissionDenied_Admin_FailAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(Authority.Admin, item => item.ID != authentication.ID);
             var message = RandomUtility.NextString();
-            await adminUser.BanAsync(authentication, message);
+            await user.BanAsync(authentication, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task BanAsyncTestAsync_PermissionDenied_Member_Fail()
+        public async Task BanAsyncTest_PermissionDenied_MemberAuthentication_FailAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
+            var user = await userCollection.GetRandomUserAsync(item => item.Authority != Authority.Admin && item.ID != authentication.ID);
             var message = RandomUtility.NextString();
-            await memberUser.BanAsync(memberAuthentication, message);
+            await user.BanAsync(authentication, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task BanAsyncTestAsync_PermissionDenied_Guest_Fail()
+        public async Task BanAsyncTest_PermissionDenied_GuestAuthentication_FailAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
+            var user = await userCollection.GetRandomUserAsync(item => item.Authority != Authority.Admin && item.ID != authentication.ID);
             var message = RandomUtility.NextString();
-            await memberUser.BanAsync(guestAuthentication, message);
+            await user.BanAsync(authentication, message);
         }
 
         [TestMethod]
         public async Task UnbanAsyncTestAsync_Member()
         {
-            var message = RandomUtility.NextString();
-            var memberAuthentication = await cremaHost.LoginRandomAsync(Authority.Member);
-            var memberUser = await userCollection.GetUserAsync(memberAuthentication.ID);
-            await memberUser.BanAsync(authentication, message);
-            await memberUser.UnbanAsync(authentication);
-            Assert.AreEqual(string.Empty, memberUser.BanInfo.Path);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(Authority.Member, item => item.ID != authentication.ID && item.BanInfo.IsBanned);
+            await user.UnbanAsync(authentication);
+            Assert.AreEqual(string.Empty, user.BanInfo.Path);
         }
 
         [TestMethod]
         public async Task UnbanAsyncTestAsync_Guest()
         {
-            var message = RandomUtility.NextString();
-            var guestAuthentication = await cremaHost.LoginRandomAsync(Authority.Guest);
-            var guestUser = await userCollection.GetUserAsync(guestAuthentication.ID);
-            await guestUser.BanAsync(authentication, message);
-            await guestUser.UnbanAsync(authentication);
-            Assert.AreEqual(string.Empty, guestUser.BanInfo.Path);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(Authority.Guest, item => item.ID != authentication.ID && item.BanInfo.IsBanned);
+            await user.UnbanAsync(authentication);
+            Assert.AreEqual(string.Empty, user.BanInfo.Path);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task UnbanAsyncTestAsync_Null_Arg0_Fail()
+        public async Task UnbanAsyncTest_Null_Arg0_FailAsync()
         {
-            await memberUser.UnbanAsync(null);
+            var user = await userCollection.GetRandomUserAsync(Authority.Member);
+            await user.UnbanAsync(null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task UnbanAsyncTestAsync_Expired_Fail()
+        public async Task UnbanAsyncTest_Expired_FailAsync()
         {
-            await memberUser.UnbanAsync(expiredAuthentication);
+            var user = await userCollection.GetRandomUserAsync(Authority.Member);
+            await user.UnbanAsync(expiredAuthentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task UnbanAsyncTestAsync_Member_Fail()
+        public async Task UnbanAsyncTest_Member_FailAsync()
         {
-            await memberUser.UnbanAsync(memberAuthentication);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
+            var user = await userCollection.GetRandomUserAsync(Authority.Member, item => item.ID != authentication.ID);
+            await user.UnbanAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task UnbanAsyncTestAsync_Guest_Fail()
+        public async Task UnbanAsyncTest_Guest_FailAsync()
         {
-            await memberUser.UnbanAsync(guestAuthentication);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
+            var user = await userCollection.GetRandomUserAsync(Authority.Member);
+            await user.UnbanAsync(authentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task UnbanAsyncTestAsync_Unbanned_Fail()
+        public async Task UnbanAsyncTest_Unbanned_FailAsync()
         {
-            await memberUser.UnbanAsync(authentication);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(Authority.Member, item => item.BanInfo.IsNotBanned);
+            await user.UnbanAsync(authentication);
         }
 
         [TestMethod]
-        public void IDTest()
+        public async Task IDTestAsync()
         {
+            var user = await userCollection.GetUserAsync(Authentication.AdminID);
             Assert.AreEqual(Authentication.AdminID, user.ID);
         }
 
         [TestMethod]
-        public void UserNameTest()
+        public async Task UserNameTestAsync()
         {
+            var user = await userCollection.GetUserAsync(Authentication.AdminID);
             Assert.AreEqual(Authentication.AdminName, user.UserName);
         }
 
         [TestMethod]
-        public void PathTest()
+        public async Task PathTestAsync()
         {
+            var user = await userCollection.GetUserAsync(Authentication.AdminID);
             NameValidator.ValidateItemPath(user.Path);
         }
 
         [TestMethod]
-        public void AuthorityTest()
+        public async Task AuthorityTestAsync()
         {
+            var user = await userCollection.GetUserAsync(Authentication.AdminID);
             Assert.AreEqual(Authority.Admin, user.Authority);
         }
 
         [TestMethod]
-        public void CategoryTest()
+        public async Task CategoryTestAsync()
         {
+            var user = await userCollection.GetUserAsync(Authentication.AdminID);
             Assert.IsNotNull(user.Category);
         }
 
         [TestMethod]
-        public void UserInfoTest()
+        public async Task UserInfoTestAsync()
         {
+            var user = await userCollection.GetUserAsync(Authentication.AdminID);
             Assert.AreEqual(Authentication.AdminID, user.UserInfo.ID);
             Assert.AreEqual(user.Path, user.UserInfo.Path);
             Assert.AreEqual(user.Category.Path.Trim(PathUtility.SeparatorChar), user.UserInfo.CategoryName);
@@ -764,148 +822,231 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void UserStateTest()
+        public async Task UserStateTestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
             Assert.AreEqual(UserState.Online, user.UserState);
         }
 
         [TestMethod]
-        public void BanInfoTest()
+        public async Task BanInfoTestAsync()
         {
+            var user = await userCollection.GetUserAsync(Authentication.AdminID);
             Assert.AreEqual(string.Empty, user.BanInfo.Path);
             Assert.AreEqual(string.Empty, user.BanInfo.Comment);
             Assert.AreEqual(SignatureDate.Empty, user.BanInfo.SignatureDate);
         }
 
         [TestMethod]
-        public void RenamedTest()
+        public async Task RenamedTestAsync()
         {
-            user.Dispatcher.Invoke(() =>
+            var user = await userCollection.GetRandomUserAsync();
+            await user.Dispatcher.InvokeAsync(() =>
             {
                 user.Renamed += User_Renamed;
                 user.Renamed -= User_Renamed;
             });
+
+            void User_Renamed(object sender, EventArgs e)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void RenamedTest_Fail()
+        public async Task RenamedTest_FailAsync()
         {
-            user.Renamed += User_Renamed;
+            var user = await userCollection.GetRandomUserAsync();
+            user.Renamed += (s, e) => { };
         }
 
         [TestMethod]
-        public void MovedTest()
+        public async Task MovedTestAsync()
         {
-            user.Dispatcher.Invoke(() =>
+            var userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync();
+            var oldCategory = user.Category;
+            var category = await userCategoryCollection.GetRandomUserCategoryAsync((item) => item != user.Category);
+            var actualPath = string.Empty;
+            var expectedPath = new ItemName(category.Path, user.ID).ToString();
+            await user.Dispatcher.InvokeAsync(() =>
             {
                 user.Moved += User_Moved;
+            });
+            await user.MoveAsync(authentication, category.Path);
+            Assert.AreEqual(expectedPath, actualPath);
+            await user.Dispatcher.InvokeAsync(() =>
+            {
                 user.Moved -= User_Moved;
             });
+            await user.MoveAsync(authentication, oldCategory.Path);
+            Assert.AreEqual(expectedPath, actualPath);
+
+            void User_Moved(object sender, EventArgs e)
+            {
+                actualPath = user.Path;
+            }
         }
+
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void MovedTest_Fail()
+        public async Task MovedTest_FailAsync()
         {
-            user.Moved += User_Moved;
-        }
-
-        private void User_Moved(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
+            var user = await userCollection.GetRandomUserAsync();
+            user.Moved += (s, e) => { };
         }
 
         [TestMethod]
-        public void DeletedTest()
+        public async Task DeletedTestAsync()
         {
-            user.Dispatcher.Invoke(() =>
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(UserState.None, item => item.ID != Authentication.AdminID && item.ID != authentication.ID);
+            var userID = user.ID;
+            var actualID = string.Empty;
+            await user.Dispatcher.InvokeAsync(() =>
             {
                 user.Deleted += User_Deleted;
-                user.Deleted -= User_Deleted;
             });
+            await user.DeleteAsync(authentication);
+            Assert.IsNull(user.Dispatcher);
+            Assert.IsFalse(await userCollection.ContainsAsync(userID));
+            Assert.AreEqual(userID, actualID);
+
+            void User_Deleted(object sender, EventArgs e)
+            {
+                if (sender is IUser user)
+                {
+                    actualID = user.ID;
+                }
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void DeletedTest_Fail()
+        public async Task DeletedTest_FailAsync()
         {
-            user.Deleted += User_Deleted;
+            var user = await userCollection.GetRandomUserAsync();
+            user.Deleted += (s, e) => { };
         }
 
         [TestMethod]
-        public void UserInfoChangedTest()
+        public async Task UserInfoChangedTestAsync()
         {
-            user.Dispatcher.Invoke(() =>
+            var authentication = await this.TestContext.LoginRandomAsync();
+            var user = await userCollection.GetUserAsync(authentication.ID);
+            var oldUserName = user.UserName;
+            var actualUserName = string.Empty;
+            var expectedUserName = RandomUtility.NextName();
+            var password = user.GetPassword();
+            await user.Dispatcher.InvokeAsync(() =>
             {
                 user.UserInfoChanged += User_UserInfoChanged;
+            });
+            await user.SetUserNameAsync(authentication, password, expectedUserName);
+            Assert.AreEqual(expectedUserName, actualUserName);
+            await user.Dispatcher.InvokeAsync(() =>
+            {
                 user.UserInfoChanged -= User_UserInfoChanged;
             });
+            await user.SetUserNameAsync(authentication, password, oldUserName);
+            Assert.AreEqual(expectedUserName, actualUserName);
+
+            void User_UserInfoChanged(object sender, EventArgs e)
+            {
+                if (sender is IUser user)
+                {
+                    actualUserName = user.UserName;
+                }
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UserInfoChangedTest_Fail()
+        public async Task UserInfoChangedTest_FailAsync()
         {
-            user.UserInfoChanged += User_UserInfoChanged;
+            var user = await userCollection.GetRandomUserAsync();
+            user.UserInfoChanged += (s, e) => { };
         }
 
         [TestMethod]
-        public void UserStateChangedTest()
+        public async Task UserStateChangedTestAsync()
         {
-            user.Dispatcher.Invoke(() =>
+            var user = await userCollection.GetRandomUserAsync(UserState.None, item => item.BanInfo.IsNotBanned == true);
+            var actualUserState = UserState.None;
+            var expectedUserState = UserState.Online;
+            await user.Dispatcher.InvokeAsync(() =>
             {
                 user.UserStateChanged += User_UserStateChanged;
+            });
+            var authentication = await this.TestContext.LoginAsync(user.ID);
+            Assert.AreEqual(expectedUserState, actualUserState);
+            await user.Dispatcher.InvokeAsync(() =>
+            {
                 user.UserStateChanged -= User_UserStateChanged;
             });
+            await this.TestContext.LogoutAsync(authentication);
+            Assert.AreEqual(expectedUserState, actualUserState);
+
+            void User_UserStateChanged(object sender, EventArgs e)
+            {
+                if (sender is IUser user)
+                {
+                    actualUserState = user.UserState;
+                }
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UserStateChangedTest_Fail()
+        public async Task UserStateChangedTest_FailAsync()
         {
-            user.UserStateChanged += User_UserStateChanged;
+            var user = await userCollection.GetRandomUserAsync();
+            user.UserStateChanged += (s, e) => { };
         }
 
         [TestMethod]
-        public void UserBanInfoChangedTest()
+        public async Task UserBanInfoChangedTestAsync()
         {
-            user.Dispatcher.Invoke(() =>
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(UserState.None, item => item.Authority != Authority.Admin && item.BanInfo.IsNotBanned);
+            var actualPath = string.Empty;
+            var actualComment = string.Empty;
+            var expectedPath = user.Path;
+            var expectedComment = RandomUtility.NextString();
+            await user.Dispatcher.InvokeAsync(() =>
             {
                 user.UserBanInfoChanged += User_UserBanInfoChanged;
+            });
+            await user.BanAsync(authentication, expectedComment);
+            Assert.AreEqual(expectedPath, actualPath);
+            Assert.AreEqual(expectedComment, actualComment);
+            await user.Dispatcher.InvokeAsync(() =>
+            {
                 user.UserBanInfoChanged -= User_UserBanInfoChanged;
             });
+            await user.UnbanAsync(authentication);
+            Assert.AreEqual(expectedPath, actualPath);
+            Assert.AreEqual(expectedComment, actualComment);
+
+            void User_UserBanInfoChanged(object sender, EventArgs e)
+            {
+                if (sender is IUser user)
+                {
+                    actualPath = user.BanInfo.Path;
+                    actualComment = user.BanInfo.Comment;
+                }
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UserBanInfoChangedTest_Fail()
+        public async Task UserBanInfoChangedTest_FailAsync()
         {
-            user.UserBanInfoChanged += User_UserBanInfoChanged;
-        }
-
-        private void User_Renamed(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void User_Deleted(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void User_UserInfoChanged(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void User_UserStateChanged(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void User_UserBanInfoChanged(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
+            var user = await userCollection.GetRandomUserAsync();
+            user.UserBanInfoChanged += (s, e) => { };
         }
     }
 }
