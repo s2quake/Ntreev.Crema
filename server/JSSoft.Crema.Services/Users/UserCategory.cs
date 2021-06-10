@@ -329,9 +329,23 @@ namespace JSSoft.Crema.Services.Users
 
         IUserCategory IUserCategory.Parent => this.Parent;
 
-        IContainer<IUser> IUserCategory.Users => this.Items;
+        IContainer<IUser> IUserCategory.Users
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return this.Items;
+            }
+        }
 
-        IContainer<IUserCategory> IUserCategory.Categories => this.Categories;
+        IContainer<IUserCategory> IUserCategory.Categories
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return this.Categories;
+            }
+        }
 
         #endregion
 

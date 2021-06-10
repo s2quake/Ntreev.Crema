@@ -79,7 +79,7 @@ namespace JSSoft.Crema.Services.Users
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
-                    this.ValidateUserCreate(authentication, userID, categoryPath, password);
+                    this.ValidateUserCreate(authentication, userID, categoryPath, password, userName, authority);
                 });
                 var taskID = GuidUtility.FromName(categoryPath + userID);
                 var userSet = await this.CreateDataForCreateAsync(authentication, userID, categoryPath, password, userName, authority);
@@ -614,7 +614,7 @@ namespace JSSoft.Crema.Services.Users
             base.OnCollectionChanged(e);
         }
 
-        private void ValidateUserCreate(Authentication authentication, string userID, string categoryPath, SecureString password)
+        private void ValidateUserCreate(Authentication authentication, string userID, string categoryPath, SecureString password, string userName, Authority authority)
         {
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
                 throw new PermissionDeniedException();
@@ -626,11 +626,20 @@ namespace JSSoft.Crema.Services.Users
             if (category == null)
                 throw new CategoryNotFoundException(categoryPath);
 
+            if (userID == string.Empty)
+                throw new ArgumentException(Resources.Exception_EmptyStringIsNotAllowed, nameof(userID));
+
             if (this.Contains(userID) == true)
                 throw new ArgumentException(Resources.Exception_UserIDisAlreadyResitered, nameof(userID));
 
             if (VerifyName(userID) == false)
                 throw new ArgumentException(Resources.Exception_InvalidUserID, nameof(userID));
+
+            if (userName == string.Empty)
+                throw new ArgumentException(Resources.Exception_EmptyStringIsNotAllowed, nameof(userName));
+
+            if (authority == Authority.None)
+                throw new ArgumentException(nameof(authority));
         }
 
         private static bool VerifyName(string name)

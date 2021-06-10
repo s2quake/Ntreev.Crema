@@ -355,7 +355,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task AddNewCategoryAsync_Expired_TestAsync()
         {
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
@@ -388,7 +388,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task AddNewCategoryAsync_Member_PermissionDenied_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
-            var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
+            var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null && item.Categories.Any() == true);
             var name = await userCategory.Dispatcher.InvokeAsync(() => userCategory.Categories.Random().Name);
             await userCategory.AddNewCategoryAsync(authentication, name);
         }
@@ -398,7 +398,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task AddNewCategoryAsync_Guest_PermissionDenied_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
-            var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
+            var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null && item.Categories.Any() == true);
             var name = await userCategory.Dispatcher.InvokeAsync(() => userCategory.Categories.Random().Name);
             await userCategory.AddNewCategoryAsync(authentication, name);
         }
