@@ -49,7 +49,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
                 var userID = NameUtility.GenerateNewName(name, usersByID.Keys);
                 var password = name.Encrypt();
                 var userName = Regex.Replace(userID, $"{name}(\\d+)", $"{userNameByAuthority[authority]}$1");
-                var categoryPath = categoryPaths.Random();
+                var categoryPath = categoryPaths.Skip((int)(categoryCount * 0.75)).Random();
                 var isBanned = authority != Authority.Admin && RandomUtility.Within(10);
                 var banInfo = isBanned == true ? new BanInfo()
                 {
@@ -81,64 +81,64 @@ namespace JSSoft.Crema.Services.Test.Extensions
             return serializationInfo;
         }
 
-        private static UserSerializationInfo CreateUser(int index, Authority authority, SignatureDate signatureDate)
-        {
-            switch (authority)
-            {
-                case Authority.Guest:
-                    return CreateGuest(index, signatureDate);
-                case Authority.Member:
-                    return CreateMember(index, signatureDate);
-                case Authority.Admin:
-                    return CreateAdmin(index, signatureDate);
-            }
-            throw new NotImplementedException();
-        }
+        // private static UserSerializationInfo CreateUser(int index, Authority authority, SignatureDate signatureDate)
+        // {
+        //     switch (authority)
+        //     {
+        //         case Authority.Guest:
+        //             return CreateGuest(index, signatureDate);
+        //         case Authority.Member:
+        //             return CreateMember(index, signatureDate);
+        //         case Authority.Admin:
+        //             return CreateAdmin(index, signatureDate);
+        //     }
+        //     throw new NotImplementedException();
+        // }
 
-        private static UserSerializationInfo CreateAdmin(int index, SignatureDate signatureDate)
-        {
-            return new UserSerializationInfo()
-            {
-                ID = "admin" + index,
-                Name = "관리자" + index,
-                CategoryName = "Administrators",
-                Authority = Authority.Admin,
-                Password = "admin".Encrypt(),
-                CreationInfo = signatureDate,
-                ModificationInfo = signatureDate,
-                BanInfo = (BanSerializationInfo)BanInfo.Empty,
-            };
-        }
+        // private static UserSerializationInfo CreateAdmin(int index, SignatureDate signatureDate)
+        // {
+        //     return new UserSerializationInfo()
+        //     {
+        //         ID = "admin" + index,
+        //         Name = "관리자" + index,
+        //         CategoryName = "Administrators",
+        //         Authority = Authority.Admin,
+        //         Password = "admin".Encrypt(),
+        //         CreationInfo = signatureDate,
+        //         ModificationInfo = signatureDate,
+        //         BanInfo = (BanSerializationInfo)BanInfo.Empty,
+        //     };
+        // }
 
-        private static UserSerializationInfo CreateMember(int index, SignatureDate signatureDate)
-        {
-            return new UserSerializationInfo()
-            {
-                ID = "member" + index,
-                Name = "구성원" + index,
-                CategoryName = "Members",
-                Authority = Authority.Member,
-                Password = "member".Encrypt(),
-                CreationInfo = signatureDate,
-                ModificationInfo = signatureDate,
-                BanInfo = (BanSerializationInfo)BanInfo.Empty,
-            };
-        }
+        // private static UserSerializationInfo CreateMember(int index, SignatureDate signatureDate)
+        // {
+        //     return new UserSerializationInfo()
+        //     {
+        //         ID = "member" + index,
+        //         Name = "구성원" + index,
+        //         CategoryName = "Members",
+        //         Authority = Authority.Member,
+        //         Password = "member".Encrypt(),
+        //         CreationInfo = signatureDate,
+        //         ModificationInfo = signatureDate,
+        //         BanInfo = (BanSerializationInfo)BanInfo.Empty,
+        //     };
+        // }
 
-        private static UserSerializationInfo CreateGuest(int index, SignatureDate signatureDate)
-        {
-            return new UserSerializationInfo()
-            {
-                ID = "guest" + index,
-                Name = "손님" + index,
-                CategoryName = "Guests",
-                Authority = Authority.Guest,
-                Password = "guest".Encrypt(),
-                CreationInfo = signatureDate,
-                ModificationInfo = signatureDate,
-                BanInfo = (BanSerializationInfo)BanInfo.Empty,
-            };
-        }
+        // private static UserSerializationInfo CreateGuest(int index, SignatureDate signatureDate)
+        // {
+        //     return new UserSerializationInfo()
+        //     {
+        //         ID = "guest" + index,
+        //         Name = "손님" + index,
+        //         CategoryName = "Guests",
+        //         Authority = Authority.Guest,
+        //         Password = "guest".Encrypt(),
+        //         CreationInfo = signatureDate,
+        //         ModificationInfo = signatureDate,
+        //         BanInfo = (BanSerializationInfo)BanInfo.Empty,
+        //     };
+        // }
     }
 }
 #endif

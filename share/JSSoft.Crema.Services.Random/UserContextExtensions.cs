@@ -27,6 +27,7 @@ using JSSoft.Library.Random;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Random
@@ -35,7 +36,7 @@ namespace JSSoft.Crema.Services.Random
     {
         public static Task<IUser> GetRandomUserAsync(this IUserContext userContext)
         {
-            return GetRandomUserAsync(userContext, item => true);
+            return GetRandomUserAsync(userContext, DefaultPredicate);
         }
 
         public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, Func<IUser, bool> predicate)
@@ -47,9 +48,51 @@ namespace JSSoft.Crema.Services.Random
             throw new NotImplementedException();
         }
 
+        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, Authority authority)
+        {
+            return GetRandomUserAsync(userContext, authority, DefaultPredicate);
+        }
+
+        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, Authority authority, Func<IUser, bool> predicate)
+        {
+            if (userContext.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
+            {
+                return userCollection.GetRandomUserAsync(authority, predicate);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, Authority authority, UserState userState)
+        {
+            return GetRandomUserAsync(userContext, authority, userState, DefaultPredicate);
+        }
+
+        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, Authority authority, UserState userState, Func<IUser, bool> predicate)
+        {
+            if (userContext.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
+            {
+                return userCollection.GetRandomUserAsync(authority, userState, predicate);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, UserState userState)
+        {
+            return GetRandomUserAsync(userContext, userState, DefaultPredicate);
+        }
+
+        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, UserState userState, Func<IUser, bool> predicate)
+        {
+            if (userContext.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
+            {
+                return userCollection.GetRandomUserAsync(userState, predicate);
+            }
+            throw new NotImplementedException();
+        }
+
         public static Task<IUserCategory> GetRandomUserCategoryAsync(this IUserContext userContext)
         {
-            return GetRandomUserCategoryAsync(userContext, item => true);
+            return GetRandomUserCategoryAsync(userContext, DefaultPredicate);
         }
 
         public static Task<IUserCategory> GetRandomUserCategoryAsync(this IUserContext userContext, Func<IUserCategory, bool> predicate)
@@ -63,12 +106,22 @@ namespace JSSoft.Crema.Services.Random
 
         public static Task<IUserItem> GetRandomUserItemAsync(this IUserContext userContext)
         {
-            return userContext.Dispatcher.InvokeAsync(() => userContext.Random());
+            return GetRandomUserItemAsync(userContext, DefaultPredicate);
         }
 
         public static Task<IUserItem> GetRandomUserItemAsync(this IUserContext userContext, Func<IUserItem, bool> predicate)
         {
             return userContext.Dispatcher.InvokeAsync(() => userContext.Random(predicate));
+        }
+
+        public static Task<IUserItem> GetRandomUserItemAsync(this IUserContext userContext, Type type)
+        {
+            return GetRandomUserItemAsync(userContext, type, DefaultPredicate);
+        }
+
+        public static Task<IUserItem> GetRandomUserItemAsync(this IUserContext userContext, Type type, Func<IUserItem, bool> predicate)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.Random(item => type.IsAssignableFrom(item.GetType()) && predicate(item)));
         }
 
         public static async Task<IUserItem> GenerateAsync(this IUserContext context, Authentication authentication)
@@ -149,5 +202,22 @@ namespace JSSoft.Crema.Services.Random
                         select item.ID;
             return NameUtility.GenerateNewName(name, query);
         }
+
+        public static Authority GetRandomAuthority(this IUserContext userContext)
+        {
+            var items = new Authority[] { Authority.Admin, Authority.Member, Authority.Guest };
+            return items.Random();
+        }
+
+        public static SecureString GetPassword(this IUserContext userContext, Authority authority)
+        {
+            return authority.ToString().ToLower().ToSecureString();
+        }
+
+        private static bool DefaultPredicate(IUserItem _) => true;
+
+        private static bool DefaultPredicate(IUserCategory _) => true;
+
+        private static bool DefaultPredicate(IUser _) => true;
     }
 }

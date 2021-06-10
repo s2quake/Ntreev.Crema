@@ -27,6 +27,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TypeCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserCategoryCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserCategoryExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserContextExtensions.cs" />
   </ItemGroup>

@@ -39,7 +39,8 @@ namespace JSSoft.Crema.Services.Test
     {
         private static CremaBootstrapper app;
         private static ICremaHost cremaHost;
-        private static Authentication authentication;
+        private static Guid token;
+        private static Authentication expiredAuthentication;
         private static IUserCollection userCollection;
 
         [ClassInitialize]
@@ -48,16 +49,32 @@ namespace JSSoft.Crema.Services.Test
             app = new CremaBootstrapper();
             app.Initialize(context);
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            authentication = await cremaHost.StartAsync();
+            token = await cremaHost.OpenAsync();
+            expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+            await cremaHost.LogoutAsync(expiredAuthentication);
             userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
         }
 
         [ClassCleanup]
         public static async Task ClassCleanupAsync()
         {
-            await cremaHost.StopAsync(authentication);
+            await cremaHost.CloseAsync(token);
             app.Release();
         }
+
+        [TestInitialize]
+        public async Task TestInitializeAsync()
+        {
+            await this.TestContext.InitializeAsync(cremaHost);
+        }
+
+        [TestCleanup]
+        public async Task TestCleanupAsync()
+        {
+            await this.TestContext.ReleaseAsync();
+        }
+        
+        public TestContext TestContext { get; set; }
 
         [TestMethod]
         public void CountTest()
@@ -83,7 +100,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ContainsTest_Null_Test()
+        public void ContainsTest_Arg0_Null_Test()
         {
             userCollection.Contains(null);
         }
@@ -116,7 +133,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void IndexerTest_Null_Fail()
+        public void IndexerTest_Arg0_Null_Fail()
         {
             var value = userCollection[null];
             Assert.Fail($"{value}");
@@ -125,6 +142,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersCreatedTestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var actualUserID = string.Empty;
             var actualUserName = string.Empty;
             var userContext = userCollection.GetService(typeof(IUserContext)) as IUserContext;
@@ -163,6 +181,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersMovedTestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryCollection = userCollection.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             var user = await userCollection.GetRandomUserAsync();
             var category = await userCategoryCollection.GetRandomUserCategoryAsync(item => item != user.Category);
@@ -202,7 +221,8 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersDeletedTestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID && item.UserState == UserState.None);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var user = await userCollection.GetRandomUserAsync(UserState.None);
             var actualUserPath = user.Path;
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
@@ -215,7 +235,7 @@ namespace JSSoft.Crema.Services.Test
             {
                 userCollection.UsersDeleted -= UserCollection_UsersDeleted;
             });
-            var user2 = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID && item.UserState == UserState.None);
+            var user2 = await userCollection.GetRandomUserAsync(UserState.None);
             var userPath2 = user2.Path;
             await user2.DeleteAsync(authentication);
             Assert.AreNotEqual(string.Empty, userPath2);
@@ -372,6 +392,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersKickedTestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var authentication1 = await cremaHost.LoginRandomAsync();
             var user1 = await userCollection.GetUserAsync(authentication1.ID);
             var authentication2 = await cremaHost.LoginRandomAsync();
@@ -413,6 +434,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersBanChangedTestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user1 = await userCollection.GetRandomUserAsync(item => item.Authority != Authority.Admin && item.BanInfo.IsBanned == false);
             var actualUserID = string.Empty;
             var actualMessage = string.Empty;

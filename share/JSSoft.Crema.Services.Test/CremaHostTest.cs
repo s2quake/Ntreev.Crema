@@ -120,7 +120,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task LoginAsync_Null_Arg0_TestFailAsync()
+        public async Task LoginAsync_Arg0_Null_TestFailAsync()
         {
             var password = Authentication.AdminID.ToSecureString();
             token = await cremaHost.OpenAsync();
@@ -129,7 +129,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task LoginAsync_Null_Arg1_TestFailAsync()
+        public async Task LoginAsync_Arg1_Null_TestFailAsync()
         {
             var userID = Authentication.AdminID;
             token = await cremaHost.OpenAsync();
@@ -192,7 +192,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task LogoutAsync_Null_Arg0_TestFailAsync()
+        public async Task LogoutAsync_Arg0_Null_TestFailAsync()
         {
             var userID = Authentication.AdminID;
             var password = Authentication.AdminID.ToSecureString();
@@ -372,7 +372,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ShutdownAsync_Null_Arg0_TestFailAsync()
+        public async Task ShutdownAsync_Arg0_Null_TestFailAsync()
         {
             var shutdownContext = new ShutdownContext() { IsRestart = true };
             token = await cremaHost.OpenAsync();
@@ -382,7 +382,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ShutdownAsync_Null_Arg1_TestFailAsync()
+        public async Task ShutdownAsync_Arg1_Null_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
@@ -422,7 +422,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ShutdownAsync_Null_Message_TestFailAsync()
+        public async Task ShutdownAsync_ShutdownContext_Message_Null_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication1 = await cremaHost.LoginRandomAsync(Authority.Admin);
@@ -488,7 +488,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task CancelShutdownAsync_Null_Arg0_TestFailAsync()
+        public async Task CancelShutdownAsync_Arg0_Null_TestFailAsync()
         {
             token = await cremaHost.OpenAsync();
             await cremaHost.CancelShutdownAsync(null);

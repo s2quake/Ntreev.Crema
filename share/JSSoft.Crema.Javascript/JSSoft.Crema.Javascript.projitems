@@ -128,7 +128,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Methods\IO\CreateDirectoryMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\IO\DirectoryExistsMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\IO\FileExistsMethod.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Methods\User\ContainsUserItemMethod.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Methods\User\ContainsMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\User\ContainsUserMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IScriptMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\DataBase\CancelDataBaseTransactionMethod.cs" />

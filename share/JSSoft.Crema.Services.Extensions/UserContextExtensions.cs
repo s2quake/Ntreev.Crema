@@ -22,6 +22,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library.Linq;
 
 namespace JSSoft.Crema.Services.Extensions
 {
@@ -32,7 +34,7 @@ namespace JSSoft.Crema.Services.Extensions
             return userContext.NotifyMessageAsync(authentication, new string[] { }, message);
         }
 
-        public static Task<bool> ContainsUserItemAsync(this IUserContext userContext, string itemPath)
+        public static Task<bool> ContainsAsync(this IUserContext userContext, string itemPath)
         {
             return userContext.Dispatcher.InvokeAsync(() => userContext.Contains(itemPath));
         }

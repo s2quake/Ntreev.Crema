@@ -19,45 +19,31 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Crema.ServiceModel;
-using JSSoft.Library.ObjectModel;
-using System;
-using System.Security;
+using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Extensions;
+using System.ComponentModel;
+using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
-namespace JSSoft.Crema.Services
+namespace JSSoft.Crema.Javascript.Methods.User
 {
-    public interface IUserCategory : IServiceProvider, IDispatcherObject, IExtendedProperties
+    [Export(typeof(IScriptMethod))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
+    [Category(nameof(User))]
+    class ContainsMethod : ScriptFuncTaskBase<string, bool>
     {
-        Task RenameAsync(Authentication authentication, string newName);
+        [ImportingConstructor]
+        public ContainsMethod(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
 
-        Task MoveAsync(Authentication authentication, string parentPath);
+        }
 
-        Task DeleteAsync(Authentication authentication);
+        protected override Task<bool> OnExecuteAsync(string userItemPath)
+        {
+            return this.UserContext.ContainsAsync(userItemPath);
+        }
 
-        Task<IUserCategory> AddNewCategoryAsync(Authentication authentication, string name);
-
-        Task<IUser> AddNewUserAsync(Authentication authentication, string userID, SecureString password, string userName, Authority authority);
-
-        string Name { get; }
-
-        string Path { get; }
-
-        IUserCategory Parent { get; }
-
-        [DispatcherProperty(typeof(IUserContext))]
-        IContainer<IUserCategory> Categories { get; }
-
-        [DispatcherProperty(typeof(IUserContext))]
-        IContainer<IUser> Users { get; }
-
-        [DispatcherEvent(typeof(IUserContext))]
-        event EventHandler Renamed;
-
-        [DispatcherEvent(typeof(IUserContext))]
-        event EventHandler Moved;
-
-        [DispatcherEvent(typeof(IUserContext))]
-        event EventHandler Deleted;
+        private IUserContext UserContext => this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
     }
 }

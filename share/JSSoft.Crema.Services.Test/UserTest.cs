@@ -93,7 +93,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task MoveAsync_Null_Arg0_TestFailAsync()
+        public async Task MoveAsync_Arg0_Null_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync();
             await user.MoveAsync(null, "/");
@@ -101,7 +101,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task MoveAsync_Null_Arg1_TestFailAsync()
+        public async Task MoveAsync_Arg1_Null_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync();
@@ -110,7 +110,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task MoveAsync_InvalidPath_Arg1_TestFailAsync()
+        public async Task MoveAsync_Arg1_InvalidPath_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync();
@@ -120,7 +120,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(CategoryNotFoundException))]
-        public async Task MoveAsync_NotExistsPath_Arg1_TestFailAsync()
+        public async Task MoveAsync_Arg1_NotExistsPath_TestFailAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync();
@@ -170,7 +170,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task DeleteAsync_Null_TestFailAsync()
+        public async Task DeleteAsync_Arg0_Null_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync();
             await user.DeleteAsync(null);
@@ -235,7 +235,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetUserNameAsync_Null_Arg0_TestFailAsync()
+        public async Task SetUserNameAsync_Arg0_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -246,7 +246,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetUserNameAsync_Null_Arg1_TestFailAsync()
+        public async Task SetUserNameAsync_Arg1_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -256,7 +256,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SetUserNameAsync_WrongPassword_Arg1_TestFailAsync()
+        public async Task SetUserNameAsync_Arg1_WrongPassword_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -267,7 +267,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetUserNameAsync_Null_Arg2_TestFailAsync()
+        public async Task SetUserNameAsync_Arg2_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -277,7 +277,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SetUserNameAsync_Empty_Arg2_TestFailAsync()
+        public async Task SetUserNameAsync_Arg2_Empty_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -323,7 +323,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetPasswordAsync_Null_Arg0_TestFailAsync()
+        public async Task SetPasswordAsync_Arg0_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -334,7 +334,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetPasswordAsync_Null_Arg1_TestFailAsync()
+        public async Task SetPasswordAsync_Arg1_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -344,7 +344,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SetPasswordAsync_Null_Arg2_TestFailAsync()
+        public async Task SetPasswordAsync_Arg2_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -365,7 +365,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SetPasswordAsync_WrongPassword_Arg1_TestFailAsync()
+        public async Task SetPasswordAsync_Arg1_WrongPassword_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -376,7 +376,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SetPasswordAsync_SamePassword_Arg1_TestFailAsync()
+        public async Task SetPasswordAsync_Arg1_SamePassword_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -406,7 +406,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ResetPasswordAsync_Null_TestFailAsync()
+        public async Task ResetPasswordAsync_Arg0_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
@@ -442,7 +442,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SendMessageAsync_Null_Arg0_TestFailAsync()
+        public async Task SendMessageAsync_Arg0_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
@@ -452,7 +452,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task SendMessageAsync_Null_Arg1_TestFailAsync()
+        public async Task SendMessageAsync_Arg1_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
@@ -461,7 +461,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task SendMessageAsync_Empty_Arg1_TestFailAsync()
+        public async Task SendMessageAsync_Arg1_Empty_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
             var user = await userCollection.GetRandomUserAsync(item => item.ID != authentication.ID);
@@ -516,7 +516,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task KickAsync_Null_Arg0_TestFailAsync()
+        public async Task KickAsync_Arg0_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
@@ -526,7 +526,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task KickAsync_Null_Arg1_TestFailAsync()
+        public async Task KickAsync_Arg1_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
@@ -535,7 +535,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task KickAsync_Empty_Arg1_TestFailAsync()
+        public async Task KickAsync_Arg1_Empty_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID);
@@ -638,7 +638,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task BanAsync_Null_Arg0_TestFailAsync()
+        public async Task BanAsync_Arg0_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(item => item.Authority == Authority.Member);
@@ -648,7 +648,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task BanAsync_Null_Arg1_TestFailAsync()
+        public async Task BanAsync_Arg1_Null_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(Authority.Member);
@@ -657,7 +657,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task BanAsync_Empty_Arg1_TestFailAsync()
+        public async Task BanAsync_Arg1_Empty_TestFailAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(Authority.Member);
@@ -734,7 +734,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task UnbanAsync_Null_Arg0_TestFailAsync()
+        public async Task UnbanAsync_Arg0_Null_TestFailAsync()
         {
             var user = await userCollection.GetRandomUserAsync(Authority.Member);
             await user.UnbanAsync(null);

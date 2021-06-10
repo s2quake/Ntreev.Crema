@@ -19,7 +19,9 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System.Linq;
 using System.Threading.Tasks;
+using JSSoft.Library;
 
 namespace JSSoft.Crema.Services.Extensions
 {
@@ -33,6 +35,11 @@ namespace JSSoft.Crema.Services.Extensions
         public static Task<IUser> GetUserAsync(this IUserCollection userCollection, string userID)
         {
             return userCollection.Dispatcher.InvokeAsync(() => userCollection[userID]);
+        }
+
+        public static Task<string> GenerateNewUserIDAsync(this IUserCollection userCollection, string userID)
+        {
+            return userCollection.Dispatcher.InvokeAsync(() => NameUtility.GenerateNewName(userID, userCollection.Select(item => item.ID)));
         }
     }
 }

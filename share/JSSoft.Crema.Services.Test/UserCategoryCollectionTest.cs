@@ -81,7 +81,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ContainsTest_Null_Test()
+        public void ContainsTest_Arg0_Null_Test()
         {
             userCategoryCollection.Contains(null);
         }
@@ -105,7 +105,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void IndexerTest_Null_Fail()
+        public void IndexerTest_Arg0_Null_Fail()
         {
             var value = userCategoryCollection[null];
             Assert.Fail($"{value}");

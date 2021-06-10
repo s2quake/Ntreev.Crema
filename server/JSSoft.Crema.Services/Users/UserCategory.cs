@@ -189,6 +189,8 @@ namespace JSSoft.Crema.Services.Users
         {
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
                 throw new PermissionDeniedException();
+            if (this.Parent == null)
+                throw new InvalidOperationException("root cannot move.");
             if (this.Parent.Path == parentPath)
                 throw new ArgumentException(Resources.Exception_CannotMoveToSamePath, nameof(parentPath));
             if (parentPath == string.Empty)

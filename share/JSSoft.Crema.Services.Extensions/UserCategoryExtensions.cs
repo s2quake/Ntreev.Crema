@@ -19,31 +19,29 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Crema.Services;
-using JSSoft.Crema.Services.Extensions;
-using System.ComponentModel;
-using System.ComponentModel.Composition;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
+using JSSoft.Library;
 
-namespace JSSoft.Crema.Javascript.Methods.User
+namespace JSSoft.Crema.Services.Extensions
 {
-    [Export(typeof(IScriptMethod))]
-    [PartCreationPolicy(CreationPolicy.NonShared)]
-    [Category(nameof(User))]
-    class ContainsUserItemMethod : ScriptFuncTaskBase<string, bool>
+    public static class UserCategoryExtensions
     {
-        [ImportingConstructor]
-        public ContainsUserItemMethod(ICremaHost cremaHost)
-            : base(cremaHost)
+        public static Task<string> GenerateNewCategoryNameAsync(this IUserCategory category, string name)
         {
-
+            return category.Dispatcher.InvokeAsync(() =>
+            {
+                var names = category.Categories.Select(item => item.Name);
+                return NameUtility.GenerateNewName(name, names);
+            });
         }
 
-        protected override Task<bool> OnExecuteAsync(string userItemPath)
+        public static bool CanMove(this IUserCategory category, string parentPath)
         {
-            return this.UserContext.ContainsUserItemAsync(userItemPath);
+            if (category.Path == parentPath)
+                return false;
+            return category.Path.StartsWith(parentPath) == false;
         }
-
-        private IUserContext UserContext => this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
     }
 }
