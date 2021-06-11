@@ -273,42 +273,17 @@ namespace JSSoft.Crema.Services.Data
                 this.info.Revision = null;
             }
 
-            //var domainContext = this.DataBase.GetService(typeof(IDomainContext)) as IDomainContext;
-            //domainContext.Domains.DomainCreated += Domains_DomainCreated;
-            //domainContext.Domains.DomainDeleted += Domains_DomainDeleted;
-            //domainContext.Domains.DomainRowAdded += Domains_DomainRowAdded;
-            //domainContext.Domains.DomainRowChanged += Domains_DomainRowChanged;
-            //domainContext.Domains.DomainRowRemoved += Domains_DomainRowRemoved;
-
-            //var domainItems = new Dictionary<string, IDomain>();
-            //foreach (var item in domainContext.Domains)
-            //{
-            //    if (item.DataBaseID != this.dataBaseID)
-            //        continue;
-            //    Collect(item);
-            //}
-
             await this.Dispatcher.InvokeAsync(() =>
             {
-                //foreach (var item in domainItems)
-                //{
-                //    this.domainItems.Add(item.Key, item.Value);
-                //}
-                this.Initialize();
-            });
+                try
+                {
+                    this.Initialize();
+                }
+                catch
+                {
 
-            //void Collect(IDomain domain)
-            //{
-            //    if (domain.Host is TableContent content)
-            //    {
-            //        var contents = EnumerableUtility.Friends(content, content.Childs);
-            //        var tableNames = contents.Select(item => item.Table.Name).ToArray();
-            //        foreach (var item in tableNames)
-            //        {
-            //            domainItems.Add(item, domain);
-            //        }
-            //    }
-            //}
+                }
+            });
         }
 
         private void Domains_DomainRowRemoved(object sender, DomainRowEventArgs e)
@@ -331,7 +306,7 @@ namespace JSSoft.Crema.Services.Data
             this.DataBaseName = this.DataBase.Name;
         }
 
-        private void DataBase_Unloaded(object sender, EventArgs e)
+        private async void DataBase_Unloaded(object sender, EventArgs e)
         {
             if (sender is IDataBase dataBase && dataBase.GetService(typeof(IDomainContext)) is IDomainContext domainContext)
             {
@@ -342,7 +317,7 @@ namespace JSSoft.Crema.Services.Data
                 });
             }
 
-            this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.Commit();
 
@@ -359,20 +334,20 @@ namespace JSSoft.Crema.Services.Data
 
         }
 
-        private void TypeContext_ItemCreated(object sender, Services.ItemsCreatedEventArgs<ITypeItem> e)
+        private async void TypeContext_ItemCreated(object sender, Services.ItemsCreatedEventArgs<ITypeItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
             var revision = this.DataBase.DataBaseInfo.Revision;
 
-            this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
+            await this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
         }
 
-        private void TypeContext_ItemRenamed(object sender, Services.ItemsRenamedEventArgs<ITypeItem> e)
+        private async void TypeContext_ItemRenamed(object sender, Services.ItemsRenamedEventArgs<ITypeItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
             var revision = this.DataBase.DataBaseInfo.Revision;
 
-            this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 for (var i = 0; i < e.Items.Length; i++)
                 {
@@ -383,20 +358,20 @@ namespace JSSoft.Crema.Services.Data
             });
         }
 
-        private void TypeContext_ItemMoved(object sender, Services.ItemsMovedEventArgs<ITypeItem> e)
+        private async void TypeContext_ItemMoved(object sender, Services.ItemsMovedEventArgs<ITypeItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
             var revision = this.DataBase.DataBaseInfo.Revision;
 
-            this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
+            await this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
         }
 
-        private void TypeContext_ItemDeleted(object sender, Services.ItemsDeletedEventArgs<ITypeItem> e)
+        private async void TypeContext_ItemDeleted(object sender, Services.ItemsDeletedEventArgs<ITypeItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
             var revision = this.DataBase.DataBaseInfo.Revision;
 
-            this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 for (var i = 0; i < e.Items.Length; i++)
                 {
@@ -407,28 +382,28 @@ namespace JSSoft.Crema.Services.Data
             });
         }
 
-        private void TypeContext_ItemsChanged(object sender, Services.ItemsEventArgs<ITypeItem> e)
+        private async void TypeContext_ItemsChanged(object sender, Services.ItemsEventArgs<ITypeItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
             var revision = this.DataBase.DataBaseInfo.Revision;
 
-            this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
+            await this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
         }
 
-        private void TableContext_ItemCreated(object sender, Services.ItemsCreatedEventArgs<ITableItem> e)
+        private async void TableContext_ItemCreated(object sender, Services.ItemsCreatedEventArgs<ITableItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
             var revision = this.DataBase.DataBaseInfo.Revision;
 
-            this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
+            await this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
         }
 
-        private void TableContext_ItemRenamed(object sender, Services.ItemsRenamedEventArgs<ITableItem> e)
+        private async void TableContext_ItemRenamed(object sender, Services.ItemsRenamedEventArgs<ITableItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
             var revision = this.DataBase.DataBaseInfo.Revision;
 
-            this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 for (var i = 0; i < e.Items.Length; i++)
                 {
@@ -439,20 +414,20 @@ namespace JSSoft.Crema.Services.Data
             });
         }
 
-        private void TableContext_ItemMoved(object sender, Services.ItemsMovedEventArgs<ITableItem> e)
+        private async void TableContext_ItemMoved(object sender, Services.ItemsMovedEventArgs<ITableItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
             var revision = this.DataBase.DataBaseInfo.Revision;
 
-            this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
+            await this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
         }
 
-        private void TableContext_ItemDeleted(object sender, Services.ItemsDeletedEventArgs<ITableItem> e)
+        private async void TableContext_ItemDeleted(object sender, Services.ItemsDeletedEventArgs<ITableItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
             var revision = this.DataBase.DataBaseInfo.Revision;
 
-            this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 for (var i = 0; i < e.Items.Length; i++)
                 {
@@ -463,12 +438,12 @@ namespace JSSoft.Crema.Services.Data
             });
         }
 
-        private void TableContext_ItemsChanged(object sender, Services.ItemsEventArgs<ITableItem> e)
+        private async void TableContext_ItemsChanged(object sender, Services.ItemsEventArgs<ITableItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
             var revision = this.DataBase.DataBaseInfo.Revision;
 
-            this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
+            await this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
         }
 
         private async void Initialize()
@@ -530,7 +505,7 @@ namespace JSSoft.Crema.Services.Data
                     if (contains == false)
                         await this.DataBase.EnterAsync(this.Authentication);
                     var dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, DataSetType.All, null, null);
-                    if (contains == false)
+                    if (contains == false && this.DataBase.DataBaseState == DataBaseState.Loaded)
                         await this.DataBase.LeaveAsync(this.Authentication);
                     return new Tuple<string, CremaDataSet>(revision, dataSet);
                 });

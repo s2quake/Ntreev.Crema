@@ -260,7 +260,7 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task IndexerByDataBaseName_Arg0_Null_TestFailAsync()
         {
-            await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext[string.Empty]);
+            await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext[null]);
         }
 
         [TestMethod]
@@ -343,7 +343,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsRenamed_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync();
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.None);
             var oldDataBaseName = dataBase.Name;
             var expectedDataBaseName = RandomUtility.NextName();
             var actualDataBaseName = string.Empty;
@@ -375,8 +375,8 @@ namespace JSSoft.Crema.Services.Test
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var actualDataBaseName = string.Empty;
             var actualComment = string.Empty;
-            var dataBase1 = await dataBaseContext.GetRandomDataBaseAsync();
-            var dataBase2 = await dataBaseContext.GetRandomDataBaseAsync(item => item.Name != dataBase1.Name);
+            var dataBase1 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.None);
+            var dataBase2 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.None, item => item.Name != dataBase1.Name);
             var expectedDataBaseName = dataBase1.Name;
             var expectedComment = dataBase1.DataBaseInfo.Comment;
 
@@ -553,8 +553,8 @@ namespace JSSoft.Crema.Services.Test
             void DataBaseContext_ItemsAuthenticationEntered(object sender, ItemsEventArgs<IDataBase> e)
             {
                 var dataBase = e.Items.Single();
-                expectedDataBase = dataBase;
-                expectedUserID = e.UserID;
+                actualDataBase = dataBase;
+                actualUserID = e.UserID;
             }
         }
 
@@ -589,8 +589,8 @@ namespace JSSoft.Crema.Services.Test
             void DataBaseContext_ItemsAuthenticationLeft(object sender, ItemsEventArgs<IDataBase> e)
             {
                 var dataBase = e.Items.Single();
-                expectedDataBase = dataBase;
-                expectedUserID = e.UserID;
+                actualDataBase = dataBase;
+                actualUserID = e.UserID;
             }
         }
 
@@ -670,7 +670,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsAccessChanged_TestAsync()
         {
             var authenticaiton = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(item => item.AccessInfo.IsPublic == true);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded, item => item.AccessInfo.IsPublic == true);
             var actualValue = dataBase.AccessInfo.IsPublic;
 
             await dataBaseContext.AddItemsAccessChangedEventHandlerAsync(DataBaseContext_ItemsAccessChanged);
@@ -788,7 +788,7 @@ namespace JSSoft.Crema.Services.Test
         {
             await dataBaseContext.Dispatcher.InvokeAsync(() =>
             {
-                var enumerator = (dataBaseContext as IEnumerable<IUserItem>).GetEnumerator();
+                var enumerator = (dataBaseContext as IEnumerable<IDataBase>).GetEnumerator();
                 while (enumerator.MoveNext())
                 {
                     Assert.IsNotNull(enumerator.Current);
@@ -800,7 +800,7 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public void GetGenericEnumerator_Dispatcher_TestFail()
         {
-            var enumerator = (dataBaseContext as IEnumerable<IUserItem>).GetEnumerator();
+            var enumerator = (dataBaseContext as IEnumerable<IDataBase>).GetEnumerator();
             while (enumerator.MoveNext())
             {
                 Assert.Fail();
@@ -808,9 +808,9 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void Count_TestAsync()
+        public async Task Count_TestAsync()
         {
-            var count = dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.Count);
+            var count = await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.Count);
             Assert.AreEqual(typeof(int), count.GetType());
         }
 

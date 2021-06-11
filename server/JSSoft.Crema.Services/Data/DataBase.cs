@@ -311,11 +311,13 @@ namespace JSSoft.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
+                var items = new IDataBase[] { this };
                 var repositorySetting = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LoadAsync), this);
                     this.ValidateLoad(authentication);
                     base.DataBaseState = DataBaseState.Loading;
+                    this.DataBaseContext.InvokeItemsStateChangedEvent(authentication, items);
                     return new RepositorySettings()
                     {
                         BasePath = this.DataBaseContext.RemotePath,
@@ -339,6 +341,7 @@ namespace JSSoft.Crema.Services.Data
                     base.UpdateLockParent();
                     base.UpdateAccessParent();
                     this.CremaHost.Sign(authentication);
+                    this.DataBaseContext.InvokeItemsStateChangedEvent(authentication, items);
                     this.DataBaseContext.InvokeItemsLoadedEvent(authentication, new IDataBase[] { this });
                     this.DataBaseContext.InvokeTaskCompletedEvent(authentication, taskID);
                 });
@@ -356,11 +359,13 @@ namespace JSSoft.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
+                var items = new IDataBase[] { this };
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnloadAsync), this);
                     this.ValidateUnload(authentication);
                     base.DataBaseState = DataBaseState.Unloading;
+                    this.DataBaseContext.InvokeItemsStateChangedEvent(authentication, items);
                 });
                 var taskID = Guid.NewGuid();
                 await this.WriteCacheAsync();
@@ -379,7 +384,8 @@ namespace JSSoft.Crema.Services.Data
                     base.DataBaseState = DataBaseState.Unloaded;
                     base.Unload(authentication);
                     this.CremaHost.Sign(authentication);
-                    this.DataBaseContext.InvokeItemsUnloadedEvent(authentication, new IDataBase[] { this });
+                    this.DataBaseContext.InvokeItemsStateChangedEvent(authentication, items);
+                    this.DataBaseContext.InvokeItemsUnloadedEvent(authentication, items);
                     this.DataBaseContext.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;

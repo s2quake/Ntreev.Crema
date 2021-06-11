@@ -45,6 +45,7 @@ namespace JSSoft.Crema.Services.Data
         private readonly string cachePath;
         private readonly string basePath;
         private readonly CremaDispatcher repositoryDispatcher;
+        private readonly Dictionary<Guid, DataBase> dataBaseByID = new();
 
         private ItemsCreatedEventHandler<IDataBase> itemsCreated;
         private ItemsRenamedEventHandler<IDataBase> itemsRenamed;
@@ -105,11 +106,20 @@ namespace JSSoft.Crema.Services.Data
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (dataBaseName is null)
+                    throw new ArgumentNullException(nameof(dataBaseName));
+                if (comment is null)
+                    throw new ArgumentNullException(nameof(comment));
+
                 this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewDataBaseAsync), dataBaseName, comment);
-                    this.ValidateCreateDataBase(authentication, dataBaseName);
+                    this.ValidateCreateDataBase(authentication, dataBaseName, comment);
                 });
                 var taskID = GuidUtility.FromName(dataBaseName + comment);
                 var dataSet = new CremaDataSet();
@@ -133,6 +143,7 @@ namespace JSSoft.Crema.Services.Data
                 {
                     var dataBase = new DataBase(this, dataBaseName);
                     this.CremaHost.Sign(authentication);
+                    this.dataBaseByID.Add(dataBase.ID, dataBase);
                     this.AddBase(dataBase.Name, dataBase);
                     this.InvokeItemsCreateEvent(authentication, new DataBase[] { dataBase }, comment);
                     this.InvokeTaskCompletedEvent(authentication, taskID);
@@ -209,6 +220,7 @@ namespace JSSoft.Crema.Services.Data
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.DeleteCaches(dataBaseInfo);
+                this.dataBaseByID.Remove(dataBaseInfo.ID);
                 this.RemoveBase(dataBaseInfo.Name);
             });
         }
@@ -466,7 +478,7 @@ namespace JSSoft.Crema.Services.Data
 
         public new DataBase this[string dataBaseName] => base[dataBaseName];
 
-        public DataBase this[Guid dataBaseID] => this.FirstOrDefault<DataBase>(item => item.ID == dataBaseID);
+        public DataBase this[Guid dataBaseID] => this.dataBaseByID[dataBaseID];
 
         public DataBase AddFromPath(string path)
         {
@@ -759,6 +771,8 @@ namespace JSSoft.Crema.Services.Data
             base.OnCollectionChanged(e);
         }
 
+        protected override bool UseKeyNotFoundException => true;
+
         private void ValidateCopyDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName, bool force)
         {
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
@@ -774,11 +788,14 @@ namespace JSSoft.Crema.Services.Data
                 throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);
         }
 
-        private void ValidateCreateDataBase(Authentication authentication, string dataBaseName)
+        private void ValidateCreateDataBase(Authentication authentication, string dataBaseName, string comment)
         {
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
                 throw new PermissionDeniedException();
-
+            if (dataBaseName == string.Empty)
+                throw new ArgumentException(Resources.Exception_EmptyStringIsNotAllowed, nameof(dataBaseName));
+            if (comment == string.Empty)
+                throw new ArgumentException(Resources.Exception_EmptyStringIsNotAllowed, nameof(comment));
             if (this.ContainsKey(dataBaseName) == true)
                 throw new ArgumentException(string.Format(Resources.Exception_DataBaseIsAlreadyExisted_Format, dataBaseName), nameof(dataBaseName));
         }
@@ -813,7 +830,7 @@ namespace JSSoft.Crema.Services.Data
             FileUtility.Delete(files);
         }
 
-        #region IDataBaseCollection
+        #region IDataBaseContext
 
         async Task<IDataBase> IDataBaseContext.AddNewDataBaseAsync(Authentication authentication, string dataBaseName, string comment)
         {
@@ -822,12 +839,43 @@ namespace JSSoft.Crema.Services.Data
 
         bool IDataBaseContext.Contains(string dataBaseName)
         {
+            this.Dispatcher.VerifyAccess();
             return this.ContainsKey(dataBaseName);
         }
 
-        IDataBase IDataBaseContext.this[string dataBaseName] => this[dataBaseName];
+        IDataBase IDataBaseContext.this[string dataBaseName]
+        {
+            get
+            {
+                if (dataBaseName is null)
+                    throw new ArgumentNullException(nameof(dataBaseName));
 
-        IDataBase IDataBaseContext.this[Guid dataBaseID] => this[dataBaseID];
+                this.Dispatcher.VerifyAccess();
+                return this[dataBaseName];
+            }
+        }
+
+        IDataBase IDataBaseContext.this[Guid dataBaseID]
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return this[dataBaseID];
+            }
+        }
+
+        #endregion
+
+        #region IReadOnlyCollection
+
+        int IReadOnlyCollection<IDataBase>.Count
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return this.Count;
+            }
+        }
 
         #endregion
 
@@ -835,12 +883,20 @@ namespace JSSoft.Crema.Services.Data
 
         IEnumerator<IDataBase> IEnumerable<IDataBase>.GetEnumerator()
         {
-            return this.GetEnumerator();
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in this)
+            {
+                yield return item;
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in this)
+            {
+                yield return item;
+            }
         }
 
         #endregion

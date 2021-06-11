@@ -187,6 +187,14 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
+        [ExpectedException(typeof(KeyNotFoundException))]
+        public void Indexer_Arg0_Empty_TestFail()
+        {
+            var value = userContext[string.Empty];
+            Assert.Fail($"{value}");
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void Indexer_Dispatcher_TestFail()
         {
