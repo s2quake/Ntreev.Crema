@@ -554,7 +554,7 @@ namespace JSSoft.Crema.Services.Test
             {
                 var dataBase = e.Items.Single();
                 actualDataBase = dataBase;
-                actualUserID = e.UserID;
+                actualUserID = e.InvokeID;
             }
         }
 
@@ -590,7 +590,7 @@ namespace JSSoft.Crema.Services.Test
             {
                 var dataBase = e.Items.Single();
                 actualDataBase = dataBase;
-                actualUserID = e.UserID;
+                actualUserID = e.InvokeID;
             }
         }
 
@@ -747,7 +747,8 @@ namespace JSSoft.Crema.Services.Test
 
             void DataBaseContext_TaskCompleted(object sender, TaskCompletedEventArgs e)
             {
-                actualID = e.TaskIDs.Single();
+                if (e.InvokeID == authentication.ID)
+                    actualID = e.TaskIDs.Single();
             }
         }
 

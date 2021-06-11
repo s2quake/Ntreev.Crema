@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System;
 using JSSoft.Crema.ServiceModel;
 
 namespace JSSoft.Crema.Services.Users
@@ -36,7 +37,7 @@ namespace JSSoft.Crema.Services.Users
 
         public string ID => $"{this.plugin.ID}";
 
-        public string Name => $"{this.plugin.Name}";
+        public string Name => this.plugin.Name;
 
         public Authority Authority => Authority.None;
     }

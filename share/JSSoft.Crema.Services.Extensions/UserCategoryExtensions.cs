@@ -28,6 +28,11 @@ namespace JSSoft.Crema.Services.Extensions
 {
     public static class UserCategoryExtensions
     {
+        public static Task<string> GenerateNewCategoryNameAsync(this IUserCategory category)
+        {
+            return GenerateNewCategoryNameAsync(category, "NewCategory");
+        }
+
         public static Task<string> GenerateNewCategoryNameAsync(this IUserCategory category, string name)
         {
             return category.Dispatcher.InvokeAsync(() =>

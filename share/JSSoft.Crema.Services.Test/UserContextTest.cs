@@ -187,10 +187,10 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(KeyNotFoundException))]
-        public void Indexer_Arg0_Empty_TestFail()
+        [ExpectedException(typeof(ArgumentException))]
+        public async Task Indexer_Arg0_Empty_TestFailAsync()
         {
-            var value = userContext[string.Empty];
+            var value = await userContext.Dispatcher.InvokeAsync(() => userContext[string.Empty]);
             Assert.Fail($"{value}");
         }
 
@@ -243,7 +243,7 @@ namespace JSSoft.Crema.Services.Test
             var actualPath = string.Empty;
             var actualOldName = string.Empty;
             var actualOldPath = string.Empty;
-            var expectedName = RandomUtility.NextName();
+            var expectedName = await category.Parent.GenerateNewCategoryNameAsync();
             var expectedOldName = category.Name;
             var expectedOldPath = category.Path;
             await userContext.Dispatcher.InvokeAsync(() =>

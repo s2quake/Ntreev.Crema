@@ -36,7 +36,10 @@ namespace JSSoft.Crema.Services
             this.TaskIDs = taskIDs;
         }
 
+        [Obsolete]
         public string UserID => this.SignatureDate.ID;
+
+        public string InvokeID => this.SignatureDate.ID;
 
         public SignatureDate SignatureDate { get; }
 

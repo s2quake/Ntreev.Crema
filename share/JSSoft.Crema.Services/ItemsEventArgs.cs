@@ -47,7 +47,10 @@ namespace JSSoft.Crema.Services
             this.MetaData = metaData;
         }
 
+        [Obsolete]
         public string UserID => this.SignatureDate.ID;
+
+        public string InvokeID => this.SignatureDate.ID;
 
         public SignatureDate SignatureDate { get; }
 

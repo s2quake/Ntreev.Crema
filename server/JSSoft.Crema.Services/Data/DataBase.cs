@@ -1293,7 +1293,7 @@ namespace JSSoft.Crema.Services.Data
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                if (e.UserID == this.LockInfo.UserID)
+                if (e.InvokeID == this.LockInfo.UserID)
                 {
                     this.Unlock(Authentication.System);
                 }

@@ -498,18 +498,26 @@ namespace JSSoft.Crema.Services.Data
 
             if (error == true)
             {
-                var result = await Task.Run(async () =>
+                try
                 {
-                    var revision = this.DataBase.DataBaseInfo.Revision;
-                    var contains = await this.DataBase.Dispatcher.InvokeAsync(() => this.DataBase.Contains(this.Authentication));
-                    if (contains == false)
-                        await this.DataBase.EnterAsync(this.Authentication);
-                    var dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, DataSetType.All, null, null);
-                    if (contains == false && this.DataBase.DataBaseState == DataBaseState.Loaded)
-                        await this.DataBase.LeaveAsync(this.Authentication);
-                    return new Tuple<string, CremaDataSet>(revision, dataSet);
-                });
-                this.Serialize(result.Item2, result.Item1);
+
+                    var result = await Task.Run(async () =>
+                    {
+                        var revision = this.DataBase.DataBaseInfo.Revision;
+                        var contains = await this.DataBase.Dispatcher.InvokeAsync(() => this.DataBase.Contains(this.Authentication));
+                        if (contains == false)
+                            await this.DataBase.EnterAsync(this.Authentication);
+                        var dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, DataSetType.All, null, null);
+                        if (contains == false && this.DataBase.DataBaseState == DataBaseState.Loaded)
+                            await this.DataBase.LeaveAsync(this.Authentication);
+                        return new Tuple<string, CremaDataSet>(revision, dataSet);
+                    });
+                    this.Serialize(result.Item2, result.Item1);
+                }
+                catch
+                {
+                    return;
+                }
             }
             this.initialized = true;
         }

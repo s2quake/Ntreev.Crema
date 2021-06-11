@@ -511,7 +511,7 @@ namespace JSSoft.Crema.Services.Test
             {
                 var user = e.Items.Single();
                 actualUserID = user.ID;
-                actualSenderID = e.UserID;
+                actualSenderID = e.InvokeID;
                 actualMessage = e.Message;
                 actualMessageType = e.MessageType;
             }

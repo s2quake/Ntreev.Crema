@@ -600,7 +600,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         private async void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
-            var actionUserID = e.UserID;
+            var actionUserID = e.InvokeID;
             var contains = e.Items.Any(item => item.ID == this.OwnerID);
             var closeInfo = (CloseInfo)e.MetaData;
             if (actionUserID != this.OwnerID && contains == true)
@@ -613,7 +613,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void Tables_TablesStateChanged(object sender, ItemsEventArgs<ITable> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var tableNames = e.Items.Select(item => item.Name).ToArray();
             var states = e.Items.Select(item => item.TableState).ToArray();
@@ -623,7 +623,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void Tables_TablesChanged(object sender, ItemsChangedEventArgs<ITable> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = e.Items.Select(item => item.TableInfo).ToArray();
             var itemType = e.ItemType;
@@ -633,7 +633,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void TableContext_ItemCreated(object sender, ItemsCreatedEventArgs<ITableItem> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var paths = e.Items.Select(item => item.Path).ToArray();
             var arguments = e.Arguments.Select(item => item is TableInfo tableInfo ? (TableInfo?)tableInfo : null).ToArray();
@@ -643,7 +643,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void TableContext_ItemRenamed(object sender, ItemsRenamedEventArgs<ITableItem> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
@@ -653,7 +653,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void TableContext_ItemMoved(object sender, ItemsMovedEventArgs<ITableItem> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
             var parentPaths = e.Items.Select(item =>
@@ -668,7 +668,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void TableContext_ItemDeleted(object sender, ItemsDeletedEventArgs<ITableItem> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.ItemPaths;
             this.InvokeEvent(() => this.Callback?.OnTableItemsDeleted(callbackInfo, itemPaths));
@@ -677,7 +677,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void TableContext_ItemsAccessChanged(object sender, ItemsEventArgs<ITableItem> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = new AccessInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
@@ -702,7 +702,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void TableContext_ItemsLockChanged(object sender, ItemsEventArgs<ITableItem> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = new LockInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
@@ -726,7 +726,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void Types_TypesStateChanged(object sender, ItemsEventArgs<IType> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var typeNames = e.Items.Select(item => item.Name).ToArray();
             var states = e.Items.Select(item => item.TypeState).ToArray();
@@ -736,7 +736,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void Types_TypesChanged(object sender, ItemsEventArgs<IType> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = e.Items.Select(item => item.TypeInfo).ToArray();
             this.InvokeEvent(() => this.Callback?.OnTypesChanged(callbackInfo, values));
@@ -745,7 +745,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void TypeContext_ItemCreated(object sender, ItemsCreatedEventArgs<ITypeItem> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.Items.Select(item => item.Path).ToArray();
             var arguments = e.Arguments.Select(item => item is TypeInfo typeInfo ? (TypeInfo?)typeInfo : null).ToArray();
@@ -755,7 +755,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void TypeContext_ItemRenamed(object sender, ItemsRenamedEventArgs<ITypeItem> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
@@ -765,7 +765,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void TypeContext_ItemMoved(object sender, ItemsMovedEventArgs<ITypeItem> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
             var parentPaths = e.Items.Select(item => item.Parent.Path).ToArray();
@@ -775,7 +775,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void TypeContext_ItemDeleted(object sender, ItemsDeletedEventArgs<ITypeItem> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.ItemPaths;
             this.InvokeEvent(() => this.Callback?.OnTypeItemsDeleted(callbackInfo, itemPaths));
@@ -784,7 +784,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void TypeContext_ItemsAccessChanged(object sender, ItemsEventArgs<ITypeItem> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = new AccessInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
@@ -809,7 +809,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private void TypeContext_ItemsLockChanged(object sender, ItemsEventArgs<ITypeItem> e)
         {
             var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = new LockInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)

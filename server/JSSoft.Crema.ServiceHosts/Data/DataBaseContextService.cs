@@ -274,7 +274,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         private async void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
             var signatureDate = this.authentication.SignatureDate;
-            var actionUserID = e.UserID;
+            var actionUserID = e.InvokeID;
             var contains = e.Items.Any(item => item.ID == signatureDate.ID);
             var closeInfo = (CloseInfo)e.MetaData;
             if (actionUserID != signatureDate.ID && contains == true)

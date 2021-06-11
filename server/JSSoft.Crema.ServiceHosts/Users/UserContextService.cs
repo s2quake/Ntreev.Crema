@@ -250,7 +250,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserCollection_UsersStateChanged(object sender, Services.ItemsEventArgs<IUser> e)
         {
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var userIDs = e.Items.Select(item => item.ID).ToArray();
             var states = e.Items.Select(item => item.UserState).ToArray();
@@ -259,7 +259,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserCollection_UsersChanged(object sender, Services.ItemsEventArgs<IUser> e)
         {
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = e.Items.Select(item => item.UserInfo).ToArray();
             this.InvokeEvent(() => this.Callback?.OnUsersChanged(callbackInfo, values));
@@ -267,7 +267,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserContext_ItemsCreated(object sender, Services.ItemsCreatedEventArgs<IUserItem> e)
         {
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.Items.Select(item => item.Path).ToArray();
             var arguments = e.Arguments.Select(item => item is UserInfo userInfo ? (UserInfo?)userInfo : null).ToArray();
@@ -276,7 +276,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserContext_ItemsRenamed(object sender, Services.ItemsRenamedEventArgs<IUserItem> e)
         {
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
@@ -285,7 +285,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserContext_ItemsMoved(object sender, Services.ItemsMovedEventArgs<IUserItem> e)
         {
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
             var parentPaths = e.Items.Select(item => item.Parent.Path).ToArray();
@@ -294,7 +294,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserContext_ItemsDeleted(object sender, Services.ItemsDeletedEventArgs<IUserItem> e)
         {
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.ItemPaths;
             this.InvokeEvent(() => this.Callback?.OnUserItemsDeleted(callbackInfo, itemPaths));
@@ -302,7 +302,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserContext_MessageReceived(object sender, MessageEventArgs e)
         {
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var userIDs = e.Items.Select(item => item.ID).ToArray();
             var message = e.Message;
@@ -313,7 +313,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserCollection_UsersLoggedIn(object sender, Services.ItemsEventArgs<IUser> e)
         {
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var userIDs = e.Items.Select(item => item.ID).ToArray();
             this.InvokeEvent(() => this.Callback?.OnUsersLoggedIn(callbackInfo, userIDs));
@@ -329,7 +329,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserCollection_UsersKicked(object sender, ItemsEventArgs<IUser> e)
         {
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var userIDs = e.Items.Select(item => item.ID).ToArray();
             var comments = e.MetaData as string[];
@@ -338,7 +338,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         private void UserCollection_UsersBanChanged(object sender, ItemsEventArgs<IUser> e)
         {
-            var exceptionUserID = e.UserID;
+            var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = new BanInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
