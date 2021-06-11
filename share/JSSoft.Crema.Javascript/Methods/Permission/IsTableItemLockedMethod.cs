@@ -41,7 +41,8 @@ namespace JSSoft.Crema.Javascript.Methods.Permission
 
         protected override async Task<bool> OnExecuteAsync(string dataBaseName, string tableItemPath)
         {
-            var tableItem = await this.CremaHost.GetTableItemAsync(dataBaseName, tableItemPath);
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            var tableItem = await dataBase.GetTableItemAsync(tableItemPath);
             return await tableItem.Dispatcher.InvokeAsync(() => tableItem.IsLocked);
         }
     }

@@ -19,34 +19,25 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Crema.Services;
-using JSSoft.Crema.Services.Extensions;
-using System.ComponentModel;
-using System.ComponentModel.Composition;
+using JSSoft.Library.Random;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace JSSoft.Crema.Javascript.Methods.TableContent
+namespace JSSoft.Crema.Services.Random
 {
-    [Export(typeof(IScriptMethod))]
-    [PartCreationPolicy(CreationPolicy.NonShared)]
-    [Category(nameof(TableContent))]
-    class BeginTableContentEditMethod : ScriptFuncTaskBase<string, string, string>
+    public static class TableCollectionExtensions
     {
-        [ImportingConstructor]
-        public BeginTableContentEditMethod(ICremaHost cremaHost)
-            : base(cremaHost)
+        public static Task<ITable> GetRandomTableAsync(this ITableCollection tableCollection)
         {
-
+            return GetRandomTableAsync(tableCollection, DefaultPredicate);
         }
 
-        [ReturnParameterName("domainID")]
-        protected override async Task<string> OnExecuteAsync(string dataBaseName, string tableName)
+        public static Task<ITable> GetRandomTableAsync(this ITableCollection tableCollection, Func<ITable, bool> predicate)
         {
-            var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            var table = await dataBase.GetTableAsync(tableName);
-            var authentication = this.Context.GetAuthentication(this);
-            await table.Content.BeginEditAsync(authentication);
-            return $"{table.Content.Domain.ID}";
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.Random(predicate));
         }
+
+        private static bool DefaultPredicate(ITable _) => true;
     }
 }

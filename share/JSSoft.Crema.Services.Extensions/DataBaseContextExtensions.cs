@@ -54,6 +54,38 @@ namespace JSSoft.Crema.Services.Extensions
             return dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext[dataBaseID]);
         }
 
+        public static Task<IDataBase[]> GetDataBasesAsync(this IDataBaseContext dataBaseContext)
+        {
+            return GetDataBasesAsync(dataBaseContext, DefaultPredicate);
+        }
+
+        public static Task<IDataBase[]> GetDataBasesAsync(this IDataBaseContext dataBaseContext, Func<IDataBase, bool> predicate)
+        {
+            return dataBaseContext.Dispatcher.InvokeAsync(() =>
+            {
+                var query = from item in dataBaseContext
+                            where predicate(item)
+                            select item;
+                return query.ToArray();
+            });
+        }
+
+        public static Task<IDataBase[]> GetDataBasesAsync(this IDataBaseContext dataBaseContext, DataBaseState dataBaseState)
+        {
+            return GetDataBasesAsync(dataBaseContext, dataBaseState, DefaultPredicate);
+        }
+
+        public static Task<IDataBase[]> GetDataBasesAsync(this IDataBaseContext dataBaseContext, DataBaseState dataBaseState, Func<IDataBase, bool> predicate)
+        {
+            return dataBaseContext.Dispatcher.InvokeAsync(() =>
+            {
+                var query = from item in dataBaseContext
+                            where item.DataBaseState == dataBaseState && predicate(item)
+                            select item;
+                return query.ToArray();
+            });
+        }
+
         public static Task<string> GenerateNewDataBaseNameAsync(this IDataBaseContext dataBaseContext)
         {
             return GenerateNewDataBaseNameAsync(dataBaseContext, "database");
@@ -202,5 +234,7 @@ namespace JSSoft.Crema.Services.Extensions
         {
             return dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.TaskCompleted -= handler);
         }
+
+        private static bool DefaultPredicate(IDataBase _) => true;
     }
 }

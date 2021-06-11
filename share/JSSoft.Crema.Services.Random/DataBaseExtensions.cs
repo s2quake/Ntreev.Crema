@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Random
@@ -43,11 +44,113 @@ namespace JSSoft.Crema.Services.Random
                 await InitializeRandomItemsStandardAsync(dataBase, authentication);
         }
 
+        public static Task GenerateTableAsync(this IDataBase dataBase, Authentication authentication)
+        {
+            if (dataBase.GetService(typeof(ITableContext)) is ITableContext tableContext)
+            {
+                return tableContext.GenerateAsync(authentication);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task GenerateTypeAsync(this IDataBase dataBase, Authentication authentication)
+        {
+            if (dataBase.GetService(typeof(ITypeContext)) is ITypeContext typeContext)
+            {
+                return typeContext.GenerateAsync(authentication);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<ITableItem> GetRandomTableItemAsync(this IDataBase dataBase)
+        {
+            return GetRandomTableItemAsync(dataBase, DefaultPredicate);
+        }
+
+        public static Task<ITableItem> GetRandomTableItemAsync(this IDataBase dataBase, Func<ITableItem, bool> predicate)
+        {
+            if (dataBase.GetService(typeof(ITableContext)) is ITableContext tableContext)
+            {
+                return tableContext.GetRandomTableItemAsync(predicate);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<ITable> GetRandomTableAsync(this IDataBase dataBase)
+        {
+            return GetRandomTableAsync(dataBase, DefaultPredicate);
+        }
+
+        public static Task<ITable> GetRandomTableAsync(this IDataBase dataBase, Func<ITable, bool> predicate)
+        {
+            if (dataBase.GetService(typeof(ITableCollection)) is ITableCollection tableCollection)
+            {
+                return tableCollection.GetRandomTableAsync(predicate);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<ITableCategory> GetRandomTableCategoryAsync(this IDataBase dataBase)
+        {
+            return GetRandomTableCategoryAsync(dataBase, DefaultPredicate);
+        }
+
+        public static Task<ITableCategory> GetRandomTableCategoryAsync(this IDataBase dataBase, Func<ITableCategory, bool> predicate)
+        {
+            if (dataBase.GetService(typeof(ITableCategoryCollection)) is ITableCategoryCollection tableCategoryCollection)
+            {
+                return tableCategoryCollection.GetRandomTableCategoryAsync(predicate);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<ITypeItem> GetRandomTypeItemAsync(this IDataBase dataBase)
+        {
+            return GetRandomTypeItemAsync(dataBase, DefaultPredicate);
+        }
+
+        public static Task<ITypeItem> GetRandomTypeItemAsync(this IDataBase dataBase, Func<ITypeItem, bool> predicate)
+        {
+            if (dataBase.GetService(typeof(ITypeContext)) is ITypeContext typeContext)
+            {
+                return typeContext.GetRandomTypeItemAsync(predicate);
+            }
+            throw new NotImplementedException();
+        }
+    
+        public static Task<IType> GetRandomTypeAsync(this IDataBase dataBase)
+        {
+            return GetRandomTypeAsync(dataBase, DefaultPredicate);
+        }
+
+        public static Task<IType> GetRandomTypeAsync(this IDataBase dataBase, Func<IType, bool> predicate)
+        {
+            if (dataBase.GetService(typeof(ITypeCollection)) is ITypeCollection typeCollection)
+            {
+                return typeCollection.GetRandomTypeAsync(predicate);
+            }
+            throw new NotImplementedException();
+        }
+
+        public static Task<ITypeCategory> GetRandomTypeCategoryAsync(this IDataBase dataBase)
+        {
+            return GetRandomTypeCategoryAsync(dataBase, DefaultPredicate);
+        }
+
+        public static Task<ITypeCategory> GetRandomTypeCategoryAsync(this IDataBase dataBase, Func<ITypeCategory, bool> predicate)
+        {
+            if (dataBase.GetService(typeof(ITypeCategoryCollection)) is ITypeCategoryCollection typeCategoryCollection)
+            {
+                return typeCategoryCollection.GetRandomTypeCategoryAsync(predicate);
+            }
+            throw new NotImplementedException();
+        }
+
         private static async Task InitializeRandomItemsTransactionAsync(this IDataBase dataBase, Authentication authentication)
         {
             var trans = await dataBase.BeginTransactionAsync(authentication);
-            var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
             var typeContext = dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
+            var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
             await typeContext.AddRandomItemsAsync(authentication);
             await tableContext.AddRandomItemsAsync(authentication);
             await trans.CommitAsync(authentication);
@@ -55,10 +158,22 @@ namespace JSSoft.Crema.Services.Random
 
         private static async Task InitializeRandomItemsStandardAsync(this IDataBase dataBase, Authentication authentication)
         {
-            var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
             var typeContext = dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
+            var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
             await typeContext.AddRandomItemsAsync(authentication);
             await tableContext.AddRandomItemsAsync(authentication);
         }
+
+        private static bool DefaultPredicate(ITableItem _) => true;
+
+        private static bool DefaultPredicate(ITable _) => true;
+
+        private static bool DefaultPredicate(ITableCategory _) => true;
+
+        private static bool DefaultPredicate(ITypeItem _) => true;
+
+        private static bool DefaultPredicate(IType _) => true;
+
+        private static bool DefaultPredicate(ITypeCategory _) => true;
     }
 }

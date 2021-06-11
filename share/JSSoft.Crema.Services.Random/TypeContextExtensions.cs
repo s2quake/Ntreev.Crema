@@ -100,6 +100,18 @@ namespace JSSoft.Crema.Services.Random
             return template.Type;
         }
 
+        public static Task<ITypeItem> GetRandomTypeItemAsync(this ITypeContext typeContext)
+        {
+            return GetRandomTypeItemAsync(typeContext, DefaultPredicate);
+        }
+
+        public static Task<ITypeItem> GetRandomTypeItemAsync(this ITypeContext typeContext, Func<ITypeItem, bool> predicate)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.Random(predicate));
+        }
+
+        private static bool DefaultPredicate(ITypeItem _) => true;
+
         private static int GetLevel<T>(T category, Func<T, T> parentFunc)
         {
             var level = 0;

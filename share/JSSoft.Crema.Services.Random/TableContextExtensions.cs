@@ -108,7 +108,7 @@ namespace JSSoft.Crema.Services.Random
                     var minCount = CremaRandomSettings.TableContext.MinRowCount;
                     var maxCount = CremaRandomSettings.TableContext.MaxRowCount;
                     var count = RandomUtility.Next(minCount, maxCount);
-                    await AddRandomRowsAsync(item, authentication, count);
+                    await item.AddRandomRowsAsync(authentication, count);
                 }
                 return tables.First();
             }
@@ -152,67 +152,20 @@ namespace JSSoft.Crema.Services.Random
         public static Task<ITable> AddRandomChildTableAsync(this ITableContext tableContext, Authentication authentication)
         {
             var table = tableContext.Tables.Random(item => item.TemplatedParent == null && item.Parent == null);
-            return AddRandomChildTableAsync(table, authentication);
+            return table.AddRandomChildTableAsync(authentication);
         }
 
-        public static async Task<ITable> AddRandomChildTableAsync(this ITable table, Authentication authentication)
+        public static Task<ITableItem> GetRandomTableItemAsync(this ITableContext tableContext)
         {
-            var copyData = RandomUtility.NextBoolean();
-            var template = await table.NewTableAsync(authentication);
-            await template.InitializeRandomAsync(authentication);
-            await template.EndEditAsync(authentication);
-            if (template.Target is ITable[] tables)
-            {
-                foreach (var item in tables)
-                {
-                    var minCount = CremaRandomSettings.TableContext.MinRowCount;
-                    var maxCount = CremaRandomSettings.TableContext.MaxRowCount;
-                    var count = RandomUtility.Next(minCount, maxCount);
-                    await AddRandomRowsAsync(item, authentication, count);
-                }
-                return tables.First();
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
+            return GetRandomTableItemAsync(tableContext, DefaultPredicate);
         }
 
-        public static async Task AddRandomRowsAsync(this ITable table, Authentication authentication, int tryCount)
+        public static Task<ITableItem> GetRandomTableItemAsync(this ITableContext tableContext, Func<ITableItem, bool> predicate)
         {
-            var target = table.Parent ?? table;
-            var targetContent = target.Content;
-            await targetContent.BeginEditAsync(authentication);
-            await targetContent.EnterEditAsync(authentication);
-            var failedCount = 0;
-            for (var i = 0; i < tryCount; i++)
-            {
-                try
-                {
-                    var parentRow = target != table ? targetContent.RandomOrDefault() : null;
-                    await AddRandomRowAsync(table, parentRow, authentication);
-                }
-                catch
-                {
-                    failedCount++;
-                }
-                if (failedCount > 3)
-                    break;
-            }
-            await targetContent.LeaveEditAsync(authentication);
-            await targetContent.EndEditAsync(authentication);
+            return tableContext.Dispatcher.InvokeAsync(() => tableContext.Random(predicate));
         }
 
-        public static async Task<ITableRow> AddRandomRowAsync(this ITable table, ITableRow parentRow, Authentication authentication)
-        {
-            if (table.Parent != null && parentRow == null)
-                return null;
-
-            var tableRow = await table.Content.AddNewAsync(authentication, parentRow?.ID);
-            await tableRow.InitializeRandomAsync(authentication);
-            await table.Content.EndNewAsync(authentication, tableRow);
-            return tableRow;
-        }
+        private static bool DefaultPredicate(ITableItem _) => true;
 
         private static int GetLevel<T>(T category, Func<T, T> parentFunc)
         {

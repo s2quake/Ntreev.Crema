@@ -41,7 +41,8 @@ namespace JSSoft.Crema.Javascript.Methods.Permission
 
         protected override async Task OnExecuteAsync(string dataBaseName, string typeItemPath, string comment)
         {
-            var typeItem = await this.CremaHost.GetTypeItemAsync(dataBaseName, typeItemPath);
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            var typeItem = await dataBase.GetTypeItemAsync(typeItemPath);
             var authentication = this.Context.GetAuthentication(this);
             await typeItem.LockAsync(authentication, comment);
         }

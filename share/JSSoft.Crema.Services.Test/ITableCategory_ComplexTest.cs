@@ -48,7 +48,7 @@ namespace JSSoft.Crema.Services.Test
             await dataBase.LoadAsync(authentication);
             await dataBase.EnterAsync(authentication);
             await dataBase.InitializeRandomItemsAsync(authentication);
-            category = dataBase.TableContext.Categories.Random(item => item.Parent != null);
+            category = await dataBase.GetRandomTableCategoryAsync(item => item.Parent != null);
         }
 
         [ClassCleanup]

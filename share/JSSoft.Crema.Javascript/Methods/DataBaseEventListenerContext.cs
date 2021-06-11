@@ -21,9 +21,11 @@
 
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Javascript.Methods
 {
@@ -48,95 +50,80 @@ namespace JSSoft.Crema.Javascript.Methods
             this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext.ItemsUnloaded += DataBaseContext_ItemsUnloaded);
         }
 
-        public void Dispose()
+        public async Task DisposeAsync()
         {
-            this.dispatcher.Invoke(() =>
+            foreach (var item in this.listenerHosts)
             {
-                foreach (var item in this.listenerHosts)
-                {
-                    item.Value.Dispose();
-                }
-            });
-            this.dispatcher.Dispose();
+                await item.Value.DisposeAsync();
+            }
+            await this.dispatcher.DisposeAsync();
         }
 
-        public void AddEventListener(DataBaseEvents eventName, DataBaseEventListener listener)
+        public async Task AddEventListenerAsync(DataBaseEvents eventName, DataBaseEventListener listener)
         {
-            this.dispatcher.Invoke(() =>
+            var dataBases = await this.DataBaseContext.GetDataBasesAsync(DataBaseState.Loaded);
+            if (this.listenerHosts.ContainsKey(eventName) == true)
             {
-                if (this.listenerHosts.ContainsKey(eventName) == true)
+                if (this.listeners.ContainsKey(eventName) == false)
                 {
-                    if (this.listeners.ContainsKey(eventName) == false)
-                    {
-                        this.listeners[eventName] = new DataBaseEventListenerCollection();
-                    }
-
-                    this.listeners[eventName].Add(listener);
-
-                    var dataBases = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext.Where(item => item.IsLoaded).ToArray());
-                    var listenerHost = this.listenerHosts[eventName];
-                    foreach (var item in dataBases)
-                    {
-                        listenerHost.Subscribe(item, listener);
-                    }
+                    this.listeners[eventName] = new DataBaseEventListenerCollection();
                 }
-                else
+
+                this.listeners[eventName].Add(listener);
+
+                var listenerHost = this.listenerHosts[eventName];
+                foreach (var item in dataBases)
                 {
-                    throw new NotImplementedException();
+                    await listenerHost.SubscribeAsync(item, listener);
                 }
-            });
-        }
-
-        public void RemoveEventListener(DataBaseEvents eventName, DataBaseEventListener listener)
-        {
-            this.dispatcher.Invoke(() =>
+            }
+            else
             {
-                if (this.listenerHosts.ContainsKey(eventName) == true)
-                {
-                    var dataBases = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext.Where(item => item.IsLoaded).ToArray());
-                    var listenerHost = this.listenerHosts[eventName];
-                    foreach (var item in dataBases)
-                    {
-                        listenerHost.Unsubscribe(item, listener);
-                    }
-                    var listeners = this.listeners[eventName];
-                    listeners.Remove(listener);
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-            });
-        }
-
-        private void DataBaseContext_ItemsLoaded(object sender, ItemsEventArgs<IDataBase> e)
-        {
-            if (sender is IDataBase dataBase)
-            {
-                this.dispatcher.InvokeAsync(() =>
-                {
-                    foreach (var item in this.listenerHosts)
-                    {
-                        var eventName = item.Key;
-                        var host = item.Value;
-                        var listeners = this.listeners[eventName];
-                        host.Subscribe(dataBase, listeners);
-                    }
-                });
+                throw new NotImplementedException();
             }
         }
 
-        private void DataBaseContext_ItemsUnloaded(object sender, ItemsEventArgs<IDataBase> e)
+        public async Task RemoveEventListenerAsync(DataBaseEvents eventName, DataBaseEventListener listener)
+        {
+            var dataBases = await this.DataBaseContext.GetDataBasesAsync(DataBaseState.Loaded);
+            if (this.listenerHosts.ContainsKey(eventName) == true)
+            {
+                var listenerHost = this.listenerHosts[eventName];
+                foreach (var item in dataBases)
+                {
+                    await listenerHost.UnsubscribeAsync(item, listener);
+                }
+                var listeners = this.listeners[eventName];
+                listeners.Remove(listener);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private async void DataBaseContext_ItemsLoaded(object sender, ItemsEventArgs<IDataBase> e)
         {
             if (sender is IDataBase dataBase)
             {
-                this.dispatcher.InvokeAsync(() =>
+                foreach (var item in this.listenerHosts)
                 {
-                    foreach (var item in this.listenerHosts.Values)
-                    {
-                        item.Unsubscribe(dataBase);
-                    }
-                });
+                    var eventName = item.Key;
+                    var host = item.Value;
+                    var listeners = this.listeners[eventName];
+                    await host.SubscribeAsync(dataBase, listeners);
+                }
+            }
+        }
+
+        private async void DataBaseContext_ItemsUnloaded(object sender, ItemsEventArgs<IDataBase> e)
+        {
+            if (sender is IDataBase dataBase)
+            {
+                foreach (var item in this.listenerHosts.Values)
+                {
+                    await item.UnsubscribeAsync(dataBase);
+                }
             }
         }
 

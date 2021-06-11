@@ -31,12 +31,14 @@ namespace JSSoft.Crema.Services.Random
     {
         public static Task<IUserCategory> GetRandomUserCategoryAsync(this IUserCategoryCollection userCategoryCollection)
         {
-            return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.Random());
+            return GetRandomUserCategoryAsync(userCategoryCollection, DefaultPredicate);
         }
 
         public static Task<IUserCategory> GetRandomUserCategoryAsync(this IUserCategoryCollection userCategoryCollection, Func<IUserCategory, bool> predicate)
         {
             return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.Random(predicate));
         }
+
+        private static bool DefaultPredicate(IUserCategory _) => true;
     }
 }

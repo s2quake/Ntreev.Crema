@@ -89,7 +89,7 @@ namespace JSSoft.Crema.Services.Test
             await dataBase.EnterAsync(authentication);
             try
             {
-                var tableContext = dataBase.TableContext;
+                var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
                 var category = await tableContext.Root.AddNewCategoryAsync(authentication);
                 var category1 = await category.AddNewCategoryAsync(authentication);
 

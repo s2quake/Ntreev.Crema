@@ -39,9 +39,9 @@ namespace JSSoft.Crema.Services.Random
             for (var i = 0; i < tryCount; i++)
             {
                 if (RandomUtility.Within(50) == true)
-                    await dataBase.TypeContext.GenerateAsync(authentication);
+                    await dataBase.GenerateTypeAsync(authentication);
                 else
-                    await dataBase.TableContext.GenerateAsync(authentication);
+                    await dataBase.GenerateTableAsync(authentication);
             }
         }
 

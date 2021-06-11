@@ -41,7 +41,7 @@ namespace JSSoft.Crema.Javascript.Methods
         {
             if (this.Context.Properties[typeof(DataBaseEventListenerContext)] is DataBaseEventListenerContext context)
             {
-                context.RemoveEventListener(eventName, listener);
+                context.RemoveEventListenerAsync(eventName, listener);
             }
             else
             {

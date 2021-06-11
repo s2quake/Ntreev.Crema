@@ -10,8 +10,14 @@ namespace JSSoft.Crema.Services.Test.Extensions
     {
         public static async Task GenerateStandardAsync(this IDataBase dataBase, Authentication authentication)
         {
-            await dataBase.TypeContext.GenerateStandardAsync(authentication);
-            await dataBase.TableContext.GenerateStandardAsync(authentication);
+            if (dataBase.GetService(typeof(ITypeContext)) is ITypeContext typeContext)
+            {
+                await typeContext.GenerateStandardAsync(authentication);
+            }
+            if (dataBase.GetService(typeof(ITableContext)) is ITableContext tableContext)
+            {
+                await tableContext.GenerateStandardAsync(authentication);
+            }
         }
     }
 }

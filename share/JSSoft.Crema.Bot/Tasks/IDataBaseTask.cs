@@ -22,6 +22,7 @@
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
 using JSSoft.Crema.Services.Extensions;
+using JSSoft.Crema.Services.Random;
 using JSSoft.Library;
 using JSSoft.Library.Random;
 using System;
@@ -51,7 +52,7 @@ namespace JSSoft.Crema.Bot.Tasks
 
                 if (RandomUtility.Within(35) == true)
                 {
-                    var typeItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TypeContext.Random());
+                    var typeItem = await dataBase.GetRandomTypeItemAsync();
                     await typeItem.Dispatcher.InvokeAsync(() =>
                     {
                         if (typeItem.VerifyAccessType(authentication, AccessType.Guest) == true)
@@ -62,7 +63,7 @@ namespace JSSoft.Crema.Bot.Tasks
                 }
                 else
                 {
-                    var tableItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TableContext.Random());
+                    var tableItem = await dataBase.GetRandomTableItemAsync();
                     context.Push(tableItem);
                 }
             }

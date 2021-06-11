@@ -42,7 +42,8 @@ namespace JSSoft.Crema.Javascript.Methods.TableContent
         [ReturnParameterName("domainID")]
         protected override async Task<string> OnExecuteAsync(string dataBaseName, string tableName)
         {
-            var table = await this.CremaHost.GetTableAsync(dataBaseName, tableName);
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            var table = await dataBase.GetTableAsync(tableName);
             return await table.Dispatcher.InvokeAsync(() =>
             {
                 if (table.Content.Domain != null)

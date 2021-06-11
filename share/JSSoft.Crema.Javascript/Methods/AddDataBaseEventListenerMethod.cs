@@ -55,7 +55,7 @@ namespace JSSoft.Crema.Javascript.Methods
         protected override void OnDisposed()
         {
             base.OnDisposed();
-            this.eventListenerContext?.Dispose();
+            this.eventListenerContext?.DisposeAsync();
         }
 
         private void AddDataBaseEventListener(DataBaseEvents eventName, DataBaseEventListener listener)
@@ -68,7 +68,7 @@ namespace JSSoft.Crema.Javascript.Methods
 
             if (this.eventListenerContext != null)
             {
-                this.eventListenerContext.AddEventListener(eventName, listener);
+                this.eventListenerContext.AddEventListenerAsync(eventName, listener);
             }
             else
             {
