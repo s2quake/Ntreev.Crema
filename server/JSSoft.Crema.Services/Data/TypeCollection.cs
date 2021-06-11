@@ -40,7 +40,7 @@ namespace JSSoft.Crema.Services.Data
         private ItemsMovedEventHandler<IType> typesMoved;
         private ItemsDeletedEventHandler<IType> typesDeleted;
         private ItemsEventHandler<IType> typesStateChanged;
-        private ItemsEventHandler<IType> typesChanged;
+        private ItemsChangedEventHandler<IType> typesChanged;
 
         public TypeCollection()
         {
@@ -266,7 +266,7 @@ namespace JSSoft.Crema.Services.Data
             var message = EventMessageBuilder.ChangeTypeTemplate(authentication, types);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTypesChanged(new ItemsEventArgs<IType>(authentication, types));
+            this.OnTypesChanged(new ItemsChangedEventArgs<IType>(authentication, types, dataSet, DomainItemType.TypeTemplate));
             this.Context.InvokeItemsChangedEvent(authentication, types, dataSet);
         }
 
@@ -358,7 +358,7 @@ namespace JSSoft.Crema.Services.Data
             }
         }
 
-        public event ItemsEventHandler<IType> TypesChanged
+        public event ItemsChangedEventHandler<IType> TypesChanged
         {
             add
             {
@@ -425,7 +425,7 @@ namespace JSSoft.Crema.Services.Data
             this.typesStateChanged?.Invoke(this, e);
         }
 
-        protected virtual void OnTypesChanged(ItemsEventArgs<IType> e)
+        protected virtual void OnTypesChanged(ItemsChangedEventArgs<IType> e)
         {
             this.typesChanged?.Invoke(this, e);
         }

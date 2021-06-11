@@ -32,7 +32,7 @@ namespace JSSoft.Crema.Services
 
         event ItemsEventHandler<IType> TypesStateChanged;
 
-        event ItemsEventHandler<IType> TypesChanged;
+        event ItemsChangedEventHandler<IType> TypesChanged;
 
         event ItemsCreatedEventHandler<IType> TypesCreated;
 

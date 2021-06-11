@@ -20,8 +20,11 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Extensions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Javascript.Methods.ListenerHosts.DataBases
 {
@@ -35,14 +38,22 @@ namespace JSSoft.Crema.Javascript.Methods.ListenerHosts.DataBases
         {
         }
 
-        protected override async Task OnSubscribeAsync(IDataBase dataBase)
+        protected override Task OnSubscribeAsync(IDataBase dataBase)
         {
-            dataBase.Dispatcher.Invoke(() => dataBase.TypeContext.ItemsLockChanged += TypeContext_ItemsLockChanged);
+            if (dataBase.GetService(typeof(ITypeContext)) is ITypeContext typeContext)
+            {
+                return typeContext.AddItemsLockChangedAsync(TypeContext_ItemsLockChanged);
+            }
+            throw new NotImplementedException();
         }
 
-        protected override async Task OnUnsubscribeAsync(IDataBase dataBase)
+        protected override Task OnUnsubscribeAsync(IDataBase dataBase)
         {
-            dataBase.Dispatcher.Invoke(() => dataBase.TypeContext.ItemsLockChanged -= TypeContext_ItemsLockChanged);
+            if (dataBase.GetService(typeof(ITypeContext)) is ITypeContext typeContext)
+            {
+                return typeContext.RemoveItemsLockChangedAsync(TypeContext_ItemsLockChanged);
+            }
+            throw new NotImplementedException();
         }
 
         private void TypeContext_ItemsLockChanged(object sender, ItemsEventArgs<ITypeItem> e)

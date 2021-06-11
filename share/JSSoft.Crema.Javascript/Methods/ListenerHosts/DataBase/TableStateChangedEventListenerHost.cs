@@ -20,8 +20,11 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Extensions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Javascript.Methods.ListenerHosts.DataBases
 {
@@ -35,17 +38,25 @@ namespace JSSoft.Crema.Javascript.Methods.ListenerHosts.DataBases
         {
         }
 
-        protected override async Task OnSubscribeAsync(IDataBase dataBase)
+        protected override Task OnSubscribeAsync(IDataBase dataBase)
         {
-            dataBase.Dispatcher.Invoke(() => dataBase.TableContext.Tables.TablesStateChanged += Tables_TablesStateChanged);
+            if (dataBase.GetService(typeof(ITableCollection)) is ITableCollection tableCollection)
+            {
+                return tableCollection.AddTablesStateChangedAsync(TableCollection_TablesStateChanged);
+            }
+            throw new NotImplementedException();
         }
 
-        protected override async Task OnUnsubscribeAsync(IDataBase dataBase)
+        protected override Task OnUnsubscribeAsync(IDataBase dataBase)
         {
-            dataBase.Dispatcher.Invoke(() => dataBase.TableContext.Tables.TablesStateChanged -= Tables_TablesStateChanged);
+            if (dataBase.GetService(typeof(ITableCollection)) is ITableCollection tableCollection)
+            {
+                return tableCollection.RemoveTablesStateChangedAsync(TableCollection_TablesStateChanged);
+            }
+            throw new NotImplementedException();
         }
 
-        private void Tables_TablesStateChanged(object sender, ItemsEventArgs<ITable> e)
+        private void TableCollection_TablesStateChanged(object sender, ItemsEventArgs<ITable> e)
         {
             if (sender is ITableCollection tables && tables.GetService(typeof(IDataBase)) is IDataBase dataBase)
             {

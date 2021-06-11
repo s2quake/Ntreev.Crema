@@ -20,8 +20,11 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Extensions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Javascript.Methods.ListenerHosts.DataBases
 {
@@ -35,14 +38,22 @@ namespace JSSoft.Crema.Javascript.Methods.ListenerHosts.DataBases
         {
         }
 
-        protected override async Task OnSubscribeAsync(IDataBase dataBase)
+        protected override Task OnSubscribeAsync(IDataBase dataBase)
         {
-            dataBase.Dispatcher.Invoke(() => dataBase.TypeContext.Types.TypesChanged += Types_TypesChanged);
+            if (dataBase.GetService(typeof(ITypeCollection)) is ITypeCollection typeCollection)
+            {
+                return typeCollection.AddTypesChangedAsync(Types_TypesChanged);
+            }
+            throw new NotImplementedException();
         }
 
-        protected override async Task OnUnsubscribeAsync(IDataBase dataBase)
+        protected override Task OnUnsubscribeAsync(IDataBase dataBase)
         {
-            dataBase.Dispatcher.Invoke(() => dataBase.TypeContext.Types.TypesChanged -= Types_TypesChanged);
+            if (dataBase.GetService(typeof(ITypeCollection)) is ITypeCollection typeCollection)
+            {
+                return typeCollection.RemoveTypesChangedAsync(Types_TypesChanged);
+            }
+            throw new NotImplementedException();
         }
 
         private void Types_TypesChanged(object sender, ItemsEventArgs<IType> e)

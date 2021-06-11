@@ -95,5 +95,75 @@ namespace JSSoft.Crema.Services.Extensions
             }
             throw new NotImplementedException();
         }
+
+        public static Task AddItemsCreatedAsync(this ITypeContext typeContext, ItemsCreatedEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsCreated += handler);
+        }
+
+        public static Task AddItemsRenamedAsync(this ITypeContext typeContext, ItemsRenamedEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsRenamed += handler);
+        }
+
+        public static Task AddItemsMovedAsync(this ITypeContext typeContext, ItemsMovedEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsMoved += handler);
+        }
+
+        public static Task AddItemsDeletedAsync(this ITypeContext typeContext, ItemsDeletedEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsDeleted += handler);
+        }
+
+        public static Task AddItemsChangedAsync(this ITypeContext typeContext, ItemsEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsChanged += handler);
+        }
+
+        public static Task AddItemsAccessChangedAsync(this ITypeContext typeContext, ItemsEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsAccessChanged += handler);
+        }
+
+        public static Task AddItemsLockChangedAsync(this ITypeContext typeContext, ItemsEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsLockChanged += handler);
+        }
+
+        public static Task RemoveItemsCreatedAsync(this ITypeContext typeContext, ItemsCreatedEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsCreated -= handler);
+        }
+
+        public static Task RemoveItemsRenamedAsync(this ITypeContext typeContext, ItemsRenamedEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsRenamed -= handler);
+        }
+
+        public static Task RemoveItemsMovedAsync(this ITypeContext typeContext, ItemsMovedEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsMoved -= handler);
+        }
+
+        public static Task RemoveItemsDeletedAsync(this ITypeContext typeContext, ItemsDeletedEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsDeleted -= handler);
+        }
+
+        public static Task RemoveItemsChangedAsync(this ITypeContext typeContext, ItemsEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsChanged -= handler);
+        }
+
+        public static Task RemoveItemsAccessChangedAsync(this ITypeContext typeContext, ItemsEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsAccessChanged -= handler);
+        }
+
+        public static Task RemoveItemsLockChangedAsync(this ITypeContext typeContext, ItemsEventHandler<ITypeItem> handler)
+        {
+            return typeContext.Dispatcher.InvokeAsync(() => typeContext.ItemsLockChanged -= handler);
+        }
     }
 }

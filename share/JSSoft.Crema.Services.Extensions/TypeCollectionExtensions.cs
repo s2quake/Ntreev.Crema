@@ -40,5 +40,65 @@ namespace JSSoft.Crema.Services.Extensions
         {
             return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.ToArray());
         }
+
+        public static Task AddTypesStateChangedAsync(this ITypeCollection typeCollection, ItemsEventHandler<IType> handler)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.TypesStateChanged += handler);
+        }
+
+        public static Task AddTypesChangedAsync(this ITypeCollection typeCollection, ItemsChangedEventHandler<IType> handler)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.TypesChanged += handler);
+        }
+
+        public static Task AddTypesCreatedAsync(this ITypeCollection typeCollection, ItemsCreatedEventHandler<IType> handler)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.TypesCreated += handler);
+        }
+
+        public static Task AddTypesMovedAsync(this ITypeCollection typeCollection, ItemsMovedEventHandler<IType> handler)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.TypesMoved += handler);
+        }
+
+        public static Task AddTypesRenamedAsync(this ITypeCollection typeCollection, ItemsRenamedEventHandler<IType> handler)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.TypesRenamed += handler);
+        }
+
+        public static Task AddTypesDeletedAsync(this ITypeCollection typeCollection, ItemsDeletedEventHandler<IType> handler)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.TypesDeleted += handler);
+        }
+
+        public static Task RemoveTypesStateChangedAsync(this ITypeCollection typeCollection, ItemsEventHandler<IType> handler)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.TypesStateChanged -= handler);
+        }
+
+        public static Task RemoveTypesChangedAsync(this ITypeCollection typeCollection, ItemsChangedEventHandler<IType> handler)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.TypesChanged -= handler);
+        }
+
+        public static Task RemoveTypesCreatedAsync(this ITypeCollection typeCollection, ItemsCreatedEventHandler<IType> handler)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.TypesCreated -= handler);
+        }
+
+        public static Task RemoveTypesMovedAsync(this ITypeCollection typeCollection, ItemsMovedEventHandler<IType> handler)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.TypesMoved -= handler);
+        }
+
+        public static Task RemoveTypesRenamedAsync(this ITypeCollection typeCollection, ItemsRenamedEventHandler<IType> handler)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.TypesRenamed -= handler);
+        }
+
+        public static Task RemoveTypesDeletedAsync(this ITypeCollection typeCollection, ItemsDeletedEventHandler<IType> handler)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.TypesDeleted -= handler);
+        }
     }
 }
