@@ -44,29 +44,26 @@ namespace JSSoft.Crema.Javascript.Methods.TableTemplate
         [ReturnParameterName("domainID")]
         protected override async Task<string> OnExecuteAsync(string dataBaseName, string parentPath)
         {
-            var dataBase = await this.CremaHost.GetDataBaseAsync(dataBaseName);
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
 
             if (NameValidator.VerifyCategoryPath(parentPath) == true)
             {
-                var category = dataBase.TableContext.Categories[parentPath];
-                if (category == null)
-                    throw new CategoryNotFoundException(parentPath);
+                var category = await dataBase.GetTableCategoryAsync(parentPath);
                 var authentication = this.Context.GetAuthentication(this);
                 var template = await category.NewTableAsync(authentication);
                 return $"{template.Domain.ID}";
             }
             else if (NameValidator.VerifyItemPath(parentPath) == true)
             {
-                if (dataBase.TableContext[parentPath] is not ITable table)
-                    throw new CategoryNotFoundException(parentPath);
+                var tableItem = await dataBase.GetTableItemAsync(parentPath);
+                var table = tableItem as ITable;
                 var authentication = this.Context.GetAuthentication(this);
                 var template = await table.NewTableAsync(authentication);
                 return $"{template.Domain.ID}";
             }
             else
             {
-                if (dataBase.TableContext.Tables[parentPath] is not ITable table)
-                    throw new CategoryNotFoundException(parentPath);
+                var table = await dataBase.GetTableAsync(parentPath);
                 var authentication = this.Context.GetAuthentication(this);
                 var template = await table.NewTableAsync(authentication);
                 return $"{template.Domain.ID}";

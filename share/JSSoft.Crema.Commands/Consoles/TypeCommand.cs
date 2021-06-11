@@ -130,7 +130,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task MoveAsync([CommandCompletion(nameof(GetTypeNamesAsync))] string typeName, [CommandCompletion(nameof(GetCategoryPaths))] string categoryPath)
+        public async Task MoveAsync([CommandCompletion(nameof(GetTypeNamesAsync))] string typeName, [CommandCompletion(nameof(GetCategoryPathsAsync))] string categoryPath)
         {
             var type = await this.GetTypeAsync(typeName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -237,7 +237,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandProperty]
-        [CommandCompletion(nameof(GetCategoryPaths))]
+        [CommandCompletion(nameof(GetCategoryPathsAsync))]
         public string CategoryPath
         {
             get; set;
@@ -247,39 +247,20 @@ namespace JSSoft.Crema.Commands.Consoles
 
         private async Task<IType> GetTypeAsync(string typeName)
         {
-            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            var type = await dataBase.Dispatcher.InvokeAsync(() =>
-            {
-                if (NameValidator.VerifyItemPath(typeName) == true)
-                    return dataBase.TypeContext[typeName] as IType;
-                return dataBase.TypeContext.Types[typeName];
-            });
-            if (type == null)
-                throw new TypeNotFoundException(typeName);
-            return type;
+            var dataBase = await this.DataBaseContext.GetDataBaseAsync(this.Drive.DataBaseName);
+            return await dataBase.GetTypeAsync(typeName);
         }
 
         private async Task<ITypeCategory> GetCategoryAsync(string categoryPath)
         {
-            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            var category = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TypeContext.Categories[categoryPath]);
-            if (category == null)
-                throw new CategoryNotFoundException(categoryPath);
-            return category;
+            var dataBase = await this.DataBaseContext.GetDataBaseAsync(this.Drive.DataBaseName);
+            return await dataBase.GetTypeCategoryAsync(categoryPath);
         }
 
         private async Task<ITypeItem> GetTypeItemAsync([CommandCompletion(nameof(GetPathsAsync))] string typeItemName)
         {
-            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            var typeItem = await dataBase.Dispatcher.InvokeAsync(() =>
-            {
-                if (NameValidator.VerifyItemPath(typeItemName) == true || NameValidator.VerifyCategoryPath(typeItemName) == true)
-                    return dataBase.TypeContext[typeItemName];
-                return dataBase.TypeContext.Types[typeItemName] as ITypeItem;
-            });
-            if (typeItem == null)
-                throw new TypeNotFoundException(typeItemName);
-            return typeItem;
+            var dataBase = await this.DataBaseContext.GetDataBaseAsync(this.Drive.DataBaseName);
+            return await dataBase.GetTypeItemAsync(typeItemName);
         }
 
         private Task<string[]> GetTypeNamesAsync()
@@ -289,48 +270,35 @@ namespace JSSoft.Crema.Commands.Consoles
 
         private async Task<string[]> GetTypeNamesAsync(TagInfo tags, string filterExpress)
         {
-            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            return await dataBase.Dispatcher.InvokeAsync(() =>
-            {
-                var query = from item in dataBase.TypeContext.Types
-                            where StringUtility.GlobMany(item.Name, filterExpress)
-                            where (item.TypeInfo.DerivedTags & tags) == tags
-                            orderby item.Name
-                            select item.Name;
+            var dataBase = await this.DataBaseContext.GetDataBaseAsync(this.Drive.DataBaseName);
+            var types = await dataBase.GetTypesAsync();
+            var query = from item in types
+                        where StringUtility.GlobMany(item.Name, filterExpress)
+                        where (item.TypeInfo.DerivedTags & tags) == tags
+                        orderby item.Name
+                        select item.Name;
 
-                return query.ToArray();
-            });
+            return query.ToArray();
         }
 
-        private string[] GetCategoryPaths()
+        private async Task<string[]> GetCategoryPathsAsync()
         {
-            var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            return dataBase.Dispatcher.Invoke(() =>
-            {
-                var query = from item in dataBase.TypeContext.Categories
-                            orderby item.Path
-                            select item.Path;
-                return query.ToArray();
-            });
+            var dataBase = await this.DataBaseContext.GetDataBaseAsync(this.Drive.DataBaseName);
+            var categories = await dataBase.GetTypeCategoriesAsync();
+            var query = from item in categories
+                        orderby item.Path
+                        select item.Path;
+            return query.ToArray();
         }
 
         private async Task<string[]> GetPathsAsync()
         {
-            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            return await dataBase.Dispatcher.InvokeAsync(() =>
-            {
-                var query = from item in dataBase.TypeContext.Categories
-                            orderby item.Path
-                            select item;
-
-                var itemList = new List<string>(dataBase.TypeContext.Count());
-                foreach (var item in query)
-                {
-                    itemList.Add(item.Path);
-                    itemList.AddRange(from type in item.Types orderby type.Name select type.Name);
-                }
-                return itemList.ToArray();
-            });
+            var dataBase = await this.DataBaseContext.GetDataBaseAsync(this.Drive.DataBaseName);
+            var typeItems = await dataBase.GetTypeItemsAsync();
+            var query = from item in typeItems
+                        orderby item.Path
+                        select item is IType ? item.Name : item.Path;
+            return query.ToArray();
         }
 
         private string GetCurrentDirectory()

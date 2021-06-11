@@ -19,15 +19,26 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Extensions
 {
     public static class TableCategoryCollectionExtensions
     {
-        public static Task<bool> ContainsAsync(this ITableCategoryCollection categories, string categoryPath)
+        public static Task<bool> ContainsAsync(this ITableCategoryCollection tableCategoryCollection, string categoryPath)
         {
-            return categories.Dispatcher.InvokeAsync(() => categories.Contains(categoryPath));
+            return tableCategoryCollection.Dispatcher.InvokeAsync(() => tableCategoryCollection.Contains(categoryPath));
+        }
+
+        public static Task<ITableCategory> GetCategoryAsync(this ITableCategoryCollection tableCategoryCollection, string categoryPath)
+        {
+            return tableCategoryCollection.Dispatcher.InvokeAsync(() => tableCategoryCollection[categoryPath]);
+        }
+
+        public static Task<ITableCategory[]> GetCategoriesAsync(this ITableCategoryCollection tableCategoryCollection)
+        {
+            return tableCategoryCollection.Dispatcher.InvokeAsync(() => tableCategoryCollection.ToArray());
         }
     }
 }

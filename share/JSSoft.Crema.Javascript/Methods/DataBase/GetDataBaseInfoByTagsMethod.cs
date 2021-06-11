@@ -47,7 +47,7 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
 
         protected override async Task<IDictionary<string, object>> OnExecuteAsync(string dataBaseName, string tags)
         {
-            var dataBase = await this.CremaHost.GetDataBaseAsync(dataBaseName);
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
             return await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 var dataBaseInfo = dataBase.DataBaseInfo;
@@ -78,7 +78,8 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
         private string GetTypesHashValue(IDataBase dataBase, TagInfo tags)
         {
             var typeInfoList = new List<Data.TypeInfo>();
-            foreach (var item in dataBase.TypeContext.Types.OrderBy(item => item.Name))
+            var typeCollection = dataBase.GetService(typeof(ITypeCollection)) as ITypeCollection;
+            foreach (var item in typeCollection.OrderBy(item => item.Name))
             {
                 if ((item.TypeInfo.Tags & tags) != TagInfo.Unused)
                 {
@@ -92,7 +93,8 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
         private string GetTablesHashValue(IDataBase dataBase, TagInfo tags)
         {
             var tableInfoList = new List<Data.TableInfo>();
-            foreach (var item in dataBase.TableContext.Tables.OrderBy(item => item.Name))
+            var tableCollection = dataBase.GetService(typeof(ITableCollection)) as ITableCollection;
+            foreach (var item in tableCollection.OrderBy(item => item.Name))
             {
                 if ((item.TableInfo.Tags & tags) != TagInfo.Unused)
                 {
@@ -105,9 +107,11 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
 
         private IEnumerable<string> GetItems(IDataBase dataBase, TagInfo tags)
         {
+            var tableCollection = dataBase.GetService(typeof(ITableCollection)) as ITableCollection;
+            var typeCollection = dataBase.GetService(typeof(ITypeCollection)) as ITypeCollection;
             yield return PathUtility.Separator;
 
-            foreach (var item in dataBase.TypeContext)
+            foreach (var item in typeCollection)
             {
                 if (item is IType type && (type.TypeInfo.Tags & tags) == TagInfo.Unused)
                 {
@@ -116,7 +120,7 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
                 yield return PathUtility.Separator + CremaSchema.TypeDirectory + item.Path;
             }
 
-            foreach (var item in dataBase.TableContext)
+            foreach (var item in tableCollection)
             {
                 if (item is ITable table && (table.TableInfo.DerivedTags & tags) == TagInfo.Unused)
                 {

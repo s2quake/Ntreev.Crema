@@ -23,6 +23,7 @@ using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Javascript.Methods
 {
@@ -35,16 +36,16 @@ namespace JSSoft.Crema.Javascript.Methods
             this.EventName = eventName;
         }
 
-        public void Dispose()
+        public async Task DisposeAsync()
         {
             foreach (var item in this.dataBaseToListeners)
             {
-                this.OnUnsubscribe(item.Key);
+                await this.OnUnsubscribeAsync(item.Key);
             }
             this.dataBaseToListeners.Clear();
         }
 
-        public void Subscribe(IDataBase dataBase, DataBaseEventListener listener)
+        public async Task SubscribeAsync(IDataBase dataBase, DataBaseEventListener listener)
         {
             if (this.dataBaseToListeners.ContainsKey(dataBase) == false)
             {
@@ -53,31 +54,31 @@ namespace JSSoft.Crema.Javascript.Methods
             var listeners = this.dataBaseToListeners[dataBase];
             if (listeners.Any() == false)
             {
-                this.OnSubscribe(dataBase);
+                await this.OnSubscribeAsync(dataBase);
             }
             listeners.Add(listener);
         }
 
-        public void Unsubscribe(IDataBase dataBase, DataBaseEventListener listener)
+        public async Task UnsubscribeAsync(IDataBase dataBase, DataBaseEventListener listener)
         {
             var listeners = this.dataBaseToListeners[dataBase];
             listeners.Remove(listener);
             if (listeners.Any() == false)
             {
-                this.OnUnsubscribe(dataBase);
+                await this.OnUnsubscribeAsync(dataBase);
                 this.dataBaseToListeners.Remove(dataBase);
             }
         }
 
-        public void Subscribe(IDataBase dataBase, IEnumerable<DataBaseEventListener> listeners)
+        public async Task SubscribeAsync(IDataBase dataBase, IEnumerable<DataBaseEventListener> listeners)
         {
             this.dataBaseToListeners[dataBase] = new DataBaseEventListenerCollection(listeners);
-            this.OnSubscribe(dataBase);
+            await this.OnSubscribeAsync(dataBase);
         }
 
-        public void Unsubscribe(IDataBase dataBase)
+        public async Task UnsubscribeAsync(IDataBase dataBase)
         {
-            this.OnUnsubscribe(dataBase);
+            await this.OnUnsubscribeAsync(dataBase);
             this.dataBaseToListeners.Remove(dataBase);
         }
 
@@ -88,11 +89,11 @@ namespace JSSoft.Crema.Javascript.Methods
 
         public DataBaseEvents EventName { get; }
 
-        protected void InvokeAsync(IDataBase dataBase, IDictionary<string, object> properties)
+        protected async void InvokeAsync(IDataBase dataBase, IDictionary<string, object> properties)
         {
             var dataBaseName = dataBase.Name;
             var listeners = this.dataBaseToListeners[dataBase].ToArray();
-            this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 foreach (var item in listeners)
                 {
@@ -101,9 +102,9 @@ namespace JSSoft.Crema.Javascript.Methods
             });
         }
 
-        protected abstract void OnSubscribe(IDataBase dataBase);
+        protected abstract Task OnSubscribeAsync(IDataBase dataBase);
 
-        protected abstract void OnUnsubscribe(IDataBase dataBase);
+        protected abstract Task OnUnsubscribeAsync(IDataBase dataBase);
 
 
     }

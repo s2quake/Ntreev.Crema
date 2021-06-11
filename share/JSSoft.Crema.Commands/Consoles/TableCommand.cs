@@ -63,7 +63,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task MoveAsync([CommandCompletion(nameof(GetTableNamesAsync))] string tableName, [CommandCompletion(nameof(GetCategoryPaths))] string categoryPath)
+        public async Task MoveAsync([CommandCompletion(nameof(GetTableNamesAsync))] string tableName, [CommandCompletion(nameof(GetCategoryPathsAsync))] string categoryPath)
         {
             var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -362,7 +362,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandProperty]
-        [CommandCompletion(nameof(GetCategoryPaths))]
+        [CommandCompletion(nameof(GetCategoryPathsAsync))]
         public string CategoryPath
         {
             get; set;
@@ -409,12 +409,13 @@ namespace JSSoft.Crema.Commands.Consoles
 
         private async Task<ITable> GetTableAsync(string tableName)
         {
-            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
+            var dataBase = await this.DataBaseContext.GetDataBaseAsync(this.Drive.DataBaseName);
+            var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
             var table = await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 if (NameValidator.VerifyItemPath(tableName) == true)
-                    return dataBase.TableContext[tableName] as ITable;
-                return dataBase.TableContext.Tables[tableName];
+                    return tableContext[tableName] as ITable;
+                return tableContext.Tables[tableName];
             });
             if (table == null)
                 throw new TableNotFoundException(tableName);
@@ -423,25 +424,14 @@ namespace JSSoft.Crema.Commands.Consoles
 
         private async Task<ITableCategory> GetCategoryAsync(string categoryPath)
         {
-            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            var category = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TableContext.Categories[categoryPath]);
-            if (category == null)
-                throw new CategoryNotFoundException(categoryPath);
-            return category;
+            var dataBase = await this.DataBaseContext.GetDataBaseAsync(this.Drive.DataBaseName);
+            return await dataBase.GetTableCategoryAsync(categoryPath);
         }
 
         private async Task<ITableItem> GetTableItemAsync(string tableItemName)
         {
-            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            var tableItem = await dataBase.Dispatcher.InvokeAsync(() =>
-            {
-                if (NameValidator.VerifyItemPath(tableItemName) == true || NameValidator.VerifyCategoryPath(tableItemName) == true)
-                    return dataBase.TableContext[tableItemName];
-                return dataBase.TableContext.Tables[tableItemName] as ITableItem;
-            });
-            if (tableItem == null)
-                throw new TableNotFoundException(tableItemName);
-            return tableItem;
+            var dataBase = await this.DataBaseContext.GetDataBaseAsync(this.Drive.DataBaseName);
+            return await dataBase.GetTableItemAsync(tableItemName);
         }
 
         private Task<string[]> GetTableNamesAsync()
@@ -451,48 +441,35 @@ namespace JSSoft.Crema.Commands.Consoles
 
         private async Task<string[]> GetTableNamesAsync(TagInfo tags, string filterExpress)
         {
-            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            return await dataBase.Dispatcher.InvokeAsync(() =>
-            {
-                var query = from item in dataBase.TableContext.Tables
-                            where StringUtility.GlobMany(item.Name, filterExpress)
-                            where (item.TableInfo.DerivedTags & tags) == tags
-                            orderby item.Name
-                            select item.Name;
+            var dataBase = await this.DataBaseContext.GetDataBaseAsync(this.Drive.DataBaseName);
+            var tables = await dataBase.GetTablesAsync();
+            var query = from item in tables
+                        where StringUtility.GlobMany(item.Name, filterExpress)
+                        where (item.TableInfo.DerivedTags & tags) == tags
+                        orderby item.Name
+                        select item.Name;
 
-                return query.ToArray();
-            });
+            return query.ToArray();
         }
 
-        private async Task<string[]> GetCategoryPaths()
+        private async Task<string[]> GetCategoryPathsAsync()
         {
-            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            return await dataBase.Dispatcher.InvokeAsync(() =>
-            {
-                var query = from item in dataBase.TableContext.Categories
-                            orderby item.Path
-                            select item.Path;
-                return query.ToArray();
-            });
+            var dataBase = await this.DataBaseContext.GetDataBaseAsync(this.Drive.DataBaseName);
+            var tableCategories = await dataBase.GetTableCategoriesAsync();
+            var query = from item in tableCategories
+                        orderby item.Path
+                        select item.Path;
+            return query.ToArray();
         }
 
         private async Task<string[]> GetPathsAsync()
         {
-            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            return await dataBase.Dispatcher.InvokeAsync(() =>
-            {
-                var query = from item in dataBase.TableContext.Categories
-                            orderby item.Path
-                            select item;
-
-                var itemList = new List<string>(dataBase.TableContext.Count());
-                foreach (var item in query)
-                {
-                    itemList.Add(item.Path);
-                    itemList.AddRange(from table in item.Tables orderby table.Name select table.Name);
-                }
-                return itemList.ToArray();
-            });
+            var dataBase = await this.DataBaseContext.GetDataBaseAsync(this.Drive.DataBaseName);
+            var tableItems = await dataBase.GetTableItemsAsync();
+            var query = from item in tableItems
+                        orderby item.Path
+                        select item is ITable ? item.Name : item.Path;
+            return query.ToArray();
         }
 
         private string GetCurrentDirectory()

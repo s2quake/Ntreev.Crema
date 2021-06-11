@@ -20,6 +20,7 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Extensions;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -76,6 +77,15 @@ namespace JSSoft.Crema.Javascript
         protected virtual void OnInitialized()
         {
 
+        }
+
+        protected Task<IDataBase> GetDataBaseAsync(string dataBaseName)
+        {
+            if (this.CremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
+            {
+                return dataBaseContext.GetDataBaseAsync(dataBaseName);
+            }
+            throw new NotImplementedException();
         }
 
         protected ICremaHost CremaHost { get; }

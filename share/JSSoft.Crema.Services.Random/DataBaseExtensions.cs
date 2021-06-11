@@ -46,15 +46,19 @@ namespace JSSoft.Crema.Services.Random
         private static async Task InitializeRandomItemsTransactionAsync(this IDataBase dataBase, Authentication authentication)
         {
             var trans = await dataBase.BeginTransactionAsync(authentication);
-            await dataBase.TypeContext.AddRandomItemsAsync(authentication);
-            await dataBase.TableContext.AddRandomItemsAsync(authentication);
+            var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
+            var typeContext = dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
+            await typeContext.AddRandomItemsAsync(authentication);
+            await tableContext.AddRandomItemsAsync(authentication);
             await trans.CommitAsync(authentication);
         }
 
         private static async Task InitializeRandomItemsStandardAsync(this IDataBase dataBase, Authentication authentication)
         {
-            await dataBase.TypeContext.AddRandomItemsAsync(authentication);
-            await dataBase.TableContext.AddRandomItemsAsync(authentication);
+            var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
+            var typeContext = dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
+            await typeContext.AddRandomItemsAsync(authentication);
+            await tableContext.AddRandomItemsAsync(authentication);
         }
     }
 }

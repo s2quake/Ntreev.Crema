@@ -44,7 +44,8 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
 
         protected override async Task<IDictionary<string, object>> OnExecuteAsync(string dataBaseName, string typeName)
         {
-            var type = await this.CremaHost.GetTypeAsync(dataBaseName, typeName);
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            var type = await dataBase.GetTypeAsync(typeName);
             return await type.Dispatcher.InvokeAsync(() =>
             {
                 var typeInfo = type.TypeInfo;

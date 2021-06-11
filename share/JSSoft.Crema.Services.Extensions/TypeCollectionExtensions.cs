@@ -19,15 +19,26 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Extensions
 {
     public static class TypeCollectionExtensions
     {
-        public static Task<bool> ContainsAsync(this ITypeCollection types, string typeName)
+        public static Task<bool> ContainsAsync(this ITypeCollection typeCollection, string typeName)
         {
-            return types.Dispatcher.InvokeAsync(() => types.Contains(typeName));
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.Contains(typeName));
+        }
+
+        public static Task<IType> GetTypeAsync(this ITypeCollection typeCollection, string typeName)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection[typeName]);
+        }
+
+        public static Task<IType[]> GetTypesAsync(this ITypeCollection typeCollection)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.ToArray());
         }
     }
 }

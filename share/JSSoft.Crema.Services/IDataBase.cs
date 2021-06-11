@@ -28,6 +28,9 @@ namespace JSSoft.Crema.Services
 {
     public interface IDataBase : IAccessible, IPermission, ILockable, IServiceProvider, IDispatcherObject, IExtendedProperties
     {
+        [DispatcherMethod(typeof(IDataBase))]
+        DataBaseMetaData GetMetaData(Authentication authentication);
+
         Task LoadAsync(Authentication authentication);
 
         Task UnloadAsync(Authentication authentication);
@@ -44,6 +47,7 @@ namespace JSSoft.Crema.Services
 
         Task ImportAsync(Authentication authentication, CremaDataSet dataSet, string comment);
 
+        [DispatcherMethod(typeof(IDataBase))]
         bool Contains(Authentication authentication);
 
         Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision);
@@ -53,10 +57,6 @@ namespace JSSoft.Crema.Services
         Task<ITransaction> BeginTransactionAsync(Authentication authentication);
 
         Task<IDataBase> CopyAsync(Authentication authentication, string newDataBaseName, string comment, bool force);
-
-        ITypeContext TypeContext { get; }
-
-        ITableContext TableContext { get; }
 
         string Name { get; }
 
@@ -72,34 +72,46 @@ namespace JSSoft.Crema.Services
 
         DataBaseState DataBaseState { get; }
 
+        [DispatcherProperty(typeof(IDataBase))]
         AuthenticationInfo[] AuthenticationInfos { get; }
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler Renamed;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler Deleted;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler Loaded;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler Unloaded;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler Resetting;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler Reset;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler<AuthenticationEventArgs> AuthenticationEntered;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler<AuthenticationEventArgs> AuthenticationLeft;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler DataBaseInfoChanged;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler DataBaseStateChanged;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler LockChanged;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler AccessChanged;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event TaskCompletedEventHandler TaskCompleted;
-
-        DataBaseMetaData GetMetaData(Authentication authentication);
     }
 }

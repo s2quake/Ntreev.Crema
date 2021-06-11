@@ -27,7 +27,7 @@ namespace JSSoft.Crema.Services.Random
     {
         public static async Task CreateStandardAsync(this IDataBase dataBase, Authentication authentication)
         {
-            var tableContext = dataBase.TableContext;
+            var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
             await tableContext.Root.AddNewCategoryAsync(authentication, "All");
             await tableContext.Root.AddNewCategoryAsync(authentication, "Client");
             await tableContext.Root.AddNewCategoryAsync(authentication, "Server");

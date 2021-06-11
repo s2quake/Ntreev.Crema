@@ -73,7 +73,7 @@ namespace JSSoft.Crema.Services.Test
         {
             await this.TestContext.ReleaseAsync();
         }
-        
+
         public TestContext TestContext { get; set; }
 
         [TestMethod]
@@ -84,14 +84,14 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void CountTest_Dispatcher_Fail()
+        public void Count_Dispatcher_FailTest()
         {
             var count = userCollection.Count;
             Assert.Fail();
         }
 
         [TestMethod]
-        public void ContainsTest()
+        public void Contains_est()
         {
             var userID = userCollection.Dispatcher.Invoke(() => userCollection.Random().ID);
             var contains = userCollection.Dispatcher.Invoke(() => userCollection.Contains(userID));
@@ -100,14 +100,14 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ContainsTest_Arg0_Null_Test()
+        public void Contains_Arg0_Null_Test()
         {
             userCollection.Contains(null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ContainsTest_Dispatcher_Fail()
+        public void Contains_Dispatcher_FailTest()
         {
             var userID = userCollection.Dispatcher.Invoke(() => userCollection.Random().ID);
             userCollection.Contains(userID);
@@ -115,7 +115,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void IndexerTest()
+        public void Indexer_Test()
         {
             var userID = userCollection.Dispatcher.Invoke(() => userCollection.Random().ID);
             var user = userCollection.Dispatcher.Invoke(() => userCollection[userID]);
@@ -124,7 +124,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void IndexerTest_Dispatcher_Fail()
+        public void Indexer_Dispatcher_FailTest()
         {
             var userID = userCollection.Dispatcher.Invoke(() => userCollection.Random().ID);
             var user = userCollection[userID];
@@ -133,14 +133,29 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void IndexerTest_Arg0_Null_Fail()
+        public void Indexer_Arg0_Null_FailTest()
         {
             var value = userCollection[null];
             Assert.Fail($"{value}");
         }
 
         [TestMethod]
-        public async Task UsersCreatedTestAsync()
+        [ExpectedException(typeof(ArgumentException))]
+        public void Indexer_Arg0_Empty_FailTest()
+        {
+            userCollection.Dispatcher.Invoke(() => userCollection[string.Empty]);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(UserNotFoundException))]
+        public async Task Indexer_Arg0_NonExists_FailTestAsync()
+        {
+            var userID = await userCollection.GenerateNewUserIDAsync();
+            userCollection.Dispatcher.Invoke(() => userCollection[userID]);
+        }
+
+        [TestMethod]
+        public async Task UsersCreated_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var actualUserID = string.Empty;
@@ -173,13 +188,13 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersCreated_Dispatcher_Fail()
+        public void UsersCreated_Dispatcher_FailTest()
         {
             userCollection.UsersCreated += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task UsersMovedTestAsync()
+        public async Task UsersMoved_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryCollection = userCollection.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
@@ -213,13 +228,13 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersMoved_Dispatcher_Fail()
+        public void UsersMoved_Dispatcher_FailTest()
         {
             userCollection.UsersMoved += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task UsersDeletedTestAsync()
+        public async Task UsersDeleted_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync(UserState.None);
@@ -248,13 +263,13 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersDeleted_Dispatcher_Fail()
+        public void UsersDeleted_Dispatcher_FailTest()
         {
             userCollection.UsersDeleted += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task UsersStateChangedTestAsync()
+        public async Task UsersStateChanged_TestAsync()
         {
             var actualState = UserState.None;
             var user = await userCollection.GetRandomUserAsync(item => item.UserState == UserState.None && item.BanInfo.IsBanned == false);
@@ -282,13 +297,13 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersStateChanged_Dispatcher_Fail()
+        public void UsersStateChanged_Dispatcher_FailTest()
         {
             userCollection.UsersStateChanged += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task UsersChangedTestAsync()
+        public async Task UsersChanged_TestAsync()
         {
             var authentication = await cremaHost.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
@@ -316,13 +331,13 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersChanged_Dispatcher_Fail()
+        public void UsersChanged_Dispatcher_FailTest()
         {
             userCollection.UsersChanged += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task UsersLoggedInTestAsync()
+        public async Task UsersLoggedIn_TestAsync()
         {
             var actualUserID = string.Empty;
             await userCollection.Dispatcher.InvokeAsync(() =>
@@ -348,13 +363,13 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersLoggedIn_Dispatcher_Fail()
+        public void UsersLoggedIn_Dispatcher_FailTest()
         {
             userCollection.UsersLoggedIn += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task UsersLoggedOutTestAsync()
+        public async Task UsersLoggedOut_TestAsync()
         {
             var authentication1 = await cremaHost.LoginRandomAsync();
             var authentication2 = await cremaHost.LoginRandomAsync();
@@ -384,13 +399,13 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersLoggedOut_Dispatcher_Fail()
+        public void UsersLoggedOut_Dispatcher_FailTest()
         {
             userCollection.UsersLoggedOut += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task UsersKickedTestAsync()
+        public async Task UsersKicked_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var authentication1 = await cremaHost.LoginRandomAsync();
@@ -426,13 +441,13 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersKicked_Dispatcher_Fail()
+        public void UsersKicked_Dispatcher_FailTest()
         {
             userCollection.UsersKicked += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task UsersBanChangedTestAsync()
+        public async Task UsersBanChanged_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user1 = await userCollection.GetRandomUserAsync(item => item.Authority != Authority.Admin && item.BanInfo.IsBanned == false);
@@ -471,13 +486,13 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void UsersBanChanged_Dispatcher_Fail()
+        public void UsersBanChanged_Dispatcher_FailTest()
         {
             userCollection.UsersBanChanged += (s, e) => { };
         }
 
         [TestMethod]
-        public async Task MessageReceivedTest()
+        public async Task MessageReceived_Test()
         {
             var authentication1 = await cremaHost.LoginRandomAsync();
             var authentication2 = await cremaHost.LoginRandomAsync();
@@ -519,13 +534,13 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void MessageReceived_Dispatcher_Fail()
+        public void MessageReceived_Dispatcher_FailTest()
         {
             userCollection.MessageReceived += (s, e) => { };
         }
 
         [TestMethod]
-        public void GetEnumeratorTest()
+        public void GetEnumerator_Test()
         {
             userCollection.Dispatcher.Invoke(() =>
             {
@@ -539,7 +554,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GetEnumeratorTest_Dispatcher_Fail()
+        public void GetEnumerator_Dispatcher_FailTest()
         {
             var enumerator = (userCollection as IEnumerable).GetEnumerator();
             while (enumerator.MoveNext())
@@ -549,7 +564,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void GetGenericEnumeratorTest()
+        public void GetGenericEnumerator_Test()
         {
             userCollection.Dispatcher.Invoke(() =>
             {
@@ -563,7 +578,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GetGenericEnumeratorTest_Dispatcher_Fail()
+        public void GetGenericEnumerator_Dispatcher_FailTest()
         {
             var enumerator = (userCollection as IEnumerable<IUser>).GetEnumerator();
             while (enumerator.MoveNext())

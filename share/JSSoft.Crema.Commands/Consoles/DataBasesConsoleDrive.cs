@@ -384,23 +384,25 @@ namespace JSSoft.Crema.Commands.Consoles
             if (dataBase.IsLoaded == false)
                 await dataBase.LoadAsync(authentication);
 
+            var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
+            var typeContext = dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
             if (dataBasePath.Context == CremaSchema.TableDirectory)
             {
                 if (NameValidator.VerifyCategoryPath(dataBasePath.ItemPath) == true)
-                    return dataBase.TableContext[dataBasePath.ItemPath];
-                var item = dataBase.TableContext[dataBasePath.ItemPath + PathUtility.Separator];
+                    return tableContext[dataBasePath.ItemPath];
+                var item = tableContext[dataBasePath.ItemPath + PathUtility.Separator];
                 if (item != null)
                     return item;
-                return dataBase.TableContext[dataBasePath.ItemPath];
+                return tableContext[dataBasePath.ItemPath];
             }
             else if (dataBasePath.Context == CremaSchema.TypeDirectory)
             {
                 if (NameValidator.VerifyCategoryPath(dataBasePath.ItemPath) == true)
-                    return dataBase.TypeContext[dataBasePath.ItemPath];
-                var item = dataBase.TypeContext[dataBasePath.ItemPath + PathUtility.Separator];
+                    return typeContext[dataBasePath.ItemPath];
+                var item = typeContext[dataBasePath.ItemPath + PathUtility.Separator];
                 if (item != null)
                     return item;
-                return dataBase.TypeContext[dataBasePath.ItemPath];
+                return typeContext[dataBasePath.ItemPath];
             }
             else
             {

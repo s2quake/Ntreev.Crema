@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CreationTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaHostTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBaseContextTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBaseTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserCollectionTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserCategoryCollectionTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserCategoryTest.cs" />

@@ -70,21 +70,21 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void GetMetaData_Arg0_Null_TestFail()
+        public void GetMetaData_Arg0_Null_FailTest()
         {
             userContext.GetMetaData(null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public void GetMetaData_Expired_TestFail()
+        public void GetMetaData_Expired_FailTest()
         {
             userContext.GetMetaData(expiredAuthentication);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GetMetaData_Dispatcher_TestFail()
+        public void GetMetaData_Dispatcher_FailTest()
         {
             userContext.GetMetaData(authentication);
         }
@@ -97,28 +97,28 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task NotifyMessageAsync_Arg0_Null_TestFailAsync()
+        public async Task NotifyMessageAsync_Arg0_Null_FailTestAsync()
         {
             await userContext.NotifyMessageAsync(null, new string[] { }, RandomUtility.NextString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task NotifyMessageAsync_Arg1_Null_TestFailAsync()
+        public async Task NotifyMessageAsync_Arg1_Null_FailTestAsync()
         {
             await userContext.NotifyMessageAsync(authentication, null, RandomUtility.NextString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task NotifyMessageAsync_Arg2_Null_TestFailAsync()
+        public async Task NotifyMessageAsync_Arg2_Null_FailTestAsync()
         {
             await userContext.NotifyMessageAsync(authentication, new string[] { }, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task NotifyMessageAsync_Expired_TestFailAsync()
+        public async Task NotifyMessageAsync_Expired_FailTestAsync()
         {
             await userContext.NotifyMessageAsync(expiredAuthentication, new string[] { }, RandomUtility.NextString());
         }
@@ -134,7 +134,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Contains_Dispatcher_TestFail()
+        public void Contains_Dispatcher_FailTest()
         {
             var itemPath = userContext.Dispatcher.Invoke(() => userContext.Random().Path);
             userContext.Contains(itemPath);
@@ -142,14 +142,14 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void Contains_Arg0_Null_TestFail()
+        public void Contains_Arg0_Null_FailTest()
         {
             userContext.Contains(null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void Contains_Arg0_Empty_TestFail()
+        public void Contains_Arg0_Empty_FailTest()
         {
             try
             {
@@ -180,7 +180,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void Indexer_Arg0_Null_TestFail()
+        public void Indexer_Arg0_Null_FailTest()
         {
             var value = userContext[null];
             Assert.Fail($"{value}");
@@ -188,15 +188,25 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task Indexer_Arg0_Empty_TestFailAsync()
+        public async Task Indexer_Arg0_Empty_FailTestAsync()
         {
             var value = await userContext.Dispatcher.InvokeAsync(() => userContext[string.Empty]);
             Assert.Fail($"{value}");
         }
 
+
+        [TestMethod]
+        [ExpectedException(typeof(KeyNotFoundException))]
+        public async Task Indexer_Arg0_NonExists_FailTestAsync()
+        {
+            var userCollection = userContext.GetService(typeof(IUserCollection)) as IUserCollection;
+            var userID = await userCollection.GenerateNewUserIDAsync();
+            await userContext.Dispatcher.InvokeAsync(() => userContext[userID]);
+        }
+
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Indexer_Dispatcher_TestFail()
+        public void Indexer_Dispatcher_FailTest()
         {
             var itemPath = userContext.Dispatcher.Invoke(() => userContext.Random().Path);
             var item = userContext[itemPath];
@@ -277,7 +287,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsRenamed_Dispatcher_TestFail()
+        public void ItemsRenamed_Dispatcher_FailTest()
         {
             userContext.ItemsRenamed += (s, e) => { };
         }
@@ -343,7 +353,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsMoved_Dispatcher_TestFail()
+        public void ItemsMoved_Dispatcher_FailTest()
         {
             userContext.ItemsMoved += (s, e) => { };
         }
@@ -396,7 +406,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsDeleted_Dispatcher_TestFail()
+        public void ItemsDeleted_Dispatcher_FailTest()
         {
             userContext.ItemsDeleted += (s, e) => { };
         }
@@ -431,7 +441,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsChanged_Dispatcher_TestFail()
+        public void ItemsChanged_Dispatcher_FailTest()
         {
             userContext.ItemsChanged += (s, e) => { };
         }
@@ -464,7 +474,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void TaskCompleted_Dispatcher_TestFail()
+        public void TaskCompleted_Dispatcher_FailTest()
         {
             userContext.TaskCompleted += (s, e) => { };
         }
@@ -484,7 +494,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GetEnumerator_Dispatcher_TestFail()
+        public void GetEnumerator_Dispatcher_FailTest()
         {
             var enumerator = (userContext as IEnumerable).GetEnumerator();
             while (enumerator.MoveNext())
@@ -508,7 +518,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GetGenericEnumerator_Dispatcher_TestFail()
+        public void GetGenericEnumerator_Dispatcher_FailTest()
         {
             var enumerator = (userContext as IEnumerable<IUserItem>).GetEnumerator();
             while (enumerator.MoveNext())

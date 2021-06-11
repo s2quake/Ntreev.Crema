@@ -41,7 +41,8 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
 
         protected override async Task OnExecuteAsync(string dataBaseName, string tableName)
         {
-            var table = await this.CremaHost.GetTableAsync(dataBaseName, tableName);
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            var table = await dataBase.GetTableAsync(tableName);
             var authentication = this.Context.GetAuthentication(this);
             await table.DeleteAsync(authentication);
         }

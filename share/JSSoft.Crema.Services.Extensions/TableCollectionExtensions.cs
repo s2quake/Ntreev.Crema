@@ -19,15 +19,86 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Extensions
 {
     public static class TableCollectionExtensions
     {
-        public static Task<bool> ContainsAsync(this ITableCollection tables, string tableName)
+        public static Task<bool> ContainsAsync(this ITableCollection tableCollection, string tableName)
         {
-            return tables.Dispatcher.InvokeAsync(() => tables.Contains(tableName));
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.Contains(tableName));
+        }
+
+        public static Task<ITable> GetTableAsync(this ITableCollection tableCollection, string tableName)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection[tableName]);
+        }
+
+        public static Task<ITable[]> GetTablesAsync(this ITableCollection tableCollection)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.ToArray());
+        }
+
+        public static Task AddTablesStateChangedAsync(this ITableCollection tableCollection, ItemsEventHandler<ITable> handler)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.TablesStateChanged += handler);
+        }
+
+        public static Task AddTablesChangedAsync(this ITableCollection tableCollection, ItemsChangedEventHandler<ITable> handler)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.TablesChanged += handler);
+        }
+
+        public static Task AddTablesCreatedAsync(this ITableCollection tableCollection, ItemsCreatedEventHandler<ITable> handler)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.TablesCreated += handler);
+        }
+
+        public static Task AddTablesMovedAsync(this ITableCollection tableCollection, ItemsMovedEventHandler<ITable> handler)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.TablesMoved += handler);
+        }
+
+        public static Task AddTablesRenamedAsync(this ITableCollection tableCollection, ItemsRenamedEventHandler<ITable> handler)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.TablesRenamed += handler);
+        }
+
+        public static Task AddTablesDeletedAsync(this ITableCollection tableCollection, ItemsDeletedEventHandler<ITable> handler)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.TablesDeleted += handler);
+        }
+
+        public static Task RemoveTablesStateChangedAsync(this ITableCollection tableCollection, ItemsEventHandler<ITable> handler)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.TablesStateChanged -= handler);
+        }
+
+        public static Task RemoveTablesChangedAsync(this ITableCollection tableCollection, ItemsChangedEventHandler<ITable> handler)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.TablesChanged -= handler);
+        }
+
+        public static Task RemoveTablesCreatedAsync(this ITableCollection tableCollection, ItemsCreatedEventHandler<ITable> handler)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.TablesCreated -= handler);
+        }
+
+        public static Task RemoveTablesMovedAsync(this ITableCollection tableCollection, ItemsMovedEventHandler<ITable> handler)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.TablesMoved -= handler);
+        }
+
+        public static Task RemoveTablesRenamedAsync(this ITableCollection tableCollection, ItemsRenamedEventHandler<ITable> handler)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.TablesRenamed -= handler);
+        }
+
+        public static Task RemoveTablesDeletedAsync(this ITableCollection tableCollection, ItemsDeletedEventHandler<ITable> handler)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.TablesDeleted -= handler);
         }
     }
 }

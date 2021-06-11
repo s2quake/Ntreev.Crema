@@ -24,6 +24,7 @@ using JSSoft.Crema.Commands.Consoles.Properties;
 using JSSoft.Crema.Data;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Extensions;
 using JSSoft.Crema.Spreadsheet;
 using JSSoft.Library;
 using JSSoft.Library.Commands;
@@ -93,8 +94,9 @@ namespace JSSoft.Crema.Commands.Spreadsheet
             var path = PathUtility.GetFullPath(filename, this.CommandContext.BaseDirectory);
             var sheetNames = SpreadsheetReader.ReadTableNames(path);
             var authentication = this.CommandContext.GetAuthentication(this);
-            var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[this.DataBaseName]);
-            var tableNames = dataBase.Dispatcher.Invoke(() => dataBase.TableContext.Tables.Select(item => item.Name).ToArray());
+            var dataBase = await this.DataBaseContext.GetDataBaseAsync(this.DataBaseName);
+            var tables = await dataBase.GetTablesAsync();
+            var tableNames = tables.Select(item => item.Name).ToArray();
             var query = from sheet in sheetNames
                         join table in tableNames on sheet equals SpreadsheetUtility.Ellipsis(table)
                         where StringUtility.GlobMany(table, FilterProperties.FilterExpression)

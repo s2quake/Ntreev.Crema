@@ -42,8 +42,11 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
 
         protected override async Task<string[]> OnExecuteAsync(string dataBaseName)
         {
-            var dataBase = await this.CremaHost.GetDataBaseAsync(dataBaseName);
-            return await dataBase.Dispatcher.InvokeAsync(() => dataBase.TableContext.Tables.Select(item => item.Name).ToArray());
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            var tables = await dataBase.GetTablesAsync();
+            var query = from item in tables
+                        select item.Name;
+            return query.ToArray();
         }
     }
 }

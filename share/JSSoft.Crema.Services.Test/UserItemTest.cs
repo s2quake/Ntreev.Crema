@@ -79,7 +79,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(NotImplementedException))]
-        public async Task RenameAsync_User_TestFailAsync()
+        public async Task RenameAsync_User_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItem = await userContext.GetRandomUserItemAsync(typeof(IUser));
@@ -98,7 +98,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task RenameAsync_Arg0_Null_TestFailAsync()
+        public async Task RenameAsync_Arg0_Null_FailTestAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync();
             await userItem.RenameAsync(null, RandomUtility.NextName());
@@ -106,7 +106,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task RenameAsync_Arg1_Null_TestFailAsync()
+        public async Task RenameAsync_Arg1_Null_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItem = await userContext.GetRandomUserItemAsync();
@@ -115,7 +115,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task RenameAsync_Expired_TestFailAsync()
+        public async Task RenameAsync_Expired_FailTestAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync();
             var name = RandomUtility.NextName();
@@ -134,7 +134,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task MoveAsync_Arg0_Null_TestFailAsync()
+        public async Task MoveAsync_Arg0_Null_FailTestAsync()
         {
             var rootItem = userContext.Root;
             var userItem = await userContext.GetRandomUserItemAsync();
@@ -143,7 +143,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task MoveAsync_Arg1_Null_TestFailAsync()
+        public async Task MoveAsync_Arg1_Null_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItem = await userContext.GetRandomUserItemAsync();
@@ -152,7 +152,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task MoveAsync_Arg1_Empty_TestFailAsync()
+        public async Task MoveAsync_Arg1_Empty_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var rootItem = userContext.Root;
@@ -162,7 +162,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(CategoryNotFoundException))]
-        public async Task MoveAsync_CategoryNotFound_TestFailAsync()
+        public async Task MoveAsync_CategoryNotFound_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var rootItem = userContext.Root;
@@ -175,7 +175,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task MoveAsync_SameParent_TestFailAsync()
+        public async Task MoveAsync_SameParent_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItem = await userContext.GetRandomUserItemAsync();
@@ -185,7 +185,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task MoveAsync_Expired_TestFailAsync()
+        public async Task MoveAsync_Expired_FailTestAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync();
             var rootItem = userContext.Root;
@@ -194,7 +194,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task MoveAsync_PermissionDenied_TestFailAsync()
+        public async Task MoveAsync_PermissionDenied_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var userItem = await userContext.GetRandomUserItemAsync(item => item != userContext.Root);
@@ -221,7 +221,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task DeleteAsync_Arg0_Null_TestFailAsync()
+        public async Task DeleteAsync_Arg0_Null_FailTestAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync();
             await userItem.DeleteAsync(null);
@@ -229,7 +229,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task DeleteAsync_Expired_TestFailAsync()
+        public async Task DeleteAsync_Expired_FailTestAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync();
             await userItem.DeleteAsync(expiredAuthentication);
@@ -237,7 +237,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task DeleteAsync_PermissionDenied_TestFailAsync()
+        public async Task DeleteAsync_PermissionDenied_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var userItem = await userContext.GetRandomUserItemAsync(typeof(IUser));
@@ -246,7 +246,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsync_HasChild_TestFailAsync()
+        public async Task DeleteAsync_HasChild_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItem = await userContext.GetRandomUserItemAsync(typeof(IUserCategory), item => item.Childs.Any() == true);
@@ -255,7 +255,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsync_Self_TestFailAsync()
+        public async Task DeleteAsync_Self_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userContext.GetUserAsync(authentication.ID);
@@ -265,7 +265,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsync_Admin_TestFailAsync()
+        public async Task DeleteAsync_Admin_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userContext.GetUserAsync(Authentication.AdminID);
@@ -275,7 +275,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsync_Online_TestFailAsync()
+        public async Task DeleteAsync_Online_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userContext.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID && item.ID != Authentication.AdminID);
@@ -309,7 +309,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task Child_Dispatcher_TestFailAsync()
+        public async Task Child_Dispatcher_FailTestAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync();
             Assert.Fail($"{userItem.Childs.Any()}");
@@ -317,7 +317,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(NotImplementedException))]
-        public async Task Renamed_User_TestFailAsync()
+        public async Task Renamed_User_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItem = await userContext.GetRandomUserItemAsync(typeof(IUser));
@@ -366,7 +366,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task Renamed_TestFailAsync()
+        public async Task Renamed_FailTestAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync();
             userItem.Renamed += (s, e) => { };
@@ -436,7 +436,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task Moved_TestFailAsync()
+        public async Task Moved_FailTestAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync();
             userItem.Moved += (s, e) => { };
@@ -492,7 +492,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task Deleted_TestFailAsync()
+        public async Task Deleted_FailTestAsync()
         {
             var userItem = await userContext.GetRandomUserItemAsync();
             userItem.Deleted += (s, e) => { };

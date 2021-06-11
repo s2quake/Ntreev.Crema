@@ -976,8 +976,8 @@ namespace JSSoft.Crema.ServiceHosts.Data
             });
         }
 
-        private ITableContext TableContext => this.dataBase.TableContext;
+        private ITableContext TableContext => this.dataBase.GetService(typeof(ITableContext)) as ITableContext;
 
-        private ITypeContext TypeContext => this.dataBase.TypeContext;
+        private ITypeContext TypeContext => this.dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
     }
 }

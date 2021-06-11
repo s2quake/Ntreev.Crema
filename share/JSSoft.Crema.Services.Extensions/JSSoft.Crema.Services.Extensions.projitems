@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DomainCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DomainUserCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableContentExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TableContextExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableCategoryCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableCategoryExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableCollectionExtensions.cs" />
@@ -25,6 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TypeCategoryCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeCategoryExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeContextExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserCategoryCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserCategoryExtensions.cs" />

@@ -233,14 +233,14 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task Contains_Arg0_Null_TestFailAsync()
+        public async Task Contains_Arg0_Null_FailTestAsync()
         {
             await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.Contains(null));
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task Contains_Dispatcher_TestFailAsync()
+        public async Task Contains_Dispatcher_FailTestAsync()
         {
             var dataBase = await dataBaseContext.GetRandomDataBaseAsync();
             var dataBaseName = dataBase.Name;
@@ -258,21 +258,21 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task IndexerByDataBaseName_Arg0_Null_TestFailAsync()
+        public async Task IndexerByDataBaseName_Arg0_Null_FailTestAsync()
         {
             await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext[null]);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(KeyNotFoundException))]
-        public async Task IndexerByDataBaseName_Arg0_Empty_TestFailAsync()
+        [ExpectedException(typeof(DataBaseNotFoundException))]
+        public async Task IndexerByDataBaseName_Arg0_Empty_FailTestAsync()
         {
             await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext[string.Empty]);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task IndexerByDataBaseName_Dispatcher_TestFailAsync()
+        public async Task IndexerByDataBaseName_Dispatcher_FailTestAsync()
         {
             var dataBase = await dataBaseContext.GetRandomDataBaseAsync();
             var dataBaseName = dataBase.Name;
@@ -334,7 +334,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsCreated_Dispatcher_TestFail()
+        public void ItemsCreated_Dispatcher_FailTest()
         {
             dataBaseContext.ItemsCreated += (s, e) => { };
         }
@@ -364,7 +364,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsRenamed_Dispatcher_TestFail()
+        public void ItemsRenamed_Dispatcher_FailTest()
         {
             dataBaseContext.ItemsRenamed += (s, e) => { };
         }
@@ -401,7 +401,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsDeleted_Dispatcher_TestFail()
+        public void ItemsDeleted_Dispatcher_FailTest()
         {
             dataBaseContext.ItemsDeleted += (s, e) => { };
         }
@@ -431,7 +431,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsLoaded_Dispatcher_TestFail()
+        public void ItemsLoaded_Dispatcher_FailTest()
         {
             dataBaseContext.ItemsLoaded += (s, e) => { };
         }
@@ -462,7 +462,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsUnloaded_Dispatcher_TestFail()
+        public void ItemsUnloaded_Dispatcher_FailTest()
         {
             dataBaseContext.ItemsUnloaded += (s, e) => { };
         }
@@ -493,7 +493,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsResetting_Dispatcher_TestFail()
+        public void ItemsResetting_Dispatcher_FailTest()
         {
             dataBaseContext.ItemsResetting += (s, e) => { };
         }
@@ -524,7 +524,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsReset_Dispatcher_TestFail()
+        public void ItemsReset_Dispatcher_FailTest()
         {
             dataBaseContext.ItemsReset += (s, e) => { };
         }
@@ -560,7 +560,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsAuthenticationEntered_Dispatcher_TestFail()
+        public void ItemsAuthenticationEntered_Dispatcher_FailTest()
         {
             dataBaseContext.ItemsAuthenticationEntered += (s, e) => { };
         }
@@ -596,7 +596,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsAuthenticationLeft_Dispatcher_TestFail()
+        public void ItemsAuthenticationLeft_Dispatcher_FailTest()
         {
             dataBaseContext.ItemsAuthenticationLeft += (s, e) => { };
         }
@@ -631,7 +631,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsInfoChanged_Dispatcher_TestFail()
+        public void ItemsInfoChanged_Dispatcher_FailTest()
         {
             dataBaseContext.ItemsInfoChanged += (s, e) => { };
         }
@@ -661,7 +661,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsStateChanged_Dispatcher_TestFail()
+        public void ItemsStateChanged_Dispatcher_FailTest()
         {
             dataBaseContext.ItemsStateChanged += (s, e) => { };
         }
@@ -690,7 +690,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsAccessChanged_Dispatcher_TestFail()
+        public void ItemsAccessChanged_Dispatcher_FailTest()
         {
             dataBaseContext.ItemsAccessChanged += (s, e) => { };
         }
@@ -724,7 +724,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ItemsLockChanged_Dispatcher_TestFail()
+        public void ItemsLockChanged_Dispatcher_FailTest()
         {
             dataBaseContext.ItemsLockChanged += (s, e) => { };
         }
@@ -754,7 +754,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void TaskCompleted_Dispatcher_TestFail()
+        public void TaskCompleted_Dispatcher_FailTest()
         {
             dataBaseContext.TaskCompleted += (s, e) => { };
         }
@@ -775,7 +775,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GetEnumerator_Dispatcher_TestFail()
+        public void GetEnumerator_Dispatcher_FailTest()
         {
             var enumerator = (dataBaseContext as IEnumerable).GetEnumerator();
             while (enumerator.MoveNext())
@@ -799,7 +799,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GetGenericEnumerator_Dispatcher_TestFail()
+        public void GetGenericEnumerator_Dispatcher_FailTest()
         {
             var enumerator = (dataBaseContext as IEnumerable<IDataBase>).GetEnumerator();
             while (enumerator.MoveNext())
@@ -817,7 +817,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Count_Dispatcher_TestFail()
+        public void Count_Dispatcher_FailTest()
         {
             Assert.Fail($"{dataBaseContext.Count}");
         }

@@ -45,7 +45,8 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
 
         protected override async Task<IDictionary<string, object>> OnExecuteAsync(string dataBaseName, string tableName, string tags)
         {
-            var table = await this.CremaHost.GetTableAsync(dataBaseName, tableName);
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            var table = await dataBase.GetTableAsync(tableName);
             return await table.Dispatcher.InvokeAsync(() =>
             {
                 var tableInfo = table.TableInfo.Filter((TagInfo)tags);

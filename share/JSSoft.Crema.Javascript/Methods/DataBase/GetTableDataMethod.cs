@@ -45,7 +45,8 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
 
         protected override async Task<IDictionary<int, object>> OnExecuteAsync(string dataBaseName, string tableName, string revision)
         {
-            var table = await this.CremaHost.GetTableAsync(dataBaseName, tableName);
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            var table = await dataBase.GetTableAsync(tableName);
             var revisionValue = revision;
             var authentication = this.Context.GetAuthentication(this);
             var dataSet = await table.GetDataSetAsync(authentication, revisionValue);

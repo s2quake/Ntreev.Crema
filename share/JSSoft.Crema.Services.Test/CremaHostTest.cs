@@ -93,7 +93,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task OpenAsync_OpenTwice_TestFailAsync()
+        public async Task OpenAsync_OpenTwice_FailTestAsync()
         {
             token = await cremaHost.OpenAsync();
             await cremaHost.OpenAsync();
@@ -120,7 +120,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task LoginAsync_Arg0_Null_TestFailAsync()
+        public async Task LoginAsync_Arg0_Null_FailTestAsync()
         {
             var password = Authentication.AdminID.ToSecureString();
             token = await cremaHost.OpenAsync();
@@ -129,7 +129,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task LoginAsync_Arg1_Null_TestFailAsync()
+        public async Task LoginAsync_Arg1_Null_FailTestAsync()
         {
             var userID = Authentication.AdminID;
             token = await cremaHost.OpenAsync();
@@ -138,7 +138,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(CremaException))]
-        public async Task LoginAsync_LoginTwice_TestFailAsync()
+        public async Task LoginAsync_LoginTwice_FailTestAsync()
         {
             var userID = Authentication.AdminID;
             var password = Authentication.AdminID.ToSecureString();
@@ -149,7 +149,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task LoginAsync_Not_Open_Login_TestFailAsync()
+        public async Task LoginAsync_Not_Open_Login_FailTestAsync()
         {
             var userID = Authentication.AdminID;
             var password = Authentication.AdminID.ToSecureString();
@@ -158,7 +158,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task LoginAsync_BannedUser_TestFailAsync()
+        public async Task LoginAsync_BannedUser_FailTestAsync()
         {
             token = await cremaHost.OpenAsync();
             var userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
@@ -192,7 +192,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task LogoutAsync_Arg0_Null_TestFailAsync()
+        public async Task LogoutAsync_Arg0_Null_FailTestAsync()
         {
             var userID = Authentication.AdminID;
             var password = Authentication.AdminID.ToSecureString();
@@ -204,7 +204,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task LogoutAsync_Expired_TestFailAsync()
+        public async Task LogoutAsync_Expired_FailTestAsync()
         {
             var userID = Authentication.AdminID;
             var password = Authentication.AdminID.ToSecureString();
@@ -219,7 +219,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task LogoutAsync_Closed_Expired_TestFailAsync()
+        public async Task LogoutAsync_Closed_Expired_FailTestAsync()
         {
             var userID = Authentication.AdminID;
             var password = Authentication.AdminID.ToSecureString();
@@ -294,7 +294,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task CloseAsync_InvalidToken_TestFailAsync()
+        public async Task CloseAsync_InvalidToken_FailTestAsync()
         {
             token = await cremaHost.OpenAsync();
             await cremaHost.CloseAsync(Guid.Empty);
@@ -302,7 +302,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task CloseAsync_NotOpen_TestFailAsync()
+        public async Task CloseAsync_NotOpen_FailTestAsync()
         {
             await cremaHost.CloseAsync(Guid.Empty);
         }
@@ -372,7 +372,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ShutdownAsync_Arg0_Null_TestFailAsync()
+        public async Task ShutdownAsync_Arg0_Null_FailTestAsync()
         {
             var shutdownContext = new ShutdownContext() { IsRestart = true };
             token = await cremaHost.OpenAsync();
@@ -382,7 +382,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ShutdownAsync_Arg1_Null_TestFailAsync()
+        public async Task ShutdownAsync_Arg1_Null_FailTestAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
@@ -391,7 +391,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task ShutdownAsync_Member_PermissionDenied_TestFailAsync()
+        public async Task ShutdownAsync_Member_PermissionDenied_FailTestAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication = await cremaHost.LoginRandomAsync(Authority.Member);
@@ -400,7 +400,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task ShutdownAsync_Guest_PermissionDenied_TestFailAsync()
+        public async Task ShutdownAsync_Guest_PermissionDenied_FailTestAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication = await cremaHost.LoginRandomAsync(Authority.Guest);
@@ -409,7 +409,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public async Task ShutdownAsync_Invalid_Milliseconds_TestFailAsync()
+        public async Task ShutdownAsync_Invalid_Milliseconds_FailTestAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication1 = await cremaHost.LoginRandomAsync(Authority.Admin);
@@ -422,7 +422,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task ShutdownAsync_ShutdownContext_Message_Null_TestFailAsync()
+        public async Task ShutdownAsync_ShutdownContext_Message_Null_FailTestAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication1 = await cremaHost.LoginRandomAsync(Authority.Admin);
@@ -450,7 +450,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task CancelShutdownAsync_Not_Shutdown_TestFailAsync()
+        public async Task CancelShutdownAsync_Not_Shutdown_FailTestAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
@@ -459,7 +459,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task CancelShutdownAsync_Member_PermissionDenied_TestFailAsync()
+        public async Task CancelShutdownAsync_Member_PermissionDenied_FailTestAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication1 = await cremaHost.LoginRandomAsync(Authority.Member);
@@ -468,7 +468,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task CancelShutdownAsync_Guest_PermissionDenied_TestFailAsync()
+        public async Task CancelShutdownAsync_Guest_PermissionDenied_FailTestAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication1 = await cremaHost.LoginRandomAsync(Authority.Guest);
@@ -477,7 +477,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task CancelShutdownAsync_Not_Open_TestFailAsync()
+        public async Task CancelShutdownAsync_Not_Open_FailTestAsync()
         {
             token = await cremaHost.OpenAsync();
             var authentication = await cremaHost.LoginRandomAsync(Authority.Member);
@@ -488,7 +488,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task CancelShutdownAsync_Arg0_Null_TestFailAsync()
+        public async Task CancelShutdownAsync_Arg0_Null_FailTestAsync()
         {
             token = await cremaHost.OpenAsync();
             await cremaHost.CancelShutdownAsync(null);

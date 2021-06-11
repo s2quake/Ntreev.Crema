@@ -34,12 +34,12 @@ namespace JSSoft.Crema.Javascript.Methods.ListenerHosts.DataBases
         {
         }
 
-        protected override void OnSubscribe(IDataBase dataBase)
+        protected override async Task OnSubscribeAsync(IDataBase dataBase)
         {
             dataBase.Dispatcher.Invoke(() => dataBase.TableContext.ItemsMoved += TableContext_ItemsMoved);
         }
 
-        protected override void OnUnsubscribe(IDataBase dataBase)
+        protected override async Task OnUnsubscribeAsync(IDataBase dataBase)
         {
             dataBase.Dispatcher.Invoke(() => dataBase.TableContext.ItemsMoved -= TableContext_ItemsMoved);
         }

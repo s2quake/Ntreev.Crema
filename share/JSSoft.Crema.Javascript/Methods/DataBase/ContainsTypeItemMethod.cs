@@ -39,9 +39,10 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Task<bool> OnExecuteAsync(string dataBaseName, string typeItemPath)
+        protected override async Task<bool> OnExecuteAsync(string dataBaseName, string typeItemPath)
         {
-            return this.CremaHost.ContainsTypeItemAsync(dataBaseName, typeItemPath);
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            return await dataBase.ContainsTypeItemAsync(typeItemPath);
         }
     }
 }

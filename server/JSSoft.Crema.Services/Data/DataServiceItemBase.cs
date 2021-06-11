@@ -250,19 +250,21 @@ namespace JSSoft.Crema.Services.Data
         {
             if (sender is DataBase dataBase)
             {
+                var typeContext = dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
+                var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
                 await dataBase.Dispatcher.InvokeAsync(() =>
                 {
-                    this.DataBase.TypeContext.ItemsCreated += TypeContext_ItemCreated;
-                    this.DataBase.TypeContext.ItemsRenamed += TypeContext_ItemRenamed;
-                    this.DataBase.TypeContext.ItemsMoved += TypeContext_ItemMoved;
-                    this.DataBase.TypeContext.ItemsDeleted += TypeContext_ItemDeleted;
-                    this.DataBase.TypeContext.ItemsChanged += TypeContext_ItemsChanged;
+                    typeContext.ItemsCreated += TypeContext_ItemCreated;
+                    typeContext.ItemsRenamed += TypeContext_ItemRenamed;
+                    typeContext.ItemsMoved += TypeContext_ItemMoved;
+                    typeContext.ItemsDeleted += TypeContext_ItemDeleted;
+                    typeContext.ItemsChanged += TypeContext_ItemsChanged;
 
-                    this.DataBase.TableContext.ItemsCreated += TableContext_ItemCreated;
-                    this.DataBase.TableContext.ItemsRenamed += TableContext_ItemRenamed;
-                    this.DataBase.TableContext.ItemsMoved += TableContext_ItemMoved;
-                    this.DataBase.TableContext.ItemsDeleted += TableContext_ItemDeleted;
-                    this.DataBase.TableContext.ItemsChanged += TableContext_ItemsChanged;
+                    tableContext.ItemsCreated += TableContext_ItemCreated;
+                    tableContext.ItemsRenamed += TableContext_ItemRenamed;
+                    tableContext.ItemsMoved += TableContext_ItemMoved;
+                    tableContext.ItemsDeleted += TableContext_ItemDeleted;
+                    tableContext.ItemsChanged += TableContext_ItemsChanged;
                     this.DataBaseID = this.DataBase.ID;
                 });
                 this.NoCache = dataBase.CremaHost.NoCache;

@@ -42,7 +42,8 @@ namespace JSSoft.Crema.Javascript.Methods.TypeTemplate
         [ReturnParameterName("domainID")]
         protected override async Task<string> OnExecuteAsync(string dataBaseName, string typeName)
         {
-            var type = await this.CremaHost.GetTypeAsync(dataBaseName, typeName);
+            var dataBase = await this.GetDataBaseAsync(dataBaseName);
+            var type = await dataBase.GetTypeAsync(typeName);
             return await type.Dispatcher.InvokeAsync(() =>
             {
                 if (type.Template.Domain != null)

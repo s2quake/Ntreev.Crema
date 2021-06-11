@@ -29,6 +29,7 @@ using JSSoft.Crema.ServiceModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JSSoft.Crema.Services.Extensions;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -72,7 +73,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void ContainsTest()
+        public void Contains_Test()
         {
             var categoryPath = userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection.Random().Path);
             var contains = userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection.Contains(categoryPath));
@@ -96,7 +97,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void IndexerTest()
+        public void Indexer_Test()
         {
             var categoryPath = userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection.Random().Path);
             var category = userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection[categoryPath]);
@@ -105,10 +106,27 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void IndexerTest_Arg0_Null_Fail()
+        public void Indexer_Arg0_Null_FailTest()
         {
             var value = userCategoryCollection[null];
             Assert.Fail($"{value}");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Indexer_Arg0_Empty_FailTest()
+        {
+            userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection[string.Empty]);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(CategoryNotFoundException))]
+        public async Task Indexer_Arg0_NonExists_FailTestAsync()
+        {
+            var category = await userCategoryCollection.GetRandomUserCategoryAsync();
+            var name = await category.GenerateNewCategoryNameAsync();
+            var categoryName = new CategoryName(category.Path, name);
+            await userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection[categoryName]);
         }
 
         [TestMethod]

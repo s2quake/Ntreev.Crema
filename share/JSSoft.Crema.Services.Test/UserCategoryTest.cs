@@ -95,7 +95,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task RenameAsync_Arg0_Null_TestFailAsync()
+        public async Task RenameAsync_Arg0_Null_FailTestAsync()
         {
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
             var name = RandomUtility.NextName();
@@ -104,7 +104,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task RenameAsync_Arg1_Null_TestFailAsync()
+        public async Task RenameAsync_Arg1_Null_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
@@ -113,7 +113,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task RenameAsync_Arg1_Empty_TestFailAsync()
+        public async Task RenameAsync_Arg1_Empty_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
@@ -122,7 +122,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task RenameAsync_Arg1_InvalidName_TestFailAsync()
+        public async Task RenameAsync_Arg1_InvalidName_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
@@ -132,7 +132,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task RenameAsync_Root_TestFailAsync()
+        public async Task RenameAsync_Root_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent == null);
@@ -142,7 +142,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task RenameAsync_Member_PermissionDenied_TestFailAsync()
+        public async Task RenameAsync_Member_PermissionDenied_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
@@ -152,7 +152,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task RenameAsync_Guest_PermissionDenied_TestFailAsync()
+        public async Task RenameAsync_Guest_PermissionDenied_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
@@ -162,7 +162,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task RenameAsync_Expired_TestFailAsync()
+        public async Task RenameAsync_Expired_FailTestAsync()
         {
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
             var name = RandomUtility.NextName();
@@ -181,7 +181,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task MoveAsync_Arg0_Null_TestFailAsync()
+        public async Task MoveAsync_Arg0_Null_FailTestAsync()
         {
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
             var parentCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => userCategory.CanMove(item.Path) == true);
@@ -190,7 +190,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task MoveAsync_Arg1_Null_TestFailAsync()
+        public async Task MoveAsync_Arg1_Null_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
@@ -208,7 +208,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task MoveAsync_Root_TestFailAsync()
+        public async Task MoveAsync_Root_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent == null);
@@ -218,7 +218,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task MoveAsync_SameParent_TestFailAsync()
+        public async Task MoveAsync_SameParent_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
@@ -228,7 +228,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task MoveAsync_Member_PermissionDenied_TestFailAsync()
+        public async Task MoveAsync_Member_PermissionDenied_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
@@ -238,7 +238,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task MoveAsync_Guest_PermissionDenied_TestFailAsync()
+        public async Task MoveAsync_Guest_PermissionDenied_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
@@ -248,7 +248,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task MoveAsync_ToChild_TestFailAsync()
+        public async Task MoveAsync_ToChild_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null && item.Categories.Any() == true);
@@ -266,7 +266,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task DeleteAsync_Arg0_Null_TestFailAsync()
+        public async Task DeleteAsync_Arg0_Null_FailTestAsync()
         {
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null && item.Categories.Any() == false);
             await userCategory.DeleteAsync(null);
@@ -274,7 +274,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task DeleteAsync_Expired_TestFailAsync()
+        public async Task DeleteAsync_Expired_FailTestAsync()
         {
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null && item.Categories.Any() == false);
             await userCategory.DeleteAsync(expiredAuthentication);
@@ -282,7 +282,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsync_HasChild_TestFailAsync()
+        public async Task DeleteAsync_HasChild_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null && item.Categories.Any() == true);
@@ -291,7 +291,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task DeleteAsync_Member_PermissionDenied_TestFailAsync()
+        public async Task DeleteAsync_Member_PermissionDenied_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null && item.Categories.Any() == false);
@@ -300,7 +300,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task DeleteAsync_Guest_PermissionDenied_TestFailAsync()
+        public async Task DeleteAsync_Guest_PermissionDenied_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null && item.Categories.Any() == false);
@@ -309,7 +309,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsync_Root_TestFailAsync()
+        public async Task DeleteAsync_Root_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent == null);
