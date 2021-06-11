@@ -37,6 +37,11 @@ namespace JSSoft.Crema.Services.Extensions
             return userCollection.Dispatcher.InvokeAsync(() => userCollection[userID]);
         }
 
+        public static Task<string> GenerateNewUserIDAsync(this IUserCollection userCollection)
+        {
+            return GenerateNewUserIDAsync(userCollection, "user");
+        }
+
         public static Task<string> GenerateNewUserIDAsync(this IUserCollection userCollection, string userID)
         {
             return userCollection.Dispatcher.InvokeAsync(() => NameUtility.GenerateNewName(userID, userCollection.Select(item => item.ID)));

@@ -174,6 +174,9 @@ namespace JSSoft.Crema.ServiceModel
         [IgnoreDataMember]
         public bool IsPrivate => this.UserID != string.Empty;
 
+        [IgnoreDataMember]
+        public bool IsPublic => this.UserID == string.Empty;
+
         private object[] GetMembersInfo()
         {
             var items = new object[this.Members.Length];

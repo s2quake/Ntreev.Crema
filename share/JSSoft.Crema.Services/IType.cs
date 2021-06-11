@@ -58,18 +58,25 @@ namespace JSSoft.Crema.Services
 
         ITypeTemplate Template { get; }
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler Renamed;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler Moved;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler Deleted;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler LockChanged;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler AccessChanged;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler TypeInfoChanged;
 
+        [DispatcherEvent(typeof(IDataBase))]
         event EventHandler TypeStateChanged;
     }
 }

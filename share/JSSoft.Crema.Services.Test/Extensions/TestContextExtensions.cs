@@ -94,5 +94,17 @@ namespace JSSoft.Crema.Services.Test.Extensions
                 await cremaHost.LoginRandomManyAsync(count);
             }
         }
+
+        public static async Task LoadRandomDataBaseManyAsync(this TestContext context, IDataBaseContext dataBaseContext, Authentication authentication)
+        {
+            var count = await dataBaseContext.GetCountAsync();
+            var total = count / 2;
+
+            for (var i = 0; i < total; i++)
+            {
+                var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.None);
+                await dataBase.LoadAsync(authentication);
+            }
+        }
     }
 }

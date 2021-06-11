@@ -226,8 +226,11 @@ namespace JSSoft.Crema.Services.Data
 
         public DataBaseContextMetaData GetMetaData(Authentication authentication)
         {
-            if (authentication == null)
+            if (authentication is null)
                 throw new ArgumentNullException(nameof(authentication));
+            if (authentication.IsExpired == true)
+                throw new AuthenticationExpiredException(nameof(authentication));
+            this.Dispatcher.VerifyAccess();
 
             var dataBases = this.ToArray<DataBase>();
             var metaList = new List<DataBaseMetaData>(this.Count);
@@ -246,6 +249,8 @@ namespace JSSoft.Crema.Services.Data
         {
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
+            if (authentication.IsExpired == true)
+                throw new AuthenticationExpiredException(nameof(authentication));
 
             var dataBases = await this.Dispatcher.InvokeAsync(() => (from DataBase item in this select item).ToArray());
             var metaList = new List<DataBaseMetaData>(this.Count);

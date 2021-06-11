@@ -128,5 +128,8 @@ namespace JSSoft.Crema.ServiceModel
 
         [IgnoreDataMember]
         public bool IsLocked => this.UserID != string.Empty;
+
+        [IgnoreDataMember]
+        public bool IsNotLocked => this.UserID == string.Empty;
     }
 }

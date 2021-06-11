@@ -408,7 +408,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
-            var userID = await userCollection.GenerateNewUserIDAsync("user");
+            var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
             var userName = RandomUtility.NextName();
@@ -426,7 +426,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
-            var userID = await userCollection.GenerateNewUserIDAsync("user");
+            var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
             var userName = RandomUtility.NextName();
@@ -463,7 +463,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
-            var userID = await userCollection.GenerateNewUserIDAsync("user");
+            var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var userName = RandomUtility.NextName();
             await userCategory.AddNewUserAsync(authentication, userID, null, userName, authority);
@@ -475,7 +475,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
-            var userID = await userCollection.GenerateNewUserIDAsync("user");
+            var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
             await userCategory.AddNewUserAsync(authentication, userID, password, null, authority);
@@ -487,7 +487,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
-            var userID = await userCollection.GenerateNewUserIDAsync("user");
+            var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
             await userCategory.AddNewUserAsync(authentication, userID, password, string.Empty, authority);
@@ -499,7 +499,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
-            var userID = await userCollection.GenerateNewUserIDAsync("user");
+            var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
             var userName = RandomUtility.NextName();
@@ -511,7 +511,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task AddNewUserAsync_Expired_TestAsync()
         {
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
-            var userID = await userCollection.GenerateNewUserIDAsync("user");
+            var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
             var userName = RandomUtility.NextName();
@@ -524,7 +524,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
-            var userID = await userCollection.GenerateNewUserIDAsync("user");
+            var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
             var userName = RandomUtility.NextName();
@@ -537,7 +537,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null);
-            var userID = await userCollection.GenerateNewUserIDAsync("user");
+            var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
             var userName = RandomUtility.NextName();
