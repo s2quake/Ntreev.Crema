@@ -264,10 +264,18 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(DataBaseNotFoundException))]
+        [ExpectedException(typeof(ArgumentException))]
         public async Task IndexerByDataBaseName_Arg0_Empty_FailTestAsync()
         {
             await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext[string.Empty]);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(DataBaseNotFoundException))]
+        public async Task IndexerByDataBaseName_Arg0_Nonexistent_FailTestAsync()
+        {
+            var dataBaseName = await dataBaseContext.GenerateNewDataBaseNameAsync();
+            await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext[dataBaseName]);
         }
 
         [TestMethod]
@@ -290,10 +298,17 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(KeyNotFoundException))]
+        [ExpectedException(typeof(ArgumentException))]
         public async Task IndexerByDataBaseID_Arg0_Empty_TestAsync()
         {
             await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext[Guid.Empty]);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(DataBaseNotFoundException))]
+        public async Task IndexerByDataBaseID_Arg0_Nonexistent_TestAsync()
+        {
+            await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext[Guid.NewGuid()]);
         }
 
         [TestMethod]

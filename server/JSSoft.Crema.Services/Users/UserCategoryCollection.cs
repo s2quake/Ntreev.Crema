@@ -20,6 +20,7 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Properties;
 using JSSoft.Library;
 using JSSoft.Library.ObjectModel;
 using System;
@@ -337,7 +338,11 @@ namespace JSSoft.Crema.Services.Users
                     throw new ArgumentNullException(nameof(categoryPath));
 
                 this.Dispatcher.VerifyAccess();
-                return this[categoryPath];
+                if (categoryPath == string.Empty)
+                    throw new ArgumentException(Resources.Exception_EmptyStringIsNotAllowed);
+                if (this.Contains(categoryPath) == false)
+                    throw new CategoryNotFoundException(categoryPath);
+                return base[categoryPath];
             }
         }
 

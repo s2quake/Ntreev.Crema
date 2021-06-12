@@ -851,6 +851,10 @@ namespace JSSoft.Crema.Services.Data
                     throw new ArgumentNullException(nameof(dataBaseName));
 
                 this.Dispatcher.VerifyAccess();
+                if (dataBaseName == string.Empty)
+                    throw new ArgumentException(Resources.Exception_EmptyStringIsNotAllowed);
+                if (this.ContainsKey(dataBaseName) == false)
+                    throw new DataBaseNotFoundException(dataBaseName);
                 return this[dataBaseName];
             }
         }
@@ -860,6 +864,10 @@ namespace JSSoft.Crema.Services.Data
             get
             {
                 this.Dispatcher.VerifyAccess();
+                if (dataBaseID == Guid.Empty)
+                    throw new ArgumentException("empty id is not allowed.");
+                if (this.dataBaseByID.ContainsKey(dataBaseID) == false)
+                    throw new DataBaseNotFoundException($"{dataBaseID}");
                 return this[dataBaseID];
             }
         }

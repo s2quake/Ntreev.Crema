@@ -49,9 +49,9 @@ namespace JSSoft.Crema.Services.Data
         {
             this.DataBase = dataBase;
             this.DataBaseName = dataBase.Name;
-            this.DataBase.Loaded += DataBase_Loaded;
-            this.DataBase.Renamed += DataBase_Renamed;
-            this.DataBase.Unloaded += DataBase_Unloaded;
+            // this.DataBase.Loaded += DataBase_Loaded;
+            // this.DataBase.Renamed += DataBase_Renamed;
+            // this.DataBase.Unloaded += DataBase_Unloaded;
             this.logService = dataBase.GetService(typeof(ILogService)) as ILogService;
             this.Serializer = dataBase.GetService(typeof(IObjectSerializer)) as IObjectSerializer;
 

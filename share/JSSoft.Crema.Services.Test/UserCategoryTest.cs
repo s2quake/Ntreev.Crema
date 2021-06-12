@@ -260,7 +260,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null && item.Categories.Any() == false);
+            var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null && item.Categories.Any() == false && item.Users.Any() == false);
             await userCategory.DeleteAsync(authentication);
         }
 
@@ -282,10 +282,19 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task DeleteAsync_HasChild_FailTestAsync()
+        public async Task DeleteAsync_HasCategories_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null && item.Categories.Any() == true);
+            await userCategory.DeleteAsync(authentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task DeleteAsync_HasUsers_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Parent != null && item.Users.Any() == true);
             await userCategory.DeleteAsync(authentication);
         }
 

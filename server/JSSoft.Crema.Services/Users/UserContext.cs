@@ -323,7 +323,7 @@ namespace JSSoft.Crema.Services.Users
             {
                 Version = CremaSchema.VersionValue,
                 Categories = new string[] { },
-                Users = new UserSerializationInfo[] { administrator},
+                Users = new UserSerializationInfo[] { administrator },
             };
             return serializationInfo;
         }
@@ -623,6 +623,8 @@ namespace JSSoft.Crema.Services.Users
                     throw new ArgumentNullException(nameof(itemPath));
 
                 this.Dispatcher.VerifyAccess();
+                if (this.Contains(itemPath) == false)
+                    throw new ItemNotFoundException(itemPath);
                 return this[itemPath] as IUserItem;
             }
         }

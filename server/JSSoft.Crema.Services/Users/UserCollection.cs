@@ -668,7 +668,11 @@ namespace JSSoft.Crema.Services.Users
                     throw new ArgumentNullException(nameof(userID));
 
                 this.Dispatcher.VerifyAccess();
-                return this[userID];
+                if (userID == string.Empty)
+                    throw new ArgumentException(Resources.Exception_EmptyStringIsNotAllowed);
+                if (this.Contains(userID) == false)
+                    throw new UserNotFoundException(userID);
+                return base[userID];
             }
         }
 

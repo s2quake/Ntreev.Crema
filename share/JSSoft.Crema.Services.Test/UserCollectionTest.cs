@@ -141,17 +141,17 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void Indexer_Arg0_Empty_FailTest()
+        public async Task Indexer_Arg0_Empty_FailTestAsync()
         {
-            userCollection.Dispatcher.Invoke(() => userCollection[string.Empty]);
+            await userCollection.Dispatcher.InvokeAsync(() => userCollection[string.Empty]);
         }
 
         [TestMethod]
         [ExpectedException(typeof(UserNotFoundException))]
-        public async Task Indexer_Arg0_NonExists_FailTestAsync()
+        public async Task Indexer_Arg0_Nonexistent_FailTestAsync()
         {
             var userID = await userCollection.GenerateNewUserIDAsync();
-            userCollection.Dispatcher.Invoke(() => userCollection[userID]);
+            await userCollection.Dispatcher.InvokeAsync(() => userCollection[userID]);
         }
 
         [TestMethod]

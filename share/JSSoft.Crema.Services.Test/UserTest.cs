@@ -305,6 +305,8 @@ namespace JSSoft.Crema.Services.Test
             var password = otherUser.GetPassword();
             var userName = RandomUtility.NextName();
             await otherUser.SetUserNameAsync(authentication, password, userName);
+            this.TestContext.WriteLine($"{nameof(otherUser)}: {otherUser.ID}");
+            this.TestContext.WriteLine($"{nameof(authentication)}: {authentication.ID}");
         }
 
         [TestMethod]

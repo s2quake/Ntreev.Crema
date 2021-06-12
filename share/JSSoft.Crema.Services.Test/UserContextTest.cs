@@ -194,10 +194,9 @@ namespace JSSoft.Crema.Services.Test
             Assert.Fail($"{value}");
         }
 
-
         [TestMethod]
-        [ExpectedException(typeof(KeyNotFoundException))]
-        public async Task Indexer_Arg0_NonExists_FailTestAsync()
+        [ExpectedException(typeof(ItemNotFoundException))]
+        public async Task Indexer_Arg0_Nonexistent_FailTestAsync()
         {
             var userCollection = userContext.GetService(typeof(IUserCollection)) as IUserCollection;
             var userID = await userCollection.GenerateNewUserIDAsync();

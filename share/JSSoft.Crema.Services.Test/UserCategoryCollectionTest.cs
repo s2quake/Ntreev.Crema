@@ -114,14 +114,14 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void Indexer_Arg0_Empty_FailTest()
+        public async Task Indexer_Arg0_Empty_FailTestAsync()
         {
-            userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection[string.Empty]);
+            await userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection[string.Empty]);
         }
 
         [TestMethod]
         [ExpectedException(typeof(CategoryNotFoundException))]
-        public async Task Indexer_Arg0_NonExists_FailTestAsync()
+        public async Task Indexer_Arg0_Nonexistent_FailTestAsync()
         {
             var category = await userCategoryCollection.GetRandomUserCategoryAsync();
             var name = await category.GenerateNewCategoryNameAsync();
