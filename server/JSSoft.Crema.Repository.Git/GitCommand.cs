@@ -60,7 +60,7 @@ namespace JSSoft.Crema.Repository.Git
         {
             this.RunProcess();
             if (this.ExitCode != 0)
-                throw new System.Exception(this.ErrorMessage);
+                throw new CommandHostException(this.ErrorMessage, this.ToString(), this.WorkingDirectory ?? string.Empty);
             return this.Message;
         }
 
