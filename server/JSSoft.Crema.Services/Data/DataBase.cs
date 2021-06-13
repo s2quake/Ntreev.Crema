@@ -483,6 +483,13 @@ namespace JSSoft.Crema.Services.Data
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (name is null)
+                    throw new ArgumentNullException(nameof(name));
+                    
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -843,7 +850,7 @@ namespace JSSoft.Crema.Services.Data
             set => base.DataBaseState = value;
         }
 
-        public AuthenticationInfo[] AuthenticationInfos { get; private set; }
+        public AuthenticationInfo[] AuthenticationInfos { get; private set; } = new AuthenticationInfo[] { };
 
         public override TypeCategoryBase<Type, TypeCategory, TypeCollection, TypeCategoryCollection, TypeContext> TypeCategory => this.TypeContext?.Root;
 

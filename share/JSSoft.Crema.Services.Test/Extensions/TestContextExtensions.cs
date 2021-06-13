@@ -32,8 +32,13 @@ namespace JSSoft.Crema.Services.Test.Extensions
 
         public static Task<Authentication> LoginRandomAsync(this TestContext context)
         {
+            return LoginRandomAsync(context, DefaultPredicate);
+        }
+
+        public static Task<Authentication> LoginRandomAsync(this TestContext context, Func<IUser, bool> predicate)
+        {
             var items = new Authority[] { Authority.Admin, Authority.Member, Authority.Guest };
-            return LoginRandomAsync(context, items.Random());
+            return LoginRandomAsync(context, items.Random(), predicate);
         }
 
         public static Task<Authentication> LoginRandomAsync(this TestContext context, Authority authority)

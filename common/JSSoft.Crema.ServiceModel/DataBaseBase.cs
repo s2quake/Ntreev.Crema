@@ -475,6 +475,10 @@ namespace JSSoft.Crema.ServiceModel
 
         protected void ValidateRename(IAuthentication authentication, string name)
         {
+            if (name is null)
+                throw new ArgumentNullException(nameof(name));
+            if (name == string.Empty)
+                throw new ArgumentException("empty string is not allowed", nameof(name));
             if (this.Name == name)
                 throw new ArgumentException(Resources.Exception_CannotRename, nameof(name));
             this.OnValidateRename(authentication, this, this.Name, name);

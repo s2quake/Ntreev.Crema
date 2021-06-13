@@ -392,6 +392,8 @@ namespace JSSoft.Crema.Services.Test
             var actualComment = string.Empty;
             var dataBase1 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
             var dataBase2 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded, item => item.Name != dataBase1.Name);
+            var dataBaseName1 = dataBase1.Name;
+            var dataBaseName2 = dataBase2.Name;
             var expectedDataBaseName = dataBase1.Name;
             var expectedComment = dataBase1.DataBaseInfo.Comment;
 
@@ -399,11 +401,13 @@ namespace JSSoft.Crema.Services.Test
             await dataBase1.DeleteAsync(authentication);
             Assert.AreEqual(expectedDataBaseName, actualDataBaseName);
             Assert.AreEqual(expectedComment, actualComment);
+            Assert.IsFalse(await dataBaseContext.ContainsAsync(dataBaseName1));
 
             await dataBaseContext.RemoveItemsDeletedEventHandlerAsync(DataBaseContext_ItemsDeleted);
             await dataBase2.DeleteAsync(authentication);
             Assert.AreEqual(expectedDataBaseName, actualDataBaseName);
             Assert.AreEqual(expectedComment, actualComment);
+            Assert.IsFalse(await dataBaseContext.ContainsAsync(dataBaseName2));
 
             void DataBaseContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
             {
@@ -547,21 +551,21 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task ItemsAuthenticationEntered_TestAsync()
         {
-            var authentication1 = await this.TestContext.LoginRandomAsync();
-            var authentication2 = await this.TestContext.LoginRandomAsync();
+            var authentication = await this.TestContext.LoginRandomAsync();
             var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             var expectedDataBase = dataBase;
-            var expectedUserID = authentication1.ID;
+            var expectedUserID = authentication.ID;
             var actualDataBase = null as IDataBase;
             var actualUserID = string.Empty;
 
             await dataBaseContext.AddItemsAuthenticationEnteredEventHandlerAsync(DataBaseContext_ItemsAuthenticationEntered);
-            await dataBase.EnterAsync(authentication1);
+            await dataBase.EnterAsync(authentication);
             Assert.AreEqual(expectedDataBase, actualDataBase);
             Assert.AreEqual(expectedUserID, actualUserID);
+            await dataBase.LeaveAsync(authentication);
 
             await dataBaseContext.RemoveItemsAuthenticationEnteredEventHandlerAsync(DataBaseContext_ItemsAuthenticationEntered);
-            await dataBase.EnterAsync(authentication2);
+            await dataBase.EnterAsync(authentication);
             Assert.AreEqual(expectedDataBase, actualDataBase);
             Assert.AreEqual(expectedUserID, actualUserID);
 
@@ -583,21 +587,24 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task ItemsAuthenticationLeft_TestAsync()
         {
-            var authentication1 = await this.TestContext.LoginRandomAsync();
-            var authentication2 = await this.TestContext.LoginRandomAsync();
             var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
+            var authentications = await dataBase.GetAuthenticationInfosAsync();
+            var authenticationIDs = authentications.Select(item => item.ID).ToArray();
+            var authentication = await this.TestContext.LoginRandomAsync(item => authenticationIDs.Contains(item.ID) == false);
             var expectedDataBase = dataBase;
-            var expectedUserID = authentication1.ID;
+            var expectedUserID = authentication.ID;
             var actualDataBase = null as IDataBase;
             var actualUserID = string.Empty;
 
+            await dataBase.EnterAsync(authentication);
             await dataBaseContext.AddItemsAuthenticationLeftEventHandlerAsync(DataBaseContext_ItemsAuthenticationLeft);
-            await dataBase.LeaveAsync(authentication1);
+            await dataBase.LeaveAsync(authentication);
             Assert.AreEqual(expectedDataBase, actualDataBase);
             Assert.AreEqual(expectedUserID, actualUserID);
 
+            await dataBase.EnterAsync(authentication);
             await dataBaseContext.RemoveItemsAuthenticationLeftEventHandlerAsync(DataBaseContext_ItemsAuthenticationLeft);
-            await dataBase.LeaveAsync(authentication2);
+            await dataBase.LeaveAsync(authentication);
             Assert.AreEqual(expectedDataBase, actualDataBase);
             Assert.AreEqual(expectedUserID, actualUserID);
 

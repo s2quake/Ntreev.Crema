@@ -22,6 +22,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using JSSoft.Crema.ServiceModel;
 
 namespace JSSoft.Crema.Services.Extensions
 {
@@ -84,6 +85,11 @@ namespace JSSoft.Crema.Services.Extensions
                 return typeCategoryCollection.ContainsAsync(categoryPath);
             }
             throw new NotImplementedException();
+        }
+
+        public static Task<AuthenticationInfo[]> GetAuthenticationInfosAsync(this IDataBase dataBase)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.AuthenticationInfos);
         }
 
         public static Task<ITableItem> GetTableItemAsync(this IDataBase dataBase, string itemPath)
