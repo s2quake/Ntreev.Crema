@@ -61,7 +61,7 @@ namespace JSSoft.Crema.Javascript.Methods
 
         public async Task AddEventListenerAsync(DataBaseEvents eventName, DataBaseEventListener listener)
         {
-            var dataBases = await this.DataBaseContext.GetDataBasesAsync(DataBaseState.Loaded);
+            var dataBases = await this.DataBaseContext.GetDataBasesAsync(DataBaseFlags.Loaded);
             if (this.listenerHosts.ContainsKey(eventName) == true)
             {
                 if (this.listeners.ContainsKey(eventName) == false)
@@ -85,7 +85,7 @@ namespace JSSoft.Crema.Javascript.Methods
 
         public async Task RemoveEventListenerAsync(DataBaseEvents eventName, DataBaseEventListener listener)
         {
-            var dataBases = await this.DataBaseContext.GetDataBasesAsync(DataBaseState.Loaded);
+            var dataBases = await this.DataBaseContext.GetDataBasesAsync(DataBaseFlags.Loaded);
             if (this.listenerHosts.ContainsKey(eventName) == true)
             {
                 var listenerHost = this.listenerHosts[eventName];

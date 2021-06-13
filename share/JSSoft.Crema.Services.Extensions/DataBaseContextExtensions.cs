@@ -70,20 +70,58 @@ namespace JSSoft.Crema.Services.Extensions
             });
         }
 
-        public static Task<IDataBase[]> GetDataBasesAsync(this IDataBaseContext dataBaseContext, DataBaseState dataBaseState)
+        public static Task<IDataBase[]> GetDataBasesAsync(this IDataBaseContext dataBaseContext, DataBaseFlags dataBaseFlags)
         {
-            return GetDataBasesAsync(dataBaseContext, dataBaseState, DefaultPredicate);
+            return GetDataBasesAsync(dataBaseContext, dataBaseFlags, DefaultPredicate);
         }
 
-        public static Task<IDataBase[]> GetDataBasesAsync(this IDataBaseContext dataBaseContext, DataBaseState dataBaseState, Func<IDataBase, bool> predicate)
+        public static Task<IDataBase[]> GetDataBasesAsync(this IDataBaseContext dataBaseContext, DataBaseFlags dataBaseFlags, Func<IDataBase, bool> predicate)
         {
             return dataBaseContext.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in dataBaseContext
-                            where item.DataBaseState == dataBaseState && predicate(item)
+                            where TestFlags(item, dataBaseFlags) && predicate(item)
                             select item;
                 return query.ToArray();
             });
+
+            static bool TestFlags(IDataBase dataBase, DataBaseFlags dataBaseFlags)
+            {
+                if (TestDataBaseStateFlags(dataBase, dataBaseFlags) == false)
+                    return false;
+                if (TestDataBaseLockedFlags(dataBase, dataBaseFlags) == false)
+                    return false;
+                if (TestDataBaseAccessFlags(dataBase, dataBaseFlags) == false)
+                    return false;
+                return true;
+            }
+
+            static bool TestDataBaseStateFlags(IDataBase dataBase, DataBaseFlags dataBaseFlags)
+            {
+                if (dataBaseFlags.HasFlag(DataBaseFlags.NotLoaded) == true && dataBase.DataBaseState != DataBaseState.None)
+                    return false;
+                if (dataBaseFlags.HasFlag(DataBaseFlags.Loaded) == true && dataBase.DataBaseState != DataBaseState.Loaded)
+                    return false;
+                return true;
+            }
+
+            static bool TestDataBaseLockedFlags(IDataBase dataBase, DataBaseFlags dataBaseFlags)
+            {
+                if (dataBaseFlags.HasFlag(DataBaseFlags.NotLocked) == true && dataBase.IsLocked == true)
+                    return false;
+                if (dataBaseFlags.HasFlag(DataBaseFlags.Locked) == true && dataBase.IsLocked == false)
+                    return false;
+                return true;
+            }
+
+            static bool TestDataBaseAccessFlags(IDataBase dataBase, DataBaseFlags dataBaseFlags)
+            {
+                if (dataBaseFlags.HasFlag(DataBaseFlags.Private) == true && dataBase.IsPrivate == false)
+                    return false;
+                if (dataBaseFlags.HasFlag(DataBaseFlags.Public) == true && dataBase.IsPrivate == true)
+                    return false;
+                return true;
+            }
         }
 
         public static Task<string> GenerateNewDataBaseNameAsync(this IDataBaseContext dataBaseContext)

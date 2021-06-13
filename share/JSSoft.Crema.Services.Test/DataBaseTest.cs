@@ -56,7 +56,7 @@ namespace JSSoft.Crema.Services.Test
             expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
             await dataBaseContext.GenerateDataBasesAsync(expiredAuthentication, 20);
             await context.LoginRandomManyAsync(cremaHost);
-            await context.InitializeRandomSettingDataBasesAsync(dataBaseContext);
+            await context.LoadRandomDataBasesAsync(dataBaseContext);
             await cremaHost.LogoutAsync(expiredAuthentication);
         }
 
@@ -85,7 +85,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task GetMetaData_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync();
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             var metaData = await dataBase.Dispatcher.InvokeAsync(() => dataBase.GetMetaData(authentication));
             Assert.AreEqual(dataBase.DataBaseState, metaData.DataBaseState);
         }
@@ -94,7 +94,7 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task GetMetaData_Arg0_Null_FailTestAsync()
         {
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             await dataBase.Dispatcher.InvokeAsync(() => dataBase.GetMetaData(null));
         }
 
@@ -103,7 +103,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task GetMetaData_Expired_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync();
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             await dataBase.Dispatcher.InvokeAsync(() => dataBase.GetMetaData(expiredAuthentication));
         }
 
@@ -112,7 +112,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task GetMetaData_Dispatcher_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync();
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             dataBase.GetMetaData(authentication);
         }
 
@@ -120,7 +120,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task LoadAsync_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
             await dataBase.LoadAsync(authentication);
             Assert.AreEqual(DataBaseState.Loaded, dataBase.DataBaseState);
         }
@@ -129,7 +129,7 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task LoadAsync_Arg0_Null_TestAsync()
         {
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
             await dataBase.LoadAsync(null);
         }
 
@@ -137,7 +137,7 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task LoadAsync_Expired_TestAsync()
         {
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
             await dataBase.LoadAsync(expiredAuthentication);
         }
 
@@ -146,7 +146,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task LoadAsync_Member_PermissionDenied_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
             await dataBase.LoadAsync(authentication);
         }
 
@@ -155,7 +155,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task LoadAsync_Guest_PermissionDenied_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
             await dataBase.LoadAsync(authentication);
         }
 
@@ -164,7 +164,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task LoadAsync_Loaded_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             await dataBase.LoadAsync(authentication);
         }
 
@@ -172,7 +172,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task UnloadAsync_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             await dataBase.UnloadAsync(authentication);
             Assert.AreEqual(DataBaseState.None, dataBase.DataBaseState);
         }
@@ -181,7 +181,7 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task UnloadAsync_Arg0_Null_TestAsync()
         {
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             await dataBase.UnloadAsync(null);
         }
 
@@ -189,7 +189,7 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task UnloadAsync_Expired_TestAsync()
         {
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             await dataBase.UnloadAsync(expiredAuthentication);
         }
 
@@ -198,7 +198,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task UnloadAsync_Member_PermissionDenied_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             await dataBase.UnloadAsync(authentication);
         }
 
@@ -207,7 +207,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task UnloadAsync_Guest_PermissionDenied_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             await dataBase.UnloadAsync(authentication);
         }
 
@@ -216,7 +216,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task UnloadAsync_Unloaded_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
             await dataBase.UnloadAsync(authentication);
         }
 
@@ -224,7 +224,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task EnterAsync_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync();
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             await dataBase.EnterAsync(authentication);
         }
 
@@ -232,7 +232,7 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task EnterAsync_Arg0_Null_TestAsync()
         {
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             await dataBase.EnterAsync(null);
         }
 
@@ -240,7 +240,7 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task EnterAsync_Expired_TestAsync()
         {
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             await dataBase.EnterAsync(expiredAuthentication);
         }
 
@@ -249,7 +249,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task EnterAsync_Enter_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync();
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             await dataBase.EnterAsync(authentication);
             await dataBase.EnterAsync(authentication);
         }
@@ -259,7 +259,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task EnterAsync_Unloaded_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync();
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
             await dataBase.EnterAsync(authentication);
         }
 

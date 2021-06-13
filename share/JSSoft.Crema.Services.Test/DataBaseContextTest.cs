@@ -56,7 +56,7 @@ namespace JSSoft.Crema.Services.Test
             expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
             await dataBaseContext.GenerateDataBasesAsync(expiredAuthentication, 20);
             await context.LoginRandomManyAsync(cremaHost);
-            await context.InitializeRandomSettingDataBasesAsync(dataBaseContext);
+            await context.LoadRandomDataBasesAsync(dataBaseContext);
             await cremaHost.LogoutAsync(expiredAuthentication);
         }
 
@@ -358,7 +358,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsRenamed_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.None);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
             var oldDataBaseName = dataBase.Name;
             var expectedDataBaseName = RandomUtility.NextName();
             var actualDataBaseName = string.Empty;
@@ -390,8 +390,8 @@ namespace JSSoft.Crema.Services.Test
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var actualDataBaseName = string.Empty;
             var actualComment = string.Empty;
-            var dataBase1 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.None);
-            var dataBase2 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.None, item => item.Name != dataBase1.Name);
+            var dataBase1 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
+            var dataBase2 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded, item => item.Name != dataBase1.Name);
             var expectedDataBaseName = dataBase1.Name;
             var expectedComment = dataBase1.DataBaseInfo.Comment;
 
@@ -425,8 +425,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsLoaded_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase1 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.None);
-            var dataBase2 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.None, item => item != dataBase1);
+            var dataBase1 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
+            var dataBase2 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded, item => item != dataBase1);
             var expectedDataBase = dataBase1;
             var actualDataBase = null as IDataBase;
             await dataBaseContext.AddItemsLoadedEventHandlerAsync(DataBaseContext_ItemsLoaded);
@@ -455,8 +455,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsUnloaded_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase1 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
-            var dataBase2 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded, item => item != dataBase1);
+            var dataBase1 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
+            var dataBase2 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded, item => item != dataBase1);
 
             var expectedDataBase = dataBase1;
             var actualDataBase = null as IDataBase;
@@ -486,7 +486,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsResetting_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             var expectedDataBase = dataBase;
             var actualDataBase = null as IDataBase;
             await dataBaseContext.AddItemsResettingEventHandlerAsync(DataBaseContext_ItemsResetting);
@@ -517,7 +517,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsReset_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             var expectedDataBase = dataBase;
             var actualDataBase = null as IDataBase;
             await dataBaseContext.AddItemsResetEventHandlerAsync(DataBaseContext_ItemsReset);
@@ -549,7 +549,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication1 = await this.TestContext.LoginRandomAsync();
             var authentication2 = await this.TestContext.LoginRandomAsync();
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             var expectedDataBase = dataBase;
             var expectedUserID = authentication1.ID;
             var actualDataBase = null as IDataBase;
@@ -585,7 +585,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication1 = await this.TestContext.LoginRandomAsync();
             var authentication2 = await this.TestContext.LoginRandomAsync();
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             var expectedDataBase = dataBase;
             var expectedUserID = authentication1.ID;
             var actualDataBase = null as IDataBase;
@@ -620,7 +620,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsInfoChanged_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             var dataBaseInfo = dataBase.DataBaseInfo;
             var typeContext = dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
             var expectedModificationInfo = dataBaseInfo.ModificationInfo;
@@ -655,7 +655,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsStateChanged_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.None);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
             var expectedDataBaseState = DataBaseState.Loaded;
             var actualDataBaseState = dataBase.DataBaseState;
 
@@ -685,7 +685,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsAccessChanged_TestAsync()
         {
             var authenticaiton = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded, item => item.AccessInfo.IsPublic == true);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded, item => item.AccessInfo.IsPublic == true);
             var actualValue = dataBase.AccessInfo.IsPublic;
 
             await dataBaseContext.AddItemsAccessChangedEventHandlerAsync(DataBaseContext_ItemsAccessChanged);
@@ -748,7 +748,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task TaskCompleted_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.None);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
             var actualID = Guid.Empty;
 
             await dataBaseContext.AddTaskCompletedEventHandlerAsync(DataBaseContext_TaskCompleted);

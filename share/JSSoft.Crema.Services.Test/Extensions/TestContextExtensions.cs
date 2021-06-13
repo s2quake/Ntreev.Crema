@@ -95,7 +95,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
             }
         }
 
-        public static async Task InitializeRandomSettingDataBasesAsync(this TestContext context, IDataBaseContext dataBaseContext)
+        public static async Task LoadRandomDataBasesAsync(this TestContext context, IDataBaseContext dataBaseContext)
         {
             var cremaHost = dataBaseContext.GetService(typeof(ICremaHost)) as ICremaHost;
             var dataBases = await dataBaseContext.GetDataBasesAsync();
@@ -103,15 +103,43 @@ namespace JSSoft.Crema.Services.Test.Extensions
             {
                 var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
                 var dataBase = dataBases[i];
-                await dataBase.LoadAsync(authentication);
                 if (RandomUtility.Within(50) == true)
                 {
+                    await dataBase.LoadAsync(authentication);
+                }
+                await cremaHost.LogoutAsync(authentication);
+            }
+        }
+
+        public static async Task SetPrivateRandomDataBasesAsync(this TestContext context, IDataBaseContext dataBaseContext)
+        {
+            var cremaHost = dataBaseContext.GetService(typeof(ICremaHost)) as ICremaHost;
+            var dataBases = await dataBaseContext.GetDataBasesAsync();
+            for (var i = 0; i < dataBases.Length; i++)
+            {
+                var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+                var dataBase = dataBases[i];
+                if (RandomUtility.Within(50) == true)
+                {
+                    var isLoaded = dataBase.IsLoaded;
+                    if (isLoaded == false)
+                        await dataBase.LoadAsync(authentication);
                     await dataBase.SetPrivateAsync(authentication);
+                    if (isLoaded == false)
+                        await dataBase.UnloadAsync(authentication);
                 }
-                if (RandomUtility.Within(50) == true)
-                {
-                    await dataBase.UnloadAsync(authentication);
-                }
+                await cremaHost.LogoutAsync(authentication);
+            }
+        }
+
+        public static async Task LockRandomDataBasesAsync(this TestContext context, IDataBaseContext dataBaseContext)
+        {
+            var cremaHost = dataBaseContext.GetService(typeof(ICremaHost)) as ICremaHost;
+            var dataBases = await dataBaseContext.GetDataBasesAsync();
+            for (var i = 0; i < dataBases.Length; i++)
+            {
+                var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+                var dataBase = dataBases[i];
                 if (RandomUtility.Within(50) == true)
                 {
                     await dataBase.LockAsync(authentication, RandomUtility.NextString());

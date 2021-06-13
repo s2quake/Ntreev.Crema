@@ -46,6 +46,7 @@ namespace JSSoft.Crema.ServiceModel
 
         private DataBaseInfo dataBaseInfo;
         private DataBaseState dataBaseState;
+        private DataBaseFlags dataBaseFlags;
 
         private PropertyCollection extendedProperties;
 
@@ -78,6 +79,7 @@ namespace JSSoft.Crema.ServiceModel
                     this.UpdateLockParent(this);
                 else
                     this.UpdateLockParent(null);
+                this.UpdateDataBaseFlags();
                 this.OnLockChanged(EventArgs.Empty);
             }
         }
@@ -139,6 +141,7 @@ namespace JSSoft.Crema.ServiceModel
             set
             {
                 this.dataBaseInfo = value;
+                this.UpdateDataBaseFlags();
                 this.OnDataBaseInfoChanged(EventArgs.Empty);
             }
         }
@@ -149,9 +152,12 @@ namespace JSSoft.Crema.ServiceModel
             set
             {
                 this.dataBaseState = value;
+                this.UpdateDataBaseFlags();
                 this.OnDataBaseStateChanged(EventArgs.Empty);
             }
         }
+
+        public DataBaseFlags DataBaseFlags => this.dataBaseFlags;
 
         [Browsable(false)]
         public PropertyCollection ExtendedProperties
@@ -212,6 +218,7 @@ namespace JSSoft.Crema.ServiceModel
         {
             this.accessInfo.SetPublic();
             this.UpdateAccessParent(null);
+            this.UpdateDataBaseFlags();
             this.OnAccessChanged(EventArgs.Empty);
         }
 
@@ -219,6 +226,7 @@ namespace JSSoft.Crema.ServiceModel
         {
             this.accessInfo.SetPrivate(this.Name, authentication.SignatureDate);
             this.UpdateAccessParent(this);
+            this.UpdateDataBaseFlags();
             this.OnAccessChanged(EventArgs.Empty);
         }
 
@@ -226,6 +234,7 @@ namespace JSSoft.Crema.ServiceModel
         {
             this.accessInfo.Add(authentication.SignatureDate, memberID, accessType);
             this.UpdateAccessParent(this);
+            this.UpdateDataBaseFlags();
             this.OnAccessChanged(EventArgs.Empty);
         }
 
@@ -233,6 +242,7 @@ namespace JSSoft.Crema.ServiceModel
         {
             this.accessInfo.Set(authentication.SignatureDate, memberID, accessType);
             this.UpdateAccessParent(this);
+            this.UpdateDataBaseFlags();
             this.OnAccessChanged(EventArgs.Empty);
         }
 
@@ -240,6 +250,7 @@ namespace JSSoft.Crema.ServiceModel
         {
             this.accessInfo.Remove(authentication.SignatureDate, memberID);
             this.UpdateAccessParent(this);
+            this.UpdateDataBaseFlags();
             this.OnAccessChanged(EventArgs.Empty);
         }
 
@@ -258,6 +269,7 @@ namespace JSSoft.Crema.ServiceModel
                 Comment = comment,
             };
             this.UpdateLockParent(this);
+            this.UpdateDataBaseFlags();
             this.OnLockChanged(EventArgs.Empty);
         }
 
@@ -265,6 +277,7 @@ namespace JSSoft.Crema.ServiceModel
         {
             this.lockInfo = LockInfo.Empty;
             this.UpdateLockParent(null);
+            this.UpdateDataBaseFlags();
             this.OnLockChanged(EventArgs.Empty);
         }
 
@@ -738,6 +751,23 @@ namespace JSSoft.Crema.ServiceModel
         internal void InvokeAccessChanged(EventArgs e)
         {
             this.OnAccessChanged(e);
+        }
+
+        private void UpdateDataBaseFlags()
+        {
+            this.dataBaseFlags = DataBaseFlags.None;
+            if (this.DataBaseState == DataBaseState.Unloaded)
+                this.dataBaseFlags |= DataBaseFlags.NotLoaded;
+            if (this.DataBaseState == DataBaseState.Loaded)
+                this.dataBaseFlags |= DataBaseFlags.Loaded;
+            if (this.IsLocked == true)
+                this.dataBaseFlags |= DataBaseFlags.Locked;
+            else
+                this.dataBaseFlags |= DataBaseFlags.NotLocked;
+            if (this.IsPrivate == true)
+                this.dataBaseFlags |= DataBaseFlags.Private;
+            else
+                this.dataBaseFlags |= DataBaseFlags.Public;
         }
 
         #region ILockParent

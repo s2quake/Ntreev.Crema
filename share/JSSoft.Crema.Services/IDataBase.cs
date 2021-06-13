@@ -72,6 +72,8 @@ namespace JSSoft.Crema.Services
 
         DataBaseState DataBaseState { get; }
 
+        DataBaseFlags DataBaseFlags { get; }
+
         [DispatcherProperty(typeof(IDataBase))]
         AuthenticationInfo[] AuthenticationInfos { get; }
 
