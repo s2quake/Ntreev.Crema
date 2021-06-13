@@ -77,11 +77,16 @@ namespace JSSoft.Crema.Services.Test.Extensions
             return LoginRandomAsync(cremaHost, items.Random());
         }
 
-        public static async Task<Authentication> LoginRandomAsync(this ICremaHost cremaHost, Authority authority)
+        public static Task<Authentication> LoginRandomAsync(this ICremaHost cremaHost, Authority authority)
+        {
+            return LoginRandomAsync(cremaHost, authority, DefaultPredicate);
+        }
+
+        public static async Task<Authentication> LoginRandomAsync(this ICremaHost cremaHost, Authority authority, Func<IUser, bool> predicate)
         {
             if (cremaHost.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
             {
-                var user = await userCollection.GetRandomUserAsync(item => Predicate(item, authority));
+                var user = await userCollection.GetRandomUserAsync(Test);
                 var name = user.ID;
                 var password = user.GetPassword();
                 var token = await cremaHost.LoginAsync(name, password);
@@ -89,7 +94,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
             }
             throw new NotImplementedException();
 
-            static bool Predicate(IUser user, Authority authority)
+            bool Test(IUser user)
             {
                 if (user.BanInfo.Path != string.Empty)
                     return false;
@@ -97,7 +102,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
                     return false;
                 if (user.Authority != authority)
                     return false;
-                return true;
+                return predicate(user);
             }
         }
 
@@ -111,5 +116,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
             }
             return authenticationList.ToArray();
         }
+
+        private static bool DefaultPredicate(IUser _) => true;
     }
 }

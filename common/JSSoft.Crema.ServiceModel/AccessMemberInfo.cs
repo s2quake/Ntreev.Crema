@@ -41,6 +41,11 @@ namespace JSSoft.Crema.ServiceModel
         [IgnoreDataMember]
         public DateTime DateTime => this.SignatureDate.DateTime;
 
+        public override string ToString()
+        {
+            return $"{this.UserID}: {this.AccessType}";
+        }
+
         public static bool operator ==(AccessMemberInfo x, AccessMemberInfo y)
         {
             return x.SignatureDate == y.SignatureDate &&

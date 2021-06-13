@@ -411,6 +411,11 @@ namespace JSSoft.Crema.Services.Data
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
                 this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -442,6 +447,11 @@ namespace JSSoft.Crema.Services.Data
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
                 this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -1489,6 +1499,8 @@ namespace JSSoft.Crema.Services.Data
         {
             if (this.IsLoaded == false)
                 throw new InvalidOperationException(Resources.Exception_DataBaseHasNotBeenLoaded);
+            if (this.authentications.Contains(authentication) == false)
+                throw new ArgumentException(Resources.Exception_NotInDataBase, nameof(authentication));
         }
 
         private void ValidateLoad(Authentication authentication)

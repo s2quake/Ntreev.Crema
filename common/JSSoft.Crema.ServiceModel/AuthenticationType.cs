@@ -33,7 +33,5 @@ namespace JSSoft.Crema.ServiceModel
         Administrator = 2,
 
         User = 4,
-
-        ReadOnly = 8,
     }
 }

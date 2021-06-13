@@ -198,8 +198,6 @@ namespace JSSoft.Crema.ServiceModel
                 return AccessType.System;
             if (authentication.Types == AuthenticationType.None)
                 return AccessType.Guest;
-            if (authentication.Types.HasFlag(AuthenticationType.ReadOnly))
-                return AccessType.Guest;
             if (this.IsLocked == true && authentication.IsOwnerOf(this.LockInfo) == false)
                 return AccessType.None;
             if (this.IsLocked == true && authentication.IsOwnerOf(this.LockInfo) == true)
