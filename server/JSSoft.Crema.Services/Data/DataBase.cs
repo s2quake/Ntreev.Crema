@@ -310,6 +310,11 @@ namespace JSSoft.Crema.Services.Data
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
                 this.ValidateExpired();
                 var items = new IDataBase[] { this };
                 var repositorySetting = await this.Dispatcher.InvokeAsync(() =>
@@ -358,6 +363,11 @@ namespace JSSoft.Crema.Services.Data
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
                 this.ValidateExpired();
                 var items = new IDataBase[] { this };
                 await this.Dispatcher.InvokeAsync(() =>
@@ -654,6 +664,9 @@ namespace JSSoft.Crema.Services.Data
         {
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
+            if (authentication.IsExpired == true)
+                throw new AuthenticationExpiredException(nameof(authentication));
+            this.Dispatcher.VerifyAccess();
             return this.metaData;
         }
 

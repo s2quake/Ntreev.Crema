@@ -48,44 +48,16 @@ namespace JSSoft.Crema.Services.Random
             throw new NotImplementedException();
         }
 
-        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, Authority authority)
+        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, UserFlags userFlags)
         {
-            return GetRandomUserAsync(userContext, authority, DefaultPredicate);
+            return GetRandomUserAsync(userContext, userFlags, DefaultPredicate);
         }
 
-        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, Authority authority, Func<IUser, bool> predicate)
+        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, UserFlags userFlags, Func<IUser, bool> predicate)
         {
             if (userContext.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
             {
-                return userCollection.GetRandomUserAsync(authority, predicate);
-            }
-            throw new NotImplementedException();
-        }
-
-        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, Authority authority, UserState userState)
-        {
-            return GetRandomUserAsync(userContext, authority, userState, DefaultPredicate);
-        }
-
-        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, Authority authority, UserState userState, Func<IUser, bool> predicate)
-        {
-            if (userContext.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
-            {
-                return userCollection.GetRandomUserAsync(authority, userState, predicate);
-            }
-            throw new NotImplementedException();
-        }
-
-        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, UserState userState)
-        {
-            return GetRandomUserAsync(userContext, userState, DefaultPredicate);
-        }
-
-        public static Task<IUser> GetRandomUserAsync(this IUserContext userContext, UserState userState, Func<IUser, bool> predicate)
-        {
-            if (userContext.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
-            {
-                return userCollection.GetRandomUserAsync(userState, predicate);
+                return userCollection.GetRandomUserAsync(userFlags, predicate);
             }
             throw new NotImplementedException();
         }

@@ -206,7 +206,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_Item_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await userContext.GetRandomUserAsync(UserState.None, item => item.ID != authentication.ID && item.ID != Authentication.AdminID);
+            var user = await userContext.GetRandomUserAsync(UserFlags.Offline, item => item.ID != authentication.ID && item.ID != Authentication.AdminID);
             var userItem = user as IUserItem;
             await userItem.DeleteAsync(authentication);
         }
@@ -278,7 +278,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_Online_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await userContext.GetRandomUserAsync(UserState.Online, item => item.ID != authentication.ID && item.ID != Authentication.AdminID);
+            var user = await userContext.GetRandomUserAsync(UserFlags.Online, item => item.ID != authentication.ID && item.ID != Authentication.AdminID);
             var userItem = user as IUserItem;
             await userItem.DeleteAsync(authentication);
         }
@@ -446,7 +446,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task Deleted_User_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await userContext.GetRandomUserAsync(Authority.Member, UserState.None);
+            var user = await userContext.GetRandomUserAsync(UserFlags.Member);
             var userItem = user as IUserItem;
             var expectedUserItem = userItem;
             var actualUserItem = null as IUserItem;

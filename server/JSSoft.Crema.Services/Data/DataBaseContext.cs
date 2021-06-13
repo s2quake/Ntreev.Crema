@@ -908,5 +908,14 @@ namespace JSSoft.Crema.Services.Data
         }
 
         #endregion
+
+        #region IServiceProvider
+
+        object IServiceProvider.GetService(System.Type serviceType)
+        {
+            return (this.CremaHost as ICremaHost).GetService(serviceType);
+        }
+
+        #endregion
     }
 }

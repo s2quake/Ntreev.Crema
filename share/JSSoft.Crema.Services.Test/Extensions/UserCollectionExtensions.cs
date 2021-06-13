@@ -35,9 +35,9 @@ namespace JSSoft.Crema.Services.Test.Extensions
             }
         }
 
-        public static async Task<IUser> BanRandomUserAsync(this IUserCollection userCollection, Authentication authentication, Authority authority)
+        public static async Task<IUser> BanRandomUserAsync(this IUserCollection userCollection, Authentication authentication, UserFlags userFlags)
         {
-            var user = await userCollection.GetRandomUserAsync(authority, Predicate);
+            var user = await userCollection.GetRandomUserAsync(userFlags, Predicate);
             var message = RandomUtility.NextString();
             await user.BanAsync(authentication, message);
             return user;

@@ -39,34 +39,49 @@ namespace JSSoft.Crema.Services.Random
             return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(predicate));
         }
 
-        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, Authority authority)
+        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, UserFlags userFlags)
         {
-            return GetRandomUserAsync(userCollection, authority, DefaultPredicate);
+            return GetRandomUserAsync(userCollection, userFlags, DefaultPredicate);
         }
 
-        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, Authority authority, Func<IUser, bool> predicate)
+        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, UserFlags userFlags, Func<IUser, bool> predicate)
         {
-            return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(item => item.Authority == authority && predicate(item) == true));
-        }
+            return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(item => TestFlags(item, userFlags) == true && predicate(item) == true));
 
-        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, Authority authority, UserState userState)
-        {
-            return GetRandomUserAsync(userCollection, authority, userState, DefaultPredicate);
-        }
+            static bool TestFlags(IUser user, UserFlags userFlags)
+            {
+                return TestAuthorityFlags(user, userFlags) && TestUserStateFlags(user, userFlags) && TestBanInfoFlags(user, userFlags);
+            }
 
-        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, Authority authority, UserState userState, Func<IUser, bool> predicate)
-        {
-            return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(item => item.Authority == authority && item.UserState == userState && predicate(item) == true));
-        }
+            static bool TestAuthorityFlags(IUser user, UserFlags userFlags)
+            {
+                var mask = userFlags & (UserFlags.Admin | UserFlags.Member | UserFlags.Guest);
+                if (mask.HasFlag(UserFlags.Admin) == true && user.Authority == Authority.Admin)
+                    return true;
+                if (mask.HasFlag(UserFlags.Member) == true && user.Authority == Authority.Member)
+                    return true;
+                if (mask.HasFlag(UserFlags.Guest) == true && user.Authority == Authority.Guest)
+                    return true;
+                return mask == UserFlags.None;
+            }
 
-        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, UserState userState)
-        {
-            return GetRandomUserAsync(userCollection, userState, DefaultPredicate);
-        }
+            static bool TestUserStateFlags(IUser user, UserFlags userFlags)
+            {
+                if (userFlags.HasFlag(UserFlags.Offline) == true && user.UserState != UserState.None)
+                    return false;
+                if (userFlags.HasFlag(UserFlags.Online) == true && user.UserState != UserState.Online)
+                    return false;
+                return true;
+            }
 
-        public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, UserState userState, Func<IUser, bool> predicate)
-        {
-            return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(item => item.UserState == userState && predicate(item) == true));
+            static bool TestBanInfoFlags(IUser user, UserFlags userFlags)
+            {
+                if (userFlags.HasFlag(UserFlags.NotBanned) == true && user.BanInfo.IsBanned == true)
+                    return false;
+                if (userFlags.HasFlag(UserFlags.Banned) == true && user.BanInfo.IsNotBanned == true)
+                    return false;
+                return true;
+            }
         }
 
         private static bool DefaultPredicate(IUser _) => true;

@@ -62,6 +62,8 @@ namespace JSSoft.Crema.Services
 
         BanInfo BanInfo { get; }
 
+        UserFlags UserFlags { get; }
+
         [DispatcherEvent(typeof(IUserContext))]
         event EventHandler Renamed;
 

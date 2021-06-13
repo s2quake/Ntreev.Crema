@@ -56,7 +56,7 @@ namespace JSSoft.Crema.Services.Test
             expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
             await dataBaseContext.GenerateDataBasesAsync(expiredAuthentication, 20);
             await context.LoginRandomManyAsync(cremaHost);
-            await context.LoadRandomDataBaseManyAsync(dataBaseContext, expiredAuthentication);
+            await context.InitializeRandomSettingDataBasesAsync(dataBaseContext);
             await cremaHost.LogoutAsync(expiredAuthentication);
         }
 
@@ -84,25 +84,183 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task GetMetaData_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync();
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            var metaData = await dataBase.Dispatcher.InvokeAsync(() => dataBase.GetMetaData(authentication));
+            Assert.AreEqual(dataBase.DataBaseState, metaData.DataBaseState);
+        }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task GetMetaData_Arg0_Null_FailTestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            await dataBase.Dispatcher.InvokeAsync(() => dataBase.GetMetaData(null));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
+        public async Task GetMetaData_Expired_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync();
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            await dataBase.Dispatcher.InvokeAsync(() => dataBase.GetMetaData(expiredAuthentication));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task GetMetaData_Dispatcher_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync();
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            dataBase.GetMetaData(authentication);
         }
 
         [TestMethod]
         public async Task LoadAsync_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            await dataBase.LoadAsync(authentication);
+            Assert.AreEqual(DataBaseState.Loaded, dataBase.DataBaseState);
+        }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task LoadAsync_Arg0_Null_TestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            await dataBase.LoadAsync(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
+        public async Task LoadAsync_Expired_TestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            await dataBase.LoadAsync(expiredAuthentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task LoadAsync_Member_PermissionDenied_TestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            await dataBase.LoadAsync(authentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task LoadAsync_Guest_PermissionDenied_TestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            await dataBase.LoadAsync(authentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task LoadAsync_Loaded_TestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            await dataBase.LoadAsync(authentication);
         }
 
         [TestMethod]
         public async Task UnloadAsync_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            await dataBase.UnloadAsync(authentication);
+            Assert.AreEqual(DataBaseState.None, dataBase.DataBaseState);
+        }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task UnloadAsync_Arg0_Null_TestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            await dataBase.UnloadAsync(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
+        public async Task UnloadAsync_Expired_TestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            await dataBase.UnloadAsync(expiredAuthentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task UnloadAsync_Member_PermissionDenied_TestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            await dataBase.UnloadAsync(authentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task UnloadAsync_Guest_PermissionDenied_TestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            await dataBase.UnloadAsync(authentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task UnloadAsync_Unloaded_TestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            await dataBase.UnloadAsync(authentication);
         }
 
         [TestMethod]
         public async Task EnterAsync_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync();
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            await dataBase.EnterAsync(authentication);
+        }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task EnterAsync_Arg0_Null_TestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            await dataBase.EnterAsync(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
+        public async Task EnterAsync_Expired_TestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            await dataBase.EnterAsync(expiredAuthentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task EnterAsync_Enter_TestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync();
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Loaded);
+            await dataBase.EnterAsync(authentication);
+            await dataBase.EnterAsync(authentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task EnterAsync_Unloaded_TestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync();
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.Unloaded);
+            await dataBase.EnterAsync(authentication);
         }
 
         [TestMethod]

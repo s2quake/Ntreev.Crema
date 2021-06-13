@@ -95,15 +95,28 @@ namespace JSSoft.Crema.Services.Test.Extensions
             }
         }
 
-        public static async Task LoadRandomDataBaseManyAsync(this TestContext context, IDataBaseContext dataBaseContext, Authentication authentication)
+        public static async Task InitializeRandomSettingDataBasesAsync(this TestContext context, IDataBaseContext dataBaseContext)
         {
-            var count = await dataBaseContext.GetCountAsync();
-            var total = count / 2;
-
-            for (var i = 0; i < total; i++)
+            var cremaHost = dataBaseContext.GetService(typeof(ICremaHost)) as ICremaHost;
+            var dataBases = await dataBaseContext.GetDataBasesAsync();
+            for (var i = 0; i < dataBases.Length; i++)
             {
-                var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseState.None);
+                var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+                var dataBase = dataBases[i];
                 await dataBase.LoadAsync(authentication);
+                if (RandomUtility.Within(50) == true)
+                {
+                    await dataBase.SetPrivateAsync(authentication);
+                }
+                if (RandomUtility.Within(50) == true)
+                {
+                    await dataBase.UnloadAsync(authentication);
+                }
+                if (RandomUtility.Within(50) == true)
+                {
+                    await dataBase.LockAsync(authentication, RandomUtility.NextString());
+                }
+                await cremaHost.LogoutAsync(authentication);
             }
         }
     }

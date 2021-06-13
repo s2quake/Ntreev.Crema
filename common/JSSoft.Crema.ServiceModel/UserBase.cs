@@ -36,6 +36,7 @@ namespace JSSoft.Crema.ServiceModel
     {
         private UserInfo userInfo;
         private UserState userState;
+        private UserFlags userFlags;
         private BanInfo banInfo = BanInfo.Empty;
         private bool isLoaded;
 
@@ -47,6 +48,7 @@ namespace JSSoft.Crema.ServiceModel
         public void UpdateUserInfo(UserInfo userInfo)
         {
             this.userInfo = userInfo;
+            this.UpdateUserFlags();
             this.OnUserInfoChanged(EventArgs.Empty);
         }
 
@@ -57,6 +59,7 @@ namespace JSSoft.Crema.ServiceModel
             this.userInfo = userInfo;
             this.banInfo = banInfo;
             this.isLoaded = true;
+            this.UpdateUserFlags();
             this.OnUserInfoChanged(EventArgs.Empty);
             this.OnUserBanInfoChanged(EventArgs.Empty);
         }
@@ -76,6 +79,7 @@ namespace JSSoft.Crema.ServiceModel
             protected set
             {
                 this.banInfo = value;
+                this.UpdateUserFlags();
                 this.OnUserBanInfoChanged(EventArgs.Empty);
             }
         }
@@ -88,9 +92,12 @@ namespace JSSoft.Crema.ServiceModel
                 if (this.userState == value)
                     return;
                 this.userState = value;
+                this.UpdateUserFlags();
                 this.OnUserStateChanged(EventArgs.Empty);
             }
         }
+
+        public UserFlags UserFlags => this.userFlags;
 
         public Authority Authority => this.userInfo.Authority;
 
@@ -125,12 +132,14 @@ namespace JSSoft.Crema.ServiceModel
         protected void Ban(IAuthentication authentication, BanInfo banInfo)
         {
             this.banInfo = banInfo;
+            this.UpdateUserFlags();
             this.OnUserBanInfoChanged(EventArgs.Empty);
         }
 
         protected void Unban(IAuthentication authentication)
         {
             this.banInfo = BanInfo.Empty;
+            this.UpdateUserFlags();
             this.OnUserBanInfoChanged(EventArgs.Empty);
         }
 
@@ -175,6 +184,25 @@ namespace JSSoft.Crema.ServiceModel
             if (category == null)
                 throw new CategoryNotFoundException(categoryPath);
             base.ValidateMove(category);
+        }
+
+        private void UpdateUserFlags()
+        {
+            this.userFlags = UserFlags.None;
+            if (this.userInfo.Authority == Authority.Admin)
+                this.userFlags |= UserFlags.Admin;
+            else if (this.userInfo.Authority == Authority.Member)
+                this.userFlags |= UserFlags.Member;
+            else if (this.userInfo.Authority == Authority.Guest)
+                this.userFlags |= UserFlags.Guest;
+            if (this.userState == UserState.Online)
+                this.userFlags |= UserFlags.Online;
+            else
+                this.userFlags |= UserFlags.Offline;
+            if (this.banInfo.IsBanned == true)
+                this.userFlags |= UserFlags.Banned;
+            else
+                this.userFlags |= UserFlags.NotBanned;
         }
     }
 }

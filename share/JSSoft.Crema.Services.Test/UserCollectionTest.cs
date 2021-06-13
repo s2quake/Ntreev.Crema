@@ -237,7 +237,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task UsersDeleted_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await userCollection.GetRandomUserAsync(UserState.None);
+            var user = await userCollection.GetRandomUserAsync(UserFlags.Offline);
             var actualUserPath = user.Path;
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
@@ -250,7 +250,7 @@ namespace JSSoft.Crema.Services.Test
             {
                 userCollection.UsersDeleted -= UserCollection_UsersDeleted;
             });
-            var user2 = await userCollection.GetRandomUserAsync(UserState.None);
+            var user2 = await userCollection.GetRandomUserAsync(UserFlags.Offline);
             var userPath2 = user2.Path;
             await user2.DeleteAsync(authentication);
             Assert.AreNotEqual(string.Empty, userPath2);

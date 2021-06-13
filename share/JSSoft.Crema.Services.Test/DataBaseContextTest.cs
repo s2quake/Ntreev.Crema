@@ -56,7 +56,7 @@ namespace JSSoft.Crema.Services.Test
             expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
             await dataBaseContext.GenerateDataBasesAsync(expiredAuthentication, 20);
             await context.LoginRandomManyAsync(cremaHost);
-            await context.LoadRandomDataBaseManyAsync(dataBaseContext, expiredAuthentication);
+            await context.InitializeRandomSettingDataBasesAsync(dataBaseContext);
             await cremaHost.LogoutAsync(expiredAuthentication);
         }
 

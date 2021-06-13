@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Services
     [DispatcherMethod(typeof(IDataBaseContext), DeclaringType = typeof(IEnumerable<IDataBase>), MethodName = nameof(IEnumerable<IDataBase>.GetEnumerator))]
     [DispatcherMethod(typeof(IDataBaseContext), DeclaringType = typeof(IEnumerable), MethodName = nameof(IEnumerable.GetEnumerator))]
     [DispatcherProperty(typeof(IDataBaseContext), DeclaringType = typeof(IReadOnlyCollection<IDataBase>), PropertyName = nameof(IReadOnlyCollection<IDataBase>.Count))]
-    public interface IDataBaseContext : IReadOnlyCollection<IDataBase>, IEnumerable<IDataBase>, IDispatcherObject
+    public interface IDataBaseContext : IReadOnlyCollection<IDataBase>, IEnumerable<IDataBase>, IServiceProvider, IDispatcherObject
     {
         [DispatcherMethod(typeof(IDataBaseContext))]
         DataBaseContextMetaData GetMetaData(Authentication authentication);
