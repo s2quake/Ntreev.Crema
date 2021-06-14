@@ -651,6 +651,7 @@ namespace JSSoft.Crema.ServiceModel
             this.ValidateInvokeMethod(authentication);
             if (this.VerifyAccessType(authentication, AccessType.Master) == false)
                 throw new PermissionDeniedException();
+            NameValidator.ValidateName(newName);
 
             if (this.TypeCategory != null)
             {

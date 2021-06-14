@@ -54,7 +54,7 @@ namespace JSSoft.Crema.Services.Test
             token = await cremaHost.OpenAsync();
             dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
             expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-            await dataBaseContext.GenerateDataBasesAsync(expiredAuthentication, 40);
+            await dataBaseContext.GenerateDataBasesAsync(expiredAuthentication, 20);
             await context.LoginRandomManyAsync(cremaHost);
             await context.LoadRandomDataBasesAsync(dataBaseContext);
             await context.LockRandomDataBasesAsync(dataBaseContext);
@@ -350,7 +350,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task EnterAsync_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync();
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded | DataBaseFlags.Public);
             await dataBase.EnterAsync(authentication);
         }
 
@@ -375,7 +375,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task EnterAsync_Enter_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync();
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded | DataBaseFlags.Public);
             await dataBase.EnterAsync(authentication);
             await dataBase.EnterAsync(authentication);
         }
@@ -496,7 +496,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task RenameAsync_Expired_FailTestAsync()
         {
             var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Public);
-            var dataBaseName = RandomUtility.NextInvalidName();
+            var dataBaseName = RandomUtility.NextName();
             await dataBase.RenameAsync(expiredAuthentication, dataBaseName);
         }
 
@@ -506,7 +506,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Public);
-            var dataBaseName = RandomUtility.NextInvalidName();
+            var dataBaseName = RandomUtility.NextName();
             await dataBase.RenameAsync(authentication, dataBaseName);
         }
 
@@ -516,7 +516,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Public);
-            var dataBaseName = RandomUtility.NextInvalidName();
+            var dataBaseName = RandomUtility.NextName();
             await dataBase.RenameAsync(authentication, dataBaseName);
         }
 
@@ -526,7 +526,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded | DataBaseFlags.Public);
-            var dataBaseName = RandomUtility.NextInvalidName();
+            var dataBaseName = RandomUtility.NextName();
             await dataBase.RenameAsync(authentication, dataBaseName);
         }
 
@@ -538,19 +538,32 @@ namespace JSSoft.Crema.Services.Test
             var accessInfo = dataBase.AccessInfo;
             var user = await userCollection.GetRandomUserAsync(item => accessInfo.IsOwner(item.ID) == true);
             var authentication = await this.TestContext.LoginAsync(user.ID);
-            var dataBaseName = RandomUtility.NextInvalidName();
+            var dataBaseName = RandomUtility.NextName();
             await dataBase.RenameAsync(authentication, dataBaseName);
         }
 
         [TestMethod]
-        public async Task RenameAsync_Private_Master_TestAsync()
+        public async Task RenameAsync_Private_Master_Admin_TestAsync()
         {
             var userCollection = dataBaseContext.GetService(typeof(IUserCollection)) as IUserCollection;
             var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Private);
             var accessInfo = dataBase.AccessInfo;
-            var user = await userCollection.GetRandomUserAsync(item => accessInfo.IsMember(item.ID) && accessInfo.GetAccessType(item.ID) >= AccessType.Master);
-            var authentication = await this.TestContext.LoginAsync(user.ID);
-            var dataBaseName = RandomUtility.NextInvalidName();
+            var masterMembers = accessInfo.Members.Where(item => item.AccessType == AccessType.Master).Select(item => item.UserID);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin, item => masterMembers.Contains(item.ID));
+            var dataBaseName = RandomUtility.NextName();
+            await dataBase.RenameAsync(authentication, dataBaseName);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task RenameAsync_Private_Master_Member_FailTestAsync()
+        {
+            var userCollection = dataBaseContext.GetService(typeof(IUserCollection)) as IUserCollection;
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Private);
+            var accessInfo = dataBase.AccessInfo;
+            var masterMembers = accessInfo.Members.Where(item => item.AccessType == AccessType.Master).Select(item => item.UserID);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member, item => masterMembers.Contains(item.ID));
+            var dataBaseName = RandomUtility.NextName();
             await dataBase.RenameAsync(authentication, dataBaseName);
         }
 
@@ -561,7 +574,7 @@ namespace JSSoft.Crema.Services.Test
             var userCollection = dataBaseContext.GetService(typeof(IUserCollection)) as IUserCollection;
             var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Private);
             var accessInfo = dataBase.AccessInfo;
-            var user = await userCollection.GetRandomUserAsync(item => accessInfo.IsMember(item.ID) == false && accessInfo.IsOwner(item.ID) == false);
+            var user = await userCollection.GetRandomUserAsync(UserFlags.NotBanned, item => accessInfo.IsMember(item.ID) == false && accessInfo.IsOwner(item.ID) == false);
             var authentication = await this.TestContext.LoginAsync(user.ID);
             var dataBaseName = RandomUtility.NextInvalidName();
             await dataBase.RenameAsync(authentication, dataBaseName);
@@ -570,7 +583,92 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task DeleteAsync_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBase = await dataBaseContext.AddNewRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked, authentication);
+            var dataBaseName = dataBase.Name;
+            await dataBase.DeleteAsync(authentication);
+            var condition = await dataBaseContext.ContainsAsync(dataBaseName);
+            Assert.IsFalse(condition);
+        }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task DeleteAsync_Arg0_Null_FailTestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            await dataBase.DeleteAsync(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
+        public async Task DeleteAsync_FailTestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            await dataBase.DeleteAsync(expiredAuthentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task DeleteAsync_Member_PermissionDenied_FailTestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
+            await dataBase.DeleteAsync(authentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task DeleteAsync_Guest_PermissionDenied_FailTestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
+            await dataBase.DeleteAsync(authentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task DeleteAsync_Loaded_FailTestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            await dataBase.DeleteAsync(authentication);
+        }
+
+        [TestMethod]
+        public async Task DeleteAsync_Private_TestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Private | DataBaseFlags.NotLocked);
+            var dataBaseName = dataBase.Name;
+            var accessInfo = dataBase.AccessInfo;
+            var authentication = await this.TestContext.LoginAsync(accessInfo.UserID);
+            await dataBase.DeleteAsync(authentication);
+            var condition = await dataBaseContext.ContainsAsync(dataBaseName);
+            Assert.IsFalse(condition);
+        }
+
+        [TestMethod]
+        public async Task DeleteAsync_Private_MasterAccessType_Admin_TestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Private | DataBaseFlags.NotLocked);
+            var dataBaseName = dataBase.Name;
+            var accessInfo = dataBase.AccessInfo;
+            var masterMembers = accessInfo.Members.Where(item => item.AccessType == AccessType.Master).Select(item => item.UserID);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin, item => masterMembers.Contains(item.ID));
+            await dataBase.DeleteAsync(authentication);
+            var condition = await dataBaseContext.ContainsAsync(dataBaseName);
+            Assert.IsFalse(condition);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task DeleteAsync_Private_MasterAccessType_Member_FailTestAsync()
+        {
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Private | DataBaseFlags.NotLocked);
+            var dataBaseName = dataBase.Name;
+            var accessInfo = dataBase.AccessInfo;
+            var masterMembers = accessInfo.Members.Where(item => item.AccessType == AccessType.Master).Select(item => item.UserID);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member, item => masterMembers.Contains(item.ID));
+            await dataBase.DeleteAsync(authentication);
         }
 
         [TestMethod]

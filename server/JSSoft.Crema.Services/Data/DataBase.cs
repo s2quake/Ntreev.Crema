@@ -489,7 +489,7 @@ namespace JSSoft.Crema.Services.Data
                     throw new AuthenticationExpiredException(nameof(authentication));
                 if (name is null)
                     throw new ArgumentNullException(nameof(name));
-                    
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -522,6 +522,11 @@ namespace JSSoft.Crema.Services.Data
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {

@@ -22,6 +22,7 @@
 using System;
 using System.Threading.Tasks;
 using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.ServiceModel.Extensions;
 using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library.Random;
 
@@ -89,9 +90,23 @@ namespace JSSoft.Crema.Services.Random
 
         public static async Task<IDataBase> AddNewRandomDataBaseAsync(this IDataBaseContext dataBaseContext, Authentication authentication)
         {
-            var dataBaseName = await dataBaseContext.GenerateNewDataBaseNameAsync();
+            var name = RandomUtility.NextName();
+            var dataBaseName = await dataBaseContext.GenerateNewDataBaseNameAsync(name);
             var comment = RandomUtility.NextString();
             return await dataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
+        }
+
+        public static async Task<IDataBase> AddNewRandomDataBaseAsync(this IDataBaseContext dataBaseContext, DataBaseFlags dataBaseFlags, Authentication authentication)
+        {
+            dataBaseFlags.Validate();
+            var dataBase = await AddNewRandomDataBaseAsync(dataBaseContext, authentication);
+            if (dataBaseFlags.HasFlag(DataBaseFlags.Loaded) == true)
+                await dataBase.LoadAsync(authentication);
+            if (dataBaseFlags.HasFlag(DataBaseFlags.Private) == true)
+                await dataBase.SetPrivateAsync(authentication);
+            if (dataBaseFlags.HasFlag(DataBaseFlags.Locked) == true)
+                await dataBase.LockAsync(authentication, RandomUtility.NextString());
+            return dataBase;
         }
 
         private static bool DefaultPredicate(IDataBase dataBase) => true;

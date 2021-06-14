@@ -155,15 +155,18 @@ namespace JSSoft.Crema.Services.Test.Extensions
                     if (isLoaded == false)
                         await dataBase.LoadAsync(authentication);
                     await dataBase.SetPrivateAsync(authentication);
-                    await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Master);
-                    await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Developer);
-                    await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Editor);
-                    await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Guest);
-                    await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Master);
-                    await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Developer);
-                    await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Editor);
-                    await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Guest);
-                    await dataBase.AddAccessMemberAsync(authentication, guests.Dequeue().ID, AccessType.Guest);
+                    for (var j = 0; j < 3; j++)
+                    {
+                        await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Master);
+                        await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Developer);
+                        await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Editor);
+                        await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Guest);
+                        await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Master);
+                        await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Developer);
+                        await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Editor);
+                        await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Guest);
+                        await dataBase.AddAccessMemberAsync(authentication, guests.Dequeue().ID, AccessType.Guest);
+                    }
                     if (isLoaded == false)
                         await dataBase.UnloadAsync(authentication);
                     await cremaHost.LogoutAsync(authentication);
