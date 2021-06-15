@@ -32,7 +32,7 @@ using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost
 {
-    class CremaApplication : CremaBootstrapper
+    class CremaApplication : CremaBootstrapper, ICremaApplication
     {
         private readonly CremaService service;
 
@@ -64,7 +64,9 @@ namespace JSSoft.Crema.ConsoleHost
             {
                 yield return item;
             }
+            yield return new Tuple<Type, object>(typeof(ICremaApplication), this);
             yield return new Tuple<Type, object>(typeof(CremaApplication), this);
+            yield return new Tuple<Type, object>(typeof(CremaBootstrapper), this);
             yield return new Tuple<Type, object>(typeof(CremaService), service);
             yield return new Tuple<Type, object>(typeof(ICremaService), service);
         }
@@ -144,24 +146,24 @@ namespace JSSoft.Crema.ConsoleHost
             Environment.Exit(-1);
         }
 
-        private void Service_Opening(object sender, EventArgs e)
+        private async void Service_Opening(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() => this.Opening?.Invoke(this, e));
+            await this.Dispatcher.InvokeAsync(() => this.Opening?.Invoke(this, e));
         }
 
-        private void Service_Opened(object sender, EventArgs e)
+        private async void Service_Opened(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() => this.Opened?.Invoke(this, e));
+            await this.Dispatcher.InvokeAsync(() => this.Opened?.Invoke(this, e));
         }
 
-        private void Service_Closing(object sender, EventArgs e)
+        private async void Service_Closing(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() => this.Closing?.Invoke(this, e));
+            await this.Dispatcher.InvokeAsync(() => this.Closing?.Invoke(this, e));
         }
 
-        private void Service_Closed(object sender, ClosedEventArgs e)
+        private async void Service_Closed(object sender, ClosedEventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() => this.Closed?.Invoke(this, e));
+            await this.Dispatcher.InvokeAsync(() => this.Closed?.Invoke(this, e));
         }
     }
 }

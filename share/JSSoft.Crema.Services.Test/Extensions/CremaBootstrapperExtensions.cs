@@ -25,7 +25,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
 
         private static readonly Dictionary<Authentication, Guid> authenticationToToken = new();
 
-        public static void Initialize(this CremaBootstrapper app, TestContext context)
+        public static ServerHost Initialize(this CremaBootstrapper app, TestContext context)
         {
 #if SERVER
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", context.FullyQualifiedTestClassName);
@@ -34,7 +34,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
             CremaBootstrapper.CreateRepositoryInternal(app, repositoryPath, "git", "xml", string.Empty, userInfos, dataSet);
             app.BasePath = repositoryPath;
             repositoryPathByApp.Add(app, repositoryPath);
-            context.SetUserInfos(userInfos);
+            return new ServerHost(app, userInfos);
 #endif
 #if CLIENT
             var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;

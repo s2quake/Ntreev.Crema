@@ -1,5 +1,4 @@
-﻿#if CLIENT
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -76,4 +75,3 @@ namespace JSSoft.Crema.Services.Test
         }
     }
 }
-#endif

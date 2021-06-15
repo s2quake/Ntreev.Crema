@@ -40,6 +40,7 @@ namespace JSSoft.Crema.Services.Test
     public class UserCategoryTest
     {
         private static CremaBootstrapper app;
+        private static ServerHost serverHost;
         private static ICremaHost cremaHost;
         private static Guid token;
         private static IUserCategoryCollection userCategoryCollection;
@@ -51,7 +52,7 @@ namespace JSSoft.Crema.Services.Test
         public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
-            app.Initialize(context);
+            serverHost = app.Initialize(context);
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             token = await cremaHost.OpenAsync();
             userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
@@ -59,7 +60,7 @@ namespace JSSoft.Crema.Services.Test
             userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
             expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
             await cremaHost.LogoutAsync(expiredAuthentication);
-            await context.LoginRandomManyAsync(cremaHost);
+            await serverHost.LoginRandomManyAsync();
         }
 
         [ClassCleanup]

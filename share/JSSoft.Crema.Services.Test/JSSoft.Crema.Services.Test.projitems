@@ -35,6 +35,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\UserCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\UserExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableCategory_ComplexTest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ServerHost.cs" />
   </ItemGroup>
 </Project>

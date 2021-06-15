@@ -40,6 +40,7 @@ namespace JSSoft.Crema.Services.Test
     public class DataBaseTest
     {
         private static CremaBootstrapper app;
+        private static ServerHost serverHost;
         private static ICremaHost cremaHost;
         private static Guid token;
         private static IDataBaseContext dataBaseContext;
@@ -49,16 +50,16 @@ namespace JSSoft.Crema.Services.Test
         public static async Task ClassInitAsync(TestContext context)
         {
             app = new CremaBootstrapper();
-            app.Initialize(context);
+            serverHost = app.Initialize(context);
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             token = await cremaHost.OpenAsync();
             dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
             expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-            await dataBaseContext.GenerateDataBasesAsync(expiredAuthentication, 20);
-            await context.LoginRandomManyAsync(cremaHost);
-            await context.LoadRandomDataBasesAsync(dataBaseContext);
-            await context.LockRandomDataBasesAsync(dataBaseContext);
-            await context.SetPrivateRandomDataBasesAsync(dataBaseContext);
+            await serverHost.GenerateDataBasesAsync(20);
+            await serverHost.LoginRandomManyAsync();
+            await serverHost.LoadRandomDataBasesAsync();
+            await serverHost.LockRandomDataBasesAsync();
+            await serverHost.SetPrivateRandomDataBasesAsync();
             await cremaHost.LogoutAsync(expiredAuthentication);
         }
 
