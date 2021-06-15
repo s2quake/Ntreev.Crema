@@ -77,9 +77,6 @@ namespace JSSoft.Crema.Services.Users
                 case Authority.Admin:
                     types |= AuthenticationType.Administrator;
                     break;
-                case Authority.Guest:
-                    types |= AuthenticationType.ReadOnly;
-                    break;
             }
             return types;
         }

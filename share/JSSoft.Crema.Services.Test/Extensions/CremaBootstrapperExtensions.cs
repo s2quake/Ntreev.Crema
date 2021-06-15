@@ -38,7 +38,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
 #endif
 #if CLIENT
             var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", name);
+            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", context.FullyQualifiedTestClassName);
             var solutionPath = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
             var executablePath = Path.Combine(solutionPath, "server", "JSSoft.Crema.ConsoleHost", "bin", "Debug", "netcoreapp3.1", "cremaserver.exe");
             var port = ReservePort();

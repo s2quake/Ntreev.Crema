@@ -917,10 +917,6 @@ namespace JSSoft.Crema.Services.Users
             return this.Contains(itemPath);
         }
 
-        IUserCollection IUserContext.Users => this.Users;
-
-        IUserCategoryCollection IUserContext.Categories => this.Categories;
-
         IUserItem IUserContext.this[string itemPath] => this[itemPath] as IUserItem;
 
         IUserCategory IUserContext.Root => this.Root;

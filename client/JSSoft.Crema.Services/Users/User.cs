@@ -165,23 +165,90 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        public async Task<Guid> ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
+        public async Task<Guid> SetUserNameAsync(Authentication authentication, SecureString password, string userName)
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (password is null)
+                    throw new ArgumentNullException(nameof(password));
+                if (userName is null)
+                    throw new ArgumentNullException(nameof(userName));
+
                 this.ValidateExpired();
                 var userInfo = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(ChangeUserInfoAsync), this, userName, authority);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetUserNameAsync), this, userName);
                     return base.UserInfo;
                 });
-                if (userInfo.ID == authentication.ID && password == null && newPassword != null)
+                // if (userInfo.ID == authentication.ID && password == null && newPassword != null)
+                //     throw new ArgumentNullException(nameof(password));
+                // if (newPassword == null && password != null)
+                //     throw new ArgumentNullException(nameof(newPassword));
+                var encryptedPassword = UserContext.Encrypt(userInfo.ID, password);
+                // var p2 = newPassword == null ? null : UserContext.Encrypt(userInfo.ID, newPassword);
+                var result = await this.Service.SetUserNameAsync(userInfo.ID, encryptedPassword, userName);
+                await this.Context.WaitAsync(result.TaskID);
+                return result.TaskID;
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task<Guid> SetPasswordAsync(Authentication authentication, SecureString password, SecureString newPassword)
+        {
+            try
+            {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (password is null)
                     throw new ArgumentNullException(nameof(password));
-                if (newPassword == null && password != null)
+                if (newPassword is null)
                     throw new ArgumentNullException(nameof(newPassword));
-                var p1 = password == null ? null : UserContext.Encrypt(userInfo.ID, password);
-                var p2 = newPassword == null ? null : UserContext.Encrypt(userInfo.ID, newPassword);
-                var result = await this.Service.ChangeUserInfoAsync(userInfo.ID, p1, p2, userName, authority);
+
+                this.ValidateExpired();
+                var userInfo = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetPasswordAsync), this);
+                    return base.UserInfo;
+                });
+                var encryptedPassword1 = UserContext.Encrypt(userInfo.ID, password);
+                var encryptedPassword2 = UserContext.Encrypt(userInfo.ID, newPassword);
+                var result = await this.Service.SetPasswordAsync(userInfo.ID, encryptedPassword1, encryptedPassword2);
+                await this.Context.WaitAsync(result.TaskID);
+                return result.TaskID;
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task<Guid> ResetPasswordAsync(Authentication authentication)
+        {
+            try
+            {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
+                this.ValidateExpired();
+                var userInfo = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(ResetPasswordAsync), this);
+                    return base.UserInfo;
+                });
+                var result = await this.Service.ResetPasswordAsync(userInfo.ID);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -367,10 +434,21 @@ namespace JSSoft.Crema.Services.Users
             return this.DeleteAsync(authentication);
         }
 
-        Task IUser.ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
+        Task IUser.SetUserNameAsync(Authentication authentication, SecureString password, string userName)
         {
-            return this.ChangeUserInfoAsync(authentication, password, newPassword, userName, authority);
+            return this.SetUserNameAsync(authentication, password, userName);
         }
+
+        Task IUser.SetPasswordAsync(Authentication authentication, SecureString password, SecureString newPassword)
+        {
+            return this.SetPasswordAsync(authentication, password, newPassword);
+        }
+
+        Task IUser.ResetPasswordAsync(Authentication authentication)
+        {
+            return this.ResetPasswordAsync(authentication);
+        }
+
 
         Task IUser.KickAsync(Authentication authentication, string comment)
         {

@@ -2086,10 +2086,6 @@ namespace JSSoft.Crema.Services.Data
             return await this.BeginTransactionAsync(authentication);
         }
 
-        ITableContext IDataBase.TableContext => this.TableContext;
-
-        ITypeContext IDataBase.TypeContext => this.TypeContext;
-
         #endregion
 
         #region IAccessible

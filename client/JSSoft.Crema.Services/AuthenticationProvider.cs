@@ -53,7 +53,7 @@ namespace JSSoft.Crema.Services
                 else if (authority == Authority.Member)
                     return AuthenticationType.User;
                 else
-                    return AuthenticationType.User | AuthenticationType.ReadOnly;
+                    return AuthenticationType.User;
             }
         }
 

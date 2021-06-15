@@ -3,7 +3,6 @@ using JSSoft.Crema.Data.Xml.Schema;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Extensions;
 using JSSoft.Crema.Services.Random;
-using JSSoft.Crema.Services.Users.Serializations;
 using JSSoft.Library;
 using JSSoft.Library.Linq;
 using JSSoft.Library.Random;
@@ -106,7 +105,8 @@ namespace JSSoft.Crema.Services.Test.Extensions
             authentications.Clear();
         }
 
-        public static void SetUserInfos(this TestContext context, UserContextSerializationInfo userInfos)
+#if SERVER
+        public static void SetUserInfos(this TestContext context, JSSoft.Crema.Services.Users.Serializations.UserContextSerializationInfo userInfos)
         {
             context.Properties.Add(userInfosKey, userInfos);
         }
@@ -115,12 +115,12 @@ namespace JSSoft.Crema.Services.Test.Extensions
         {
             if (context.Properties.Contains(userInfosKey) == true)
             {
-                var userInfos = (UserContextSerializationInfo)context.Properties[userInfosKey];
+                var userInfos = (JSSoft.Crema.Services.Users.Serializations.UserContextSerializationInfo)context.Properties[userInfosKey];
                 var count = (int)(userInfos.Users.Length * 0.1);
                 await cremaHost.LoginRandomManyAsync(count);
             }
         }
-
+#endif
         public static async Task LoadRandomDataBasesAsync(this TestContext context, IDataBaseContext dataBaseContext)
         {
             var cremaHost = dataBaseContext.GetService(typeof(ICremaHost)) as ICremaHost;

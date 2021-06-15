@@ -115,7 +115,7 @@ namespace JSSoft.Crema.Services.Users
         public void InvokeUsersChangedEvent(Authentication authentication, User[] users)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersChangedEvent), users);
-            var message = EventMessageBuilder.ChangeUserInfo(authentication, users);
+            var message = EventMessageBuilder.SetUserName(authentication, users);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
             this.OnUsersChanged(new ItemsEventArgs<IUser>(authentication, users));
