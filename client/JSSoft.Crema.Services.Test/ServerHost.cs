@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -54,6 +55,31 @@ namespace JSSoft.Crema.Services.Test
             this.process.StandardInput.Flush();
             this.process.StandardInput.WriteLine("exit");
             this.process.WaitForExit();
+        }
+
+        public async Task GenerateDataBasesAsync(int count)
+        {
+
+        }
+
+        public async Task LoginRandomManyAsync()
+        {
+
+        }
+
+        public async Task LoadRandomDataBasesAsync()
+        {
+
+        }
+
+        public async Task LockRandomDataBasesAsync()
+        {
+
+        }
+
+        public async Task SetPrivateRandomDataBasesAsync()
+        {
+            
         }
 
         private void Process_Exited(object sender, EventArgs e)

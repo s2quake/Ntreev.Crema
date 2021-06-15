@@ -42,11 +42,11 @@ namespace JSSoft.Crema.Services.Test.Extensions
             var solutionPath = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
             var executablePath = Path.Combine(solutionPath, "server", "JSSoft.Crema.ConsoleHost", "bin", "Debug", "netcoreapp3.1", "cremaserver.exe");
             var port = ReservePort();
-            var repositoryInitCommand = new CommandHost(executablePath, solutionPath)
-            {
-                "init",
-                $"\"{repositoryPath}\""
-            };
+            // var repositoryInitCommand = new CommandHost(executablePath, solutionPath)
+            // {
+            //     "init",
+            //     $"\"{repositoryPath}\""
+            // };
             var serverHost = new ServerHost()
             {
                 ExecutablePath = executablePath,
@@ -54,10 +54,11 @@ namespace JSSoft.Crema.Services.Test.Extensions
                 WorkingPath = solutionPath,
                 Port = port
             };
-            repositoryInitCommand.Run();
+            // repositoryInitCommand.Run();
             serverHost.Start();
             serverHostByApp.Add(app, serverHost);
             app.Address = $"localhost:{port}";
+            return serverHost;
 #endif
         }
 
