@@ -54,6 +54,20 @@
             "console": "integratedTerminal",
             "stopAtEntry": false,
             "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "launch-crema-server-console-test",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/server/JSSoft.Crema.Services.TestModule/bin/Debug/netcoreapp3.1/cremaserver.dll",
+            "args": [
+                "test",
+                "../repository-test"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "neverOpen"
         }
     ]
 }

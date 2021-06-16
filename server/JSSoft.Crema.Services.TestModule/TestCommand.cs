@@ -27,6 +27,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using JSSoft.Crema.ConsoleHost;
 using System;
+using JSSoft.Crema.Services.TestModule.TestCommands;
 
 namespace JSSoft.Crema.Services.TestModule
 {
@@ -34,12 +35,14 @@ namespace JSSoft.Crema.Services.TestModule
     class TestCommand : CommandAsyncBase
     {
         private readonly ICremaApplication application;
+        private readonly TestCommandContext testCommandContext;
 
         [ImportingConstructor]
-        public TestCommand(ICremaApplication application)
+        public TestCommand(ICremaApplication application, TestCommandContext testCommandContext)
             : base("test")
         {
             this.application = application;
+            this.testCommandContext = testCommandContext;
         }
 
         [CommandPropertyRequired]
@@ -97,9 +100,36 @@ namespace JSSoft.Crema.Services.TestModule
             this.application.Port = this.Port;
             await this.application.OpenAsync();
             await this.Out.WriteLineAsync(this.StartupMessage);
-            while (Console.ReadLine() != this.CloseCommand)
-                ;
+            while (this.testCommandContext.IsCancellationRequested == false && Console.ReadLine() is string line)
+            {
+                await this.testCommandContext.ExecuteAsync(line);
+            }
             await this.application.CloseAsync();
+        }
+
+        private async Task GenerateDataBasesAsync(int count)
+        {
+
+        }
+
+        private async Task LoginRandomManyAsync()
+        {
+
+        }
+
+        private async Task LoadRandomDataBasesAsync()
+        {
+
+        }
+
+        private async Task LockRandomDataBasesAsync()
+        {
+
+        }
+
+        private async Task SetPrivateRandomDataBasesAsync()
+        {
+
         }
     }
 }

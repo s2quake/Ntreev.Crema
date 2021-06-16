@@ -66,7 +66,6 @@ namespace JSSoft.Crema.ConsoleHost
             }
             yield return new Tuple<Type, object>(typeof(ICremaApplication), this);
             yield return new Tuple<Type, object>(typeof(CremaApplication), this);
-            yield return new Tuple<Type, object>(typeof(CremaBootstrapper), this);
             yield return new Tuple<Type, object>(typeof(CremaService), service);
             yield return new Tuple<Type, object>(typeof(ICremaService), service);
         }
