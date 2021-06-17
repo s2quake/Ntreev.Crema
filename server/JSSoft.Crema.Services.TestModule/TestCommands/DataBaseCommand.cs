@@ -27,15 +27,36 @@ using System.Threading;
 using System.Threading.Tasks;
 using JSSoft.Crema.ConsoleHost;
 using System;
+using JSSoft.Crema.Services.Extensions;
+using JSSoft.Library.Random;
+using JSSoft.Crema.Services.Test.Extensions;
 
 namespace JSSoft.Crema.Services.TestModule.TestCommands
 {
     [Export(typeof(ITestCommand))]
     class DataBaseCommand : CommandMethodBase, ITestCommand
     {
+        private readonly ICremaHost cremaHost;
+
+        [ImportingConstructor]
+        public DataBaseCommand(ICremaHost cremaHost)
+            : base("database")
+        {
+            this.cremaHost = cremaHost;
+        }
+
+        [CommandMethod]
         public async Task GenerateAsync(int count)
         {
-            await this.Out.WriteAsync($"{count}");
+            var authentication = await this.cremaHost.LoginRandomAsync(Authority.Admin);
+            var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+            for (var i = 0; i < count; i++)
+            {
+                var dataBaseName = await dataBaseContext.GenerateNewDataBaseNameAsync(RandomUtility.NextName());
+                var comment = RandomUtility.NextString();
+                var item = await dataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
+            }
+            await cremaHost.LogoutAsync(authentication);
         }
     }
 }

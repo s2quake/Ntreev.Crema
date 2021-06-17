@@ -31,11 +31,11 @@ namespace JSSoft.Crema.Services.Test
         {
             this.errorList.Clear();
             this.manualEvent.Reset();
-            this.process.StartInfo.FileName = this.ExecutablePath;
-            this.process.StartInfo.Arguments = $"run \"{this.RepositoryPath}\" --port {this.Port} --startup-message {this.id}";
+            this.process.StartInfo.FileName = "dotnet";
+            this.process.StartInfo.Arguments = $"\"{this.ExecutablePath}\" test \"{this.RepositoryPath}\" --port {this.Port} --separator {this.id}";
             this.process.StartInfo.WorkingDirectory = this.WorkingPath;
-            this.process.StartInfo.RedirectStandardInput = true;
             this.process.StartInfo.UseShellExecute = false;
+            this.process.StartInfo.RedirectStandardInput = true;
             this.process.StartInfo.RedirectStandardOutput = true;
             this.process.StartInfo.RedirectStandardError = true;
             this.process.StartInfo.CreateNoWindow = true;
@@ -59,12 +59,18 @@ namespace JSSoft.Crema.Services.Test
 
         public async Task GenerateDataBasesAsync(int count)
         {
-
+            this.manualEvent.Reset();
+            this.process.StandardInput.Flush();
+            this.process.StandardInput.WriteLine("database generate 10");
+            await Task.Run(() => this.manualEvent.WaitOne());
         }
 
         public async Task LoginRandomManyAsync()
         {
-
+            this.manualEvent.Reset();
+            this.process.StandardInput.Flush();
+            this.process.StandardInput.WriteLine("cremahost login-many");
+            await Task.Run(() => this.manualEvent.WaitOne());
         }
 
         public async Task LoadRandomDataBasesAsync()
@@ -89,6 +95,7 @@ namespace JSSoft.Crema.Services.Test
 
         private void Process_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
         {
+            Console.WriteLine(e.Data);
             if (e.Data == $"{this.id}")
             {
                 this.manualEvent.Set();

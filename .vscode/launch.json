@@ -62,7 +62,10 @@
             "program": "${workspaceFolder}/server/JSSoft.Crema.Services.TestModule/bin/Debug/netcoreapp3.1/cremaserver.dll",
             "args": [
                 "test",
-                "../repository-test"
+                "../repository-test",
+                "--force",
+                "--port",
+                "4006"
             ],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",

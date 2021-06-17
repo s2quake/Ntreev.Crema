@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
+using JSSoft.Crema.Data;
 using JSSoft.Library.Commands;
 using System.ComponentModel.Composition;
 using System.Threading;
@@ -28,6 +29,9 @@ using System.Threading.Tasks;
 using JSSoft.Crema.ConsoleHost;
 using System;
 using JSSoft.Crema.Services.TestModule.TestCommands;
+using JSSoft.Library.IO;
+using JSSoft.Crema.Services.Test.Extensions;
+using JSSoft.Library.Random;
 
 namespace JSSoft.Crema.Services.TestModule
 {
@@ -35,14 +39,16 @@ namespace JSSoft.Crema.Services.TestModule
     class TestCommand : CommandAsyncBase
     {
         private readonly ICremaApplication application;
-        private readonly TestCommandContext testCommandContext;
+        private readonly TestTerminal terminal;
+        private readonly Cancellation cancellation;
 
         [ImportingConstructor]
-        public TestCommand(ICremaApplication application, TestCommandContext testCommandContext)
+        public TestCommand(ICremaApplication application, TestTerminal terminal, Cancellation cancellation)
             : base("test")
         {
             this.application = application;
-            this.testCommandContext = testCommandContext;
+            this.terminal = terminal;
+            this.cancellation = cancellation;
         }
 
         [CommandPropertyRequired]
@@ -80,31 +86,77 @@ namespace JSSoft.Crema.Services.TestModule
             set;
         }
 
-        [CommandProperty]
-        public string StartupMessage
+        [CommandProperty(InitValue = "8c93fab8-d772-44ef-836c-e491f03b300e")]
+        public string Separator
         {
             get; set;
         }
 
-        [CommandProperty(InitValue = "exit")]
-        public string CloseCommand
+        [CommandPropertySwitch]
+        public bool Force
         {
             get; set;
         }
 
         protected override async Task OnExecuteAsync(CancellationToken cancellation)
         {
-            CremaBootstrapper.CreateRepository(this.application, this.Path, this.RepositoryModule, this.FileType, this.DataBaseUrl);
-
-            this.application.BasePath = this.Path;
-            this.application.Port = this.Port;
-            await this.application.OpenAsync();
-            await this.Out.WriteLineAsync(this.StartupMessage);
-            while (this.testCommandContext.IsCancellationRequested == false && Console.ReadLine() is string line)
+            this.CreateRepository();
+            try
             {
-                await this.testCommandContext.ExecuteAsync(line);
+                this.application.BasePath = this.Path;
+                this.application.Port = this.Port;
+                await this.Out.WriteLineAsync(this.Path);
+                await this.Out.WriteLineAsync($"{this.Port}");
+                await this.application.OpenAsync();
+                await this.WriteUserListAsync();
+                await this.Out.WriteLineAsync(this.Separator);
+                this.terminal.Separator = this.Separator;
+                await this.terminal.StartAsync(this.cancellation.Token);
+                await this.application.CloseAsync();
             }
-            await this.application.CloseAsync();
+            catch (Exception e)
+            {
+                await this.Error.WriteLineAsync(e.Message);
+            }
+            finally
+            {
+                this.DeleteRepository();
+            }
+        }
+
+        private void CreateRepository()
+        {
+            var userInfos = UserContextExtensions.GenerateUserInfos(RandomUtility.Next(500, 1000), RandomUtility.Next(100, 1000));
+            var dataSet = new CremaDataSet();
+            try
+            {
+                CremaBootstrapper.CreateRepositoryInternal(this.application, this.Path, this.RepositoryModule, this.FileType, this.DataBaseUrl, userInfos, dataSet);
+            }
+            catch
+            {
+                if (this.Force == true)
+                {
+                    DirectoryUtility.Delete(this.Path);
+                }
+                CremaBootstrapper.CreateRepositoryInternal(this.application, this.Path, this.RepositoryModule, this.FileType, this.DataBaseUrl, userInfos, dataSet);
+            }
+        }
+
+        private void DeleteRepository()
+        {
+            DirectoryUtility.Delete(this.Path);
+        }
+
+        private async Task WriteUserListAsync()
+        {
+            var userCollection = this.application.GetService(typeof(IUserCollection)) as IUserCollection;
+            var users = await userCollection.GetUsersAsync();
+            var sb = new StringBuilder();
+            foreach (var item in users)
+            {
+                sb.AppendLine($"{item.ID}: {item.Authority}");
+            }
+            this.Out.WriteAsync(sb.ToString());
         }
 
         private async Task GenerateDataBasesAsync(int count)

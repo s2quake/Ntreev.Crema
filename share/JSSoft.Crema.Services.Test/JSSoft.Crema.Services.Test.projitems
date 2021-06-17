@@ -23,17 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\CremaBootstrapperExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\CremaHostExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DataBaseContextExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DataBaseExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableCategoryExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableContextExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TestContextExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeCategoryExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeContextExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\UserContextExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\UserCollectionExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\UserExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableCategory_ComplexTest.cs" />
   </ItemGroup>
 </Project>

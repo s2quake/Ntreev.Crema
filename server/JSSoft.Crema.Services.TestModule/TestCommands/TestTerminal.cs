@@ -32,12 +32,19 @@ using System.Collections.Generic;
 namespace JSSoft.Crema.Services.TestModule.TestCommands
 {
     [Export]
-    class TestCommandContext : CommandContextBase
+    class TestTerminal : CommandContextTerminal
     {
         [ImportingConstructor]
-        public TestCommandContext([ImportMany]IEnumerable<ITestCommand> commands)
-            : base(commands)
+        public TestTerminal(TestCommandContext testCommandContext)
+            : base(testCommandContext)
         {
+        }
+
+        public string Separator { get; set; }
+
+        protected override void OnExecuted(Exception e)
+        {
+            this.EnqueueString(this.Separator + Environment.NewLine);
         }
     }
 }

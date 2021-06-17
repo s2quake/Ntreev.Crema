@@ -27,17 +27,31 @@ using System.Threading;
 using System.Threading.Tasks;
 using JSSoft.Crema.ConsoleHost;
 using System;
-using System.Collections.Generic;
+using JSSoft.Crema.Services.Extensions;
+using JSSoft.Library.Random;
+using JSSoft.Crema.Services.Test.Extensions;
 
 namespace JSSoft.Crema.Services.TestModule.TestCommands
 {
-    [Export]
-    class TestCommandContext : CommandContextBase
+    [Export(typeof(ITestCommand))]
+    class CremaHostCommand : CommandMethodBase, ITestCommand
     {
+        private readonly ICremaHost cremaHost;
+
         [ImportingConstructor]
-        public TestCommandContext([ImportMany]IEnumerable<ITestCommand> commands)
-            : base(commands)
+        public CremaHostCommand(ICremaHost cremaHost)
+            : base("cremahost")
         {
+            this.cremaHost = cremaHost;
+        }
+
+        [CommandMethod]
+        public async Task LoginManyAsync()
+        {
+            var userCollection = this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            var userCount = await userCollection.Dispatcher.InvokeAsync(() => userCollection.Count);
+            var count = (int)(userCount * 0.25);
+            await cremaHost.LoginRandomManyAsync(count);
         }
     }
 }

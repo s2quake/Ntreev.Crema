@@ -2,12 +2,12 @@
 using JSSoft.Library;
 using JSSoft.Library.IO;
 using JSSoft.Library.Random;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace JSSoft.Crema.Services.Test.Extensions
 {
@@ -39,14 +39,9 @@ namespace JSSoft.Crema.Services.Test.Extensions
 #if CLIENT
             var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", context.FullyQualifiedTestClassName);
-            var solutionPath = Path.GetDirectoryName(Path.GetDirectoryName(context.TestDir));
-            var executablePath = Path.Combine(solutionPath, "server", "JSSoft.Crema.ConsoleHost", "bin", "Debug", "netcoreapp3.1", "cremaserver.exe");
+            var solutionPath = Path.GetFullPath(Path.Combine(context.DeploymentDirectory, "..", "..", "..", "..", ".."));
+            var executablePath = Path.Combine(solutionPath, "server", "JSSoft.Crema.Services.TestModule", "bin", "Debug", "netcoreapp3.1", "cremaserver.dll");
             var port = ReservePort();
-            // var repositoryInitCommand = new CommandHost(executablePath, solutionPath)
-            // {
-            //     "init",
-            //     $"\"{repositoryPath}\""
-            // };
             var serverHost = new ServerHost()
             {
                 ExecutablePath = executablePath,
@@ -54,7 +49,6 @@ namespace JSSoft.Crema.Services.Test.Extensions
                 WorkingPath = solutionPath,
                 Port = port
             };
-            // repositoryInitCommand.Run();
             serverHost.Start();
             serverHostByApp.Add(app, serverHost);
             app.Address = $"localhost:{port}";
@@ -102,6 +96,5 @@ namespace JSSoft.Crema.Services.Test.Extensions
             }
         }
 #endif
-
     }
 }
