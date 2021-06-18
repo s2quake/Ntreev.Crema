@@ -29,9 +29,9 @@ namespace JSSoft.Crema.Services.Extensions
 {
     public static class UserContextExtensions
     {
-        public static Task<UserContextMetaData> GetMetaDataAsync(this IUserContext userContext, Authentication authentication)
+        public static Task<UserContextMetaData> GetMetaDataAsync(this IUserContext userContext)
         {
-            return userContext.Dispatcher.InvokeAsync(() => userContext.GetMetaData(authentication));
+            return userContext.Dispatcher.InvokeAsync(() => userContext.GetMetaData());
         }
 
         public static Task NotifyMessageAsync(this IUserContext userContext, Authentication authentication, string message)

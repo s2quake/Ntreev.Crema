@@ -174,17 +174,15 @@ namespace JSSoft.Crema.Services.Domains
             return this.Contains(domainID.ToString());
         }
 
-        public DomainMetaData[] GetMetaData(Authentication authentication)
+        public DomainMetaData[] GetMetaData()
         {
             this.Dispatcher.VerifyAccess();
-            if (authentication == null)
-                throw new ArgumentNullException(nameof(authentication));
 
             var domains = this.ToArray<Domain>();
             var metaDataList = new List<DomainMetaData>(domains.Length);
             foreach (var item in domains)
             {
-                var metaData = item.GetMetaData(authentication);
+                var metaData = item.GetMetaData(Authentication.System);
                 metaDataList.Add(metaData);
             }
             return metaDataList.ToArray();

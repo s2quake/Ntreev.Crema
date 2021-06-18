@@ -24,6 +24,7 @@ using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
 using JSSoft.Library;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Text;
@@ -33,10 +34,7 @@ namespace JSSoft.Crema.ServiceHosts
 {
     class CremaHostService : CremaServiceItemBase<ICremaHostEventCallback>, ICremaHostService
     {
-        private bool isSubscribed;
-        private Guid authenticationToken;
-        private Authentication authentication;
-        private ShutdownContext shutdownContext;
+        private Peer peer;
 
         public CremaHostService(CremaService service, ICremaHostEventCallback callback)
             : base(service, callback)
@@ -48,88 +46,88 @@ namespace JSSoft.Crema.ServiceHosts
 
         private void CremaHost_CloseRequested(object sender, CloseRequestedEventArgs e)
         {
-            if (this.authentication != null)
-            {
-                this.authentication = null;
-            }
+            // this.authenticationByToken.Clear();
         }
 
         public async Task DisposeAsync()
         {
-            if (this.authentication != null)
+            if (this.peer != null)
             {
-                await this.CremaHost.LogoutAsync(this.authentication);
-                this.authentication = null;
+                foreach (var item in this.peer.Authentications)
+                {
+                    await this.CremaHost.LogoutAsync(item);
+                }
+                this.peer.Dispose();
+                this.peer = null;
             }
+            // this.authenticationByToken.Clear();
             this.CremaHost.CloseRequested -= CremaHost_CloseRequested;
         }
 
-        public async Task<ResultBase> SubscribeAsync(string version, string platformID, string culture)
+        public async Task<ResultBase<Guid>> SubscribeAsync(string version, string platformID, string culture)
         {
-            if (this.isSubscribed == true)
+            if (this.peer != null)
                 throw new InvalidOperationException();
             var serverVersion = typeof(ICremaHost).Assembly.GetName().Version;
             var clientVersion = new Version(version);
+            var token = Guid.NewGuid();
             if (clientVersion < serverVersion)
                 throw new ArgumentException(Resources.Exception_LowerVersion, nameof(version));
 
-            await Task.Run(() => this.isSubscribed = true);
+            await Task.Delay(1);
+            this.peer = new Peer(token);
             this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(SubscribeAsync)}");
-            return new ResultBase()
+            return new ResultBase<Guid>()
             {
+                Value = token,
                 SignatureDate = new SignatureDateProvider(this.OwnerID)
             };
         }
 
         public async Task<ResultBase<Guid>> LoginAsync(string userID, byte[] password)
         {
-            this.authenticationToken = await this.CremaHost.LoginAsync(userID, ToSecureString(userID, password));
-            this.authentication = await this.CremaHost.AuthenticateAsync(this.authenticationToken);
-            this.OwnerID = this.authentication.ID;
+            var authenticationToken = await this.CremaHost.LoginAsync(userID, ToSecureString(userID, password));
+            var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
+            this.peer.Add(authenticationToken, authentication);
             this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(LoginAsync)}");
             return new ResultBase<Guid>()
             {
-                Value = this.authenticationToken,
-                SignatureDate = this.authentication.SignatureDate
+                Value = authenticationToken,
+                SignatureDate = authentication.SignatureDate
             };
         }
 
-        public async Task<ResultBase> LogoutAsync()
+        public async Task<ResultBase> LogoutAsync(Guid authenticationToken)
         {
-            var ownerID = this.OwnerID;
-            await this.CremaHost.LogoutAsync(this.authentication);
-            this.authentication = null;
+            var authentication = this.peer[authenticationToken];
+            var authenticationID = authentication.ID;
+            await this.CremaHost.LogoutAsync(authentication);
+            this.peer.Remove(authenticationToken);
             this.OwnerID = nameof(CremaHostService);
-            this.LogService.Debug($"[{ownerID}] {nameof(CremaHostService)} {nameof(LogoutAsync)}");
+            this.LogService.Debug($"[{authenticationID}] {nameof(CremaHostService)} {nameof(LogoutAsync)}");
             return new ResultBase()
             {
-                SignatureDate = new SignatureDateProvider(ownerID)
+                SignatureDate = new SignatureDateProvider(authenticationID)
             };
         }
 
         public async Task<ResultBase> LogoutAsync(string userID, byte[] password)
         {
-            var ownerID = this.OwnerID;
             await this.CremaHost.LogoutAsync(userID, ToSecureString(userID, password));
-            this.authentication = null;
-            this.OwnerID = nameof(CremaHostService);
-            this.LogService.Debug($"[{ownerID}] {nameof(CremaHostService)} {nameof(LogoutAsync)}");
+            this.LogService.Debug($"[{userID}] {nameof(CremaHostService)} {nameof(LogoutAsync)}");
             return new ResultBase()
             {
-                SignatureDate = new SignatureDateProvider(ownerID)
+                SignatureDate = new SignatureDateProvider(userID)
             };
         }
 
-        public async Task<ResultBase> UnsubscribeAsync()
+        public async Task<ResultBase> UnsubscribeAsync(Guid token)
         {
-            if (this.isSubscribed == false)
+            if (this.peer is null)
                 throw new InvalidOperationException();
-            if (this.authentication != null)
-            {
-                await this.CremaHost.LogoutAsync(this.authentication);
-                this.authentication = null;
-            }
-            this.isSubscribed = false;
+            await Task.Delay(1);
+            this.peer.Dispose();
+            this.peer = null;
             this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(UnsubscribeAsync)}");
             return new ResultBase()
             {
@@ -167,28 +165,29 @@ namespace JSSoft.Crema.ServiceHosts
             };
         }
 
-        public async Task<ResultBase> ShutdownAsync(int milliseconds, bool isRestart, string message)
+        public async Task<ResultBase> ShutdownAsync(Guid authenticationToken, int milliseconds, bool isRestart, string message)
         {
-            this.shutdownContext = new ShutdownContext()
+            var authentication = this.peer[authenticationToken];
+            var shutdownContext = new ShutdownContext()
             {
                 Milliseconds = milliseconds,
                 IsRestart = isRestart,
                 Message = message
             };
-            await this.CremaHost.ShutdownAsync(this.authentication, this.shutdownContext);
+            await this.CremaHost.ShutdownAsync(authentication, shutdownContext);
             return new ResultBase()
             {
-                SignatureDate = this.authentication.SignatureDate
+                SignatureDate = authentication.SignatureDate
             };
         }
 
-        public async Task<ResultBase> CancelShutdownAsync()
+        public async Task<ResultBase> CancelShutdownAsync(Guid authenticationToken)
         {
-            await this.CremaHost.CancelShutdownAsync(this.authentication);
-            this.shutdownContext = null;
+            var authentication = this.peer[authenticationToken];
+            await this.CremaHost.CancelShutdownAsync(authentication);
             return new ResultBase()
             {
-                SignatureDate = this.authentication.SignatureDate
+                SignatureDate = authentication.SignatureDate
             };
         }
 

@@ -236,19 +236,15 @@ namespace JSSoft.Crema.Services.Data
             });
         }
 
-        public DataBaseContextMetaData GetMetaData(Authentication authentication)
+        public DataBaseContextMetaData GetMetaData()
         {
-            if (authentication is null)
-                throw new ArgumentNullException(nameof(authentication));
-            if (authentication.IsExpired == true)
-                throw new AuthenticationExpiredException(nameof(authentication));
             this.Dispatcher.VerifyAccess();
 
             var dataBases = this.ToArray<DataBase>();
             var metaList = new List<DataBaseMetaData>(this.Count);
             foreach (var item in dataBases)
             {
-                var metaData = item.Dispatcher.Invoke(() => item.GetMetaData(authentication));
+                var metaData = item.Dispatcher.Invoke(() => item.GetMetaData());
                 metaList.Add(metaData);
             }
             return new DataBaseContextMetaData()
@@ -257,18 +253,13 @@ namespace JSSoft.Crema.Services.Data
             };
         }
 
-        public async Task<DataBaseContextMetaData> GetMetaDataAsync(Authentication authentication)
+        public async Task<DataBaseContextMetaData> GetMetaDataAsync()
         {
-            if (authentication == null)
-                throw new ArgumentNullException(nameof(authentication));
-            if (authentication.IsExpired == true)
-                throw new AuthenticationExpiredException(nameof(authentication));
-
             var dataBases = await this.Dispatcher.InvokeAsync(() => (from DataBase item in this select item).ToArray());
             var metaList = new List<DataBaseMetaData>(this.Count);
             foreach (var item in dataBases)
             {
-                var metaData = await item.Dispatcher.InvokeAsync(() => item.GetMetaData(authentication));
+                var metaData = await item.Dispatcher.InvokeAsync(() => item.GetMetaData());
                 metaList.Add(metaData);
             }
             return new DataBaseContextMetaData()

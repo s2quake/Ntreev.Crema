@@ -35,7 +35,7 @@ namespace JSSoft.Crema.RuntimeService
             this.service = service;
         }
 
-        protected override Task<IRuntimeService> CreateServiceAsync()
+        protected override Task<IRuntimeService> CreateServiceAsync(IPeer peer)
         {
             return Task.Run<IRuntimeService>(() => this.service);
         }

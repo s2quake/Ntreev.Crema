@@ -276,5 +276,7 @@ namespace JSSoft.Crema.ServiceHosts
                 throw new InvalidOperationException($"port {port} can not use.");
             }
         }
+
+        internal Guid Token => this.token;
     }
 }

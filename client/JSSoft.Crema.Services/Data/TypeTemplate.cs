@@ -83,17 +83,17 @@ namespace JSSoft.Crema.Services.Data
 
         protected override Task<ResultBase<DomainMetaData>> OnBeginDomainAsync(Authentication authentication)
         {
-            return this.Service.BeginTypeTemplateEditAsync(this.type.Name);
+            return this.Service.BeginTypeTemplateEditAsync(authentication.Token, this.type.Name);
         }
 
         protected override async Task<ResultBase<TypeInfo[]>> OnEndDomainAsync(Authentication authentication)
         {
-            return await this.Service.EndTypeTemplateEditAsync(this.Domain.ID);
+            return await this.Service.EndTypeTemplateEditAsync(authentication.Token, this.Domain.ID);
         }
 
         protected override async Task<ResultBase> OnCancelDomainAsync(Authentication authentication)
         {
-            return await this.Service.CancelTypeTemplateEditAsync(this.Domain.ID);
+            return await this.Service.CancelTypeTemplateEditAsync(authentication.Token, this.Domain.ID);
         }
 
         private TypeCollection Container => this.type.Container;

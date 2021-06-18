@@ -84,7 +84,7 @@ namespace JSSoft.Crema.Services.Data
                     return table.Name;
                 });
                 var taskID = GuidUtility.FromName(nameof(InheritAsync) + categoryPath + newTableName + copyContent);
-                var result = await this.Service.InheritTableAsync(name, newTableName, categoryPath, copyContent);
+                var result = await this.Service.InheritTableAsync(authentication.Token, name, newTableName, categoryPath, copyContent);
                 var tableInfos = result.Value;
                 await this.DataBase.WaitAsync(taskID);
                 return await this.Dispatcher.InvokeAsync(() => tableInfos.Select(item => this[item.Name]).ToArray());
@@ -108,7 +108,7 @@ namespace JSSoft.Crema.Services.Data
                     return table.Name;
                 });
                 var taskID = GuidUtility.FromName(nameof(CopyAsync) + categoryPath + newTableName + copyContent);
-                var result = await this.Service.CopyTableAsync(name, newTableName, categoryPath, copyContent);
+                var result = await this.Service.CopyTableAsync(authentication.Token, name, newTableName, categoryPath, copyContent);
                 var tableInfos = result.Value;
                 await this.DataBase.WaitAsync(taskID);
                 return await this.Dispatcher.InvokeAsync(() => tableInfos.Select(item => this[item.Name]).ToArray());

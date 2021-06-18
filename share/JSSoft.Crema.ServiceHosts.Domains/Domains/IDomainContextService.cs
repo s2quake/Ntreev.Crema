@@ -29,42 +29,42 @@ namespace JSSoft.Crema.ServiceHosts.Domains
     public interface IDomainContextService
     {
         [OperationContract]
-        Task<ResultBase<DomainContextMetaData>> SubscribeAsync(Guid authenticationToken);
+        Task<ResultBase<DomainContextMetaData>> SubscribeAsync(Guid token);
 
         [OperationContract]
-        Task<ResultBase> UnsubscribeAsync();
+        Task<ResultBase> UnsubscribeAsync(Guid token);
 
         [OperationContract]
         Task<ResultBase<DomainMetaData[]>> GetMetaDataAsync(Guid dataBaseID);
 
         [OperationContract]
-        Task<ResultBase> SetUserLocationAsync(Guid domainID, DomainLocationInfo location);
+        Task<ResultBase> SetUserLocationAsync(Guid authenticationToken, Guid domainID, DomainLocationInfo location);
 
         [OperationContract]
-        Task<ResultBase<DomainRowInfo[]>> NewRowAsync(Guid domainID, DomainRowInfo[] rows);
+        Task<ResultBase<DomainRowInfo[]>> NewRowAsync(Guid authenticationToken, Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
-        Task<ResultBase<DomainRowInfo[]>> RemoveRowAsync(Guid domainID, DomainRowInfo[] rows);
+        Task<ResultBase<DomainRowInfo[]>> RemoveRowAsync(Guid authenticationToken, Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
-        Task<ResultBase<DomainRowInfo[]>> SetRowAsync(Guid domainID, DomainRowInfo[] rows);
+        Task<ResultBase<DomainRowInfo[]>> SetRowAsync(Guid authenticationToken, Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
-        Task<ResultBase> SetPropertyAsync(Guid domainID, string propertyName, object value);
+        Task<ResultBase> SetPropertyAsync(Guid authenticationToken, Guid domainID, string propertyName, object value);
 
         [OperationContract]
-        Task<ResultBase> BeginUserEditAsync(Guid domainID, DomainLocationInfo location);
+        Task<ResultBase> BeginUserEditAsync(Guid authenticationToken, Guid domainID, DomainLocationInfo location);
 
         [OperationContract]
-        Task<ResultBase> EndUserEditAsync(Guid domainID);
+        Task<ResultBase> EndUserEditAsync(Guid authenticationToken, Guid domainID);
 
         [OperationContract]
-        Task<ResultBase> KickAsync(Guid domainID, string userID, string comment);
+        Task<ResultBase> KickAsync(Guid authenticationToken, Guid domainID, string userID, string comment);
 
         [OperationContract]
-        Task<ResultBase> SetOwnerAsync(Guid domainID, string userID);
+        Task<ResultBase> SetOwnerAsync(Guid authenticationToken, Guid domainID, string userID);
 
         [OperationContract]
-        Task<ResultBase<object>> DeleteDomainAsync(Guid domainID, bool force);
+        Task<ResultBase<object>> DeleteDomainAsync(Guid authenticationToken, Guid domainID, bool force);
     }
 }

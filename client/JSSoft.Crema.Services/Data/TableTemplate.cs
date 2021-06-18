@@ -80,17 +80,17 @@ namespace JSSoft.Crema.Services.Data
 
         protected override Task<ResultBase<DomainMetaData>> OnBeginDomainAsync(Authentication authentication)
         {
-            return this.Service.BeginTableTemplateEditAsync(this.table.Name);
+            return this.Service.BeginTableTemplateEditAsync(authentication.Token, this.table.Name);
         }
 
         protected override async Task<ResultBase<TableInfo[]>> OnEndDomainAsync(Authentication authentication)
         {
-            return await this.Service.EndTableTemplateEditAsync(this.Domain.ID);
+            return await this.Service.EndTableTemplateEditAsync(authentication.Token, this.Domain.ID);
         }
 
         protected override async Task<ResultBase> OnCancelDomainAsync(Authentication authentication)
         {
-            return await this.Service.CancelTableTemplateEditAsync(this.Domain.ID);
+            return await this.Service.CancelTableTemplateEditAsync(authentication.Token, this.Domain.ID);
         }
 
         private TableCollection Container => this.table.Container;

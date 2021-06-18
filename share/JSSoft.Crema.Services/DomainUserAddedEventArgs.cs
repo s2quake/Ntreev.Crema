@@ -29,17 +29,6 @@ namespace JSSoft.Crema.Services
             this.Data = data;
         }
 
-        public byte[] GetData(Authentication authentication)
-        {
-            if (this.UserID == authentication.ID)
-            {
-                return this.Data;
-            }
-            return null;
-        }
-
-        private byte[] Data { get; }
-
-
+        public byte[] Data { get; }
     }
 }

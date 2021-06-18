@@ -29,48 +29,48 @@ namespace JSSoft.Crema.ServiceHosts.Users
     public partial interface IUserContextService
     {
         [OperationContract]
-        Task<ResultBase<UserContextMetaData>> SubscribeAsync(Guid authenticationToken);
+        Task<ResultBase<UserContextMetaData>> SubscribeAsync(Guid token);
 
         [OperationContract]
-        Task<ResultBase> UnsubscribeAsync();
+        Task<ResultBase> UnsubscribeAsync(Guid token);
 
         [OperationContract]
-        Task<ResultBase<UserInfo>> NewUserAsync(string userID, string categoryPath, byte[] password, string userName, Authority authority);
+        Task<ResultBase<UserInfo>> NewUserAsync(Guid authenticationToken, string userID, string categoryPath, byte[] password, string userName, Authority authority);
 
         [OperationContract]
-        Task<ResultBase> NewUserCategoryAsync(string categoryPath);
+        Task<ResultBase> NewUserCategoryAsync(Guid authenticationToken, string categoryPath);
 
         [OperationContract]
-        Task<ResultBase> RenameUserItemAsync(string itemPath, string newName);
+        Task<ResultBase> RenameUserItemAsync(Guid authenticationToken, string itemPath, string newName);
 
         [OperationContract]
-        Task<ResultBase> MoveUserItemAsync(string itemPath, string parentPath);
+        Task<ResultBase> MoveUserItemAsync(Guid authenticationToken, string itemPath, string parentPath);
 
         [OperationContract]
-        Task<ResultBase> DeleteUserItemAsync(string itemPath);
+        Task<ResultBase> DeleteUserItemAsync(Guid authenticationToken, string itemPath);
 
         [OperationContract]
-        Task<ResultBase<UserInfo>> SetUserNameAsync(string userID, byte[] password, string userName);
+        Task<ResultBase<UserInfo>> SetUserNameAsync(Guid authenticationToken, string userID, byte[] password, string userName);
 
         [OperationContract]
-        Task<ResultBase<UserInfo>> SetPasswordAsync(string userID, byte[] password, byte[] newPassword);
+        Task<ResultBase<UserInfo>> SetPasswordAsync(Guid authenticationToken, string userID, byte[] password, byte[] newPassword);
 
         [OperationContract]
-        Task<ResultBase<UserInfo>> ResetPasswordAsync(string userID);
+        Task<ResultBase<UserInfo>> ResetPasswordAsync(Guid authenticationToken, string userID);
 
         [OperationContract]
-        Task<ResultBase> KickAsync(string userID, string comment);
+        Task<ResultBase> KickAsync(Guid authenticationToken, string userID, string comment);
 
         [OperationContract]
-        Task<ResultBase<BanInfo>> BanAsync(string userID, string comment);
+        Task<ResultBase<BanInfo>> BanAsync(Guid authenticationToken, string userID, string comment);
 
         [OperationContract]
-        Task<ResultBase> UnbanAsync(string userID);
+        Task<ResultBase> UnbanAsync(Guid authenticationToken, string userID);
 
         [OperationContract]
-        Task<ResultBase> SendMessageAsync(string userID, string message);
+        Task<ResultBase> SendMessageAsync(Guid authenticationToken, string userID, string message);
 
         [OperationContract]
-        Task<ResultBase> NotifyMessageAsync(string[] userIDs, string message);
+        Task<ResultBase> NotifyMessageAsync(Guid authenticationToken, string[] userIDs, string message);
     }
 }

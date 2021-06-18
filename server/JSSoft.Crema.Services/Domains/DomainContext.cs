@@ -189,19 +189,17 @@ namespace JSSoft.Crema.Services.Domains
             });
         }
 
-        public DomainContextMetaData GetMetaData(Authentication authentication)
+        public DomainContextMetaData GetMetaData()
         {
             this.Dispatcher.VerifyAccess();
-            if (authentication == null)
-                throw new ArgumentNullException(nameof(authentication));
             return new DomainContextMetaData()
             {
-                DomainCategories = this.Categories.GetMetaData(authentication),
-                Domains = this.Domains.GetMetaData(authentication),
+                DomainCategories = this.Categories.GetMetaData(),
+                Domains = this.Domains.GetMetaData(),
             };
         }
 
-        public DomainMetaData[] GetDomainMetaDatas(Authentication authentication, Guid dataBaseID)
+        public DomainMetaData[] GetDomainMetaDatas(Guid dataBaseID)
         {
             return this.Dispatcher.Invoke(() =>
             {
@@ -209,7 +207,7 @@ namespace JSSoft.Crema.Services.Domains
                 var metaDataList = new List<DomainMetaData>(domains.Length);
                 foreach (var item in domains)
                 {
-                    metaDataList.Add(item.GetMetaData(authentication));
+                    metaDataList.Add(item.GetMetaData(Authentication.System));
                 }
                 return metaDataList.ToArray();
             });

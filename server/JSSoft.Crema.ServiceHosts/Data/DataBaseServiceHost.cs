@@ -33,12 +33,12 @@ namespace JSSoft.Crema.ServiceHosts.Data
             this.service = service;
         }
 
-        protected override Task<IDataBaseService> CreateServiceAsync(IDataBaseEventCallback callback)
+        protected override Task<IDataBaseService> CreateServiceAsync(IPeer peer, IDataBaseEventCallback callback)
         {
             return Task.Run<IDataBaseService>(() => new DataBaseService(this.service, callback));
         }
 
-        protected override async Task DestroyServiceAsync(IDataBaseService service)
+        protected override async Task DestroyServiceAsync(IPeer peer, IDataBaseService service)
         {
             if (service is DataBaseService dataBaseService)
             {

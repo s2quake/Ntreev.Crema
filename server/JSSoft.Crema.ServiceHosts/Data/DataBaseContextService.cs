@@ -32,9 +32,9 @@ namespace JSSoft.Crema.ServiceHosts.Data
 {
     class DataBaseContextService : CremaServiceItemBase<IDataBaseContextEventCallback>, IDataBaseContextService
     {
-        private Authentication authentication;
         private readonly Dictionary<Guid, ITransaction> transactionByID = new();
         private long index = 0;
+        private Peer peer;
 
         public DataBaseContextService(CremaService service, IDataBaseContextEventCallback callback)
             : base(service, callback)
@@ -48,219 +48,235 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         public async Task DisposeAsync()
         {
-            if (this.authentication != null)
-            {
-                await this.DetachEventHandlersAsync();
-                this.authentication = null;
-            }
+
         }
 
-        public async Task<ResultBase<DataBaseContextMetaData>> SubscribeAsync(Guid authenticationToken)
+        public async Task<ResultBase<DataBaseContextMetaData>> SubscribeAsync(Guid token)
         {
+            if (peer is not null)
+                throw new InvalidOperationException();
             var result = new ResultBase<DataBaseContextMetaData>();
-            this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
-            this.OwnerID = this.authentication.ID;
             result.Value = await this.AttachEventHandlersAsync();
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = SignatureDate.Empty;
+            this.peer = Peer.GetPeer(token);
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(SubscribeAsync)}");
             return result;
         }
 
-        public async Task<ResultBase> UnsubscribeAsync()
+        public async Task<ResultBase> UnsubscribeAsync(Guid token)
         {
+            if (this.peer == null)
+                throw new InvalidOperationException();
+            if (this.peer.ID != token)
+                throw new ArgumentException("invalid token", nameof(token));
             var result = new ResultBase();
             await this.DetachEventHandlersAsync();
-            await this.UserCollection.Dispatcher.InvokeAsync(() =>
-            {
-                this.UserCollection.UsersLoggedOut -= UserCollection_UsersLoggedOut;
-            });
-            this.authentication = null;
+            this.peer = null;
             result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(UnsubscribeAsync)}");
             return result;
         }
 
-        public async Task<ResultBase<CremaDataSet>> GetDataSetAsync(string dataBaseName, DataSetType dataSetType, string filterExpression, string revision)
+        public async Task<ResultBase<CremaDataSet>> GetDataSetAsync(Guid authenticationToken, string dataBaseName, DataSetType dataSetType, string filterExpression, string revision)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<CremaDataSet>();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.Value = await dataBase.GetDataSetAsync(this.authentication, dataSetType, filterExpression, revision);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.Value = await dataBase.GetDataSetAsync(authentication, dataSetType, filterExpression, revision);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> SetPublicAsync(string dataBaseName)
+        public async Task<ResultBase> SetPublicAsync(Guid authenticationToken, string dataBaseName)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.TaskID = await (Task<Guid>)dataBase.SetPublicAsync(this.authentication);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)dataBase.SetPublicAsync(authentication);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<AccessInfo>> SetPrivateAsync(string dataBaseName)
+        public async Task<ResultBase<AccessInfo>> SetPrivateAsync(Guid authenticationToken, string dataBaseName)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<AccessInfo>();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.TaskID = await (Task<Guid>)dataBase.SetPrivateAsync(this.authentication);
+            result.TaskID = await (Task<Guid>)dataBase.SetPrivateAsync(authentication);
             result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessInfo);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<AccessMemberInfo>> AddAccessMemberAsync(string dataBaseName, string memberID, AccessType accessType)
+        public async Task<ResultBase<AccessMemberInfo>> AddAccessMemberAsync(Guid authenticationToken, string dataBaseName, string memberID, AccessType accessType)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<AccessMemberInfo>();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.TaskID = await (Task<Guid>)dataBase.AddAccessMemberAsync(this.authentication, memberID, accessType);
+            result.TaskID = await (Task<Guid>)dataBase.AddAccessMemberAsync(authentication, memberID, accessType);
             var accessInfo = await dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessInfo);
             result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<AccessMemberInfo>> SetAccessMemberAsync(string dataBaseName, string memberID, AccessType accessType)
+        public async Task<ResultBase<AccessMemberInfo>> SetAccessMemberAsync(Guid authenticationToken, string dataBaseName, string memberID, AccessType accessType)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<AccessMemberInfo>();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.TaskID = await (Task<Guid>)dataBase.SetAccessMemberAsync(this.authentication, memberID, accessType);
+            result.TaskID = await (Task<Guid>)dataBase.SetAccessMemberAsync(authentication, memberID, accessType);
             var accessInfo = await dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessInfo);
             result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> RemoveAccessMemberAsync(string dataBaseName, string memberID)
+        public async Task<ResultBase> RemoveAccessMemberAsync(Guid authenticationToken, string dataBaseName, string memberID)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.TaskID = await (Task<Guid>)dataBase.RemoveAccessMemberAsync(this.authentication, memberID);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)dataBase.RemoveAccessMemberAsync(authentication, memberID);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<LockInfo>> LockAsync(string dataBaseName, string comment)
+        public async Task<ResultBase<LockInfo>> LockAsync(Guid authenticationToken, string dataBaseName, string comment)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<LockInfo>();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.TaskID = await (Task<Guid>)dataBase.LockAsync(this.authentication, comment);
+            result.TaskID = await (Task<Guid>)dataBase.LockAsync(authentication, comment);
             result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.LockInfo);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> UnlockAsync(string dataBaseName)
+        public async Task<ResultBase> UnlockAsync(Guid authenticationToken, string dataBaseName)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.TaskID = await (Task<Guid>)dataBase.UnlockAsync(this.authentication);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)dataBase.UnlockAsync(authentication);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> LoadAsync(string dataBaseName)
+        public async Task<ResultBase> LoadAsync(Guid authenticationToken, string dataBaseName)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.TaskID = await (Task<Guid>)dataBase.LoadAsync(this.authentication);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)dataBase.LoadAsync(authentication);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> UnloadAsync(string dataBaseName)
+        public async Task<ResultBase> UnloadAsync(Guid authenticationToken, string dataBaseName)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.TaskID = await (Task<Guid>)dataBase.UnloadAsync(this.authentication);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)dataBase.UnloadAsync(authentication);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<DataBaseInfo>> CreateAsync(string dataBaseName, string comment)
+        public async Task<ResultBase<DataBaseInfo>> CreateAsync(Guid authenticationToken, string dataBaseName, string comment)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<DataBaseInfo>();
-            var dataBase = await this.DataBaseContext.AddNewDataBaseAsync(this.authentication, dataBaseName, comment);
+            var dataBase = await this.DataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
             result.TaskID = GuidUtility.FromName(dataBaseName + comment);
             result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> RenameAsync(string dataBaseName, string newDataBaseName)
+        public async Task<ResultBase> RenameAsync(Guid authenticationToken, string dataBaseName, string newDataBaseName)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.TaskID = await (Task<Guid>)dataBase.RenameAsync(this.authentication, newDataBaseName);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)dataBase.RenameAsync(authentication, newDataBaseName);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> DeleteAsync(string dataBaseName)
+        public async Task<ResultBase> DeleteAsync(Guid authenticationToken, string dataBaseName)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.TaskID = await (Task<Guid>)dataBase.DeleteAsync(this.authentication);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)dataBase.DeleteAsync(authentication);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<DataBaseInfo>> CopyAsync(string dataBaseName, string newDataBaseName, string comment, bool force)
+        public async Task<ResultBase<DataBaseInfo>> CopyAsync(Guid authenticationToken, string dataBaseName, string newDataBaseName, string comment, bool force)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<DataBaseInfo>();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            var newDataBase = await dataBase.CopyAsync(this.authentication, newDataBaseName, comment, force);
+            var newDataBase = await dataBase.CopyAsync(authentication, newDataBaseName, comment, force);
             result.TaskID = GuidUtility.FromName(newDataBaseName + comment);
             result.Value = await newDataBase.Dispatcher.InvokeAsync(() => newDataBase.DataBaseInfo);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<LogInfo[]>> GetLogAsync(string dataBaseName, string revision)
+        public async Task<ResultBase<LogInfo[]>> GetLogAsync(Guid authenticationToken, string dataBaseName, string revision)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<LogInfo[]>();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.Value = await dataBase.GetLogAsync(this.authentication, revision);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.Value = await dataBase.GetLogAsync(authentication, revision);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<DataBaseInfo>> RevertAsync(string dataBaseName, string revision)
+        public async Task<ResultBase<DataBaseInfo>> RevertAsync(Guid authenticationToken, string dataBaseName, string revision)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<DataBaseInfo>();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.TaskID = await (Task<Guid>)dataBase.RevertAsync(this.authentication, revision);
+            result.TaskID = await (Task<Guid>)dataBase.RevertAsync(authentication, revision);
             result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<Guid>> BeginTransactionAsync(string dataBaseName)
+        public async Task<ResultBase<Guid>> BeginTransactionAsync(Guid authenticationToken, string dataBaseName)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<Guid>();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            var transaction = await dataBase.BeginTransactionAsync(this.authentication);
+            var transaction = await dataBase.BeginTransactionAsync(authentication);
             this.transactionByID[transaction.ID] = transaction;
             result.Value = transaction.ID;
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> EndTransactionAsync(Guid transactionID)
+        public async Task<ResultBase> EndTransactionAsync(Guid authenticationToken, Guid transactionID)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var transaction = this.transactionByID[transactionID];
-            await transaction.CommitAsync(this.authentication);
-            result.SignatureDate = this.authentication.SignatureDate;
+            await transaction.CommitAsync(authentication);
+            result.SignatureDate = authentication.SignatureDate;
             this.transactionByID.Remove(transactionID);
             return result;
         }
 
-        public async Task<ResultBase<DataBaseMetaData>> CancelTransactionAsync(Guid transactionID)
+        public async Task<ResultBase<DataBaseMetaData>> CancelTransactionAsync(Guid authenticationToken, Guid transactionID)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<DataBaseMetaData>();
             var transaction = this.transactionByID[transactionID];
-            result.Value = await transaction.RollbackAsync(this.authentication);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.Value = await transaction.RollbackAsync(authentication);
+            result.SignatureDate = authentication.SignatureDate;
             this.transactionByID.Remove(transactionID);
             return result;
         }
@@ -270,19 +286,6 @@ namespace JSSoft.Crema.ServiceHosts.Data
         public IUserContext UserContext { get; }
 
         public IUserCollection UserCollection { get; }
-
-        private async void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
-        {
-            var signatureDate = this.authentication.SignatureDate;
-            var actionUserID = e.InvokeID;
-            var contains = e.Items.Any(item => item.ID == signatureDate.ID);
-            var closeInfo = (CloseInfo)e.MetaData;
-            if (actionUserID != signatureDate.ID && contains == true)
-            {
-                await this.DetachEventHandlersAsync();
-                this.authentication = null;
-            }
-        }
 
         private void DataBaseContext_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
         {
@@ -419,10 +422,6 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         private async Task<DataBaseContextMetaData> AttachEventHandlersAsync()
         {
-            await this.UserCollection.Dispatcher.InvokeAsync(() =>
-            {
-                this.UserCollection.UsersLoggedOut += UserCollection_UsersLoggedOut;
-            });
             var metaData = await this.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
                 this.DataBaseContext.ItemsCreated += DataBaseContext_ItemsCreated;
@@ -439,7 +438,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
                 this.DataBaseContext.ItemsAccessChanged += DataBaseContext_ItemsAccessChanged;
                 this.DataBaseContext.ItemsLockChanged += DataBaseContext_ItemsLockChanged;
                 this.DataBaseContext.TaskCompleted += DataBaseContext_TaskCompleted;
-                return this.DataBaseContext.GetMetaData(this.authentication);
+                return this.DataBaseContext.GetMetaData();
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(AttachEventHandlersAsync)}");
             return metaData;
@@ -463,10 +462,6 @@ namespace JSSoft.Crema.ServiceHosts.Data
                 this.DataBaseContext.ItemsAccessChanged -= DataBaseContext_ItemsAccessChanged;
                 this.DataBaseContext.ItemsLockChanged -= DataBaseContext_ItemsLockChanged;
                 this.DataBaseContext.TaskCompleted -= DataBaseContext_TaskCompleted;
-            });
-            await this.UserCollection.Dispatcher.InvokeAsync(() =>
-            {
-                this.UserCollection.UsersLoggedOut -= UserCollection_UsersLoggedOut;
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(DetachEventHandlersAsync)}");
         }

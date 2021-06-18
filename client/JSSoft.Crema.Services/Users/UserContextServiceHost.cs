@@ -36,7 +36,7 @@ namespace JSSoft.Crema.Services.Users
 
         public IUserContextService Service { get; private set; }
 
-        protected override Task<IUserContextEventCallback> CreateCallbackAsync(IUserContextService service)
+        protected override Task<IUserContextEventCallback> CreateCallbackAsync(IPeer peer, IUserContextService service)
         {
             return Task.Run<IUserContextEventCallback>(() =>
             {
@@ -45,7 +45,7 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        protected override async Task DestroyCallbackAsync(IUserContextEventCallback callback)
+        protected override async Task DestroyCallbackAsync(IPeer peer, IUserContextEventCallback callback)
         {
             if (callback is UserContext userContext)
             {

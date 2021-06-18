@@ -29,19 +29,19 @@ namespace JSSoft.Crema.ServiceHosts
     public interface ICremaHostService
     {
         [OperationContract]
-        Task<ResultBase> SubscribeAsync(string version, string platformID, string culture);
+        Task<ResultBase<Guid>> SubscribeAsync(string version, string platformID, string culture);
 
         [OperationContract]
         Task<ResultBase<Guid>> LoginAsync(string userID, byte[] password);
 
         [OperationContract]
-        Task<ResultBase> LogoutAsync();
+        Task<ResultBase> LogoutAsync(Guid authenticationToken);
 
         [OperationContract]
         Task<ResultBase> LogoutAsync(string userID, byte[] password);
 
         [OperationContract]
-        Task<ResultBase> UnsubscribeAsync();
+        Task<ResultBase> UnsubscribeAsync(Guid token);
 
         [OperationContract]
         Task<ResultBase<string>> GetVersionAsync();
@@ -53,9 +53,9 @@ namespace JSSoft.Crema.ServiceHosts
         Task<ResultBase<ServiceInfo>> GetServiceInfoAsync();
 
         [OperationContract]
-        Task<ResultBase> ShutdownAsync(int milliseconds, bool isRestart, string message);
+        Task<ResultBase> ShutdownAsync(Guid authenticationToken, int milliseconds, bool isRestart, string message);
 
         [OperationContract]
-        Task<ResultBase> CancelShutdownAsync();
+        Task<ResultBase> CancelShutdownAsync(Guid authenticationToken);
     }
 }

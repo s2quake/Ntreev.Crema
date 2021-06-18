@@ -75,31 +75,28 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task GetMetaData_TestAsync()
         {
-            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var metaData = await userContext.Dispatcher.InvokeAsync(() => userContext.GetMetaData(authentication));
+            userContext.Dispatcher.Invoke(() => userContext.GetMetaData());
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void GetMetaData_Arg0_Null_FailTest()
         {
-            userContext.GetMetaData(null);
+            userContext.GetMetaData();
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
         public void GetMetaData_Expired_FailTest()
         {
-            userContext.GetMetaData(expiredAuthentication);
+            userContext.GetMetaData();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void GetMetaData_Dispatcher_FailTest()
         {
-            var task = this.TestContext.LoginRandomAsync(Authority.Admin);
-            task.Wait();
-            userContext.GetMetaData(task.Result);
+            userContext.GetMetaData();
         }
 
         [TestMethod]

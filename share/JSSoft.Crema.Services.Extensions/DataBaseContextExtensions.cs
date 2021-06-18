@@ -29,9 +29,9 @@ namespace JSSoft.Crema.Services.Extensions
 {
     public static class DataBaseContextExtensions
     {
-        public static Task<DataBaseContextMetaData> GetMetaDataAsync(this IDataBaseContext dataBaseContext, Authentication authentication)
+        public static Task<DataBaseContextMetaData> GetMetaDataAsync(this IDataBaseContext dataBaseContext)
         {
-            return dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.GetMetaData(authentication));
+            return dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.GetMetaData());
         }
 
         public static Task<bool> ContainsAsync(this IDataBaseContext dataBaseContext, string dataBaseName)

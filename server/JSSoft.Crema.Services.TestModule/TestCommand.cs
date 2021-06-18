@@ -151,16 +151,14 @@ namespace JSSoft.Crema.Services.TestModule
 
         private async Task WriteUserListAsync()
         {
-            var cremaHost = this.application.GetService(typeof(ICremaHost)) as ICremaHost;
-            var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            var metaData = await userContext.Dispatcher.InvokeAsync(() => userContext.GetMetaData(Authentication.System));
-            var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(UserContextMetaData));
-            using var stream = new MemoryStream();
-            serializer.WriteObject(stream, metaData);
-            stream.Position = 0;
-            using var sr = new StreamReader(stream);
-            var text = sr.ReadToEnd();
-            await this.Out.WriteLineAsync(text);
+            // var userCollection = this.application.GetService(typeof(IUserCollection)) as IUserCollection;
+            // var users = await userCollection.GetUsersAsync();
+            // var sb = new StringBuilder();
+            // foreach (var item in users)
+            // {
+            //     sb.AppendLine($"{item.ID}: {item.Authority}");
+            // }
+            // this.Out.WriteAsync(sb.ToString());
         }
 
         private async Task GenerateDataBasesAsync(int count)

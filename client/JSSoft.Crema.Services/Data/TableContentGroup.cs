@@ -189,7 +189,7 @@ namespace JSSoft.Crema.Services.Data
 
             public async Task<SignatureDate> BeginContentAsync(Authentication authentication, string name)
             {
-                var result = await this.Service.BeginTableContentEditAsync(name);
+                var result = await this.Service.BeginTableContentEditAsync(authentication.Token, name);
                 this.CremaHost.Sign(authentication, result);
                 if (this.domain == null)
                 {
@@ -220,12 +220,12 @@ namespace JSSoft.Crema.Services.Data
                 return result.SignatureDate;
             }
 
-            private async Task EndDomainAsync()
+            private async Task EndDomainAsync(Authentication authentication)
             {
                 try
                 {
                     this.domain.Host = null;
-                    await this.Service.EndTableContentEditAsync(this.domain.ID);
+                    await this.Service.EndTableContentEditAsync(authentication.Token, this.domain.ID);
                     await this.DomainContext.WaitDeleteAsync(this.domain);
                 }
                 catch
@@ -235,12 +235,12 @@ namespace JSSoft.Crema.Services.Data
                 }
             }
 
-            private async Task CancelDomainAsync()
+            private async Task CancelDomainAsync(Authentication authentication)
             {
                 try
                 {
                     this.domain.Host = null;
-                    await this.Service.CancelTableContentEditAsync(this.domain.ID);
+                    await this.Service.CancelTableContentEditAsync(authentication.Token, this.domain.ID);
                     await this.DomainContext.WaitDeleteAsync(this.domain);
                 }
                 catch
@@ -254,7 +254,7 @@ namespace JSSoft.Crema.Services.Data
             {
                 if (this.domain.Host != null)
                 {
-                    await this.EndDomainAsync();
+                    await this.EndDomainAsync(authentication);
                 }
                 var tableInfos = this.domain.Result as TableInfo[];
                 var tableInfoByName = tableInfos.ToDictionary(item => item.Name);
@@ -281,7 +281,7 @@ namespace JSSoft.Crema.Services.Data
             {
                 if (this.domain.Host != null)
                 {
-                    await this.CancelDomainAsync();
+                    await this.CancelDomainAsync(authentication);
                 }
                 await this.Container.Dispatcher.InvokeAsync(() =>
                 {
@@ -300,7 +300,7 @@ namespace JSSoft.Crema.Services.Data
 
             public async Task EnterContentAsync(Authentication authentication)
             {
-                var result = await this.Service.EnterTableContentEditAsync(this.domain.ID);
+                var result = await this.Service.EnterTableContentEditAsync(authentication.Token, this.domain.ID);
                 await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
                 await this.domain.WaitUserEnterAsync(authentication);
                 await this.domain.DataDispatcher.InvokeAsync(() =>
@@ -319,7 +319,7 @@ namespace JSSoft.Crema.Services.Data
 
             public async Task LeaveContentAsync(Authentication authentication)
             {
-                var result = await this.Service.LeaveTableContentEditAsync(this.domain.ID);
+                var result = await this.Service.LeaveTableContentEditAsync(authentication.Token, this.domain.ID);
                 await this.domain.WaitUserLeaveAsync(authentication);
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 await this.Dispatcher.InvokeAsync(() =>

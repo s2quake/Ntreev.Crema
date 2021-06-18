@@ -33,12 +33,12 @@ namespace JSSoft.Crema.ServiceHosts
             this.service = service;
         }
 
-        protected override Task<ICremaHostService> CreateServiceAsync(ICremaHostEventCallback callback)
+        protected override Task<ICremaHostService> CreateServiceAsync(IPeer peer, ICremaHostEventCallback callback)
         {
             return Task.Run<ICremaHostService>(() => new CremaHostService(this.service, callback));
         }
 
-        protected override async Task DestroyServiceAsync(ICremaHostService service)
+        protected override async Task DestroyServiceAsync(IPeer peer, ICremaHostService service)
         {
             if (service is CremaHostService cremaHostService)
             {

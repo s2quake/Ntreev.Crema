@@ -44,6 +44,7 @@ namespace JSSoft.Crema.Services.Domains
         public readonly TaskResetEvent<Guid> creationEvent;
         public readonly TaskResetEvent<Guid> deletionEvent;
         public readonly IndexedDispatcher callbackEvent;
+        private Guid subscribeToken;
 
         public DomainContext(CremaHost cremaHost)
         {
@@ -61,12 +62,13 @@ namespace JSSoft.Crema.Services.Domains
             this.callbackEvent.Dispose();
         }
 
-        public async Task InitializeAsync(Guid authenticationToken)
+        public async Task InitializeAsync(Guid subscribeToken)
         {
-            var result = await this.Service.SubscribeAsync(authenticationToken);
+            var result = await this.Service.SubscribeAsync(subscribeToken);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.Initialize(result.Value);
+                this.subscribeToken = subscribeToken;
             });
             //  TODO: 데이터 베이스 변경은 서버에서 내용을 받아 갱신하는것으로 개선하는것이 좋을것 같음
             await this.CremaHost.DataBaseContext.Dispatcher.InvokeAsync(() =>
@@ -81,7 +83,7 @@ namespace JSSoft.Crema.Services.Domains
         public async Task ReleaseAsync()
         {
             if (this.Service != null)
-                await this.Service.UnsubscribeAsync();
+                await this.Service.UnsubscribeAsync(this.subscribeToken);
             await Task.Delay(100);
             var tasks = await this.Dispatcher.InvokeAsync(() =>
             {
@@ -97,6 +99,7 @@ namespace JSSoft.Crema.Services.Domains
             });
             await Task.WhenAll(tasks);
             await this.Dispatcher.InvokeAsync(this.Clear);
+            this.subscribeToken = Guid.Empty;
             this.ReleaseHandle.Set();
         }
 
@@ -141,15 +144,13 @@ namespace JSSoft.Crema.Services.Domains
             await this.deletionEvent.WaitAsync(domain.ID);
         }
 
-        public DomainContextMetaData GetMetaData(Authentication authentication)
+        public DomainContextMetaData GetMetaData()
         {
             this.Dispatcher.VerifyAccess();
-            if (authentication == null)
-                throw new ArgumentNullException(nameof(authentication));
             return new DomainContextMetaData()
             {
-                DomainCategories = this.Categories.GetMetaData(authentication),
-                Domains = this.Domains.GetMetaData(authentication),
+                DomainCategories = this.Categories.GetMetaData(),
+                Domains = this.Domains.GetMetaData(),
             };
         }
 
@@ -221,8 +222,6 @@ namespace JSSoft.Crema.Services.Domains
         public CremaDispatcher CallbackDispatcher { get; set; }
 
         public IDomainContextService Service { get; set; }
-
-        public string UserID => this.CremaHost.UserID;
 
         public ManualResetEvent ReleaseHandle { get; } = new ManualResetEvent(false);
 

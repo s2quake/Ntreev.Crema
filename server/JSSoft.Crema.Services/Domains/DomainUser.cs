@@ -71,7 +71,7 @@ namespace JSSoft.Crema.Services.Domains
             return this.domain.SetOwnerAsync(authentication, base.DomainUserInfo.UserID);
         }
 
-        public DomainUserMetaData GetMetaData(Authentication authentication)
+        public DomainUserMetaData GetMetaData()
         {
             this.Dispatcher.VerifyAccess();
             var metaData = new DomainUserMetaData()

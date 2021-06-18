@@ -34,7 +34,7 @@ namespace JSSoft.Crema.Services.Domains
             this.domainContext = domainContext;
         }
 
-        protected override Task<IDomainContextEventCallback> CreateCallbackAsync(IDomainContextService service)
+        protected override Task<IDomainContextEventCallback> CreateCallbackAsync(IPeer peer, IDomainContextService service)
         {
             return Task.Run<IDomainContextEventCallback>(() =>
             {
@@ -43,7 +43,7 @@ namespace JSSoft.Crema.Services.Domains
             });
         }
 
-        protected override async Task DestroyCallbackAsync(IDomainContextEventCallback callback)
+        protected override async Task DestroyCallbackAsync(IPeer peer, IDomainContextEventCallback callback)
         {
             if (callback is DomainContext domainContext)
             {

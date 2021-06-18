@@ -31,8 +31,8 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 {
     class DomainContextService : CremaServiceItemBase<IDomainContextEventCallback>, IDomainContextService
     {
-        private Authentication authentication;
         private long index = 0;
+        private Peer peer;
 
         public DomainContextService(CremaService service, IDomainContextEventCallback callback)
             : base(service, callback)
@@ -45,29 +45,27 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         public async Task DisposeAsync()
         {
-            if (this.authentication != null)
-            {
-                await this.DetachEventHandlersAsync();
-                this.authentication = null;
-            }
         }
 
-        public async Task<ResultBase<DomainContextMetaData>> SubscribeAsync(Guid authenticationToken)
+        public async Task<ResultBase<DomainContextMetaData>> SubscribeAsync(Guid token)
         {
             var result = new ResultBase<DomainContextMetaData>();
-            this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
-            this.OwnerID = this.authentication.ID;
             result.Value = await this.AttachEventHandlersAsync();
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = SignatureDate.Empty;
+            this.peer = Peer.GetPeer(token);
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(SubscribeAsync)}");
             return result;
         }
 
-        public async Task<ResultBase> UnsubscribeAsync()
+        public async Task<ResultBase> UnsubscribeAsync(Guid token)
         {
+            if (this.peer == null)
+                throw new InvalidOperationException();
+            if (this.peer.ID != token)
+                throw new ArgumentException("invalid token", nameof(token));
             var result = new ResultBase();
             await this.DetachEventHandlersAsync();
-            this.authentication = null;
+            this.peer = null;
             result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(UnsubscribeAsync)}");
             return result;
@@ -78,7 +76,7 @@ namespace JSSoft.Crema.ServiceHosts.Domains
             var result = new ResultBase<DomainMetaData[]>();
             result.Value = await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
-                var metaData = this.DomainContext.GetMetaData(authentication);
+                var metaData = this.DomainContext.GetMetaData();
                 var metaDataList = new List<DomainMetaData>(this.DomainContext.Domains.Count);
                 foreach (var item in metaData.Domains)
                 {
@@ -87,104 +85,114 @@ namespace JSSoft.Crema.ServiceHosts.Domains
                 }
                 return metaDataList.ToArray();
             });
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = SignatureDate.Empty;
             return result;
         }
 
-        public async Task<ResultBase<DomainRowInfo[]>> SetRowAsync(Guid domainID, DomainRowInfo[] rows)
+        public async Task<ResultBase<DomainRowInfo[]>> SetRowAsync(Guid authenticationToken, Guid domainID, DomainRowInfo[] rows)
         {
+            var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
             var result = new ResultBase<DomainRowInfo[]>();
             var domain = await this.GetDomainAsync(domainID);
-            var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.SetRowAsync(this.authentication, rows);
+            var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.SetRowAsync(authentication, rows);
             result.TaskID = info.ID;
             result.Value = info.Value;
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> SetPropertyAsync(Guid domainID, string propertyName, object value)
+        public async Task<ResultBase> SetPropertyAsync(Guid authenticationToken, Guid domainID, string propertyName, object value)
         {
+            var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
             var result = new ResultBase();
             var domain = await this.GetDomainAsync(domainID);
-            result.TaskID = await (Task<Guid>)domain.SetPropertyAsync(this.authentication, propertyName, value);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)domain.SetPropertyAsync(authentication, propertyName, value);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> BeginUserEditAsync(Guid domainID, DomainLocationInfo location)
+        public async Task<ResultBase> BeginUserEditAsync(Guid authenticationToken, Guid domainID, DomainLocationInfo location)
         {
+            var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
             var result = new ResultBase();
             var domain = await this.GetDomainAsync(domainID);
-            await domain.BeginUserEditAsync(this.authentication, location);
-            result.SignatureDate = this.authentication.SignatureDate;
+            await domain.BeginUserEditAsync(authentication, location);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> EndUserEditAsync(Guid domainID)
+        public async Task<ResultBase> EndUserEditAsync(Guid authenticationToken, Guid domainID)
         {
+            var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
             var result = new ResultBase();
             var domain = await this.GetDomainAsync(domainID);
-            await domain.EndUserEditAsync(this.authentication);
-            result.SignatureDate = this.authentication.SignatureDate;
+            await domain.EndUserEditAsync(authentication);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> KickAsync(Guid domainID, string userID, string comment)
+        public async Task<ResultBase> KickAsync(Guid authenticationToken, Guid domainID, string userID, string comment)
         {
+            var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
             var result = new ResultBase();
             var domain = await this.GetDomainAsync(domainID);
-            result.TaskID = await (Task<Guid>)domain.KickAsync(this.authentication, userID, comment);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)domain.KickAsync(authentication, userID, comment);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> SetOwnerAsync(Guid domainID, string userID)
+        public async Task<ResultBase> SetOwnerAsync(Guid authenticationToken, Guid domainID, string userID)
         {
+            var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
             var result = new ResultBase();
             var domain = await this.GetDomainAsync(domainID);
-            await domain.SetOwnerAsync(this.authentication, userID);
-            result.SignatureDate = this.authentication.SignatureDate;
+            await domain.SetOwnerAsync(authentication, userID);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> SetUserLocationAsync(Guid domainID, DomainLocationInfo location)
+        public async Task<ResultBase> SetUserLocationAsync(Guid authenticationToken, Guid domainID, DomainLocationInfo location)
         {
+            var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
             var result = new ResultBase();
             var domain = await this.GetDomainAsync(domainID);
-            await domain.SetUserLocationAsync(this.authentication, location);
-            result.SignatureDate = this.authentication.SignatureDate;
+            await domain.SetUserLocationAsync(authentication, location);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<DomainRowInfo[]>> NewRowAsync(Guid domainID, DomainRowInfo[] rows)
+        public async Task<ResultBase<DomainRowInfo[]>> NewRowAsync(Guid authenticationToken, Guid domainID, DomainRowInfo[] rows)
         {
+            var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
             var result = new ResultBase<DomainRowInfo[]>();
             var domain = await this.GetDomainAsync(domainID);
-            var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.NewRowAsync(this.authentication, rows);
+            var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.NewRowAsync(authentication, rows);
             result.TaskID = info.ID;
             result.Value = info.Value;
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<DomainRowInfo[]>> RemoveRowAsync(Guid domainID, DomainRowInfo[] rows)
+        public async Task<ResultBase<DomainRowInfo[]>> RemoveRowAsync(Guid authenticationToken, Guid domainID, DomainRowInfo[] rows)
         {
+            var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
             var result = new ResultBase<DomainRowInfo[]>();
             var domain = await this.GetDomainAsync(domainID);
-            var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.RemoveRowAsync(this.authentication, rows);
+            var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.RemoveRowAsync(authentication, rows);
             result.TaskID = info.ID;
             result.Value = info.Value;
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<object>> DeleteDomainAsync(Guid domainID, bool force)
+        public async Task<ResultBase<object>> DeleteDomainAsync(Guid authenticationToken, Guid domainID, bool force)
         {
+            var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
             var result = new ResultBase<object>();
             var domain = await this.GetDomainAsync(domainID);
-            result.TaskID = await (Task<Guid>)domain.DeleteAsync(this.authentication, force);
+            result.TaskID = await (Task<Guid>)domain.DeleteAsync(authentication, force);
             result.Value = domain.Result;
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
@@ -204,10 +212,6 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private async Task<DomainContextMetaData> AttachEventHandlersAsync()
         {
-            //await this.UserContext.Dispatcher.InvokeAsync(() =>
-            //{
-            //    this.UserContext.Users.UsersLoggedOut += UserCollection_UsersLoggedOut;
-            //});
             var metaData = await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
                 this.DomainContext.Domains.DomainsCreated += Domains_DomainsCreated;
@@ -226,7 +230,7 @@ namespace JSSoft.Crema.ServiceHosts.Domains
                 this.DomainContext.Domains.DomainRowRemoved += Domains_DomainRowRemoved;
                 this.DomainContext.Domains.DomainPropertyChanged += Domains_DomainPropertyChanged;
                 this.DomainContext.TaskCompleted += DomainContext_TaskCompleted;
-                return this.DomainContext.GetMetaData(this.authentication);
+                return this.DomainContext.GetMetaData();
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(AttachEventHandlersAsync)}");
             return metaData;
@@ -253,25 +257,8 @@ namespace JSSoft.Crema.ServiceHosts.Domains
                 this.DomainContext.Domains.DomainPropertyChanged -= Domains_DomainPropertyChanged;
                 this.DomainContext.TaskCompleted -= DomainContext_TaskCompleted;
             });
-            //await this.UserContext.Dispatcher.InvokeAsync(() =>
-            //{
-            //    this.UserContext.Users.UsersLoggedOut -= UserCollection_UsersLoggedOut;
-            //});
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(DetachEventHandlersAsync)}");
         }
-
-        //private async void UserCollection_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
-        //{
-        //    var signatureDate = this.authentication.SignatureDate;
-        //    var actionUserID = e.UserID;
-        //    var contains = e.Items.Any(item => item.ID == signatureDate.ID);
-        //    var closeInfo = (CloseInfo)e.MetaData;
-        //    if (actionUserID != signatureDate.ID && contains == true)
-        //    {
-        //        await this.DetachEventHandlersAsync();
-        //        this.authentication = null;
-        //    }
-        //}
 
         private void Domains_DomainsCreated(object sender, DomainsCreatedEventArgs e)
         {
@@ -315,7 +302,7 @@ namespace JSSoft.Crema.ServiceHosts.Domains
             var domainID = e.DomainInfo.DomainID;
             var domainUserInfo = e.DomainUserInfo;
             var domainUserState = e.DomainUserState;
-            var data = e.GetData(this.authentication);
+            var data = this.peer.Contains(e.UserID) ? e.Data : null;
             var taskID = e.TaskID;
             this.InvokeEvent(() => this.Callback?.OnUserAdded(callbackInfo, domainID, domainUserInfo, domainUserState, data, taskID));
         }
@@ -333,8 +320,7 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainUserLocationChanged(object sender, DomainUserLocationEventArgs e)
         {
-            var signatureDate = this.authentication.SignatureDate;
-            if (e.Domain.Users.Contains(signatureDate.ID) == false)
+            if (this.peer.Contains(e.UserID) == false)
                 return;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
@@ -352,8 +338,7 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainUserEditBegun(object sender, DomainUserLocationEventArgs e)
         {
-            var signatureDate = this.authentication.SignatureDate;
-            if (e.Domain.Users.Contains(signatureDate.ID) == false)
+            if (this.peer.Contains(e.UserID) == false)
                 return;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
@@ -364,8 +349,7 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainUserEditEnded(object sender, DomainUserEventArgs e)
         {
-            var signatureDate = this.authentication.SignatureDate;
-            if (e.Domain.Users.Contains(signatureDate.ID) == false)
+            if (this.peer.Contains(e.UserID) == false)
                 return;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
@@ -384,10 +368,8 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainRowAdded(object sender, DomainRowEventArgs e)
         {
-            var signatureDate = this.authentication.SignatureDate;
-            if (e.Domain.Users.Contains(signatureDate.ID) == false)
+            if (this.peer.Contains(e.UserID) == false)
                 return;
-            var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
@@ -398,8 +380,7 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainRowChanged(object sender, DomainRowEventArgs e)
         {
-            var signatureDate = this.authentication.SignatureDate;
-            if (e.Domain.Users.Contains(signatureDate.ID) == false)
+            if (this.peer.Contains(e.UserID) == false)
                 return;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
@@ -411,8 +392,7 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainRowRemoved(object sender, DomainRowEventArgs e)
         {
-            var signatureDate = this.authentication.SignatureDate;
-            if (e.Domain.Users.Contains(this.authentication.ID) == false)
+            if (this.peer.Contains(e.UserID) == false)
                 return;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
@@ -424,8 +404,7 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         private void Domains_DomainPropertyChanged(object sender, DomainPropertyEventArgs e)
         {
-            var signatureDate = this.authentication.SignatureDate;
-            if (e.Domain.Users.Contains(signatureDate.ID) == false)
+            if (this.peer.Contains(e.UserID) == false)
                 return;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };

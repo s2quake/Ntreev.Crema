@@ -32,7 +32,7 @@ namespace JSSoft.Crema.Services
     public interface IUserContext : IEnumerable<IUserItem>, IServiceProvider, IDispatcherObject
     {
         [DispatcherMethod(typeof(IUserContext))]
-        UserContextMetaData GetMetaData(Authentication authentication);
+        UserContextMetaData GetMetaData();
 
         Task NotifyMessageAsync(Authentication authentication, string[] userIDs, string message);
 

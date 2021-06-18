@@ -58,7 +58,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
                     return base.Path;
                 });
-                var result = await this.Service.SetPublicTypeItemAsync(path);
+                var result = await this.Service.SetPublicTypeItemAsync(authentication.Token, path);
                 await this.DataBase.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -79,7 +79,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
                     return base.Path;
                 });
-                var result = await this.Service.SetPrivateTypeItemAsync(path);
+                var result = await this.Service.SetPrivateTypeItemAsync(authentication.Token, path);
                 await this.DataBase.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -100,7 +100,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMemberAsync), this, memberID, accessType);
                     return base.Path;
                 });
-                var result = await this.Service.AddAccessMemberTypeItemAsync(path, memberID, accessType);
+                var result = await this.Service.AddAccessMemberTypeItemAsync(authentication.Token, path, memberID, accessType);
                 await this.DataBase.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -121,7 +121,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
                     return base.Path;
                 });
-                var result = await this.Service.SetAccessMemberTypeItemAsync(path, memberID, accessType);
+                var result = await this.Service.SetAccessMemberTypeItemAsync(authentication.Token, path, memberID, accessType);
                 await this.DataBase.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -142,7 +142,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
                     return base.Path;
                 });
-                var result = await this.Service.RemoveAccessMemberTypeItemAsync(path, memberID);
+                var result = await this.Service.RemoveAccessMemberTypeItemAsync(authentication.Token, path, memberID);
                 await this.DataBase.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -163,7 +163,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(Lock), this, comment);
                     return base.Path;
                 });
-                var result = await this.Service.LockTypeItemAsync(path, comment);
+                var result = await this.Service.LockTypeItemAsync(authentication.Token, path, comment);
                 await this.DataBase.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -184,7 +184,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnlockAsync), this);
                     return base.Path;
                 });
-                var result = await this.Service.UnlockTypeItemAsync(path);
+                var result = await this.Service.UnlockTypeItemAsync(authentication.Token, path);
                 await this.DataBase.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -209,7 +209,7 @@ namespace JSSoft.Crema.Services.Data
                     var path = base.Path;
                     return (items, oldNames, oldPaths, path);
                 });
-                var result = await this.Service.RenameTypeItemAsync(tuple.path, name);
+                var result = await this.Service.RenameTypeItemAsync(authentication.Token, tuple.path, name);
                 await this.DataBase.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -234,7 +234,7 @@ namespace JSSoft.Crema.Services.Data
                     var path = base.Path;
                     return (items, oldPaths, oldCategoryPaths, path);
                 });
-                var result = await this.Service.MoveTypeItemAsync(tuple.path, categoryPath);
+                var result = await this.Service.MoveTypeItemAsync(authentication.Token, tuple.path, categoryPath);
                 await this.DataBase.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -259,7 +259,7 @@ namespace JSSoft.Crema.Services.Data
                     var path = base.Path;
                     return (items, oldPaths, path);
                 });
-                var result = await this.Service.DeleteTypeItemAsync(tuple.path);
+                var result = await this.Service.DeleteTypeItemAsync(authentication.Token, tuple.path);
                 await dataBase.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -280,7 +280,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, revision);
                     return base.Path;
                 });
-                var result = await this.Service.GetTypeItemDataSetAsync(path, revision);
+                var result = await this.Service.GetTypeItemDataSetAsync(authentication.Token, path, revision);
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -304,7 +304,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetLogAsync), this);
                     return base.Path;
                 });
-                var result = await this.Service.GetTypeItemLogAsync(path, revision);
+                var result = await this.Service.GetTypeItemLogAsync(authentication.Token, path, revision);
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -328,7 +328,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(FindAsync), this, text, options);
                     return base.Path;
                 });
-                var result = await this.Service.FindTypeItemAsync(path, text, options);
+                var result = await this.Service.FindTypeItemAsync(authentication.Token, path, text, options);
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);

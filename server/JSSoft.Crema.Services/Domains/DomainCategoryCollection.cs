@@ -73,7 +73,7 @@ namespace JSSoft.Crema.Services.Domains
             this.Context.InvokeItemsDeleteEvent(authentication, categories, categoryPaths);
         }
 
-        public string[] GetMetaData(Authentication authentication)
+        public string[] GetMetaData()
         {
             this.Dispatcher.VerifyAccess();
 

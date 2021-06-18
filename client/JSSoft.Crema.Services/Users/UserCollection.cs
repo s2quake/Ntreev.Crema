@@ -65,7 +65,7 @@ namespace JSSoft.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
                 });
-                var result = await this.Service.NewUserAsync(userID, categoryPath, UserContext.Encrypt(userID, password), userName, authority);
+                var result = await this.Service.NewUserAsync(authentication.Token, userID, categoryPath, UserContext.Encrypt(userID, password), userName, authority);
                 await this.Context.WaitAsync(result.TaskID);
                 return this[userID];
             }

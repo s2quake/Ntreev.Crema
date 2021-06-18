@@ -28,7 +28,7 @@ namespace JSSoft.Crema.Services
 {
     public interface IDomainContext : IEnumerable<IDomainItem>, IServiceProvider, IDispatcherObject
     {
-        DomainContextMetaData GetMetaData(Authentication authentication);
+        DomainContextMetaData GetMetaData();
 
         bool Contains(string itemPath);
 

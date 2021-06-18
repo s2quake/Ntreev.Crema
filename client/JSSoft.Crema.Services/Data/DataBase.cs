@@ -51,17 +51,19 @@ namespace JSSoft.Crema.Services.Data
 
         private DataBaseClientContext clientContext;
         private Guid serviceToken;
+        private Guid subscribeToken;
         private DataBaseServiceHost host;
 
-        public DataBase(DataBaseContext dataBases, DataBaseInfo dataBaseInfo)
+        public DataBase(DataBaseContext dataBases, Guid subscribeToken, DataBaseInfo dataBaseInfo)
         {
             this.DataBaseContext = dataBases;
             this.Dispatcher = dataBases.Dispatcher;
             base.Name = dataBaseInfo.Name;
             base.DataBaseInfo = dataBaseInfo;
+            this.subscribeToken = subscribeToken;
         }
 
-        public DataBase(DataBaseContext dataBases, DataBaseMetaData metaData)
+        public DataBase(DataBaseContext dataBases, Guid subscribeToken, DataBaseMetaData metaData)
         {
             this.DataBaseContext = dataBases;
             this.Dispatcher = dataBases.Dispatcher;
@@ -70,6 +72,7 @@ namespace JSSoft.Crema.Services.Data
             base.DataBaseState = metaData.DataBaseState;
             base.AccessInfo = metaData.AccessInfo;
             base.LockInfo = metaData.LockInfo;
+            this.subscribeToken = subscribeToken;
 
             foreach (var item in metaData.Authentications)
             {
@@ -111,7 +114,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
                     return base.Name;
                 });
-                var result = await this.DataBaseContext.Service.SetPublicAsync(name);
+                var result = await this.DataBaseContext.Service.SetPublicAsync(authentication.Token, name);
                 await this.DataBaseContext.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -132,7 +135,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
                     return base.Name;
                 });
-                var result = await this.DataBaseContext.Service.SetPrivateAsync(name);
+                var result = await this.DataBaseContext.Service.SetPrivateAsync(authentication.Token, name);
                 await this.DataBaseContext.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -153,7 +156,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMember), this, memberID, accessType);
                     return base.Name;
                 });
-                var result = await this.DataBaseContext.Service.AddAccessMemberAsync(name, memberID, accessType);
+                var result = await this.DataBaseContext.Service.AddAccessMemberAsync(authentication.Token, name, memberID, accessType);
                 await this.DataBaseContext.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -174,7 +177,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
                     return base.Name;
                 });
-                var result = await this.DataBaseContext.Service.SetAccessMemberAsync(name, memberID, accessType);
+                var result = await this.DataBaseContext.Service.SetAccessMemberAsync(authentication.Token, name, memberID, accessType);
                 await this.DataBaseContext.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -195,7 +198,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
                     return base.Name;
                 });
-                var result = await this.DataBaseContext.Service.RemoveAccessMemberAsync(name, memberID);
+                var result = await this.DataBaseContext.Service.RemoveAccessMemberAsync(authentication.Token, name, memberID);
                 await this.DataBaseContext.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -216,7 +219,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(LockAsync), this);
                     return base.Name;
                 });
-                var result = await this.DataBaseContext.Service.LockAsync(name, comment);
+                var result = await this.DataBaseContext.Service.LockAsync(authentication.Token, name, comment);
                 await this.DataBaseContext.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -237,7 +240,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnlockAsync), this);
                     return base.Name;
                 });
-                var result = await this.DataBaseContext.Service.UnlockAsync(name);
+                var result = await this.DataBaseContext.Service.UnlockAsync(authentication.Token, name);
                 await this.DataBaseContext.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -257,7 +260,7 @@ namespace JSSoft.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LoadAsync), this);
                 });
-                var result = await this.DataBaseContext.Service.LoadAsync(base.Name);
+                var result = await this.DataBaseContext.Service.LoadAsync(authentication.Token, base.Name);
                 await this.DataBaseContext.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -277,7 +280,7 @@ namespace JSSoft.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnloadAsync), this);
                 });
-                var result = await this.DataBaseContext.Service.UnloadAsync(base.Name);
+                var result = await this.DataBaseContext.Service.UnloadAsync(authentication.Token, base.Name);
                 await this.DataBaseContext.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -311,7 +314,7 @@ namespace JSSoft.Crema.Services.Data
                     this.host = new DataBaseServiceHost(this);
                     this.clientContext = new DataBaseClientContext(this.host);
                     this.serviceToken = await this.clientContext.OpenAsync();
-                    var result = await this.Service.SubscribeAsync(this.CremaHost.AuthenticationToken, base.Name);
+                    var result = await this.Service.SubscribeAsync(this.subscribeToken, base.Name);
                     var taskID = await this.Dispatcher.InvokeAsync(() =>
                     {
                         var metaData = result.Value;
@@ -347,7 +350,7 @@ namespace JSSoft.Crema.Services.Data
                 });
                 if (value == true)
                 {
-                    var result = await this.Service.UnsubscribeAsync();
+                    var result = await this.Service.UnsubscribeAsync(this.subscribeToken);
                     var taskID = await this.Dispatcher.InvokeAsync(() =>
                     {
                         authentication.SignatureDate = result.SignatureDate;
@@ -383,7 +386,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
                     return base.Name;
                 });
-                var result = await this.DataBaseContext.Service.RenameAsync(oldName, name);
+                var result = await this.DataBaseContext.Service.RenameAsync(authentication.Token, oldName, name);
                 await this.DataBaseContext.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -405,7 +408,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     return base.Name;
                 });
-                var result = await this.DataBaseContext.Service.DeleteAsync(name);
+                var result = await this.DataBaseContext.Service.DeleteAsync(authentication.Token, name);
                 await dataBaseContext.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -431,7 +434,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetLogAsync), this);
                     return base.Name;
                 });
-                var result = await this.DataBaseContext.Service.GetLogAsync(name, revision);
+                var result = await this.DataBaseContext.Service.GetLogAsync(authentication.Token, name, revision);
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -455,7 +458,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(RevertAsync), this, revision);
                     return base.Name;
                 });
-                var result = await this.DataBaseContext.Service.RevertAsync(name, revision);
+                var result = await this.DataBaseContext.Service.RevertAsync(authentication.Token, name, revision);
                 await this.DataBaseContext.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -475,7 +478,7 @@ namespace JSSoft.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(ImportAsync), this, comment);
                 });
-                var result = await this.Service.ImportDataSetAsync(dataSet, comment);
+                var result = await this.Service.ImportDataSetAsync(authentication.Token, dataSet, comment);
                 await this.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -496,7 +499,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, dataSetType, filterExpression, revision);
                     return base.Name;
                 });
-                var result = await this.DataBaseContext.Service.GetDataSetAsync(name, dataSetType, filterExpression, revision);
+                var result = await this.DataBaseContext.Service.GetDataSetAsync(authentication.Token, name, dataSetType, filterExpression, revision);
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -559,10 +562,8 @@ namespace JSSoft.Crema.Services.Data
             return this.authentications.Contains(authentication);
         }
 
-        public DataBaseMetaData GetMetaData(Authentication authentication)
+        public DataBaseMetaData GetMetaData()
         {
-            if (authentication == null)
-                throw new ArgumentNullException(nameof(authentication));
             return this.metaData;
         }
 
@@ -587,7 +588,7 @@ namespace JSSoft.Crema.Services.Data
         {
             if (this.Dispatcher.Owner is DataBase)
             {
-                var result = await this.Service.UnsubscribeAsync();
+                var result = await this.Service.UnsubscribeAsync(this.subscribeToken);
                 authentication.SignatureDate = result.SignatureDate;
                 this.DetachDomainHost();
                 this.TypeContext.Dispose();
@@ -740,7 +741,7 @@ namespace JSSoft.Crema.Services.Data
             // if (result == false)
             //     return;
 
-            await (this.Service?.UnsubscribeAsync() ?? Task.Delay(1));
+            await (this.Service?.UnsubscribeAsync(this.subscribeToken) ?? Task.Delay(1));
 
             // await Task.Delay(100);
             await (this.callbackEvent?.DisposeAsync() ?? Task.Delay(1));

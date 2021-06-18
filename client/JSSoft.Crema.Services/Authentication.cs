@@ -56,7 +56,7 @@ namespace JSSoft.Crema.Services
         internal Authentication(IAuthenticationProvider provider, Guid token)
         {
             this.provider = provider;
-            this.token = token;
+            this.Token = token;
         }
 
         public Authentication BeginCommission()
@@ -65,7 +65,7 @@ namespace JSSoft.Crema.Services
                 throw new InvalidOperationException(Resources.Exception_Expired);
             if (this.child != null)
                 throw new InvalidOperationException(Resources.Exception_Commissioned);
-            var authentication = new Authentication(new UserAuthenticationProvider(this.provider.ID, this.provider.Name, this.provider.Authority, this.provider.AuthenticationTypes), this.token)
+            var authentication = new Authentication(new UserAuthenticationProvider(this.provider.ID, this.provider.Name, this.provider.Authority, this.provider.AuthenticationTypes), this.Token)
             {
                 signatureDate = this.signatureDate,
                 Parent = this,
@@ -153,6 +153,8 @@ namespace JSSoft.Crema.Services
                 }
             }
         }
+
+        internal Guid Token { get; }
 
         internal void InvokeExpiredEvent()
         {

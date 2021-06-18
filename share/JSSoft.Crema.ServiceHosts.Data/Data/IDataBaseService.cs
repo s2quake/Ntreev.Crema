@@ -30,147 +30,147 @@ namespace JSSoft.Crema.ServiceHosts.Data
     public interface IDataBaseService
     {
         [OperationContract]
-        Task<ResultBase<DataBaseMetaData>> SubscribeAsync(Guid authenticationToken, string dataBaseName);
+        Task<ResultBase<DataBaseMetaData>> SubscribeAsync(Guid token, string dataBaseName);
 
         [OperationContract]
-        Task<ResultBase> UnsubscribeAsync();
+        Task<ResultBase> UnsubscribeAsync(Guid token);
 
         [OperationContract]
         Task<ResultBase<DataBaseMetaData>> GetMetaDataAsync();
 
         [OperationContract]
-        Task<ResultBase> ImportDataSetAsync(CremaDataSet dataSet, string comment);
+        Task<ResultBase> ImportDataSetAsync(Guid authenticationToken, CremaDataSet dataSet, string comment);
 
         [OperationContract]
-        Task<ResultBase> NewTableCategoryAsync(string categoryPath);
+        Task<ResultBase> NewTableCategoryAsync(Guid authenticationToken, string categoryPath);
 
         [OperationContract]
-        Task<ResultBase<CremaDataSet>> GetTableItemDataSetAsync(string itemPath, string revision);
+        Task<ResultBase<CremaDataSet>> GetTableItemDataSetAsync(Guid authenticationToken, string itemPath, string revision);
 
         [OperationContract]
-        Task<ResultBase> RenameTableItemAsync(string itemPath, string newName);
+        Task<ResultBase> RenameTableItemAsync(Guid authenticationToken, string itemPath, string newName);
 
         [OperationContract]
-        Task<ResultBase> MoveTableItemAsync(string itemPath, string parentPath);
+        Task<ResultBase> MoveTableItemAsync(Guid authenticationToken, string itemPath, string parentPath);
 
         [OperationContract]
-        Task<ResultBase> DeleteTableItemAsync(string itemPath);
+        Task<ResultBase> DeleteTableItemAsync(Guid authenticationToken, string itemPath);
 
         [OperationContract]
-        Task<ResultBase> SetPublicTableItemAsync(string itemPath);
+        Task<ResultBase> SetPublicTableItemAsync(Guid authenticationToken, string itemPath);
 
         [OperationContract]
-        Task<ResultBase<AccessInfo>> SetPrivateTableItemAsync(string itemPath);
+        Task<ResultBase<AccessInfo>> SetPrivateTableItemAsync(Guid authenticationToken, string itemPath);
 
         [OperationContract]
-        Task<ResultBase<AccessMemberInfo>> AddAccessMemberTableItemAsync(string itemPath, string memberID, AccessType accessType);
+        Task<ResultBase<AccessMemberInfo>> AddAccessMemberTableItemAsync(Guid authenticationToken, string itemPath, string memberID, AccessType accessType);
 
         [OperationContract]
-        Task<ResultBase<AccessMemberInfo>> SetAccessMemberTableItemAsync(string itemPath, string memberID, AccessType accessType);
+        Task<ResultBase<AccessMemberInfo>> SetAccessMemberTableItemAsync(Guid authenticationToken, string itemPath, string memberID, AccessType accessType);
 
         [OperationContract]
-        Task<ResultBase> RemoveAccessMemberTableItemAsync(string itemPath, string memberID);
+        Task<ResultBase> RemoveAccessMemberTableItemAsync(Guid authenticationToken, string itemPath, string memberID);
 
         [OperationContract]
-        Task<ResultBase<LockInfo>> LockTableItemAsync(string itemPath, string comment);
+        Task<ResultBase<LockInfo>> LockTableItemAsync(Guid authenticationToken, string itemPath, string comment);
 
         [OperationContract]
-        Task<ResultBase> UnlockTableItemAsync(string itemPath);
+        Task<ResultBase> UnlockTableItemAsync(Guid authenticationToken, string itemPath);
 
         [OperationContract]
-        Task<ResultBase<LogInfo[]>> GetTableItemLogAsync(string itemPath, string revision);
+        Task<ResultBase<LogInfo[]>> GetTableItemLogAsync(Guid authenticationToken, string itemPath, string revision);
 
         [OperationContract]
-        Task<ResultBase<FindResultInfo[]>> FindTableItemAsync(string itemPath, string text, FindOptions options);
+        Task<ResultBase<FindResultInfo[]>> FindTableItemAsync(Guid authenticationToken, string itemPath, string text, FindOptions options);
 
         [OperationContract]
-        Task<ResultBase<TableInfo[]>> CopyTableAsync(string tableName, string newTableName, string categoryPath, bool copyXml);
+        Task<ResultBase<TableInfo[]>> CopyTableAsync(Guid authenticationToken, string tableName, string newTableName, string categoryPath, bool copyXml);
 
         [OperationContract]
-        Task<ResultBase<TableInfo[]>> InheritTableAsync(string tableName, string newTableName, string categoryPath, bool copyXml);
+        Task<ResultBase<TableInfo[]>> InheritTableAsync(Guid authenticationToken, string tableName, string newTableName, string categoryPath, bool copyXml);
 
         [OperationContract]
-        Task<ResultBase<DomainMetaData>> EnterTableContentEditAsync(Guid domainID);
+        Task<ResultBase<DomainMetaData>> EnterTableContentEditAsync(Guid authenticationToken, Guid domainID);
 
         [OperationContract]
-        Task<ResultBase<DomainMetaData>> LeaveTableContentEditAsync(Guid domainID);
+        Task<ResultBase<DomainMetaData>> LeaveTableContentEditAsync(Guid authenticationToken, Guid domainID);
 
         [OperationContract]
-        Task<ResultBase<DomainMetaData>> BeginTableContentEditAsync(string tableName);
+        Task<ResultBase<DomainMetaData>> BeginTableContentEditAsync(Guid authenticationToken, string tableName);
 
         [OperationContract]
-        Task<ResultBase<TableInfo[]>> EndTableContentEditAsync(Guid domainID);
+        Task<ResultBase<TableInfo[]>> EndTableContentEditAsync(Guid authenticationToken, Guid domainID);
 
         [OperationContract]
-        Task<ResultBase> CancelTableContentEditAsync(Guid domainID);
+        Task<ResultBase> CancelTableContentEditAsync(Guid authenticationToken, Guid domainID);
 
         [OperationContract]
-        Task<ResultBase<DomainMetaData>> BeginTableTemplateEditAsync(string tableName);
+        Task<ResultBase<DomainMetaData>> BeginTableTemplateEditAsync(Guid authenticationToken, string tableName);
 
         [OperationContract]
-        Task<ResultBase<DomainMetaData>> BeginNewTableAsync(string itemPath);
+        Task<ResultBase<DomainMetaData>> BeginNewTableAsync(Guid authenticationToken, string itemPath);
 
         [OperationContract]
-        Task<ResultBase<TableInfo[]>> EndTableTemplateEditAsync(Guid domainID);
+        Task<ResultBase<TableInfo[]>> EndTableTemplateEditAsync(Guid authenticationToken, Guid domainID);
 
         [OperationContract]
-        Task<ResultBase> CancelTableTemplateEditAsync(Guid domainID);
+        Task<ResultBase> CancelTableTemplateEditAsync(Guid authenticationToken, Guid domainID);
 
         [OperationContract]
-        Task<ResultBase> NewTypeCategoryAsync(string categoryPath);
+        Task<ResultBase> NewTypeCategoryAsync(Guid authenticationToken, string categoryPath);
 
         [OperationContract]
-        Task<ResultBase<CremaDataSet>> GetTypeItemDataSetAsync(string itemPath, string revision);
+        Task<ResultBase<CremaDataSet>> GetTypeItemDataSetAsync(Guid authenticationToken, string itemPath, string revision);
 
         [OperationContract]
-        Task<ResultBase> RenameTypeItemAsync(string itemPath, string newName);
+        Task<ResultBase> RenameTypeItemAsync(Guid authenticationToken, string itemPath, string newName);
 
         [OperationContract]
-        Task<ResultBase> MoveTypeItemAsync(string itemPath, string parentPath);
+        Task<ResultBase> MoveTypeItemAsync(Guid authenticationToken, string itemPath, string parentPath);
 
         [OperationContract]
-        Task<ResultBase> DeleteTypeItemAsync(string itemPath);
+        Task<ResultBase> DeleteTypeItemAsync(Guid authenticationToken, string itemPath);
 
         [OperationContract]
-        Task<ResultBase<TypeInfo>> CopyTypeAsync(string typeName, string newTypeName, string categoryPath);
+        Task<ResultBase<TypeInfo>> CopyTypeAsync(Guid authenticationToken, string typeName, string newTypeName, string categoryPath);
 
         [OperationContract]
-        Task<ResultBase<DomainMetaData>> BeginTypeTemplateEditAsync(string typeName);
+        Task<ResultBase<DomainMetaData>> BeginTypeTemplateEditAsync(Guid authenticationToken, string typeName);
 
         [OperationContract]
-        Task<ResultBase<DomainMetaData>> BeginNewTypeAsync(string categoryPath);
+        Task<ResultBase<DomainMetaData>> BeginNewTypeAsync(Guid authenticationToken, string categoryPath);
 
         [OperationContract]
-        Task<ResultBase<TypeInfo[]>> EndTypeTemplateEditAsync(Guid domainID);
+        Task<ResultBase<TypeInfo[]>> EndTypeTemplateEditAsync(Guid authenticationToken, Guid domainID);
 
         [OperationContract]
-        Task<ResultBase> CancelTypeTemplateEditAsync(Guid domainID);
+        Task<ResultBase> CancelTypeTemplateEditAsync(Guid authenticationToken, Guid domainID);
 
         [OperationContract]
-        Task<ResultBase> SetPublicTypeItemAsync(string itemPath);
+        Task<ResultBase> SetPublicTypeItemAsync(Guid authenticationToken, string itemPath);
 
         [OperationContract]
-        Task<ResultBase<AccessInfo>> SetPrivateTypeItemAsync(string itemPath);
+        Task<ResultBase<AccessInfo>> SetPrivateTypeItemAsync(Guid authenticationToken, string itemPath);
 
         [OperationContract]
-        Task<ResultBase<AccessMemberInfo>> AddAccessMemberTypeItemAsync(string itemPath, string memberID, AccessType accessType);
+        Task<ResultBase<AccessMemberInfo>> AddAccessMemberTypeItemAsync(Guid authenticationToken, string itemPath, string memberID, AccessType accessType);
 
         [OperationContract]
-        Task<ResultBase<AccessMemberInfo>> SetAccessMemberTypeItemAsync(string itemPath, string memberID, AccessType accessType);
+        Task<ResultBase<AccessMemberInfo>> SetAccessMemberTypeItemAsync(Guid authenticationToken, string itemPath, string memberID, AccessType accessType);
 
         [OperationContract]
-        Task<ResultBase> RemoveAccessMemberTypeItemAsync(string itemPath, string memberID);
+        Task<ResultBase> RemoveAccessMemberTypeItemAsync(Guid authenticationToken, string itemPath, string memberID);
 
         [OperationContract]
-        Task<ResultBase<LockInfo>> LockTypeItemAsync(string itemPath, string comment);
+        Task<ResultBase<LockInfo>> LockTypeItemAsync(Guid authenticationToken, string itemPath, string comment);
 
         [OperationContract]
-        Task<ResultBase> UnlockTypeItemAsync(string itemPath);
+        Task<ResultBase> UnlockTypeItemAsync(Guid authenticationToken, string itemPath);
 
         [OperationContract]
-        Task<ResultBase<LogInfo[]>> GetTypeItemLogAsync(string itemPath, string revision);
+        Task<ResultBase<LogInfo[]>> GetTypeItemLogAsync(Guid authenticationToken, string itemPath, string revision);
 
         [OperationContract]
-        Task<ResultBase<FindResultInfo[]>> FindTypeItemAsync(string itemPath, string text, FindOptions options);
+        Task<ResultBase<FindResultInfo[]>> FindTypeItemAsync(Guid authenticationToken, string itemPath, string text, FindOptions options);
     }
 }
