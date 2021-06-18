@@ -86,7 +86,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task GetMetaData_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync();
-            var metaData = await dataBaseContext.GetMetaDataAsync(authentication);
+            var metaData = await dataBaseContext.GetMetaDataAsync();
             Assert.AreNotEqual(0, metaData.DataBases.Length);
         }
 
@@ -94,14 +94,14 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task GetMetaData_Arg0_Null_TestAsync()
         {
-            await dataBaseContext.GetMetaDataAsync(null);
+            await dataBaseContext.GetMetaDataAsync();
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task GetMetaData_Expired_TestAsync()
         {
-            await dataBaseContext.GetMetaDataAsync(expiredAuthentication);
+            await dataBaseContext.GetMetaDataAsync();
         }
 
         [TestMethod]
@@ -109,7 +109,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task GetMetaData_Dispatcher_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync();
-            dataBaseContext.GetMetaData(authentication);
+            dataBaseContext.GetMetaData();
         }
 
         [TestMethod]

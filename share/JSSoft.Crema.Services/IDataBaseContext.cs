@@ -33,7 +33,7 @@ namespace JSSoft.Crema.Services
     public interface IDataBaseContext : IReadOnlyCollection<IDataBase>, IEnumerable<IDataBase>, IServiceProvider, IDispatcherObject
     {
         [DispatcherMethod(typeof(IDataBaseContext))]
-        DataBaseContextMetaData GetMetaData(Authentication authentication);
+        DataBaseContextMetaData GetMetaData();
 
         Task<IDataBase> AddNewDataBaseAsync(Authentication authentication, string dataBaseName, string comment);
 

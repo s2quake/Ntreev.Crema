@@ -65,28 +65,28 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public void GetMetaData_Test()
         {
-            userContext.Dispatcher.Invoke(() => userContext.GetMetaData(authentication));
+            userContext.Dispatcher.Invoke(() => userContext.GetMetaData());
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void GetMetaData_Arg0_Null_FailTest()
         {
-            userContext.GetMetaData(null);
+            userContext.GetMetaData();
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
         public void GetMetaData_Expired_FailTest()
         {
-            userContext.GetMetaData(expiredAuthentication);
+            userContext.GetMetaData();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void GetMetaData_Dispatcher_FailTest()
         {
-            userContext.GetMetaData(authentication);
+            userContext.GetMetaData();
         }
 
         [TestMethod]

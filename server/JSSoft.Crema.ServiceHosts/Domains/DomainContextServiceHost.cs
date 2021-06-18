@@ -33,12 +33,12 @@ namespace JSSoft.Crema.ServiceHosts.Domains
             this.service = service;
         }
 
-        protected override Task<IDomainContextService> CreateServiceAsync(IDomainContextEventCallback callback)
+        protected override Task<IDomainContextService> CreateServiceAsync(IPeer peer, IDomainContextEventCallback callback)
         {
             return Task.Run<IDomainContextService>(() => new DomainContextService(this.service, callback));
         }
 
-        protected override async Task DestroyServiceAsync(IDomainContextService service)
+        protected override async Task DestroyServiceAsync(IPeer peer, IDomainContextService service)
         {
             if (service is DomainContextService domainContextService)
             {

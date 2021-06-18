@@ -25,6 +25,7 @@ using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library;
 using JSSoft.Library.ObjectModel;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Text;
@@ -34,7 +35,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
 {
     class UserContextService : CremaServiceItemBase<IUserContextEventCallback>, IUserContextService
     {
-        private Authentication authentication;
+        private Peer peer;
         private long index = 0;
 
         public UserContextService(CremaService service, IUserContextEventCallback callback)
@@ -47,158 +48,170 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         public async Task DisposeAsync()
         {
-            if (this.authentication != null)
-            {
-                await this.DetachEventHandlersAsync();
-                this.authentication = null;
-            }
+            await this.DetachEventHandlersAsync();
         }
 
-        public async Task<ResultBase<UserContextMetaData>> SubscribeAsync(Guid authenticationToken)
+        public async Task<ResultBase<UserContextMetaData>> SubscribeAsync(Guid token)
         {
             var result = new ResultBase<UserContextMetaData>();
-            this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
-            this.OwnerID = this.authentication.ID;
             result.Value = await this.AttachEventHandlersAsync();
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = SignatureDateProvider.Default.Provide();
+            this.peer = Peer.GetPeer(token);
             this.LogService.Debug($"[{this.OwnerID}] {nameof(UserContextService)} {nameof(SubscribeAsync)}");
             return result;
         }
 
-        public async Task<ResultBase> UnsubscribeAsync()
+        public async Task<ResultBase> UnsubscribeAsync(Guid token)
         {
+            if (this.peer == null)
+                throw new InvalidOperationException();
+            if (this.peer.ID != token)
+                throw new ArgumentException("invalid token", nameof(token));
             var result = new ResultBase();
             await this.DetachEventHandlersAsync();
-            this.authentication = null;
+            this.peer = null;
             this.LogService.Debug($"[{this.OwnerID}] {nameof(UserContextService)} {nameof(UnsubscribeAsync)}");
             result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
             return result;
         }
 
-        public async Task<ResultBase<UserInfo>> NewUserAsync(string userID, string categoryPath, byte[] password, string userName, Authority authority)
+        public async Task<ResultBase<UserInfo>> NewUserAsync(Guid authenticationToken, string userID, string categoryPath, byte[] password, string userName, Authority authority)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<UserInfo>();
             var category = await this.GetCategoryAsync(categoryPath);
-            var user = await category.AddNewUserAsync(this.authentication, userID, ToSecureString(userID, password), userName, authority);
+            var user = await category.AddNewUserAsync(authentication, userID, ToSecureString(userID, password), userName, authority);
             result.TaskID = GuidUtility.FromName(categoryPath + userID);
             result.Value = user.UserInfo;
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> NewUserCategoryAsync(string categoryPath)
+        public async Task<ResultBase> NewUserCategoryAsync(Guid authenticationToken, string categoryPath)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var categoryName = new CategoryName(categoryPath);
             var category = await this.GetCategoryAsync(categoryName.ParentPath);
-            await category.AddNewCategoryAsync(this.authentication, categoryName.Name);
+            await category.AddNewCategoryAsync(authentication, categoryName.Name);
             result.TaskID = GuidUtility.FromName(categoryPath);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> RenameUserItemAsync(string itemPath, string newName)
+        public async Task<ResultBase> RenameUserItemAsync(Guid authenticationToken, string itemPath, string newName)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var item = await this.GetUserItemAsync(itemPath);
-            result.TaskID = await (Task<Guid>)item.RenameAsync(this.authentication, newName);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)item.RenameAsync(authentication, newName);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> MoveUserItemAsync(string itemPath, string parentPath)
+        public async Task<ResultBase> MoveUserItemAsync(Guid authenticationToken, string itemPath, string parentPath)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var item = await this.GetUserItemAsync(itemPath);
-            result.TaskID = await (Task<Guid>)item.MoveAsync(this.authentication, parentPath);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)item.MoveAsync(authentication, parentPath);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> DeleteUserItemAsync(string itemPath)
+        public async Task<ResultBase> DeleteUserItemAsync(Guid authenticationToken, string itemPath)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var item = await this.GetUserItemAsync(itemPath);
-            result.TaskID = await (Task<Guid>)item.DeleteAsync(this.authentication);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)item.DeleteAsync(authentication);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<UserInfo>> SetUserNameAsync(string userID, byte[] password, string userName)
+        public async Task<ResultBase<UserInfo>> SetUserNameAsync(Guid authenticationToken, string userID, byte[] password, string userName)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<UserInfo>();
             var p1 = password == null ? null : ToSecureString(userID, password);
             var user = await this.GetUserAsync(userID);
-            result.TaskID = await (Task<Guid>)user.SetUserNameAsync(this.authentication, p1, userName);
+            result.TaskID = await (Task<Guid>)user.SetUserNameAsync(authentication, p1, userName);
             result.Value = await user.Dispatcher.InvokeAsync(() => user.UserInfo);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<UserInfo>> SetPasswordAsync(string userID, byte[] password, byte[] newPassword)
+        public async Task<ResultBase<UserInfo>> SetPasswordAsync(Guid authenticationToken, string userID, byte[] password, byte[] newPassword)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<UserInfo>();
             var p1 = password == null ? null : ToSecureString(userID, password);
             var p2 = newPassword == null ? null : ToSecureString(userID, newPassword);
             var user = await this.GetUserAsync(userID);
-            result.TaskID = await (Task<Guid>)user.SetPasswordAsync(this.authentication, p1, p2);
+            result.TaskID = await (Task<Guid>)user.SetPasswordAsync(authentication, p1, p2);
             result.Value = await user.Dispatcher.InvokeAsync(() => user.UserInfo);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<UserInfo>> ResetPasswordAsync(string userID)
+        public async Task<ResultBase<UserInfo>> ResetPasswordAsync(Guid authenticationToken, string userID)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<UserInfo>();
             var user = await this.GetUserAsync(userID);
-            result.TaskID = await (Task<Guid>)user.ResetPasswordAsync(this.authentication);
+            result.TaskID = await (Task<Guid>)user.ResetPasswordAsync(authentication);
             result.Value = await user.Dispatcher.InvokeAsync(() => user.UserInfo);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> KickAsync(string userID, string comment)
+        public async Task<ResultBase> KickAsync(Guid authenticationToken, string userID, string comment)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var user = await this.GetUserAsync(userID);
-            result.TaskID = await (Task<Guid>)user.KickAsync(this.authentication, comment);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)user.KickAsync(authentication, comment);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase<BanInfo>> BanAsync(string userID, string comment)
+        public async Task<ResultBase<BanInfo>> BanAsync(Guid authenticationToken, string userID, string comment)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase<BanInfo>();
             var user = await this.GetUserAsync(userID);
-            result.TaskID = await (Task<Guid>)user.BanAsync(this.authentication, comment);
+            result.TaskID = await (Task<Guid>)user.BanAsync(authentication, comment);
             result.Value = await user.Dispatcher.InvokeAsync(() => user.BanInfo);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> UnbanAsync(string userID)
+        public async Task<ResultBase> UnbanAsync(Guid authenticationToken, string userID)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var user = await this.GetUserAsync(userID);
-            result.TaskID = await (Task<Guid>)user.UnbanAsync(this.authentication);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)user.UnbanAsync(authentication);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> SendMessageAsync(string userID, string message)
+        public async Task<ResultBase> SendMessageAsync(Guid authenticationToken, string userID, string message)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var user = await this.GetUserAsync(userID);
-            result.TaskID = await (Task<Guid>)user.SendMessageAsync(this.authentication, message);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)user.SendMessageAsync(authentication, message);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
-        public async Task<ResultBase> NotifyMessageAsync(string[] userIDs, string message)
+        public async Task<ResultBase> NotifyMessageAsync(Guid authenticationToken, string[] userIDs, string message)
         {
+            var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
-            result.TaskID = await (Task<Guid>)this.UserContext.NotifyMessageAsync(this.authentication, userIDs, message);
-            result.SignatureDate = this.authentication.SignatureDate;
+            result.TaskID = await (Task<Guid>)this.UserContext.NotifyMessageAsync(authentication, userIDs, message);
+            result.SignatureDate = authentication.SignatureDate;
             return result;
         }
 
@@ -222,7 +235,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
                 this.UserCollection.UsersBanChanged += UserCollection_UsersBanChanged;
                 this.UserCollection.MessageReceived += UserContext_MessageReceived;
                 this.UserContext.TaskCompleted += UserContext_TaskCompleted;
-                return this.UserContext.GetMetaData(this.authentication);
+                return this.UserContext.GetMetaData();
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(UserContextService)} {nameof(AttachEventHandlersAsync)}");
             return metaData;

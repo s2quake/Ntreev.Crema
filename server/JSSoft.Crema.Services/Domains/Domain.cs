@@ -493,7 +493,7 @@ namespace JSSoft.Crema.Services.Domains
 
             this.metaData.DomainID = Guid.Parse(this.Name);
             this.metaData.DomainInfo = base.DomainInfo;
-            this.metaData.Users = this.Users.Select<DomainUser, DomainUserMetaData>(item => item.GetMetaData(authentication)).ToArray();
+            this.metaData.Users = this.Users.Select<DomainUser, DomainUserMetaData>(item => item.GetMetaData()).ToArray();
             this.metaData.DomainState = base.DomainState;
             this.metaData.ModifiedTables = this.modifiedTableList.ToArray();
             this.metaData.CompetionID = this.Logger.CompletionID;

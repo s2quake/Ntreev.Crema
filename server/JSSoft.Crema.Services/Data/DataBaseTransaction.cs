@@ -129,7 +129,7 @@ namespace JSSoft.Crema.Services.Data
                     this.authentication.Expired -= Authentication_Expired;
                     this.dataBase.DataBaseState = DataBaseState.Loaded;
                     this.dataBase.UnlockForTransaction(authentication, this.ID);
-                    return this.dataBase.GetMetaData(authentication);
+                    return this.dataBase.GetMetaData();
                 });
             }
             catch (Exception e)

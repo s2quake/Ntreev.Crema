@@ -53,7 +53,7 @@ namespace JSSoft.Crema.Commands.Consoles
         {
             var sb = new StringBuilder();
             var authentication = this.CommandContext.GetAuthentication(this);
-            var metaData = await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.GetMetaData(authentication));
+            var metaData = await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.GetMetaData());
             var query = from item in metaData.Users
                         let userID = item.UserInfo.ID
                         orderby userID

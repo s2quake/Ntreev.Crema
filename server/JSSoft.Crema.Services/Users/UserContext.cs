@@ -239,13 +239,8 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        public UserContextMetaData GetMetaData(Authentication authentication)
+        public UserContextMetaData GetMetaData()
         {
-            if (authentication == null)
-                throw new ArgumentNullException(nameof(authentication));
-            if (authentication.IsExpired == true)
-                throw new AuthenticationExpiredException(nameof(authentication));
-
             this.Dispatcher.VerifyAccess();
 
             var metaData = new UserContextMetaData();

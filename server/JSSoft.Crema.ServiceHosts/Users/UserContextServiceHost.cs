@@ -33,12 +33,12 @@ namespace JSSoft.Crema.ServiceHosts.Users
             this.service = service;
         }
 
-        protected override Task<IUserContextService> CreateServiceAsync(IUserContextEventCallback callback)
+        protected override Task<IUserContextService> CreateServiceAsync(IPeer peer, IUserContextEventCallback callback)
         {
             return Task.Run<IUserContextService>(() => new UserContextService(this.service, callback));
         }
 
-        protected override async Task DestroyServiceAsync(IUserContextService service)
+        protected override async Task DestroyServiceAsync(IPeer peer, IUserContextService service)
         {
             if (service is UserContextService userContextService)
             {

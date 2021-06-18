@@ -682,12 +682,8 @@ namespace JSSoft.Crema.Services.Data
             new FileInfo(path);
         }
 
-        public DataBaseMetaData GetMetaData(Authentication authentication)
+        public DataBaseMetaData GetMetaData()
         {
-            if (authentication == null)
-                throw new ArgumentNullException(nameof(authentication));
-            if (authentication.IsExpired == true)
-                throw new AuthenticationExpiredException(nameof(authentication));
             this.Dispatcher.VerifyAccess();
             return this.metaData;
         }
@@ -758,7 +754,7 @@ namespace JSSoft.Crema.Services.Data
                 base.UpdateAccessParent();
 
                 this.AttachDomainHost();
-                this.DataBaseContext.InvokeItemsResetEvent(authentication, new IDataBase[] { this }, new DataBaseMetaData[] { this.GetMetaData(authentication) });
+                this.DataBaseContext.InvokeItemsResetEvent(authentication, new IDataBase[] { this }, new DataBaseMetaData[] { this.GetMetaData() });
             });
         }
 

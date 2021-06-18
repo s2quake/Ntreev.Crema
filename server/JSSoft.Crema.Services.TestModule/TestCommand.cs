@@ -149,14 +149,14 @@ namespace JSSoft.Crema.Services.TestModule
 
         private async Task WriteUserListAsync()
         {
-            var userCollection = this.application.GetService(typeof(IUserCollection)) as IUserCollection;
-            var users = await userCollection.GetUsersAsync();
-            var sb = new StringBuilder();
-            foreach (var item in users)
-            {
-                sb.AppendLine($"{item.ID}: {item.Authority}");
-            }
-            this.Out.WriteAsync(sb.ToString());
+            // var userCollection = this.application.GetService(typeof(IUserCollection)) as IUserCollection;
+            // var users = await userCollection.GetUsersAsync();
+            // var sb = new StringBuilder();
+            // foreach (var item in users)
+            // {
+            //     sb.AppendLine($"{item.ID}: {item.Authority}");
+            // }
+            // this.Out.WriteAsync(sb.ToString());
         }
 
         private async Task GenerateDataBasesAsync(int count)

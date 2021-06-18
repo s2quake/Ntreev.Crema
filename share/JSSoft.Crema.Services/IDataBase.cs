@@ -29,7 +29,7 @@ namespace JSSoft.Crema.Services
     public interface IDataBase : IAccessible, IPermission, ILockable, IServiceProvider, IDispatcherObject, IExtendedProperties
     {
         [DispatcherMethod(typeof(IDataBase))]
-        DataBaseMetaData GetMetaData(Authentication authentication);
+        DataBaseMetaData GetMetaData();
 
         Task LoadAsync(Authentication authentication);
 

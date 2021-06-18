@@ -30,66 +30,66 @@ namespace JSSoft.Crema.ServiceHosts.Data
     public interface IDataBaseContextService
     {
         [OperationContract]
-        Task<ResultBase<DataBaseContextMetaData>> SubscribeAsync(Guid authenticationToken);
+        Task<ResultBase<DataBaseContextMetaData>> SubscribeAsync(Guid token);
 
         [OperationContract]
-        Task<ResultBase> UnsubscribeAsync();
+        Task<ResultBase> UnsubscribeAsync(Guid token);
 
         [OperationContract]
-        Task<ResultBase<CremaDataSet>> GetDataSetAsync(string dataBaseName, DataSetType dataSetType, string filterExpression, string revision);
+        Task<ResultBase<CremaDataSet>> GetDataSetAsync(Guid authenticationToken, string dataBaseName, DataSetType dataSetType, string filterExpression, string revision);
 
         [OperationContract]
-        Task<ResultBase> SetPublicAsync(string dataBaseName);
+        Task<ResultBase> SetPublicAsync(Guid authenticationToken, string dataBaseName);
 
         [OperationContract]
-        Task<ResultBase<AccessInfo>> SetPrivateAsync(string dataBaseName);
+        Task<ResultBase<AccessInfo>> SetPrivateAsync(Guid authenticationToken, string dataBaseName);
 
         [OperationContract]
-        Task<ResultBase<AccessMemberInfo>> AddAccessMemberAsync(string dataBaseName, string memberID, AccessType accessType);
+        Task<ResultBase<AccessMemberInfo>> AddAccessMemberAsync(Guid authenticationToken, string dataBaseName, string memberID, AccessType accessType);
 
         [OperationContract]
-        Task<ResultBase<AccessMemberInfo>> SetAccessMemberAsync(string dataBaseName, string memberID, AccessType accessType);
+        Task<ResultBase<AccessMemberInfo>> SetAccessMemberAsync(Guid authenticationToken, string dataBaseName, string memberID, AccessType accessType);
 
         [OperationContract]
-        Task<ResultBase> RemoveAccessMemberAsync(string dataBaseName, string memberID);
+        Task<ResultBase> RemoveAccessMemberAsync(Guid authenticationToken, string dataBaseName, string memberID);
 
         [OperationContract]
-        Task<ResultBase<LockInfo>> LockAsync(string dataBaseName, string comment);
+        Task<ResultBase<LockInfo>> LockAsync(Guid authenticationToken, string dataBaseName, string comment);
 
         [OperationContract]
-        Task<ResultBase> UnlockAsync(string dataBaseName);
+        Task<ResultBase> UnlockAsync(Guid authenticationToken, string dataBaseName);
 
         [OperationContract]
-        Task<ResultBase> LoadAsync(string dataBaseName);
+        Task<ResultBase> LoadAsync(Guid authenticationToken, string dataBaseName);
 
         [OperationContract]
-        Task<ResultBase> UnloadAsync(string dataBaseName);
+        Task<ResultBase> UnloadAsync(Guid authenticationToken, string dataBaseName);
 
         [OperationContract]
-        Task<ResultBase<DataBaseInfo>> CreateAsync(string dataBaseName, string comment);
+        Task<ResultBase<DataBaseInfo>> CreateAsync(Guid authenticationToken, string dataBaseName, string comment);
 
         [OperationContract]
-        Task<ResultBase<DataBaseInfo>> CopyAsync(string dataBaseName, string newDataBaseName, string comment, bool force);
+        Task<ResultBase<DataBaseInfo>> CopyAsync(Guid authenticationToken, string dataBaseName, string newDataBaseName, string comment, bool force);
 
         [OperationContract]
-        Task<ResultBase> RenameAsync(string dataBaseName, string newDataBaseName);
+        Task<ResultBase> RenameAsync(Guid authenticationToken, string dataBaseName, string newDataBaseName);
 
         [OperationContract]
-        Task<ResultBase> DeleteAsync(string dataBaseName);
+        Task<ResultBase> DeleteAsync(Guid authenticationToken, string dataBaseName);
 
         [OperationContract]
-        Task<ResultBase<LogInfo[]>> GetLogAsync(string dataBaseName, string revision);
+        Task<ResultBase<LogInfo[]>> GetLogAsync(Guid authenticationToken, string dataBaseName, string revision);
 
         [OperationContract]
-        Task<ResultBase<DataBaseInfo>> RevertAsync(string dataBaseName, string revision);
+        Task<ResultBase<DataBaseInfo>> RevertAsync(Guid authenticationToken, string dataBaseName, string revision);
 
         [OperationContract]
-        Task<ResultBase<Guid>> BeginTransactionAsync(string dataBaseName);
+        Task<ResultBase<Guid>> BeginTransactionAsync(Guid authenticationToken, string dataBaseName);
 
         [OperationContract]
-        Task<ResultBase> EndTransactionAsync(Guid transactionID);
+        Task<ResultBase> EndTransactionAsync(Guid authenticationToken, Guid transactionID);
 
         [OperationContract]
-        Task<ResultBase<DataBaseMetaData>> CancelTransactionAsync(Guid transactionID);
+        Task<ResultBase<DataBaseMetaData>> CancelTransactionAsync(Guid authenticationToken, Guid transactionID);
     }
 }
