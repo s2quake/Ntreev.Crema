@@ -17,7 +17,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
         private static readonly object obj = new();
         private static readonly int startPort = 4006;
         private static readonly HashSet<int> reservedPort = new();
-        private static readonly Dictionary<CremaBootstrapper, ServerHost> serverHostByApp = new();
+        private static readonly Dictionary<CremaBootstrapper, TestServerHost> serverHostByApp = new();
 #endif
 #if SERVER
         private static readonly Dictionary<CremaBootstrapper, string> repositoryPathByApp = new();
@@ -25,16 +25,16 @@ namespace JSSoft.Crema.Services.Test.Extensions
 
         private static readonly Dictionary<Authentication, Guid> authenticationToToken = new();
 
-        public static ServerHost Initialize(this CremaBootstrapper app, TestContext context)
+        public static TestServerHost Initialize(this CremaBootstrapper app, TestContext context)
         {
 #if SERVER
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", context.FullyQualifiedTestClassName);
-            var userInfos = UserContextExtensions.GenerateUserInfos(RandomUtility.Next(500, 1000), RandomUtility.Next(100, 1000));
+            var userInfos = UserInfoGenerator.Generate(RandomUtility.Next(500, 1000), RandomUtility.Next(100, 1000));
             var dataSet = new CremaDataSet();
             CremaBootstrapper.CreateRepositoryInternal(app, repositoryPath, "git", "xml", string.Empty, userInfos, dataSet);
             app.BasePath = repositoryPath;
             repositoryPathByApp.Add(app, repositoryPath);
-            return new ServerHost(app, userInfos);
+            return new TestServerHost(app, userInfos);
 #endif
 #if CLIENT
             var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
@@ -42,7 +42,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
             var solutionPath = Path.GetFullPath(Path.Combine(context.DeploymentDirectory, "..", "..", "..", "..", ".."));
             var executablePath = Path.Combine(solutionPath, "server", "JSSoft.Crema.Services.TestModule", "bin", "Debug", "netcoreapp3.1", "cremaserver.dll");
             var port = ReservePort();
-            var serverHost = new ServerHost()
+            var serverHost = new TestServerHost()
             {
                 ExecutablePath = executablePath,
                 RepositoryPath = repositoryPath,

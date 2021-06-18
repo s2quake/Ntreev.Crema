@@ -39,10 +39,8 @@ namespace JSSoft.Crema.Services.Test
     [TestClass]
     public class UserTest
     {
-        private static CremaBootstrapper app;
-        private static ServerHost serverHost;
-        private static ICremaHost cremaHost;
-        private static Guid token;
+        private static TestApplication app;
+        private static TestServerHost serverHost;
         private static IUserCategoryCollection userCategoryCollection;
         private static IUserCollection userCollection;
         private static Authentication expiredAuthentication;
@@ -50,28 +48,26 @@ namespace JSSoft.Crema.Services.Test
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
-            app = new CremaBootstrapper();
+            app = new();
             serverHost = app.Initialize(context);
-            cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            token = await cremaHost.OpenAsync();
-            userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-            userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
-            expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-            await cremaHost.LogoutAsync(expiredAuthentication);
+            await app.OpenAsync();
+            userCategoryCollection = app.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            userCollection = app.GetService(typeof(IUserCollection)) as IUserCollection;
+            expiredAuthentication = app.ExpiredAuthentication;
             await serverHost.LoginRandomManyAsync();
         }
 
         [ClassCleanup]
         public static async Task ClassCleanupAsync()
         {
-            await cremaHost.CloseAsync(token);
+            await app.CloseAsync();
             app.Release();
         }
 
         [TestInitialize]
         public async Task TestInitializeAsync()
         {
-            await this.TestContext.InitializeAsync(cremaHost);
+            await this.TestContext.InitializeAsync(app);
         }
 
         [TestCleanup]
@@ -85,7 +81,6 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task MoveAsync_TestAsync()
         {
-            var userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync();
             var category = await userCategoryCollection.GetRandomUserCategoryAsync((item) => item != user.Category);
@@ -125,8 +120,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync();
-            var userCategoryColleciton = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-            var category = await userCategoryColleciton.GetRandomUserCategoryAsync(item => item.Path != user.Category.Path);
+            var category = await userCategoryCollection.GetRandomUserCategoryAsync(item => item.Path != user.Category.Path);
             var categoryPath = new CategoryName(category.Path, RandomUtility.NextName());
             await user.MoveAsync(authentication, categoryPath);
         }
@@ -145,7 +139,6 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var user = await userCollection.GetRandomUserAsync();
-            var userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             var category = await userCategoryCollection.GetRandomUserCategoryAsync((item) => item != user.Category);
             await user.MoveAsync(authentication, category.Path);
         }
@@ -156,7 +149,6 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var user = await userCollection.GetRandomUserAsync();
-            var userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             var category = await userCategoryCollection.GetRandomUserCategoryAsync((item) => item != user.Category);
             await user.MoveAsync(authentication, category.Path);
         }
@@ -868,7 +860,6 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task Moved_TestAsync()
         {
-            var userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userCollection.GetRandomUserAsync();
             var oldCategory = user.Category;

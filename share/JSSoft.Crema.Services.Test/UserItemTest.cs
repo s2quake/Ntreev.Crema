@@ -38,35 +38,31 @@ namespace JSSoft.Crema.Services.Test
     [TestClass]
     public class UserItemTest
     {
-        private static CremaBootstrapper app;
-        private static ICremaHost cremaHost;
-        private static Guid token;
+        private static TestApplication app;
         private static Authentication expiredAuthentication;
         private static IUserContext userContext;
 
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
-            app = new CremaBootstrapper();
+            app = new();
             app.Initialize(context);
-            cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            token = await cremaHost.OpenAsync();
-            userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-            await cremaHost.LogoutAsync(expiredAuthentication);
+            await app.OpenAsync();
+            userContext = app.GetService(typeof(IUserContext)) as IUserContext;
+            expiredAuthentication = app.ExpiredAuthentication;
         }
 
         [ClassCleanup]
         public static async Task ClassCleanupAsync()
         {
-            await cremaHost.CloseAsync(token);
+            await app.CloseAsync();
             app.Release();
         }
 
         [TestInitialize]
         public async Task TestInitializeAsync()
         {
-            await this.TestContext.InitializeAsync(cremaHost);
+            await this.TestContext.InitializeAsync(app);
         }
 
         [TestCleanup]

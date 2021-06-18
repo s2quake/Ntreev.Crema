@@ -22,9 +22,9 @@ namespace JSSoft.Crema.Services.Test.Extensions
         private const string cremaHostKey = "cremaHost";
         private const string userInfosKey = "userInfos";
 
-        public static async Task InitializeAsync(this TestContext context, ICremaHost cremaHost)
+        public static async Task InitializeAsync(this TestContext context, TestApplication app)
         {
-            context.Properties.Add(cremaHostKey, cremaHost);
+            context.Properties.Add(cremaHostKey, app);
             context.Properties.Add(authenticationKey, new HashSet<Authentication>());
             await Task.Delay(1);
         }

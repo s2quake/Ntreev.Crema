@@ -39,10 +39,8 @@ namespace JSSoft.Crema.Services.Test
     [TestClass]
     public class UserCategoryTest
     {
-        private static CremaBootstrapper app;
-        private static ServerHost serverHost;
-        private static ICremaHost cremaHost;
-        private static Guid token;
+        private static TestApplication app;
+        private static TestServerHost serverHost;
         private static IUserCategoryCollection userCategoryCollection;
         private static IUserCollection userCollection;
         private static IUserContext userContext;
@@ -51,29 +49,26 @@ namespace JSSoft.Crema.Services.Test
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
-            app = new CremaBootstrapper();
+            app = new ();
             serverHost = app.Initialize(context);
-            cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            token = await cremaHost.OpenAsync();
-            userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-            userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
-            userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-            await cremaHost.LogoutAsync(expiredAuthentication);
+            userCategoryCollection = app.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            userCollection = app.GetService(typeof(IUserCollection)) as IUserCollection;
+            userContext = app.GetService(typeof(IUserContext)) as IUserContext;
+            expiredAuthentication = app.ExpiredAuthentication;
             await serverHost.LoginRandomManyAsync();
         }
 
         [ClassCleanup]
         public static async Task ClassCleanupAsync()
         {
-            await cremaHost.CloseAsync(token);
+            await app.CloseAsync();
             app.Release();
         }
 
         [TestInitialize]
         public async Task TestInitializeAsync()
         {
-            await this.TestContext.InitializeAsync(cremaHost);
+            await this.TestContext.InitializeAsync(app);
         }
 
         [TestCleanup]

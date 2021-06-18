@@ -39,8 +39,8 @@ namespace JSSoft.Crema.Services.Test
     [TestClass]
     public class DataBaseTest
     {
-        private static CremaBootstrapper app;
-        private static ServerHost serverHost;
+        private static TestApplication app;
+        private static TestServerHost serverHost;
         private static ICremaHost cremaHost;
         private static Guid token;
         private static IDataBaseContext dataBaseContext;
@@ -49,7 +49,7 @@ namespace JSSoft.Crema.Services.Test
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
-            app = new CremaBootstrapper();
+            app = new ();
             serverHost = app.Initialize(context);
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             token = await cremaHost.OpenAsync();
@@ -73,7 +73,7 @@ namespace JSSoft.Crema.Services.Test
         [TestInitialize]
         public async Task TestInitializeAsync()
         {
-            await this.TestContext.InitializeAsync(cremaHost);
+            await this.TestContext.InitializeAsync(app);
         }
 
         [TestCleanup]

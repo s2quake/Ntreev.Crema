@@ -37,35 +37,31 @@ namespace JSSoft.Crema.Services.Test
     [TestClass]
     public class UserCollectionTest
     {
-        private static CremaBootstrapper app;
-        private static ICremaHost cremaHost;
-        private static Guid token;
+        private static TestApplication app;
         private static Authentication expiredAuthentication;
         private static IUserCollection userCollection;
 
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
-            app = new CremaBootstrapper();
+            app = new();
             app.Initialize(context);
-            cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            token = await cremaHost.OpenAsync();
-            expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-            await cremaHost.LogoutAsync(expiredAuthentication);
-            userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            await app.OpenAsync();
+            userCollection = app.GetService(typeof(IUserCollection)) as IUserCollection;
+            expiredAuthentication = app.ExpiredAuthentication;
         }
 
         [ClassCleanup]
         public static async Task ClassCleanupAsync()
         {
-            await cremaHost.CloseAsync(token);
+            await app.CloseAsync();
             app.Release();
         }
 
         [TestInitialize]
         public async Task TestInitializeAsync()
         {
-            await this.TestContext.InitializeAsync(cremaHost);
+            await this.TestContext.InitializeAsync(app);
         }
 
         [TestCleanup]
@@ -271,6 +267,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersStateChanged_TestAsync()
         {
+            var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             var actualState = UserState.None;
             var user = await userCollection.GetRandomUserAsync(item => item.UserState == UserState.None && item.BanInfo.IsBanned == false);
             await userCollection.Dispatcher.InvokeAsync(() =>
@@ -279,7 +276,7 @@ namespace JSSoft.Crema.Services.Test
             });
             var password = user.GetPassword();
             var token = await cremaHost.LoginAsync(user.ID, password);
-            var authentication = await cremaHost.AuthenticateAsync(token);
+            var authentication = await this.TestContext.LoginAsync(user.ID);
             Assert.AreEqual(user.UserState, actualState);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
@@ -305,6 +302,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersChanged_TestAsync()
         {
+            var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             var authentication = await cremaHost.LoginRandomAsync();
             var user = await userCollection.GetUserAsync(authentication.ID);
             var actualUserName = user.UserName;
@@ -339,6 +337,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersLoggedIn_TestAsync()
         {
+            var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             var actualUserID = string.Empty;
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
@@ -371,6 +370,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersLoggedOut_TestAsync()
         {
+            var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             var authentication1 = await cremaHost.LoginRandomAsync();
             var authentication2 = await cremaHost.LoginRandomAsync();
             var user1 = await userCollection.GetUserAsync(authentication1.ID);
@@ -407,6 +407,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersKicked_TestAsync()
         {
+            var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var authentication1 = await cremaHost.LoginRandomAsync();
             var user1 = await userCollection.GetUserAsync(authentication1.ID);
@@ -494,6 +495,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task MessageReceived_Test()
         {
+            var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             var authentication1 = await cremaHost.LoginRandomAsync();
             var authentication2 = await cremaHost.LoginRandomAsync();
             var user1 = await userCollection.GetUserAsync(authentication1.ID);

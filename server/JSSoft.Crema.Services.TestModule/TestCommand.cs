@@ -21,6 +21,8 @@
 
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Random;
+using JSSoft.Crema.Services.Extensions;
 using JSSoft.Crema.Data;
 using JSSoft.Library.Commands;
 using System.ComponentModel.Composition;
@@ -32,6 +34,8 @@ using JSSoft.Crema.Services.TestModule.TestCommands;
 using JSSoft.Library.IO;
 using JSSoft.Crema.Services.Test.Extensions;
 using JSSoft.Library.Random;
+using System.IO;
+using System.Text;
 
 namespace JSSoft.Crema.Services.TestModule
 {
@@ -105,8 +109,6 @@ namespace JSSoft.Crema.Services.TestModule
             {
                 this.application.BasePath = this.Path;
                 this.application.Port = this.Port;
-                await this.Out.WriteLineAsync(this.Path);
-                await this.Out.WriteLineAsync($"{this.Port}");
                 await this.application.OpenAsync();
                 await this.WriteUserListAsync();
                 await this.Out.WriteLineAsync(this.Separator);
@@ -126,7 +128,7 @@ namespace JSSoft.Crema.Services.TestModule
 
         private void CreateRepository()
         {
-            var userInfos = UserContextExtensions.GenerateUserInfos(RandomUtility.Next(500, 1000), RandomUtility.Next(100, 1000));
+            var userInfos = UserInfoGenerator.Generate(RandomUtility.Next(500, 1000), RandomUtility.Next(100, 1000));
             var dataSet = new CremaDataSet();
             try
             {
@@ -149,14 +151,16 @@ namespace JSSoft.Crema.Services.TestModule
 
         private async Task WriteUserListAsync()
         {
-            var userCollection = this.application.GetService(typeof(IUserCollection)) as IUserCollection;
-            var users = await userCollection.GetUsersAsync();
-            var sb = new StringBuilder();
-            foreach (var item in users)
-            {
-                sb.AppendLine($"{item.ID}: {item.Authority}");
-            }
-            this.Out.WriteAsync(sb.ToString());
+            var cremaHost = this.application.GetService(typeof(ICremaHost)) as ICremaHost;
+            var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            var metaData = await userContext.Dispatcher.InvokeAsync(() => userContext.GetMetaData(Authentication.System));
+            var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(UserContextMetaData));
+            using var stream = new MemoryStream();
+            serializer.WriteObject(stream, metaData);
+            stream.Position = 0;
+            using var sr = new StreamReader(stream);
+            var text = sr.ReadToEnd();
+            await this.Out.WriteLineAsync(text);
         }
 
         private async Task GenerateDataBasesAsync(int count)

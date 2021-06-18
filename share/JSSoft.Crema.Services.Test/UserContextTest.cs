@@ -37,35 +37,46 @@ namespace JSSoft.Crema.Services.Test
     [TestClass]
     public class UserContextTest
     {
-        private static CremaBootstrapper app;
-        private static ICremaHost cremaHost;
-        private static Authentication authentication;
+        private static TestApplication app;
         private static Authentication expiredAuthentication;
         private static IUserContext userContext;
 
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
-            app = new CremaBootstrapper();
+            app = new();
             app.Initialize(context);
-            cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            authentication = await cremaHost.StartAsync();
-            userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-            await cremaHost.LogoutAsync(expiredAuthentication);
+            await app.OpenAsync();
+            userContext = app.GetService(typeof(IUserContext)) as IUserContext;
+            expiredAuthentication = app.ExpiredAuthentication;
         }
 
         [ClassCleanup]
         public static async Task ClassCleanupAsync()
         {
-            await cremaHost.StopAsync(authentication);
+            await app.CloseAsync();
             app.Release();
         }
 
-        [TestMethod]
-        public void GetMetaData_Test()
+        [TestInitialize]
+        public async Task TestInitializeAsync()
         {
-            userContext.Dispatcher.Invoke(() => userContext.GetMetaData(authentication));
+            await this.TestContext.InitializeAsync(app);
+        }
+
+        [TestCleanup]
+        public async Task TestCleanupAsync()
+        {
+            await this.TestContext.ReleaseAsync();
+        }
+
+        public TestContext TestContext { get; set; }
+
+        [TestMethod]
+        public async Task GetMetaData_TestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var metaData = await userContext.Dispatcher.InvokeAsync(() => userContext.GetMetaData(authentication));
         }
 
         [TestMethod]
@@ -86,41 +97,54 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public void GetMetaData_Dispatcher_FailTest()
         {
-            userContext.GetMetaData(authentication);
+            var task = this.TestContext.LoginRandomAsync(Authority.Admin);
+            task.Wait();
+            userContext.GetMetaData(task.Result);
         }
 
         [TestMethod]
         public async Task NotifyMessageAsync_TestAsync()
         {
-            await userContext.NotifyMessageAsync(authentication, new string[] { }, RandomUtility.NextString());
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var userIDs = new string[] { };
+            var message = RandomUtility.NextString();
+            await userContext.NotifyMessageAsync(authentication, userIDs, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task NotifyMessageAsync_Arg0_Null_FailTestAsync()
         {
-            await userContext.NotifyMessageAsync(null, new string[] { }, RandomUtility.NextString());
+            var userIDs = new string[] { };
+            var message = RandomUtility.NextString();
+            await userContext.NotifyMessageAsync(null, userIDs, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task NotifyMessageAsync_Arg1_Null_FailTestAsync()
         {
-            await userContext.NotifyMessageAsync(authentication, null, RandomUtility.NextString());
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var message = RandomUtility.NextString();
+            await userContext.NotifyMessageAsync(authentication, null, message);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task NotifyMessageAsync_Arg2_Null_FailTestAsync()
         {
-            await userContext.NotifyMessageAsync(authentication, new string[] { }, null);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var userIDs = new string[] { };
+            await userContext.NotifyMessageAsync(authentication, userIDs, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task NotifyMessageAsync_Expired_FailTestAsync()
         {
-            await userContext.NotifyMessageAsync(expiredAuthentication, new string[] { }, RandomUtility.NextString());
+            var userIDs = new string[] { };
+            var message = RandomUtility.NextString();
+            await userContext.NotifyMessageAsync(expiredAuthentication, userIDs, message);
         }
 
 
@@ -215,6 +239,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task ItemsCreated_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var actualPath = string.Empty;
             await userContext.Dispatcher.InvokeAsync(() =>
             {
@@ -247,6 +272,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task ItemsRenamed_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var category = await userContext.GetRandomUserCategoryAsync(item => item.Parent != null);
             var actualName = string.Empty;
             var actualPath = string.Empty;
@@ -294,6 +320,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task ItemsMoved_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItem = await userContext.GetRandomUserItemAsync(PredicateItem);
             var parentItem1 = await userContext.GetRandomUserItemAsync(item => PredicateParentItem(item, userItem));
             var actualPath = string.Empty;
@@ -360,6 +387,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task ItemsDeleted_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItem1 = await userContext.GetRandomUserItemAsync(Predicate);
             var actualPath = string.Empty;
             var expectedPath = userItem1.Path;
@@ -413,7 +441,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task ItemsChanged_TestAsync()
         {
-            var authentication = await cremaHost.LoginRandomAsync();
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userContext.GetUserAsync(authentication.ID);
             var password = user.GetPassword();
             var actualPath = string.Empty;
@@ -448,7 +476,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task TaskCompleted_TestAsync()
         {
-            var authentication = await cremaHost.LoginRandomAsync();
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var user = await userContext.GetUserAsync(authentication.ID);
             var password = user.GetPassword();
             var actualTaskID = Guid.Empty;

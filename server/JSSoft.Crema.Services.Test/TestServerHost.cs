@@ -34,12 +34,12 @@ using JSSoft.Crema.Services.Random;
 
 namespace JSSoft.Crema.Services.Test
 {
-    class ServerHost
+    class TestServerHost
     {
         private readonly CremaBootstrapper app;
         private readonly UserContextSerializationInfo userInfos;
 
-        public ServerHost(CremaBootstrapper app, UserContextSerializationInfo userInfos)
+        public TestServerHost(CremaBootstrapper app, UserContextSerializationInfo userInfos)
         {
             this.app = app;
             this.userInfos = userInfos;
