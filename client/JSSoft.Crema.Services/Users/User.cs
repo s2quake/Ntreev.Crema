@@ -58,7 +58,7 @@ namespace JSSoft.Crema.Services.Users
                      var path = base.Path;
                      return (items, oldPaths, oldCategoryPaths, path);
                  });
-                var result = await this.Service.MoveUserItemAsync(this.Path, categoryPath);
+                var result = await this.Service.MoveUserItemAsync(authentication.Token, this.Path, categoryPath);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -83,7 +83,7 @@ namespace JSSoft.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldPaths, path);
                 });
-                var result = await this.Service.DeleteUserItemAsync(tuple.path);
+                var result = await this.Service.DeleteUserItemAsync(authentication.Token, tuple.path);
                 await context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -107,7 +107,7 @@ namespace JSSoft.Crema.Services.Users
                     var id = this.ID;
                     return (items, comments, id);
                 });
-                var result = await this.Service.KickAsync(tuple.id, comment ?? string.Empty);
+                var result = await this.Service.KickAsync(authentication.Token, tuple.id, comment ?? string.Empty);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -131,7 +131,7 @@ namespace JSSoft.Crema.Services.Users
                     var id = this.ID;
                     return (items, comments, id);
                 });
-                var result = await this.Service.BanAsync(tuple.id, comment ?? string.Empty);
+                var result = await this.Service.BanAsync(authentication.Token, tuple.id, comment ?? string.Empty);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -154,7 +154,7 @@ namespace JSSoft.Crema.Services.Users
                     var id = this.ID;
                     return (items, id);
                 });
-                var result = await this.Service.UnbanAsync(tuple.id);
+                var result = await this.Service.UnbanAsync(authentication.Token, tuple.id);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -190,7 +190,7 @@ namespace JSSoft.Crema.Services.Users
                 //     throw new ArgumentNullException(nameof(newPassword));
                 var encryptedPassword = UserContext.Encrypt(userInfo.ID, password);
                 // var p2 = newPassword == null ? null : UserContext.Encrypt(userInfo.ID, newPassword);
-                var result = await this.Service.SetUserNameAsync(userInfo.ID, encryptedPassword, userName);
+                var result = await this.Service.SetUserNameAsync(authentication.Token, userInfo.ID, encryptedPassword, userName);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -222,7 +222,7 @@ namespace JSSoft.Crema.Services.Users
                 });
                 var encryptedPassword1 = UserContext.Encrypt(userInfo.ID, password);
                 var encryptedPassword2 = UserContext.Encrypt(userInfo.ID, newPassword);
-                var result = await this.Service.SetPasswordAsync(userInfo.ID, encryptedPassword1, encryptedPassword2);
+                var result = await this.Service.SetPasswordAsync(authentication.Token, userInfo.ID, encryptedPassword1, encryptedPassword2);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -248,7 +248,7 @@ namespace JSSoft.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(ResetPasswordAsync), this);
                     return base.UserInfo;
                 });
-                var result = await this.Service.ResetPasswordAsync(userInfo.ID);
+                var result = await this.Service.ResetPasswordAsync(authentication.Token, userInfo.ID);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -269,7 +269,7 @@ namespace JSSoft.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(SendMessageAsync), this, message);
                     return base.UserInfo;
                 });
-                var result = await this.Service.SendMessageAsync(userInfo.ID, message);
+                var result = await this.Service.SendMessageAsync(authentication.Token, userInfo.ID, message);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }

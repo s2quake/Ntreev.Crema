@@ -48,6 +48,7 @@ namespace JSSoft.Crema.Services.Users
         private readonly Dictionary<string, Authentication> customAuthentications = new();
         private readonly TaskResetEvent<Guid> taskEvent;
         private readonly IndexedDispatcher callbackEvent;
+        private Guid subscribeToken;
 
         public UserContext(CremaHost cremaHost)
         {
@@ -64,9 +65,9 @@ namespace JSSoft.Crema.Services.Users
             this.callbackEvent.Dispose();
         }
 
-        public async Task InitializeAsync(string userID, Guid authenticationToken)
+        public async Task InitializeAsync(Guid subscribeToken)
         {
-            var result = await this.Service.SubscribeAsync(authenticationToken);
+            var result = await this.Service.SubscribeAsync(subscribeToken);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 var metaData = result.Value;
@@ -83,9 +84,7 @@ namespace JSSoft.Crema.Services.Users
                     user.Initialize(item.UserInfo, item.BanInfo);
                     user.SetUserState(item.UserState);
                 }
-                this.CurrentUser = this.Users[userID];
-                this.CurrentUser.SetUserState(UserState.Online);
-                this.CurrentUserToken = authenticationToken;
+                this.subscribeToken = subscribeToken;
             });
             this.ReleaseHandle.Reset();
         }
@@ -93,11 +92,10 @@ namespace JSSoft.Crema.Services.Users
         public async Task ReleaseAsync()
         {
             if (this.Service != null)
-                await this.Service.UnsubscribeAsync();
+                await this.Service.UnsubscribeAsync(this.subscribeToken);
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.CurrentUserToken = Guid.Empty;
-                this.CurrentUser = null;
+                this.subscribeToken = Guid.Empty;
                 this.Clear();
             });
             this.ReleaseHandle.Set();
@@ -166,8 +164,17 @@ namespace JSSoft.Crema.Services.Users
         {
             return await this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.CurrentUserToken == authenticationToken)
-                    return this.CurrentUser.Authentication;
+                var query = from User item in this.Users
+                            let authentication = item.Authentication
+                            where authentication != null && authentication.Token == authenticationToken
+                            select item;
+
+                if (query.Any() == true)
+                    return query.First().Authentication;
+
+                if (authenticationToken == Authentication.System.Token)
+                    return Authentication.System;
+
                 return null;
             });
         }
@@ -178,9 +185,9 @@ namespace JSSoft.Crema.Services.Users
             {
                 if (authentication == null)
                     throw new ArgumentNullException(nameof(authentication));
-                if (authentication.ID != this.CurrentUser.ID)
-                    throw new InvalidOperationException();
-                this.CurrentUser.Authentication.InvokeExpiredEvent();
+                // if (authentication.ID != this.CurrentUser.ID)
+                //     throw new InvalidOperationException();
+                // this.CurrentUser.Authentication.InvokeExpiredEvent();
             });
         }
 
@@ -227,11 +234,9 @@ namespace JSSoft.Crema.Services.Users
             this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskID));
         }
 
-        public UserContextMetaData GetMetaData(Authentication authentication)
+        public UserContextMetaData GetMetaData()
         {
             this.Dispatcher.VerifyAccess();
-            if (authentication == null)
-                throw new ArgumentNullException(nameof(authentication));
 
             var metaData = new UserContextMetaData();
             {
@@ -267,7 +272,7 @@ namespace JSSoft.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(NotifyMessageAsync), this, userIDs, message);
                 });
-                var result = await this.Service.NotifyMessageAsync(userIDs, message);
+                var result = await this.Service.NotifyMessageAsync(authentication.Token, userIDs, message);
                 await this.WaitAsync(result.TaskID);
                 return result.TaskID;
 
@@ -278,10 +283,6 @@ namespace JSSoft.Crema.Services.Users
                 throw;
             }
         }
-
-        public User CurrentUser { get; private set; }
-
-        public Guid CurrentUserToken { get; private set; }
 
         public IUserContextService Service { get; set; }
 

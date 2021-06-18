@@ -48,7 +48,7 @@ namespace JSSoft.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldNames, oldPaths, path);
                 });
-                var result = await this.Service.RenameUserItemAsync(tuple.path, name);
+                var result = await this.Service.RenameUserItemAsync(authentication.Token, tuple.path, name);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -73,7 +73,7 @@ namespace JSSoft.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldPaths, oldParentPaths, path);
                 });
-                var result = await this.Service.MoveUserItemAsync(tuple.path, parentPath);
+                var result = await this.Service.MoveUserItemAsync(authentication.Token, tuple.path, parentPath);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -98,7 +98,7 @@ namespace JSSoft.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldPaths, path);
                 });
-                var result = await this.Service.DeleteUserItemAsync(tuple.path);
+                var result = await this.Service.DeleteUserItemAsync(authentication.Token, tuple.path);
                 await context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }

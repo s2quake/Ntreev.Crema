@@ -58,6 +58,7 @@ namespace JSSoft.Crema.Services
         private LogService log;
         private Guid token;
         private Guid serviceToken;
+        private Guid subscribeToken;
 
         [ImportingConstructor]
         public CremaHost(IServiceProvider container,
@@ -153,7 +154,10 @@ namespace JSSoft.Crema.Services
                 this.serviceToken = await this.clientContext.OpenAsync();
                 this.clientContext.Closed += ClientContext_Closed;
                 this.ServiceInfo = await this.Service.GetServiceInfoAsync();
-                await this.Service.SubscribeAsync($"{version}", $"{platform}", $"{culture}");
+                this.subscribeToken = await this.Service.SubscribeAsync($"{version}", $"{platform}", $"{culture}");
+                await this.UserContext.InitializeAsync(this.subscribeToken);
+                await this.DataBaseContext.InitializeAsync(this.subscribeToken);
+                await this.DomainContext.InitializeAsync(this.subscribeToken);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.plugins = new PluginCollection(this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>);
@@ -195,11 +199,14 @@ namespace JSSoft.Crema.Services
                     this.OnClosing(EventArgs.Empty);
                     this.plugins.Release();
                 });
-                if (this.AuthenticationToken != Guid.Empty)
-                {
-                    await this.LogoutAsync();
-                }
-                await this.Service.UnsubscribeAsync();
+                // if (this.AuthenticationToken != Guid.Empty)
+                // {
+                //     await this.LogoutAsync();
+                // }
+                await this.DomainContext.ReleaseAsync();
+                await this.DataBaseContext.ReleaseAsync();
+                await this.UserContext.ReleaseAsync();
+                await this.Service.UnsubscribeAsync(this.subscribeToken);
                 this.clientContext.Closed -= ClientContext_Closed;
                 await this.clientContext.CloseAsync(this.serviceToken, 0);
                 await this.WaitReleaseAsync();
@@ -238,21 +245,19 @@ namespace JSSoft.Crema.Services
                     this.Debug($"{this.GetType().Name}.{nameof(LoginAsync)} : {userID}");
                 });
                 var authenticationToken = await this.Service.LoginAsync(userID, UserContext.Encrypt(userID, password));
-                await this.UserContext.InitializeAsync(userID, authenticationToken);
-                await this.DataBaseContext.InitializeAsync(authenticationToken);
-                await this.DomainContext.InitializeAsync(authenticationToken);
+
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.AuthenticationToken = authenticationToken;
+                    // this.AuthenticationToken = authenticationToken;
                     this.configs = new UserConfiguration(this.GetConfigPath(userID), this.propertiesProviders);
                 });
-                return this.AuthenticationToken;
+                return authenticationToken;
             }
             catch (Exception e)
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.AuthenticationToken = Guid.Empty;
+                    // this.AuthenticationToken = Guid.Empty;
                     this.configs = null;
                 });
                 CremaLog.Error(e);
@@ -273,18 +278,18 @@ namespace JSSoft.Crema.Services
                 {
                     if (this.ServiceState != ServiceState.Open)
                         throw new InvalidOperationException(Resources.Exception_NotOpened);
-                    if (authentication.ID != this.UserID)
-                        throw new InvalidOperationException();
+                    // if (authentication.ID != this.UserID)
+                    //     throw new InvalidOperationException();
                     this.DebugMethod(authentication, this, nameof(LogoutAsync));
                 });
-                await this.Service.LogoutAsync();
+                await this.Service.LogoutAsync(authentication.Token);
                 await this.LogoutAsync();
             }
             catch (Exception e)
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.AuthenticationToken = Guid.Empty;
+                    // this.AuthenticationToken = Guid.Empty;
                     this.configs = null;
                 });
                 CremaLog.Error(e);
@@ -306,10 +311,10 @@ namespace JSSoft.Crema.Services
                 this.Debug($"{this.GetType().Name}.{nameof(LogoutAsync)} : {userID}");
             });
             await this.Service.LogoutAsync(userID, UserContext.Encrypt(userID, password));
-            if (this.AuthenticationToken != Guid.Empty)
-            {
-                await this.LogoutAsync();
-            }
+            // if (this.AuthenticationToken != Guid.Empty)
+            // {
+            //     await this.LogoutAsync();
+            // }
         }
 
         public async Task<Authentication> AuthenticateAsync(Guid authenticationToken)
@@ -343,7 +348,7 @@ namespace JSSoft.Crema.Services
                         throw new InvalidOperationException();
                     this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, isRestart, message);
                 });
-                var result = await this.Service.ShutdownAsync(milliseconds, isRestart, message);
+                var result = await this.Service.ShutdownAsync(authentication.Token, milliseconds, isRestart, message);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.shutdownTimer.Start(shutdownContext, address);
@@ -372,7 +377,7 @@ namespace JSSoft.Crema.Services
                         throw new InvalidOperationException();
                     this.DebugMethod(authentication, this, nameof(CancelShutdownAsync));
                 });
-                var result = await this.Service.CancelShutdownAsync();
+                var result = await this.Service.CancelShutdownAsync(authentication.Token);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.shutdownTimer.Stop();
@@ -466,14 +471,6 @@ namespace JSSoft.Crema.Services
 
         public string Address { get; private set; } = string.Empty;
 
-        public string UserID => this.User != null ? this.User.ID : string.Empty;
-
-        public string UserName => this.User != null ? this.User.UserName : string.Empty;
-
-        public Authority Authority => this.User != null ? this.User.Authority : Authority.Guest;
-
-        public User User => this.UserContext.CurrentUser;
-
         public DataBaseContext DataBaseContext { get; private set; }
 
         public DomainContext DomainContext { get; private set; }
@@ -532,12 +529,8 @@ namespace JSSoft.Crema.Services
 
         private async Task LogoutAsync()
         {
-            await this.DomainContext.ReleaseAsync();
-            await this.DataBaseContext.ReleaseAsync();
-            await this.UserContext.ReleaseAsync();
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.AuthenticationToken = Guid.Empty;
                 this.configs.Commit();
                 this.configs = null;
             });
@@ -599,7 +592,7 @@ namespace JSSoft.Crema.Services
                 await this.WaitReleaseAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.AuthenticationToken = Guid.Empty;
+                    // this.AuthenticationToken = Guid.Empty;
                     this.log?.Dispose();
                     this.log = null;
                     this.configs.Commit();
@@ -637,7 +630,7 @@ namespace JSSoft.Crema.Services
             }
         }
 
-        internal Guid AuthenticationToken { get; set; }
+        // internal Guid AuthenticationToken { get; set; }
 
         #region ICremaHostEventCallback
 

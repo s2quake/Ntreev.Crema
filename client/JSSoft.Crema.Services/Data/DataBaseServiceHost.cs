@@ -34,7 +34,7 @@ namespace JSSoft.Crema.Services.Data
             this.dataBase = dataBase;
         }
 
-        protected override Task<IDataBaseEventCallback> CreateCallbackAsync(IDataBaseService service)
+        protected override Task<IDataBaseEventCallback> CreateCallbackAsync(IPeer peer, IDataBaseService service)
         {
             return Task.Run<IDataBaseEventCallback>(() =>
             {

@@ -29,7 +29,7 @@ namespace JSSoft.Crema.Services
         {
             foreach (var item in plugins)
             {
-                var authentication = new Authentication(new AuthenticationProvider(cremaHost), item.ID);
+                var authentication = new Authentication(new AuthenticationProvider(item), item.ID);
                 item.Initialize(authentication);
                 this.Add(authentication);
             }

@@ -78,7 +78,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), typeName, newTypeName, categoryPath);
                 });
                 var taskID = GuidUtility.FromName(categoryPath + newTypeName);
-                var result = await this.Context.Service.CopyTypeAsync(typeName, newTypeName, categoryPath);
+                var result = await this.Context.Service.CopyTypeAsync(authentication.Token, typeName, newTypeName, categoryPath);
                 var typeInfo = result.Value;
                 await this.DataBase.WaitAsync(taskID);
                 return await this.Dispatcher.InvokeAsync(() => this[typeInfo.Name, typeInfo.CategoryPath]);

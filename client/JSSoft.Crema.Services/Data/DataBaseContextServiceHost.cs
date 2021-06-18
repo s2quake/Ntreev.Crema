@@ -34,7 +34,7 @@ namespace JSSoft.Crema.Services.Data
             this.dataBaseContext = dataBaseContext;
         }
 
-        protected override Task<IDataBaseContextEventCallback> CreateCallbackAsync(IDataBaseContextService service)
+        protected override Task<IDataBaseContextEventCallback> CreateCallbackAsync(IPeer peer, IDataBaseContextService service)
         {
             return Task.Run<IDataBaseContextEventCallback>(() =>
             {
@@ -43,7 +43,7 @@ namespace JSSoft.Crema.Services.Data
             });
         }
 
-        protected override async Task DestroyCallbackAsync(IDataBaseContextEventCallback callback)
+        protected override async Task DestroyCallbackAsync(IPeer peer, IDataBaseContextEventCallback callback)
         {
             if (callback is DataBaseContext dataBaseContext)
             {

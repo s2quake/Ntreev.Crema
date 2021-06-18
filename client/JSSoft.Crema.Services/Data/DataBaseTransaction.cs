@@ -42,7 +42,7 @@ namespace JSSoft.Crema.Services.Data
             if (authentication is null)
                 throw new ArgumentNullException(nameof(authentication));
 
-            var result = await this.service.BeginTransactionAsync(this.dataBase.Name);
+            var result = await this.service.BeginTransactionAsync(authentication.Token, this.dataBase.Name);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.CremaHost.Sign(authentication, result);
@@ -59,7 +59,7 @@ namespace JSSoft.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                var result = await this.service.EndTransactionAsync(this.ID);
+                var result = await this.service.EndTransactionAsync(authentication.Token, this.ID);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -82,7 +82,7 @@ namespace JSSoft.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                var result = await this.service.CancelTransactionAsync(this.ID);
+                var result = await this.service.CancelTransactionAsync(authentication.Token, this.ID);
 
                 await this.dataBase.Dispatcher.InvokeAsync(() =>
                 {

@@ -22,7 +22,7 @@
 using System;
 using JSSoft.Crema.ServiceModel;
 
-namespace JSSoft.Crema.Services.Users
+namespace JSSoft.Crema.Services
 {
     class AuthenticationProvider : IAuthenticationProvider
     {

@@ -34,7 +34,7 @@ namespace JSSoft.Crema.Services
             this.cremaHost = cremaHost;
         }
 
-        protected override Task<ICremaHostEventCallback> CreateCallbackAsync(ICremaHostService service)
+        protected override Task<ICremaHostEventCallback> CreateCallbackAsync(IPeer peer, ICremaHostService service)
         {
             return Task.Run<ICremaHostEventCallback>(() =>
             {
@@ -43,7 +43,7 @@ namespace JSSoft.Crema.Services
             });
         }
 
-        protected override async Task DestroyCallbackAsync(ICremaHostEventCallback callback)
+        protected override async Task DestroyCallbackAsync(IPeer peer, ICremaHostEventCallback callback)
         {
             if (callback is CremaHost cremaHost)
             {

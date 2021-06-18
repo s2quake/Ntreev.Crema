@@ -56,7 +56,7 @@ namespace JSSoft.Crema.Services.Data
                     return new CategoryName(parentPath, name);
                 });
                 var taskID = GuidUtility.FromName(categoryName);
-                var result = await this.Service.NewTypeCategoryAsync(categoryName);
+                var result = await this.Service.NewTypeCategoryAsync(authentication.Token, categoryName);
                 await this.DataBase.WaitAsync(taskID);
                 return await this.Dispatcher.InvokeAsync(() => this[categoryName]);
             }

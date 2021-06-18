@@ -82,7 +82,7 @@ namespace JSSoft.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, isCanceled);
                 });
-                var result = await this.Service.DeleteDomainAsync(this.ID, isCanceled);
+                var result = await this.Service.DeleteDomainAsync(authentication.Token, this.ID, isCanceled);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return new DomainResultInfo<object>() { ID = result.TaskID, Value = result.Value };
             }
@@ -102,7 +102,7 @@ namespace JSSoft.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 });
-                var result = await this.Service.BeginUserEditAsync(this.ID, location);
+                var result = await this.Service.BeginUserEditAsync(authentication.Token, this.ID, location);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -122,7 +122,7 @@ namespace JSSoft.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 });
-                var result = await this.Service.EndUserEditAsync(this.ID);
+                var result = await this.Service.EndUserEditAsync(authentication.Token, this.ID);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -142,7 +142,7 @@ namespace JSSoft.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(NewRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 });
-                var result = await this.Service.NewRowAsync(this.ID, rows);
+                var result = await this.Service.NewRowAsync(authentication.Token, this.ID, rows);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return new DomainResultInfo<DomainRowInfo[]>() { ID = result.TaskID, Value = result.Value };
             }
@@ -162,7 +162,7 @@ namespace JSSoft.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 });
-                var result = await this.Service.SetRowAsync(this.ID, rows);
+                var result = await this.Service.SetRowAsync(authentication.Token, this.ID, rows);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return new DomainResultInfo<DomainRowInfo[]>() { ID = result.TaskID, Value = result.Value };
             }
@@ -182,7 +182,7 @@ namespace JSSoft.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 });
-                var result = await this.Service.RemoveRowAsync(this.ID, rows);
+                var result = await this.Service.RemoveRowAsync(authentication.Token, this.ID, rows);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return new DomainResultInfo<DomainRowInfo[]>() { ID = result.TaskID, Value = result.Value };
             }
@@ -202,7 +202,7 @@ namespace JSSoft.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPropertyAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, propertyName, value);
                 });
-                var result = await this.Service.SetPropertyAsync(this.ID, propertyName, value);
+                var result = await this.Service.SetPropertyAsync(authentication.Token, this.ID, propertyName, value);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -223,7 +223,7 @@ namespace JSSoft.Crema.Services.Domains
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetUserLocationAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     return this.GetDomainUser(authentication);
                 });
-                var result = await this.Service.SetUserLocationAsync(this.ID, location);
+                var result = await this.Service.SetUserLocationAsync(authentication.Token, this.ID, location);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     domainUser.DomainLocationInfo = location;
@@ -245,7 +245,7 @@ namespace JSSoft.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID, comment);
                 });
-                var result = await this.Service.KickAsync(this.ID, userID, comment);
+                var result = await this.Service.KickAsync(authentication.Token, this.ID, userID, comment);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -265,7 +265,7 @@ namespace JSSoft.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetOwnerAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID);
                 });
-                var result = await this.Service.SetOwnerAsync(this.ID, userID);
+                var result = await this.Service.SetOwnerAsync(authentication.Token, this.ID, userID);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -424,7 +424,7 @@ namespace JSSoft.Crema.Services.Domains
         {
             this.Users.Remove(domainUser.ID);
             this.Users.Owner = ownerUser;
-            if (domainUser.ID == this.CremaHost.UserID)
+            // if (domainUser.ID == this.CremaHost.UserID)
             {
                 await this.DataDispatcher.InvokeAsync(() =>
                 {

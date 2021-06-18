@@ -54,6 +54,7 @@ namespace JSSoft.Crema.Services.Data
 
         private readonly TaskResetEvent<Guid> taskEvent;
         private readonly IndexedDispatcher callbackEvent;
+        private Guid subscribeToken;
 
         public DataBaseContext(CremaHost cremaHost)
         {
@@ -75,13 +76,14 @@ namespace JSSoft.Crema.Services.Data
             return this.taskEvent.WaitAsync(taskID);
         }
 
-        public async Task InitializeAsync(Guid authenticationToken)
+        public async Task InitializeAsync(Guid subscribeToken)
         {
-            var result = await this.Service.SubscribeAsync(authenticationToken);
+            var result = await this.Service.SubscribeAsync(subscribeToken);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 var metaData = result.Value;
                 this.Initialize(metaData);
+                this.subscribeToken = subscribeToken;
             });
             this.ReleaseHandle.Reset();
         }
@@ -89,20 +91,21 @@ namespace JSSoft.Crema.Services.Data
         public async Task ReleaseAsync()
         {
             if (this.Service != null)
-                await this.Service.UnsubscribeAsync();
+                await this.Service.UnsubscribeAsync(this.subscribeToken);
             var dataBases = await this.Dispatcher.InvokeAsync(() => this.ToArray<DataBase>());
             foreach (var item in dataBases)
             {
                 await item.ReleaseAsync();
             }
             await this.Dispatcher.InvokeAsync(this.Clear);
+            this.subscribeToken = Guid.Empty;
             this.ReleaseHandle.Set();
         }
 
         public async Task<LockInfo> InvokeDataBaseLock(Authentication authentication, DataBase dataBase, string comment)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseLock), dataBase, comment);
-            var result = await this.Service.LockAsync(dataBase.Name, comment);
+            var result = await this.Service.LockAsync(authentication.Token, dataBase.Name, comment);
             result.Validate(authentication);
             return result.Value;
         }
@@ -110,14 +113,14 @@ namespace JSSoft.Crema.Services.Data
         public async Task InvokeDataBaseUnlock(Authentication authentication, DataBase dataBase)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseUnlock), dataBase);
-            var result = await this.Service.UnlockAsync(dataBase.Name);
+            var result = await this.Service.UnlockAsync(authentication.Token, dataBase.Name);
             result.Validate(authentication);
         }
 
         public async Task<AccessInfo> InvokeDataBaseSetPrivate(Authentication authentication, DataBase dataBase)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseSetPrivate), dataBase);
-            var result = await this.Service.SetPrivateAsync(dataBase.Name);
+            var result = await this.Service.SetPrivateAsync(authentication.Token, dataBase.Name);
             result.Validate(authentication);
             return result.Value;
         }
@@ -125,14 +128,14 @@ namespace JSSoft.Crema.Services.Data
         public async Task InvokeDataBaseSetPublic(Authentication authentication, DataBase dataBase)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseSetPrivate), dataBase);
-            var result = await this.Service.SetPublicAsync(dataBase.Name);
+            var result = await this.Service.SetPublicAsync(authentication.Token, dataBase.Name);
             result.Validate(authentication);
         }
 
         public async Task<AccessMemberInfo> InvokeDataBaseAddAccessMember(Authentication authentication, DataBase dataBase, string memberID, AccessType accessType)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseAddAccessMember), dataBase, memberID, accessType);
-            var result = await this.Service.AddAccessMemberAsync(dataBase.Name, memberID, accessType);
+            var result = await this.Service.AddAccessMemberAsync(authentication.Token, dataBase.Name, memberID, accessType);
             result.Validate(authentication);
             return result.Value;
         }
@@ -140,7 +143,7 @@ namespace JSSoft.Crema.Services.Data
         public async Task<AccessMemberInfo> InvokeDataBaseSetAccessMember(Authentication authentication, DataBase dataBase, string memberID, AccessType accessType)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseSetAccessMember), dataBase, memberID, accessType);
-            var result = await this.Service.SetAccessMemberAsync(dataBase.Name, memberID, accessType);
+            var result = await this.Service.SetAccessMemberAsync(authentication.Token, dataBase.Name, memberID, accessType);
             result.Validate(authentication);
             return result.Value;
         }
@@ -148,7 +151,7 @@ namespace JSSoft.Crema.Services.Data
         public async Task InvokeDataBaseRemoveAccessMember(Authentication authentication, DataBase dataBase, string memberID)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseRemoveAccessMember), dataBase, memberID);
-            var result = await this.Service.RemoveAccessMemberAsync(dataBase.Name, memberID);
+            var result = await this.Service.RemoveAccessMemberAsync(authentication.Token, dataBase.Name, memberID);
             result.Validate(authentication);
         }
 
@@ -161,7 +164,7 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewDataBaseAsync), dataBaseName, comment);
                 });
                 var taskID = GuidUtility.FromName(dataBaseName + comment);
-                var result = await this.Service.CreateAsync(dataBaseName, comment);
+                var result = await this.Service.CreateAsync(authentication.Token, dataBaseName, comment);
                 await this.WaitAsync(taskID);
                 return await this.Dispatcher.InvokeAsync(() => this[dataBaseName]);
             }
@@ -182,7 +185,7 @@ namespace JSSoft.Crema.Services.Data
                     return dataBase.Name;
                 });
                 var taskID = GuidUtility.FromName(newDataBaseName + comment);
-                var result = await this.Service.CopyAsync(name, newDataBaseName, comment, force);
+                var result = await this.Service.CopyAsync(authentication.Token, name, newDataBaseName, comment, force);
                 await this.WaitAsync(taskID);
                 return await this.Dispatcher.InvokeAsync(() => this[newDataBaseName]);
             }
@@ -198,7 +201,7 @@ namespace JSSoft.Crema.Services.Data
             this.Dispatcher.VerifyAccess();
             this.CremaHost.DebugMethod(authentication, this, nameof(GetLog), dataBase);
 
-            var result = await this.Service.GetLogAsync(dataBase.Name, revision);
+            var result = await this.Service.GetLogAsync(authentication.Token, dataBase.Name, revision);
             result.Validate(authentication);
             return result.Value ?? new LogInfo[] { };
         }
@@ -208,23 +211,21 @@ namespace JSSoft.Crema.Services.Data
             this.Dispatcher.VerifyAccess();
             this.CremaHost.DebugMethod(authentication, this, nameof(Revert), dataBase);
 
-            var result = await this.Service.RevertAsync(dataBase.Name, revision);
+            var result = await this.Service.RevertAsync(authentication.Token, dataBase.Name, revision);
             result.Validate(authentication);
             dataBase.SetDataBaseInfo(result.Value);
             this.InvokeItemsRevertedEvent(authentication, new DataBase[] { dataBase }, new string[] { revision });
         }
 
-        public DataBaseContextMetaData GetMetaData(Authentication authentication)
+        public DataBaseContextMetaData GetMetaData()
         {
             this.Dispatcher.VerifyAccess();
-            if (authentication == null)
-                throw new ArgumentNullException(nameof(authentication));
 
             var dataBases = this.ToArray<DataBase>();
             var metaList = new List<DataBaseMetaData>(this.Count);
             foreach (var item in dataBases)
             {
-                var metaData = item.Dispatcher.Invoke(() => item.GetMetaData(authentication));
+                var metaData = item.Dispatcher.Invoke(() => item.GetMetaData());
                 metaList.Add(metaData);
             }
             return new DataBaseContextMetaData()
@@ -414,14 +415,14 @@ namespace JSSoft.Crema.Services.Data
             this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskID));
         }
 
-        public Task<ResultBase> LoadDataBase(DataBase dataBase)
+        public Task<ResultBase> LoadDataBase(Guid subscribeToken, DataBase dataBase)
         {
-            return this.Service.LoadAsync(dataBase.Name);
+            return this.Service.LoadAsync(subscribeToken, dataBase.Name);
         }
 
-        public Task<ResultBase> UnloadDataBase(DataBase dataBase)
+        public Task<ResultBase> UnloadDataBase(Guid subscribeToken, DataBase dataBase)
         {
-            return this.Service.UnloadAsync(dataBase.Name);
+            return this.Service.UnloadAsync(subscribeToken, dataBase.Name);
         }
 
         public new DataBase this[string dataBaseName] => base[dataBaseName];
@@ -714,10 +715,11 @@ namespace JSSoft.Crema.Services.Data
 
         private void Initialize(DataBaseContextMetaData metaData)
         {
+            var subscribeToken = this.subscribeToken;
             for (var i = 0; i < metaData.DataBases.Length; i++)
             {
                 var dataBaseInfo = metaData.DataBases[i];
-                var dataBase = new DataBase(this, dataBaseInfo);
+                var dataBase = new DataBase(this, subscribeToken, dataBaseInfo);
                 this.AddBase(dataBase.Name, dataBase);
             }
         }
@@ -732,13 +734,14 @@ namespace JSSoft.Crema.Services.Data
                 {
                     this.Dispatcher.Invoke(() =>
                     {
+                        var subscribeToken = this.subscribeToken;
                         var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
                         var dataBases = new DataBase[dataBaseNames.Length];
                         for (var i = 0; i < dataBaseNames.Length; i++)
                         {
                             var dataBaseName = dataBaseNames[i];
                             var dataBaseInfo = dataBaseInfos[i];
-                            var dataBase = new DataBase(this, dataBaseInfo);
+                            var dataBase = new DataBase(this, subscribeToken, dataBaseInfo);
                             this.AddBase(dataBase.Name, dataBase);
                             dataBases[i] = dataBase;
                         }

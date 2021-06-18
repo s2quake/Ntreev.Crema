@@ -25,48 +25,19 @@ namespace JSSoft.Crema.Services
 {
     class AuthenticationProvider : IAuthenticationProvider
     {
-        private readonly CremaHost cremaHost;
+        private readonly IPlugin plugin;
 
-        public AuthenticationProvider(CremaHost cremaHost)
+        public AuthenticationProvider(IPlugin plugin)
         {
-            this.cremaHost = cremaHost;
-            // this.isUser = true;
-            // this.ID = user.ID;
-            // this.Name = user.UserName;
-            // this.Authority = user.Authority;
+            this.plugin = plugin;
         }
 
-        // public AuthenticationProvider(string name)
-        // {
-        //     this.ID = name;
-        //     this.Name = name;
-        //     this.Authority = Authority.Guest;
-        // }
+        public AuthenticationType AuthenticationTypes => AuthenticationType.None;
 
-        internal AuthenticationType AuthenticationTypes
-        {
-            get
-            {
-                var authority = this.Authority;
-                if (authority == Authority.Admin)
-                    return AuthenticationType.User | AuthenticationType.Administrator;
-                else if (authority == Authority.Member)
-                    return AuthenticationType.User;
-                else
-                    return AuthenticationType.User;
-            }
-        }
+        public string ID => $"{this.plugin.ID}";
 
-        public Authority Authority => this.cremaHost.Authority;
+        public string Name => this.plugin.Name;
 
-        public string ID => this.cremaHost.UserID;
-
-        public string Name => this.cremaHost.UserName;
-
-        #region IAuthenticationProvider
-
-        AuthenticationType IAuthenticationProvider.AuthenticationTypes => this.AuthenticationTypes;
-
-        #endregion
+        public Authority Authority => Authority.None;
     }
 }

@@ -257,9 +257,9 @@ namespace JSSoft.Crema.Services
                 return (await this.service.GetDataBaseInfosAsync()).Value;
             }
 
-            protected override void OnServiceCreated(ICremaHostService service)
+            protected override void OnServiceCreated(IPeer peer, ICremaHostService service)
             {
-                base.OnServiceCreated(service);
+                base.OnServiceCreated(peer, service);
                 this.service = service;
             }
         }
