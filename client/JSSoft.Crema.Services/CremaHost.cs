@@ -245,7 +245,7 @@ namespace JSSoft.Crema.Services
                     this.Debug($"{this.GetType().Name}.{nameof(LoginAsync)} : {userID}");
                 });
                 var authenticationToken = await this.Service.LoginAsync(userID, UserContext.Encrypt(userID, password));
-
+                await this.UserContext.LoginAsync(userID, authenticationToken);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     // this.AuthenticationToken = authenticationToken;

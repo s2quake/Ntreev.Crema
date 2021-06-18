@@ -56,19 +56,19 @@ namespace JSSoft.Crema.ServiceHosts.Data
         {
             if (this.peer is not null)
                 throw new InvalidOperationException();
-            var result = new ResultBase<DataBaseMetaData>();
-            // this.OwnerID = authentication.ID;
             await this.DataBasesContext.Dispatcher.InvokeAsync(() =>
             {
                 this.dataBase = this.DataBasesContext[dataBaseName];
                 this.dataBaseName = dataBaseName;
             });
-            // result.TaskID = await (Task<Guid>)this.dataBase.EnterAsync(authentication);
-            result.Value = await this.AttachEventHandlersAsync();
-            result.SignatureDate = SignatureDate.Empty;
+            var value = await this.AttachEventHandlersAsync(token);
             this.peer = Peer.GetPeer(token);
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(SubscribeAsync)} : {dataBaseName}");
-            return result;
+            this.LogService.Debug($"[{token}] {nameof(DataBaseService)} {nameof(SubscribeAsync)} : {dataBaseName}");
+            return new ResultBase<DataBaseMetaData>()
+            {
+                Value = value,
+                SignatureDate = new SignatureDateProvider($"{token}")
+            };
         }
 
         public async Task<ResultBase> UnsubscribeAsync(Guid token)
@@ -77,21 +77,12 @@ namespace JSSoft.Crema.ServiceHosts.Data
                 throw new InvalidOperationException();
             if (this.peer.ID != token)
                 throw new ArgumentException("invalid token", nameof(token));
-            // var authentication = this.peer[authenticationToken];
-            var result = new ResultBase();
-            // if (this.dataBase != null && authentication != null)
-            // {
-            //     result.TaskID = await (Task<Guid>)this.dataBase.LeaveAsync(authentication);
-            //     this.dataBase = null;
-            // }
-            // if (authentication != null)
-            // {
-            //     authentication = null;
-            // }
-            await this.DetachEventHandlersAsync();
-            result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(UnsubscribeAsync)} : {this.dataBaseName}");
-            return result;
+            await this.DetachEventHandlersAsync(token);
+            this.LogService.Debug($"[{token}] {nameof(DataBaseService)} {nameof(UnsubscribeAsync)} : {this.dataBaseName}");
+            return new ResultBase()
+            {
+                SignatureDate = new SignatureDateProvider($"{token}")
+            };
         }
 
         public async Task<ResultBase<DataBaseMetaData>> GetMetaDataAsync()
@@ -850,7 +841,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
             this.dataBase = null;
         }
 
-        private async Task<DataBaseMetaData> AttachEventHandlersAsync()
+        private async Task<DataBaseMetaData> AttachEventHandlersAsync(Guid token)
         {
             var metaData = await this.dataBase.Dispatcher.InvokeAsync(() =>
             {
@@ -876,11 +867,11 @@ namespace JSSoft.Crema.ServiceHosts.Data
                 this.dataBase.Unloaded += DataBase_Unloaded;
                 return this.dataBase.GetMetaData();
             });
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(AttachEventHandlersAsync)}");
+            this.LogService.Debug($"[{token}] {nameof(DataBaseService)} {nameof(AttachEventHandlersAsync)}");
             return metaData;
         }
 
-        private async Task DetachEventHandlersAsync()
+        private async Task DetachEventHandlersAsync(Guid token)
         {
             if (this.dataBase != null)
             {
@@ -908,7 +899,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
                     this.dataBase.Unloaded -= DataBase_Unloaded;
                 });
             }
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(DetachEventHandlersAsync)}");
+            this.LogService.Debug($"[{token}] {nameof(DataBaseService)} {nameof(DetachEventHandlersAsync)}");
         }
 
         private Task<ITypeItem> GetTypeItemAsync(string itemPath)

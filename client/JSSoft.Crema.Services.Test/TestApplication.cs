@@ -25,7 +25,6 @@ using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using System;
-using JSSoft.Crema.Services.Users.Serializations;
 using System.Collections.Generic;
 using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library.Random;
@@ -47,18 +46,12 @@ namespace JSSoft.Crema.Services.Test
 
         public TestServerHost Initialize(TestContext context)
         {
-            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", context.FullyQualifiedTestClassName);
-            var userInfos = UserInfoGenerator.Generate(RandomUtility.Next(500, 1000), RandomUtility.Next(100, 1000));
-            var dataSet = new CremaDataSet();
-            CremaBootstrapper.CreateRepositoryInternal(this, repositoryPath, "git", "xml", string.Empty, userInfos, dataSet);
-            this.BasePath = repositoryPath;
-            this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
-            return new TestServerHost(this, userInfos);
+            throw new NotImplementedException();
         }
 
         public void Release()
         {
-            DirectoryUtility.Delete(this.BasePath);
+            
             this.Dispose();
         }
 
@@ -72,24 +65,12 @@ namespace JSSoft.Crema.Services.Test
 
         public async Task OpenAsync()
         {
-            var cremaHost = this.cremaHost;
-            var token = await cremaHost.OpenAsync();
-            var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            var userID = Authentication.AdminID;
-            var password = Authentication.AdminID.ToSecureString();
-            var authenticationToken = await cremaHost.LoginAsync(userID, password);
-            var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
-            var userInfos = await userContext.Dispatcher.InvokeAsync(() => userContext.GetMetaData());
-            await cremaHost.LogoutAsync(authentication);
-            this.token = token;
-            this.userInfos = userInfos;
-            this.expiredAuthentication = authentication;
+            
         }
 
         public async Task CloseAsync()
         {
-            await this.cremaHost.CloseAsync(this.token);
-            this.token = Guid.Empty;
+            
         }
 
         public Task<Authentication> LoginRandomAsync()

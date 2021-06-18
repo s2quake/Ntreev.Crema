@@ -39,6 +39,14 @@ namespace JSSoft.Crema.Services.Users
 
         }
 
+        public Task LoginAsync(Guid authenticationToken)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Authentication = new Authentication(new UserAuthenticationProvider(this), authenticationToken);
+            });
+        }
+
         public Task RenameAsync(Authentication authentication, string newName)
         {
             throw new NotSupportedException();

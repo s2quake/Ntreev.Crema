@@ -48,8 +48,6 @@ namespace JSSoft.Crema.ServiceHosts
 
         protected T Callback { get; }
 
-        protected string OwnerID { get; set; }
-
         protected CremaService Service { get; }
 
         protected ICremaHost CremaHost { get; }

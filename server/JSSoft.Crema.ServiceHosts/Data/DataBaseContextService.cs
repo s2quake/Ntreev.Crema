@@ -55,12 +55,14 @@ namespace JSSoft.Crema.ServiceHosts.Data
         {
             if (peer is not null)
                 throw new InvalidOperationException();
-            var result = new ResultBase<DataBaseContextMetaData>();
-            result.Value = await this.AttachEventHandlersAsync();
-            result.SignatureDate = SignatureDate.Empty;
+            var value = await this.AttachEventHandlersAsync(token);
             this.peer = Peer.GetPeer(token);
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(SubscribeAsync)}");
-            return result;
+            this.LogService.Debug($"[{token}] {nameof(DataBaseContextService)} {nameof(SubscribeAsync)}");
+            return new ResultBase<DataBaseContextMetaData>()
+            {
+                Value = value,
+                SignatureDate = new SignatureDateProvider($"{token}")
+            };
         }
 
         public async Task<ResultBase> UnsubscribeAsync(Guid token)
@@ -69,12 +71,13 @@ namespace JSSoft.Crema.ServiceHosts.Data
                 throw new InvalidOperationException();
             if (this.peer.ID != token)
                 throw new ArgumentException("invalid token", nameof(token));
-            var result = new ResultBase();
-            await this.DetachEventHandlersAsync();
+            await this.DetachEventHandlersAsync(token);
             this.peer = null;
-            result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(UnsubscribeAsync)}");
-            return result;
+            this.LogService.Debug($"[{token}] {nameof(DataBaseContextService)} {nameof(UnsubscribeAsync)}");
+            return new ResultBase()
+            {
+                SignatureDate = new SignatureDateProvider($"{token}")
+            };
         }
 
         public async Task<ResultBase<CremaDataSet>> GetDataSetAsync(Guid authenticationToken, string dataBaseName, DataSetType dataSetType, string filterExpression, string revision)
@@ -420,7 +423,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
             this.InvokeEvent(() => this.Callback?.OnTaskCompleted(callbackInfo, taskIDs));
         }
 
-        private async Task<DataBaseContextMetaData> AttachEventHandlersAsync()
+        private async Task<DataBaseContextMetaData> AttachEventHandlersAsync(Guid token)
         {
             var metaData = await this.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
@@ -440,11 +443,11 @@ namespace JSSoft.Crema.ServiceHosts.Data
                 this.DataBaseContext.TaskCompleted += DataBaseContext_TaskCompleted;
                 return this.DataBaseContext.GetMetaData();
             });
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(AttachEventHandlersAsync)}");
+            this.LogService.Debug($"[{token}] {nameof(DataBaseContextService)} {nameof(AttachEventHandlersAsync)}");
             return metaData;
         }
 
-        private async Task DetachEventHandlersAsync()
+        private async Task DetachEventHandlersAsync(Guid token)
         {
             await this.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
@@ -463,7 +466,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
                 this.DataBaseContext.ItemsLockChanged -= DataBaseContext_ItemsLockChanged;
                 this.DataBaseContext.TaskCompleted -= DataBaseContext_TaskCompleted;
             });
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(DetachEventHandlersAsync)}");
+            this.LogService.Debug($"[{token}] {nameof(DataBaseContextService)} {nameof(DetachEventHandlersAsync)}");
         }
 
         private async Task<IDataBase> GetDataBaseAsync(string dataBaseName)

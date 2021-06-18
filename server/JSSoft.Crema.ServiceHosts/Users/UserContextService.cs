@@ -48,17 +48,19 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         public async Task DisposeAsync()
         {
-            await this.DetachEventHandlersAsync();
+            // await this.DetachEventHandlersAsync();
         }
 
         public async Task<ResultBase<UserContextMetaData>> SubscribeAsync(Guid token)
         {
-            var result = new ResultBase<UserContextMetaData>();
-            result.Value = await this.AttachEventHandlersAsync();
-            result.SignatureDate = SignatureDateProvider.Default.Provide();
+            var value = await this.AttachEventHandlersAsync(token);
             this.peer = Peer.GetPeer(token);
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(UserContextService)} {nameof(SubscribeAsync)}");
-            return result;
+            this.LogService.Debug($"[{token}] {nameof(UserContextService)} {nameof(SubscribeAsync)}");
+            return new ResultBase<UserContextMetaData>()
+            {
+                Value = value,
+                SignatureDate = new SignatureDateProvider($"{token}")
+            };
         }
 
         public async Task<ResultBase> UnsubscribeAsync(Guid token)
@@ -67,12 +69,13 @@ namespace JSSoft.Crema.ServiceHosts.Users
                 throw new InvalidOperationException();
             if (this.peer.ID != token)
                 throw new ArgumentException("invalid token", nameof(token));
-            var result = new ResultBase();
-            await this.DetachEventHandlersAsync();
+            await this.DetachEventHandlersAsync(token);
             this.peer = null;
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(UserContextService)} {nameof(UnsubscribeAsync)}");
-            result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-            return result;
+            this.LogService.Debug($"[{token}] {nameof(UserContextService)} {nameof(UnsubscribeAsync)}");
+            return new ResultBase()
+            {
+                SignatureDate = new SignatureDateProvider($"{token}")
+            };
         }
 
         public async Task<ResultBase<UserInfo>> NewUserAsync(Guid authenticationToken, string userID, string categoryPath, byte[] password, string userName, Authority authority)
@@ -219,7 +222,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         public IUserCollection UserCollection { get; set; }
 
-        private async Task<UserContextMetaData> AttachEventHandlersAsync()
+        private async Task<UserContextMetaData> AttachEventHandlersAsync(Guid token)
         {
             var metaData = await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
@@ -237,11 +240,11 @@ namespace JSSoft.Crema.ServiceHosts.Users
                 this.UserContext.TaskCompleted += UserContext_TaskCompleted;
                 return this.UserContext.GetMetaData();
             });
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(UserContextService)} {nameof(AttachEventHandlersAsync)}");
+            this.LogService.Debug($"[{token}] {nameof(UserContextService)} {nameof(AttachEventHandlersAsync)}");
             return metaData;
         }
 
-        private async Task DetachEventHandlersAsync()
+        private async Task DetachEventHandlersAsync(Guid token)
         {
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
@@ -258,7 +261,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
                 this.UserCollection.MessageReceived -= UserContext_MessageReceived;
                 this.UserContext.TaskCompleted -= UserContext_TaskCompleted;
             });
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(UserContextService)} {nameof(DetachEventHandlersAsync)}");
+            this.LogService.Debug($"[{token}] {nameof(UserContextService)} {nameof(DetachEventHandlersAsync)}");
         }
 
         private void UserCollection_UsersStateChanged(object sender, Services.ItemsEventArgs<IUser> e)

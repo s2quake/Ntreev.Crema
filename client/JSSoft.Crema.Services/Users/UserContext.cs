@@ -130,6 +130,12 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
+        public async Task LoginAsync(string userID, Guid authenticationToken)
+        {
+            var user = await this.Dispatcher.InvokeAsync(() => this.Users[userID]);
+            await user.LoginAsync(authenticationToken);
+        }
+
         public Authentication Authenticate(SignatureDate signatureDate)
         {
             return this.Dispatcher.Invoke(() => this.AuthenticateInternal(signatureDate));

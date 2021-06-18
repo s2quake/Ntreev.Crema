@@ -49,12 +49,14 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         public async Task<ResultBase<DomainContextMetaData>> SubscribeAsync(Guid token)
         {
-            var result = new ResultBase<DomainContextMetaData>();
-            result.Value = await this.AttachEventHandlersAsync();
-            result.SignatureDate = SignatureDate.Empty;
+            var value = await this.AttachEventHandlersAsync(token);
             this.peer = Peer.GetPeer(token);
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(SubscribeAsync)}");
-            return result;
+            this.LogService.Debug($"[{token}] {nameof(DomainContextService)} {nameof(SubscribeAsync)}");
+            return new ResultBase<DomainContextMetaData>()
+            {
+                Value = value,
+                SignatureDate = new SignatureDateProvider($"{token}")
+            };
         }
 
         public async Task<ResultBase> UnsubscribeAsync(Guid token)
@@ -63,12 +65,13 @@ namespace JSSoft.Crema.ServiceHosts.Domains
                 throw new InvalidOperationException();
             if (this.peer.ID != token)
                 throw new ArgumentException("invalid token", nameof(token));
-            var result = new ResultBase();
-            await this.DetachEventHandlersAsync();
+            await this.DetachEventHandlersAsync(token);
             this.peer = null;
-            result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(UnsubscribeAsync)}");
-            return result;
+            this.LogService.Debug($"[{token}] {nameof(DomainContextService)} {nameof(UnsubscribeAsync)}");
+            return new ResultBase()
+            {
+                SignatureDate = new SignatureDateProvider($"{token}").Provide()
+            };
         }
 
         public async Task<ResultBase<DomainMetaData[]>> GetMetaDataAsync(Guid dataBaseID)
@@ -210,7 +213,7 @@ namespace JSSoft.Crema.ServiceHosts.Domains
             return domain;
         }
 
-        private async Task<DomainContextMetaData> AttachEventHandlersAsync()
+        private async Task<DomainContextMetaData> AttachEventHandlersAsync(Guid token)
         {
             var metaData = await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
@@ -232,11 +235,11 @@ namespace JSSoft.Crema.ServiceHosts.Domains
                 this.DomainContext.TaskCompleted += DomainContext_TaskCompleted;
                 return this.DomainContext.GetMetaData();
             });
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(AttachEventHandlersAsync)}");
+            this.LogService.Debug($"[{token}] {nameof(DomainContextService)} {nameof(AttachEventHandlersAsync)}");
             return metaData;
         }
 
-        private async Task DetachEventHandlersAsync()
+        private async Task DetachEventHandlersAsync(Guid token)
         {
             await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
@@ -257,7 +260,7 @@ namespace JSSoft.Crema.ServiceHosts.Domains
                 this.DomainContext.Domains.DomainPropertyChanged -= Domains_DomainPropertyChanged;
                 this.DomainContext.TaskCompleted -= DomainContext_TaskCompleted;
             });
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(DetachEventHandlersAsync)}");
+            this.LogService.Debug($"[{token}] {nameof(DomainContextService)} {nameof(DetachEventHandlersAsync)}");
         }
 
         private void Domains_DomainsCreated(object sender, DomainsCreatedEventArgs e)

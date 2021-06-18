@@ -40,7 +40,6 @@ namespace JSSoft.Crema.ServiceHosts
             : base(service, callback)
         {
             this.LogService.Debug($"{nameof(CremaHostService)} Constructor");
-            this.OwnerID = nameof(CremaHostService);
             this.CremaHost.CloseRequested += CremaHost_CloseRequested;
         }
 
@@ -76,11 +75,11 @@ namespace JSSoft.Crema.ServiceHosts
 
             await Task.Delay(1);
             this.peer = new Peer(token);
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(SubscribeAsync)}");
+            this.LogService.Debug($"[{token}] {nameof(CremaHostService)} {nameof(SubscribeAsync)}");
             return new ResultBase<Guid>()
             {
                 Value = token,
-                SignatureDate = new SignatureDateProvider(this.OwnerID)
+                SignatureDate = new SignatureDateProvider($"{token}")
             };
         }
 
@@ -89,7 +88,7 @@ namespace JSSoft.Crema.ServiceHosts
             var authenticationToken = await this.CremaHost.LoginAsync(userID, ToSecureString(userID, password));
             var authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
             this.peer.Add(authenticationToken, authentication);
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(LoginAsync)}");
+            this.LogService.Debug($"[{userID}] {nameof(CremaHostService)} {nameof(LoginAsync)}");
             return new ResultBase<Guid>()
             {
                 Value = authenticationToken,
@@ -103,7 +102,6 @@ namespace JSSoft.Crema.ServiceHosts
             var authenticationID = authentication.ID;
             await this.CremaHost.LogoutAsync(authentication);
             this.peer.Remove(authenticationToken);
-            this.OwnerID = nameof(CremaHostService);
             this.LogService.Debug($"[{authenticationID}] {nameof(CremaHostService)} {nameof(LogoutAsync)}");
             return new ResultBase()
             {
@@ -128,10 +126,10 @@ namespace JSSoft.Crema.ServiceHosts
             await Task.Delay(1);
             this.peer.Dispose();
             this.peer = null;
-            this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(UnsubscribeAsync)}");
+            this.LogService.Debug($"[{token}] {nameof(CremaHostService)} {nameof(UnsubscribeAsync)}");
             return new ResultBase()
             {
-                SignatureDate = new SignatureDateProvider(this.OwnerID)
+                SignatureDate = new SignatureDateProvider($"{token}")
             };
         }
 
@@ -140,7 +138,7 @@ namespace JSSoft.Crema.ServiceHosts
             var value = await Task.Run(() => this.Service.ServiceInfo);
             return new ResultBase<ServiceInfo>()
             {
-                SignatureDate = new SignatureDateProvider(this.OwnerID),
+                SignatureDate = new SignatureDateProvider(nameof(CremaHostService)),
                 Value = value
             };
         }
@@ -150,7 +148,7 @@ namespace JSSoft.Crema.ServiceHosts
             var value = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext.Select(item => item.DataBaseInfo).ToArray());
             return new ResultBase<DataBaseInfo[]>()
             {
-                SignatureDate = new SignatureDateProvider(this.OwnerID),
+                SignatureDate = new SignatureDateProvider(nameof(CremaHostService)),
                 Value = value
             };
         }
@@ -160,7 +158,7 @@ namespace JSSoft.Crema.ServiceHosts
             var value = await Task.Run(() => AppUtility.ProductVersion.ToString());
             return new ResultBase<string>()
             {
-                SignatureDate = new SignatureDateProvider(this.OwnerID),
+                SignatureDate = new SignatureDateProvider(nameof(CremaHostService)),
                 Value = value
             };
         }
