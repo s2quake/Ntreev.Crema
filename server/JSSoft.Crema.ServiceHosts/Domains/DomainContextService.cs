@@ -45,6 +45,11 @@ namespace JSSoft.Crema.ServiceHosts.Domains
 
         public async Task DisposeAsync()
         {
+            if (this.peer != null)
+            {
+                await this.DetachEventHandlersAsync(this.peer.ID);
+                this.peer = null;
+            }
         }
 
         public async Task<ResultBase<DomainContextMetaData>> SubscribeAsync(Guid token)

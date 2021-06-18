@@ -19,25 +19,27 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace JSSoft.Crema.Services
 {
-    class PluginCollection : List<IPlugin>
+    class AuthenticationCollection : List<Authentication>
     {
-        public PluginCollection(IEnumerable<IPlugin> plugins)
-            : base(plugins.ToArray())
+        public void Initialize(CremaHost cremaHost, IEnumerable<IPlugin> plugins)
         {
-
+            foreach (var item in plugins)
+            {
+                var authentication = new Authentication(new AuthenticationProvider(item), item.ID);
+                item.Initialize(authentication);
+                this.Add(authentication);
+            }
         }
 
-        public void Release()
+        public void Release(string systemID)
         {
-            foreach (var item in this.Reverse<IPlugin>())
+            foreach (var item in this)
             {
-                item.Release();
+                item.InvokeExpiredEvent();
             }
         }
     }

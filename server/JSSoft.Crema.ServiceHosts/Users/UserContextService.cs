@@ -48,7 +48,11 @@ namespace JSSoft.Crema.ServiceHosts.Users
 
         public async Task DisposeAsync()
         {
-            // await this.DetachEventHandlersAsync();
+            if (this.peer != null)
+            {
+                await this.DetachEventHandlersAsync(this.peer.ID);
+                this.peer = null;
+            }
         }
 
         public async Task<ResultBase<UserContextMetaData>> SubscribeAsync(Guid token)

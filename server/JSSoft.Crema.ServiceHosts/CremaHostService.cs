@@ -59,7 +59,6 @@ namespace JSSoft.Crema.ServiceHosts
                 this.peer.Dispose();
                 this.peer = null;
             }
-            // this.authenticationByToken.Clear();
             this.CremaHost.CloseRequested -= CremaHost_CloseRequested;
         }
 

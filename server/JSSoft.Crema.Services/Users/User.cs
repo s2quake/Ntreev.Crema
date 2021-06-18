@@ -208,48 +208,6 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        // [Obsolete]
-        // public async Task<Guid> ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
-        // {
-        //     try
-        //     {
-        //         if (authentication is null)
-        //             throw new ArgumentNullException(nameof(authentication));
-        //         if (authentication.IsExpired == true)
-        //             throw new AuthenticationExpiredException(nameof(authentication));
-
-        //         this.ValidateExpired();
-        //         var tuple = await this.Dispatcher.InvokeAsync(() =>
-        //         {
-        //             this.CremaHost.DebugMethod(authentication, this, nameof(ChangeUserInfoAsync), this, userName, authority);
-        //             this.ValidateUserInfoChange(authentication, password, newPassword, userName, authority);
-        //             this.CremaHost.Sign(authentication);
-        //             var items = EnumerableUtility.One(this).ToArray();
-        //             var userInfo = base.UserInfo;
-        //             return (items, userInfo);
-        //         });
-        //         var taskID = Guid.NewGuid();
-        //         var userSet = await this.ReadDataForChangeAsync(authentication);
-        //         using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
-        //         await this.Container.InvokeUserChangeAsync(authentication, tuple.userInfo, userContextSet, password, newPassword, userName, authority);
-        //         await this.Dispatcher.InvokeAsync(() =>
-        //         {
-        //             var userInfo = userContextSet.GetUserInfo(this.Path);
-        //             this.CremaHost.Sign(authentication);
-        //             this.Password = UserContext.StringToSecureString(userInfo.Password);
-        //             base.UpdateUserInfo((UserInfo)userInfo);
-        //             this.Container.InvokeUsersChangedEvent(authentication, tuple.items);
-        //             this.Context.InvokeTaskCompletedEvent(authentication, taskID);
-        //         });
-        //         return taskID;
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         this.CremaHost.Error(e);
-        //         throw;
-        //     }
-        // }
-
         public async Task<Guid> SetUserNameAsync(Authentication authentication, SecureString password, string userName)
         {
             try

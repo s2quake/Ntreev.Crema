@@ -50,6 +50,11 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         public async Task DisposeAsync()
         {
+            if (this.peer != null)
+            {
+                await this.DetachEventHandlersAsync(this.peer.ID);
+                this.peer = null;
+            }
         }
 
         public async Task<ResultBase<DataBaseMetaData>> SubscribeAsync(Guid token, string dataBaseName)

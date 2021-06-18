@@ -48,7 +48,11 @@ namespace JSSoft.Crema.ServiceHosts.Data
 
         public async Task DisposeAsync()
         {
-
+            if (this.peer != null)
+            {
+                await sthis.DetachEventHandlersAsync(this.peer.ID);
+                this.peer = null;
+            }
         }
 
         public async Task<ResultBase<DataBaseContextMetaData>> SubscribeAsync(Guid token)
@@ -253,24 +257,26 @@ namespace JSSoft.Crema.ServiceHosts.Data
         public async Task<ResultBase<Guid>> BeginTransactionAsync(Guid authenticationToken, string dataBaseName)
         {
             var authentication = this.peer[authenticationToken];
-            var result = new ResultBase<Guid>();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
             var transaction = await dataBase.BeginTransactionAsync(authentication);
             this.transactionByID[transaction.ID] = transaction;
-            result.Value = transaction.ID;
-            result.SignatureDate = authentication.SignatureDate;
-            return result;
+            return new ResultBase<Guid>()
+            {
+                Value = transaction.ID,
+                SignatureDate = authentication.SignatureDate
+            };
         }
 
         public async Task<ResultBase> EndTransactionAsync(Guid authenticationToken, Guid transactionID)
         {
             var authentication = this.peer[authenticationToken];
-            var result = new ResultBase();
             var transaction = this.transactionByID[transactionID];
             await transaction.CommitAsync(authentication);
-            result.SignatureDate = authentication.SignatureDate;
             this.transactionByID.Remove(transactionID);
-            return result;
+            return new ResultBase()
+            {
+                SignatureDate = authentication.SignatureDate
+            };
         }
 
         public async Task<ResultBase<DataBaseMetaData>> CancelTransactionAsync(Guid authenticationToken, Guid transactionID)

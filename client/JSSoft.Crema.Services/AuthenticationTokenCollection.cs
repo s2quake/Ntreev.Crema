@@ -22,23 +22,50 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using JSSoft.Crema.ServiceHosts;
+using JSSoft.Crema.ServiceModel;
 
 namespace JSSoft.Crema.Services
 {
-    class PluginCollection : List<IPlugin>
+    class AuthenticationTokenCollection
     {
-        public PluginCollection(IEnumerable<IPlugin> plugins)
-            : base(plugins.ToArray())
-        {
+        private readonly HashSet<Guid> tokens = new();
+        private readonly CremaHost cremaHost;
 
+        public AuthenticationTokenCollection(CremaHost cremaHost)
+        {
+            this.cremaHost = cremaHost;
         }
 
-        public void Release()
+        public Task AddAsync(Guid token)
         {
-            foreach (var item in this.Reverse<IPlugin>())
+            return this.Dispatcher.InvokeAsync(() => this.tokens.Add(token));
+        }
+
+        public Task RemoveManyAsync(Guid[] tokens)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                item.Release();
-            }
+                foreach (var item in tokens)
+                {
+                    this.tokens.Remove(item);
+                }
+            });
         }
+
+        public async Task LogoutAsync()
+        {
+            var tokens = this.tokens.ToArray();
+            foreach (var item in tokens)
+            {
+                await this.Service.LogoutAsync(item);
+            }
+            await this.Dispatcher.InvokeAsync(() => this.tokens.Clear());
+        }
+
+        public CremaDispatcher Dispatcher => this.cremaHost.Dispatcher;
+
+        public ICremaHostService Service => this.cremaHost.Service;
     }
 }
