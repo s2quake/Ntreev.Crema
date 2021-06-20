@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
@@ -20,14 +21,8 @@ namespace JSSoft.Crema.Services.Test
         private readonly StringBuilder outputBuilder = new();
         private readonly List<(string, Authority)> userList = new();
         private Guid id = Guid.NewGuid();
-
-        public string ExecutablePath { get; set; }
-
-        public string RepositoryPath { get; set; }
-
-        public int Port { get; set; }
-
-        public string WorkingPath { get; set; }
+        private AnonymousPipeServerStream pipeStream;
+        private AnonymousPipeServerStream commandStream;
 
         public TestServerHost()
         {
@@ -38,22 +33,21 @@ namespace JSSoft.Crema.Services.Test
 
         public void Start()
         {
+            this.pipeStream = new AnonymousPipeServerStream(PipeDirection.In, HandleInheritability.Inheritable);
+            this.commandStream = new AnonymousPipeServerStream(PipeDirection.Out, HandleInheritability.Inheritable);
             this.errorBuilder.Clear();
             this.manualEvent.Reset();
-            this.process.StartInfo.FileName = "dotnet";
-            this.process.StartInfo.Arguments = $"\"{this.ExecutablePath}\" test \"{this.RepositoryPath}\" --port {this.Port} --separator {this.id}";
+            this.process.StartInfo.FileName = @"dotnet";
+            this.process.StartInfo.Arguments = $"\"{this.ExecutablePath}\" test \"{this.RepositoryPath}\" --port {this.Port} --separator {this.id} --pipe-in {this.pipeStream.GetClientHandleAsString()} --pipe-out {this.commandStream.GetClientHandleAsString()}";
             this.process.StartInfo.WorkingDirectory = this.WorkingPath;
             this.process.StartInfo.UseShellExecute = false;
-            this.process.StartInfo.RedirectStandardInput = true;
-            this.process.StartInfo.RedirectStandardOutput = true;
-            this.process.StartInfo.RedirectStandardError = true;
             this.process.StartInfo.CreateNoWindow = true;
-            this.process.EnableRaisingEvents = true;
             this.process.Start();
-            this.process.BeginOutputReadLine();
-            this.process.BeginErrorReadLine();
-            this.manualEvent.WaitOne();
-            this.ParseUsers();
+            this.pipeStream.DisposeLocalCopyOfClientHandle();
+            this.IsOpen = true;
+            var sr = new StreamReader(this.pipeStream);
+            var text = sr.ReadLine();
+
             if (this.process.HasExited == true)
             {
                 throw new Exception(this.errorBuilder.ToString());
@@ -62,41 +56,26 @@ namespace JSSoft.Crema.Services.Test
 
         public void Stop()
         {
-            this.process.StandardInput.Flush();
-            this.process.StandardInput.WriteLine("exit");
+            var sw = new StreamWriter(this.commandStream);
+            sw.WriteLine("exit");
+            sw.Close();
+            this.commandStream.WaitForPipeDrain();
             this.process.WaitForExit();
+            this.process.Kill();
+            this.IsOpen = false;
+            this.commandStream.Close();
+            this.pipeStream.Close();
         }
 
-        public async Task GenerateDataBasesAsync(int count)
-        {
-            this.manualEvent.Reset();
-            this.process.StandardInput.Flush();
-            this.process.StandardInput.WriteLine("database generate 10");
-            await Task.Run(() => this.manualEvent.WaitOne());
-        }
+        public string ExecutablePath { get; set; }
 
-        public async Task LoginRandomManyAsync()
-        {
-            this.manualEvent.Reset();
-            this.process.StandardInput.Flush();
-            this.process.StandardInput.WriteLine("cremahost login-many");
-            await Task.Run(() => this.manualEvent.WaitOne());
-        }
+        public string RepositoryPath { get; set; }
 
-        public async Task LoadRandomDataBasesAsync()
-        {
+        public int Port { get; set; }
 
-        }
+        public string WorkingPath { get; set; }
 
-        public async Task LockRandomDataBasesAsync()
-        {
-
-        }
-
-        public async Task SetPrivateRandomDataBasesAsync()
-        {
-
-        }
+        public bool IsOpen { get; set; }
 
         private void Process_Exited(object sender, EventArgs e)
         {
@@ -118,28 +97,6 @@ namespace JSSoft.Crema.Services.Test
         private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             this.errorBuilder.AppendLine(e.Data);
-        }
-
-        private void ParseUsers()
-        {
-            var text = this.outputBuilder.ToString();
-            var jsonSer = new DataContractJsonSerializer(typeof(UserContextMetaData));
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(text));
-            var metaData = (UserContextMetaData)jsonSer.ReadObject(stream);
-
-            int qwer = 0;
-            // var capacity = text.Where(item => item == '\n').Count();
-            // using var sr = new StringReader(text);
-
-            // this.userList.Clear();
-            // this.userList.Capacity = capacity;
-            // while (sr.ReadLine() is string line)
-            // {
-            //     var match = Regex.Match(line, "(.+): (.+)");
-            //     var userID = match.Groups[1].Value;
-            //     var authority = (Authority)Enum.Parse(typeof(Authority), match.Groups[2].Value);
-            //     this.userList.Add((userID, authority));
-            // }
         }
     }
 }

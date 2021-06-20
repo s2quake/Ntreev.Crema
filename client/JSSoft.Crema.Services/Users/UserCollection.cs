@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.ServiceHosts.Users;
 using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Properties;
 using JSSoft.Library.ObjectModel;
 using System;
 using System.Collections;
@@ -60,6 +61,19 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (userID is null)
+                    throw new ArgumentNullException(nameof(userID));
+                if (categoryPath is null)
+                    throw new ArgumentNullException(nameof(categoryPath));
+                if (password is null)
+                    throw new ArgumentNullException(nameof(password));
+                if (userName is null)
+                    throw new ArgumentNullException(nameof(userName));
+
                 this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -119,6 +133,7 @@ namespace JSSoft.Crema.Services.Users
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
             this.OnUsersChanged(new ItemsEventArgs<IUser>(authentication, users));
+            this.Context.InvokeItemsChangedEvent(authentication, users);
         }
 
         public void InvokeUsersStateChangedEvent(Authentication authentication, User[] users)
@@ -443,10 +458,41 @@ namespace JSSoft.Crema.Services.Users
 
         bool IUserCollection.Contains(string userID)
         {
+            if (userID is null)
+                throw new ArgumentNullException(nameof(userID));
+
+            this.Dispatcher.VerifyAccess();
             return base.Contains(userID);
         }
 
-        IUser IUserCollection.this[string userID] => this[userID];
+        IUser IUserCollection.this[string userID]
+        {
+            get
+            {
+                if (userID is null)
+                    throw new ArgumentNullException(nameof(userID));
+
+                this.Dispatcher.VerifyAccess();
+                if (userID == string.Empty)
+                    throw new ArgumentException("Empty string is not allowed.");
+                if (this.Contains(userID) == false)
+                    throw new UserNotFoundException(userID);
+                return base[userID];
+            }
+        }
+
+        #endregion
+
+        #region IReadOnlyCollection<IUser>
+
+        int IReadOnlyCollection<IUser>.Count
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return this.Count;
+            }
+        }
 
         #endregion
 
@@ -454,15 +500,24 @@ namespace JSSoft.Crema.Services.Users
 
         IEnumerator<IUser> IEnumerable<IUser>.GetEnumerator()
         {
-            return this.GetEnumerator();
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in this)
+            {
+                yield return item;
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in this)
+            {
+                yield return item;
+            }
         }
 
         #endregion
+
 
         #region IServiceProvider
 

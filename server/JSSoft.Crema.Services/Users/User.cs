@@ -92,7 +92,7 @@ namespace JSSoft.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(LogoutAsync), this);
                     this.ValidateLogout(authentication);
                     var users = new User[] { this };
-                    var taskID = Guid.NewGuid();
+                    var taskID = this.Authentication.Token;
                     this.CremaHost.Sign(authentication);
                     this.Authentication.InvokeExpiredEvent(authentication.ID, string.Empty);
                     this.Authentication = null;

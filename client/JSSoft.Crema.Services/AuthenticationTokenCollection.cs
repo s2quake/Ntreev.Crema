@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Services
 {
     class AuthenticationTokenCollection
     {
-        private readonly HashSet<Guid> tokens = new();
+        private readonly Dictionary<string, Guid> tokenByID = new();
         private readonly CremaHost cremaHost;
 
         public AuthenticationTokenCollection(CremaHost cremaHost)
@@ -38,30 +38,30 @@ namespace JSSoft.Crema.Services
             this.cremaHost = cremaHost;
         }
 
-        public Task AddAsync(Guid token)
+        public Task AddAsync(string userID, Guid token)
         {
-            return this.Dispatcher.InvokeAsync(() => this.tokens.Add(token));
+            return this.Dispatcher.InvokeAsync(() => this.tokenByID.Add(userID, token));
         }
 
-        public Task RemoveManyAsync(Guid[] tokens)
+        public Task RemoveManyAsync(string[] userIDs)
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                foreach (var item in tokens)
+                foreach (var item in userIDs)
                 {
-                    this.tokens.Remove(item);
+                    this.tokenByID.Remove(item);
                 }
             });
         }
 
         public async Task LogoutAsync()
         {
-            var tokens = this.tokens.ToArray();
+            var tokens = this.tokenByID.Values.ToArray();
             foreach (var item in tokens)
             {
                 await this.Service.LogoutAsync(item);
             }
-            await this.Dispatcher.InvokeAsync(() => this.tokens.Clear());
+            await this.Dispatcher.InvokeAsync(() => this.tokenByID.Clear());
         }
 
         public CremaDispatcher Dispatcher => this.cremaHost.Dispatcher;

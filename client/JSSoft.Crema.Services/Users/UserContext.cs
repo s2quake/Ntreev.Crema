@@ -136,6 +136,12 @@ namespace JSSoft.Crema.Services.Users
             await user.LoginAsync(authenticationToken);
         }
 
+        public async Task LogoutAsync(string userID)
+        {
+            var user = await this.Dispatcher.InvokeAsync(() => this.Users[userID]);
+            await user.LogoutAsync(user.Authentication);
+        }
+
         public Authentication Authenticate(SignatureDate signatureDate)
         {
             return this.Dispatcher.Invoke(() => this.AuthenticateInternal(signatureDate));
@@ -147,13 +153,6 @@ namespace JSSoft.Crema.Services.Users
             {
                 Authentication.System.SignatureDate = signatureDate;
                 return Authentication.System;
-            }
-
-            var user = this.Users[signatureDate.ID];
-            if (user != null)
-            {
-                user.Authentication.SignatureDate = signatureDate;
-                return user.Authentication;
             }
 
             if (this.customAuthentications.ContainsKey(signatureDate.ID) == false)
@@ -235,9 +234,9 @@ namespace JSSoft.Crema.Services.Users
             this.OnItemsChanged(new ItemsEventArgs<IUserItem>(authentication, items));
         }
 
-        public void InvokeTaskCompletedEvent(Authentication authentication, Guid taskID)
+        public void InvokeTaskCompletedEvent(Authentication authentication, params Guid[] taskIDs)
         {
-            this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskID));
+            this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskIDs));
         }
 
         public UserContextMetaData GetMetaData()
@@ -273,6 +272,15 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (userIDs is null)
+                    throw new ArgumentNullException(nameof(userIDs));
+                if (message is null)
+                    throw new ArgumentNullException(nameof(message));
+
                 this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -553,7 +561,8 @@ namespace JSSoft.Crema.Services.Users
                                 category.InternalSetName(newNames[i]);
                             }
 
-                            this.Categories.InvokeCategoriesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
+                            if (items.Any() == true)
+                                this.Categories.InvokeCategoriesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
                         }
 
                         {
@@ -583,7 +592,8 @@ namespace JSSoft.Crema.Services.Users
                                 user.Name = newNames[i];
                             }
 
-                            this.Users.InvokeUsersRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
+                            if (items.Any() == true)
+                                this.Users.InvokeUsersRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
                         }
                     });
                 });
@@ -630,7 +640,8 @@ namespace JSSoft.Crema.Services.Users
                                 category.Parent = this.Categories[parentPaths[i]];
                             }
 
-                            this.Categories.InvokeCategoriesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
+                            if (items.Any() == true)
+                                this.Categories.InvokeCategoriesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
                         }
 
                         {
@@ -660,7 +671,8 @@ namespace JSSoft.Crema.Services.Users
                                 user.Category = this.Categories[parentPaths[i]];
                             }
 
-                            this.Users.InvokeUsersMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
+                            if (items.Any() == true)
+                                this.Users.InvokeUsersMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
                         }
                     });
                 });
@@ -705,7 +717,8 @@ namespace JSSoft.Crema.Services.Users
                                 category.Dispose();
                             }
 
-                            this.Categories.InvokeCategoriesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
+                            if (items.Any() == true)
+                                this.Categories.InvokeCategoriesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
                         }
 
                         {
@@ -732,7 +745,9 @@ namespace JSSoft.Crema.Services.Users
                                 var user = userItem as User;
                                 user.Dispose();
                             }
-                            this.Users.InvokeUsersDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
+
+                            if (items.Any() == true)
+                                this.Users.InvokeUsersDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
                         }
                     });
                 });
@@ -900,7 +915,9 @@ namespace JSSoft.Crema.Services.Users
                 {
                     this.Dispatcher.Invoke(() =>
                     {
+                        var authentication = this.AuthenticateInternal(callbackInfo.SignatureDate);
                         this.taskEvent.Set(taskIDs);
+                        this.InvokeTaskCompletedEvent(authentication, taskIDs);
                     });
                 });
             }
@@ -921,10 +938,26 @@ namespace JSSoft.Crema.Services.Users
 
         bool IUserContext.Contains(string itemPath)
         {
+            if (itemPath is null)
+                throw new ArgumentNullException(nameof(itemPath));
+
+            this.Dispatcher.VerifyAccess();
             return this.Contains(itemPath);
         }
 
-        IUserItem IUserContext.this[string itemPath] => this[itemPath] as IUserItem;
+        IUserItem IUserContext.this[string itemPath]
+        {
+            get
+            {
+                if (itemPath is null)
+                    throw new ArgumentNullException(nameof(itemPath));
+
+                this.Dispatcher.VerifyAccess();
+                if (this.Contains(itemPath) == false)
+                    throw new ItemNotFoundException(itemPath);
+                return this[itemPath] as IUserItem;
+            }
+        }
 
         IUserCategory IUserContext.Root => this.Root;
 
@@ -934,6 +967,7 @@ namespace JSSoft.Crema.Services.Users
 
         IEnumerator<IUserItem> IEnumerable<IUserItem>.GetEnumerator()
         {
+            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IUserItem;
@@ -942,6 +976,7 @@ namespace JSSoft.Crema.Services.Users
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
+            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IUserItem;

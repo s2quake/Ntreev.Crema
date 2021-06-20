@@ -25,26 +25,28 @@ using System.Threading.Tasks;
 using JSSoft.Crema.Services.Random;
 using JSSoft.Library.ObjectModel;
 using JSSoft.Crema.Services.Test.Extensions;
+using JSSoft.Crema.ServiceModel;
 
 namespace JSSoft.Crema.Services.Test
 {
     [TestClass]
     public class ITableCategory_ComplexTest
     {
-        private static CremaBootstrapper app;
-        private static ICremaHost cremaHost;
-        private static Authentication authentication;
+        private static TestApplication app;
+        private static IDataBaseContext dataBaseContext;
         private static IDataBase dataBase;
         private static ITableCategory category;
+        private static Authentication authentication;
 
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
-            app = new CremaBootstrapper();
+            app = new TestApplication();
             app.Initialize(context);
-            cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            authentication = await cremaHost.StartAsync();
-            dataBase = await cremaHost.GetRandomDataBaseAsync();
+            await app.OpenAsync();
+            authentication = await app.LoginRandomAsync(Authority.Admin);
+            dataBaseContext = app.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+            dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
             await dataBase.LoadAsync(authentication);
             await dataBase.EnterAsync(authentication);
             await dataBase.InitializeRandomItemsAsync(authentication);
@@ -55,9 +57,24 @@ namespace JSSoft.Crema.Services.Test
         public static async Task ClassCleanupAsync()
         {
             await dataBase.UnloadAsync(authentication);
-            await cremaHost.StopAsync(authentication);
+            await app.LogoutAsync(authentication);
+            await app.CloseAsync();
             app.Release();
         }
+
+        [TestInitialize]
+        public async Task TestInitializeAsync()
+        {
+            await this.TestContext.InitializeAsync(app);
+        }
+
+        [TestCleanup]
+        public async Task TestCleanupAsync()
+        {
+            await this.TestContext.ReleaseAsync();
+        }
+
+        public TestContext TestContext { get; set; }
 
         [TestMethod]
         public async Task CategoryLockRenameTestAsync()

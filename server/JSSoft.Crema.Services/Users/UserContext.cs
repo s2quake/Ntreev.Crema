@@ -95,9 +95,9 @@ namespace JSSoft.Crema.Services.Users
             this.OnItemsChanged(new ItemsEventArgs<IUserItem>(authentication, items));
         }
 
-        public void InvokeTaskCompletedEvent(Authentication authentication, Guid taskID)
+        public void InvokeTaskCompletedEvent(Authentication authentication, params Guid[] taskIDs)
         {
-            this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskID));
+            this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskIDs));
         }
 
         public async Task<Guid> LoginAsync(string userID, SecureString password)

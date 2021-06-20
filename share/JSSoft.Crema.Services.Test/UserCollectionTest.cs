@@ -38,7 +38,6 @@ namespace JSSoft.Crema.Services.Test
     public class UserCollectionTest
     {
         private static TestApplication app;
-        private static Authentication expiredAuthentication;
         private static IUserCollection userCollection;
 
         [ClassInitialize]
@@ -48,7 +47,6 @@ namespace JSSoft.Crema.Services.Test
             app.Initialize(context);
             await app.OpenAsync();
             userCollection = app.GetService(typeof(IUserCollection)) as IUserCollection;
-            expiredAuthentication = app.ExpiredAuthentication;
         }
 
         [ClassCleanup]
@@ -274,15 +272,13 @@ namespace JSSoft.Crema.Services.Test
             {
                 userCollection.UsersStateChanged += UserCollection_UsersStateChanged;
             });
-            var password = user.GetPassword();
-            var token = await cremaHost.LoginAsync(user.ID, password);
             var authentication = await this.TestContext.LoginAsync(user.ID);
             Assert.AreEqual(user.UserState, actualState);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersStateChanged -= UserCollection_UsersStateChanged;
             });
-            await cremaHost.LogoutAsync(authentication);
+            await this.TestContext.LogoutAsync(authentication);
             Assert.AreNotEqual(user.UserState, actualState);
 
             void UserCollection_UsersStateChanged(object sender, ItemsEventArgs<IUser> e)

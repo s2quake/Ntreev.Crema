@@ -25,7 +25,6 @@ using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using System;
-using JSSoft.Crema.Services.Users.Serializations;
 using System.Collections.Generic;
 using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library.Random;
@@ -34,15 +33,13 @@ using JSSoft.Crema.Services.Random;
 
 namespace JSSoft.Crema.Services.Test
 {
-    class TestServerHost
+    class TestServerConfigurator
     {
-        private readonly CremaBootstrapper app;
-        private readonly UserContextSerializationInfo userInfos;
+        private readonly TestApplication app;
 
-        public TestServerHost(CremaBootstrapper app, UserContextSerializationInfo userInfos)
+        public TestServerConfigurator(TestApplication app)
         {
             this.app = app;
-            this.userInfos = userInfos;
         }
 
         public async Task<IDataBase[]> GenerateDataBasesAsync(int count)
@@ -65,8 +62,9 @@ namespace JSSoft.Crema.Services.Test
         public async Task LoginRandomManyAsync()
         {
             var cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
-            var count = (int)(this.userInfos.Users.Length * 0.25);
-            await cremaHost.LoginRandomManyAsync(count);
+            var userCollcection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            var count = await userCollcection.Dispatcher.InvokeAsync(() => userCollcection.Count);
+            await cremaHost.LoginRandomManyAsync((int)(count * 0.25));
         }
 
         public async Task LoadRandomDataBasesAsync()

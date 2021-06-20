@@ -48,6 +48,15 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (name is null)
+                    throw new ArgumentNullException(nameof(name));
+                if (parentPath is null)
+                    throw new ArgumentNullException(nameof(parentPath));
+
                 this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -55,14 +64,6 @@ namespace JSSoft.Crema.Services.Users
                 });
                 var categoryName = new CategoryName(parentPath, name);
                 var result = await this.Context.Service.NewUserCategoryAsync(authentication.Token, categoryName);
-                //return await this.Dispatcher.InvokeAsync(() =>
-                //{
-                //    this.CremaHost.Sign(authentication, result);
-                //    var category = this.BaseAddNew(name, parentPath, authentication);
-                //    var items = EnumerableUtility.One(category).ToArray();
-                //    this.InvokeCategoriesCreatedEvent(authentication, items);
-                //    return category;
-                //});
                 await this.Context.WaitAsync(result.TaskID);
                 return this[categoryName];
             }

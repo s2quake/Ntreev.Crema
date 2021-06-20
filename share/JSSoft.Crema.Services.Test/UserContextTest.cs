@@ -75,21 +75,7 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task GetMetaData_TestAsync()
         {
-            userContext.Dispatcher.Invoke(() => userContext.GetMetaData());
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void GetMetaData_Arg0_Null_FailTest()
-        {
-            userContext.GetMetaData();
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(AuthenticationExpiredException))]
-        public void GetMetaData_Expired_FailTest()
-        {
-            userContext.GetMetaData();
+            await userContext.Dispatcher.InvokeAsync(() => userContext.GetMetaData());
         }
 
         [TestMethod]

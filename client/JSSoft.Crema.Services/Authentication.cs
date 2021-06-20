@@ -156,7 +156,7 @@ namespace JSSoft.Crema.Services
 
         internal Guid Token { get; }
 
-        internal void InvokeExpiredEvent()
+        internal void InvokeExpiredEvent(string userID, string message)
         {
             lock (lockobj)
             {

@@ -34,83 +34,62 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Library.IO;
 using JSSoft.Crema.Data;
 using JSSoft.Library;
+using System.IO;
 
 namespace JSSoft.Crema.Services.Test
 {
-    class TestApplication : CremaBootstrapper
+    partial class TestApplication : CremaBootstrapper
     {
-        private ICremaHost cremaHost;
-        private Guid token;
-        private UserContextMetaData userInfos;
-        private Authentication expiredAuthentication;
+        private static readonly object obj = new();
+        private static readonly int startPort = 4004;
+        private static readonly HashSet<int> reservedPort = new();
+        private readonly TestServerHost serverHost = new ();
 
-        public TestServerHost Initialize(TestContext context)
+        public void Initialize(TestContext context)
         {
-            throw new NotImplementedException();
+            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", context.FullyQualifiedTestClassName);
+            var solutionPath = Path.GetFullPath(Path.Combine(context.DeploymentDirectory, "..", "..", "..", "..", ".."));
+            var executablePath = Path.Combine(solutionPath, "server", "JSSoft.Crema.Services.TestModule", "bin", "Debug", "netcoreapp3.1", "cremaserver.dll");
+            var port = ReservePort();
+            this.Address = $"localhost:{port}";
+            this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
+            this.serverHost.ExecutablePath = executablePath;
+            this.serverHost.RepositoryPath = repositoryPath;
+            this.serverHost.WorkingPath = solutionPath;
+            this.serverHost.Port = port;
+            this.serverHost.Start();
         }
 
         public void Release()
         {
-            
+            if (this.serverHost.IsOpen == true)
+                this.serverHost.Stop();
             this.Dispose();
+            ReleasePort(this.serverHost.Port);
         }
 
-        public new object GetService(Type serviceType)
+        private static int ReservePort()
         {
-            var instance = base.GetService(serviceType);
-            if (instance != null)
-                return instance;
-            return this.cremaHost.GetService(serviceType);
-        }
-
-        public async Task OpenAsync()
-        {
-            
-        }
-
-        public async Task CloseAsync()
-        {
-            
-        }
-
-        public Task<Authentication> LoginRandomAsync()
-        {
-            var items = new Authority[] { Authority.Admin, Authority.Member, Authority.Guest };
-            return LoginRandomAsync(items.Random());
-        }
-
-        public Task<Authentication> LoginRandomAsync(Authority authority)
-        {
-            return LoginRandomAsync(authority, DefaultPredicate);
-        }
-
-        public async Task<Authentication> LoginRandomAsync(Authority authority, Func<IUser, bool> predicate)
-        {
-            var cremaHost = this.cremaHost;
-            if (cremaHost.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
+            lock (obj)
             {
-                var user = await userCollection.GetRandomUserAsync(Test);
-                var name = user.ID;
-                var password = user.GetPassword();
-                var token = await cremaHost.LoginAsync(name, password);
-                return await cremaHost.AuthenticateAsync(token);
-            }
-            throw new NotImplementedException();
-
-            bool Test(IUser user)
-            {
-                if (user.BanInfo.Path != string.Empty)
-                    return false;
-                if (user.UserState == UserState.Online)
-                    return false;
-                if (user.Authority != authority)
-                    return false;
-                return predicate(user);
+                for (var i = startPort; i < int.MaxValue; i++)
+                {
+                    if (reservedPort.Contains(i) == false)
+                    {
+                        reservedPort.Add(i);
+                        return i;
+                    }
+                }
+                throw new NotImplementedException();
             }
         }
 
-        public Authentication ExpiredAuthentication => this.expiredAuthentication;
-
-        private static bool DefaultPredicate(IUser _) => true;
+        private static void ReleasePort(int port)
+        {
+            lock (obj)
+            {
+                reservedPort.Remove(port);
+            }
+        }
     }
 }

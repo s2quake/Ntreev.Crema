@@ -40,7 +40,7 @@ namespace JSSoft.Crema.Services.Test
     public class UserCategoryTest
     {
         private static TestApplication app;
-        private static TestServerHost serverHost;
+        private static TestServerConfigurator configurator;
         private static IUserCategoryCollection userCategoryCollection;
         private static IUserCollection userCollection;
         private static IUserContext userContext;
@@ -49,13 +49,15 @@ namespace JSSoft.Crema.Services.Test
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
-            app = new ();
-            serverHost = app.Initialize(context);
+            app = new();
+            configurator = new(app);
+            app.Initialize(context);
+            await app.OpenAsync();
             userCategoryCollection = app.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             userCollection = app.GetService(typeof(IUserCollection)) as IUserCollection;
             userContext = app.GetService(typeof(IUserContext)) as IUserContext;
             expiredAuthentication = app.ExpiredAuthentication;
-            await serverHost.LoginRandomManyAsync();
+            await configurator.LoginRandomManyAsync();
         }
 
         [ClassCleanup]

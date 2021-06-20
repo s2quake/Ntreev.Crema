@@ -91,9 +91,12 @@ namespace JSSoft.Crema.Services
 
         private void Remove(string userID)
         {
-            var config = this.configByID[userID];
-            config.Commit();
-            this.configByID.Remove(userID);
+            if (this.configByID.ContainsKey(userID) == true)
+            {
+                var config = this.configByID[userID];
+                config.Commit();
+                this.configByID.Remove(userID);
+            }
         }
     }
 }

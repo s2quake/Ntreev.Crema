@@ -40,14 +40,14 @@ namespace JSSoft.Crema.Services.Test
     [TestClass]
     public class CremaHostTest
     {
-        private static CremaBootstrapper app;
+        private static TestApplication app;
         private static ICremaHost cremaHost;
         private static Guid token;
 
         [ClassInitialize]
         public static async Task ClassInitializeAsync(TestContext context)
         {
-            app = new CremaBootstrapper();
+            app = new ();
             app.Initialize(context);
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
         }

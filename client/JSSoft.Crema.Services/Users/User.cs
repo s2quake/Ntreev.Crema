@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.ServiceHosts.Users;
 using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
 using JSSoft.Library.Linq;
 using System;
 using System.Collections.Generic;
@@ -39,23 +40,49 @@ namespace JSSoft.Crema.Services.Users
 
         }
 
-        public Task LoginAsync(Guid authenticationToken)
+        public async Task LoginAsync(Guid authenticationToken)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            var taskID = GuidUtility.FromName(this.ID);
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.Authentication = new Authentication(new UserAuthenticationProvider(this), authenticationToken);
             });
+            await this.Context.WaitAsync(taskID);
+        }
+
+        public async Task LogoutAsync(Authentication authentication)
+        {
+            var taskID = this.Authentication.Token;
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Authentication.InvokeExpiredEvent(authentication.ID, string.Empty);
+                this.Authentication = null;
+            });
+            await this.Context.WaitAsync(taskID);
         }
 
         public Task RenameAsync(Authentication authentication, string newName)
         {
-            throw new NotSupportedException();
+            if (authentication is null)
+                throw new ArgumentNullException(nameof(authentication));
+            if (authentication.IsExpired == true)
+                throw new AuthenticationExpiredException(nameof(authentication));
+            if (newName is null)
+                throw new ArgumentNullException(nameof(newName));
+            throw new NotImplementedException();
         }
 
         public async Task<Guid> MoveAsync(Authentication authentication, string categoryPath)
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (categoryPath is null)
+                    throw new ArgumentNullException(nameof(categoryPath));
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                  {
@@ -81,6 +108,11 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
                 this.ValidateExpired();
                 var context = this.Context;
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
@@ -106,6 +138,13 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (comment is null)
+                    throw new ArgumentNullException(nameof(comment));
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -130,6 +169,13 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (comment is null)
+                    throw new ArgumentNullException(nameof(comment));
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -154,6 +200,11 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -192,12 +243,7 @@ namespace JSSoft.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetUserNameAsync), this, userName);
                     return base.UserInfo;
                 });
-                // if (userInfo.ID == authentication.ID && password == null && newPassword != null)
-                //     throw new ArgumentNullException(nameof(password));
-                // if (newPassword == null && password != null)
-                //     throw new ArgumentNullException(nameof(newPassword));
                 var encryptedPassword = UserContext.Encrypt(userInfo.ID, password);
-                // var p2 = newPassword == null ? null : UserContext.Encrypt(userInfo.ID, newPassword);
                 var result = await this.Service.SetUserNameAsync(authentication.Token, userInfo.ID, encryptedPassword, userName);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
@@ -271,6 +317,13 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (message is null)
+                    throw new ArgumentNullException(nameof(message));
+
                 this.ValidateExpired();
                 var userInfo = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -417,19 +470,6 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        protected override void OnAttached()
-        {
-            base.OnAttached();
-            this.Authentication = new Authentication(new UserAuthenticationProvider(this));
-        }
-
-        protected override void OnDetached()
-        {
-            base.OnDetached();
-            this.Authentication.InvokeExpiredEvent();
-            this.Authentication = null;
-        }
-
         #region IUser
 
         Task IUser.MoveAsync(Authentication authentication, string categoryPath)
@@ -500,7 +540,14 @@ namespace JSSoft.Crema.Services.Users
 
         IUserItem IUserItem.Parent => this.Category;
 
-        IEnumerable<IUserItem> IUserItem.Childs => Enumerable.Empty<IUserItem>();
+        IEnumerable<IUserItem> IUserItem.Childs
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return Enumerable.Empty<IUserItem>();
+            }
+        }
 
         #endregion
 

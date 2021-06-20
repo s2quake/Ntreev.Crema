@@ -66,21 +66,21 @@ namespace JSSoft.Crema.Services.Test
             //var domain = System.AppDomain.CreateDomain("crema-server");
         }
 
-        [ClassInitialize]
-        public static async Task ClassInitAsync(TestContext context)
-        {
-            app = new CremaBootstrapper();
-            app.Initialize(context);
-            cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            authentication = await cremaHost.StartAsync();
-        }
+        //[ClassInitialize]
+        //public static async Task ClassInitAsync(TestContext context)
+        //{
+        //    app = new CremaBootstrapper();
+        //    app.Initialize(context);
+        //    cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
+        //    authentication = await cremaHost.StartAsync();
+        //}
 
-        [ClassCleanup]
-        public static async Task ClassCleanupAsync()
-        {
-            await cremaHost.StopAsync(authentication);
-            app.Dispose();
-        }
+        //[ClassCleanup]
+        //public static async Task ClassCleanupAsync()
+        //{
+        //    await cremaHost.StopAsync(authentication);
+        //    app.Dispose();
+        //}
 
         [AssemblyCleanup()]
         public static void AssemblyCleanup()

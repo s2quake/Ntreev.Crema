@@ -36,6 +36,8 @@ using JSSoft.Crema.Services.Test.Extensions;
 using JSSoft.Library.Random;
 using System.IO;
 using System.Text;
+using System.Diagnostics;
+using System.IO.Pipes;
 
 namespace JSSoft.Crema.Services.TestModule
 {
@@ -96,6 +98,18 @@ namespace JSSoft.Crema.Services.TestModule
             get; set;
         }
 
+        [CommandProperty]
+        public string PipeIn
+        {
+            get; set;
+        }
+
+        [CommandProperty]
+        public string PipeOut
+        {
+            get; set;
+        }
+
         [CommandPropertySwitch]
         public bool Force
         {
@@ -107,13 +121,42 @@ namespace JSSoft.Crema.Services.TestModule
             this.CreateRepository();
             try
             {
+                //Debugger.Launch();
+
+
+                using var writeStream = new AnonymousPipeClientStream(PipeDirection.Out, this.PipeIn);
+                using var readStream = new AnonymousPipeClientStream(PipeDirection.In, this.PipeOut);
+
+                using var sw = new StreamWriter(writeStream);
+                
+                sw.AutoFlush = true;
+
+
+
                 this.application.BasePath = this.Path;
                 this.application.Port = this.Port;
                 await this.application.OpenAsync();
                 await this.WriteUserListAsync();
                 await this.Out.WriteLineAsync(this.Separator);
-                this.terminal.Separator = this.Separator;
-                await this.terminal.StartAsync(this.cancellation.Token);
+
+
+                //this.terminal.Separator = this.Separator;
+                //await this.terminal.StartAsync(this.cancellation.Token);
+                await sw.WriteLineAsync("123123");
+                
+                writeStream.WaitForPipeDrain();
+
+                sw.Close();
+
+                
+                using var sr = new StreamReader(readStream);
+                while(sr.ReadLine() is string line)
+                {
+                    if (line == "exit")
+                        break;
+                }
+                sr.Close();
+
                 await this.application.CloseAsync();
             }
             catch (Exception e)
@@ -128,7 +171,7 @@ namespace JSSoft.Crema.Services.TestModule
 
         private void CreateRepository()
         {
-            var userInfos = UserInfoGenerator.Generate(RandomUtility.Next(500, 1000), RandomUtility.Next(100, 1000));
+            var userInfos = UserInfoGenerator.Generate(RandomUtility.Next(100, 200), RandomUtility.Next(100, 200));
             var dataSet = new CremaDataSet();
             try
             {

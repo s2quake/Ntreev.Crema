@@ -38,6 +38,13 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (name is null)
+                    throw new ArgumentNullException(nameof(name));
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -63,13 +70,20 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (parentPath is null)
+                    throw new ArgumentNullException(nameof(parentPath));
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, parentPath);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
-                    var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
+                    var oldParentPaths = items.Select(item => item.Parent != null ? item.Parent.Path : null).ToArray();
                     var path = base.Path;
                     return (items, oldPaths, oldParentPaths, path);
                 });
@@ -88,6 +102,11 @@ namespace JSSoft.Crema.Services.Users
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
                 this.ValidateExpired();
                 var context = this.Context;
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
@@ -205,9 +224,23 @@ namespace JSSoft.Crema.Services.Users
 
         IUserCategory IUserCategory.Parent => this.Parent;
 
-        IContainer<IUser> IUserCategory.Users => this.Items;
+        IContainer<IUser> IUserCategory.Users
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return this.Items;
+            }
+        }
 
-        IContainer<IUserCategory> IUserCategory.Categories => this.Categories;
+        IContainer<IUserCategory> IUserCategory.Categories
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return this.Categories;
+            }
+        }
 
         #endregion
 
@@ -234,6 +267,7 @@ namespace JSSoft.Crema.Services.Users
         {
             get
             {
+                this.Dispatcher.VerifyAccess();
                 foreach (var item in this.Categories)
                 {
                     yield return item;

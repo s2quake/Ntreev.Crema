@@ -50,7 +50,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         {
             if (this.peer != null)
             {
-                await sthis.DetachEventHandlersAsync(this.peer.ID);
+                await this.DetachEventHandlersAsync(this.peer.ID);
                 this.peer = null;
             }
         }

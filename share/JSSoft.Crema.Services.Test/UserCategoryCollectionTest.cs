@@ -36,25 +36,22 @@ namespace JSSoft.Crema.Services.Test
     [TestClass]
     public class UserCategoryCollectionTest
     {
-        private static CremaBootstrapper app;
-        private static ICremaHost cremaHost;
-        private static Authentication authentication;
+        private static TestApplication app;
         private static IUserCategoryCollection userCategoryCollection;
 
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
-            app = new CremaBootstrapper();
+            app = new TestApplication();
             app.Initialize(context);
-            cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            authentication = await cremaHost.StartAsync();
-            userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            await app.OpenAsync();
+            userCategoryCollection = app.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
         }
 
         [ClassCleanup]
         public static async Task ClassCleanupAsync()
         {
-            await cremaHost.StopAsync(authentication);
+            await app.CloseAsync();
             app.Release();
         }
 

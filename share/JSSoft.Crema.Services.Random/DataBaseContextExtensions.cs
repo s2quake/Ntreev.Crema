@@ -37,7 +37,7 @@ namespace JSSoft.Crema.Services.Random
 
         public static Task<IDataBase> GetRandomDataBaseAsync(this IDataBaseContext dataBaseContext, Func<IDataBase, bool> predicate)
         {
-            return dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.Random(predicate));
+            return dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.RandomOrDefault(predicate));
         }
 
         public static Task<IDataBase> GetRandomDataBaseAsync(this IDataBaseContext dataBaseContext, DataBaseFlags dataBaseFlags)
@@ -47,7 +47,7 @@ namespace JSSoft.Crema.Services.Random
 
         public static Task<IDataBase> GetRandomDataBaseAsync(this IDataBaseContext dataBaseContext, DataBaseFlags dataBaseFlags, Func<IDataBase, bool> predicate)
         {
-            return dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.Random(item => TestFlags(item, dataBaseFlags) && predicate(item) == true));
+            return dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.RandomOrDefault(item => TestFlags(item, dataBaseFlags) && predicate(item) == true));
 
             static bool TestFlags(IDataBase dataBase, DataBaseFlags dataBaseFlags)
             {

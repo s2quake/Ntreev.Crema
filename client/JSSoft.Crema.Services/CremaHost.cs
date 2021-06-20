@@ -95,8 +95,7 @@ namespace JSSoft.Crema.Services
         {
             var users = e.Items.Select(item => item as User);
             var items = users.Select(item => item.ID).ToArray();
-            var tokens = users.Select(item => item.Authentication.Token).ToArray();
-            await this.authenticationTokens.RemoveManyAsync(tokens);
+            await this.authenticationTokens.RemoveManyAsync(items);
             await this.configs.RemoveManyAsync(items);
         }
 
@@ -166,7 +165,7 @@ namespace JSSoft.Crema.Services
                 await this.UserContext.InitializeAsync(this.subscribeToken);
                 await this.DataBaseContext.InitializeAsync(this.subscribeToken);
                 await this.DomainContext.InitializeAsync(this.subscribeToken);
-                this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
+                await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.plugins = new PluginCollection(this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>);
@@ -209,6 +208,7 @@ namespace JSSoft.Crema.Services
                     this.plugins.Release();
                 });
 
+                await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
                 await this.authenticationTokens.LogoutAsync();
                 await this.DomainContext.ReleaseAsync();
                 await this.DataBaseContext.ReleaseAsync();
@@ -254,7 +254,7 @@ namespace JSSoft.Crema.Services
                 var authenticationToken = await this.Service.LoginAsync(userID, UserContext.Encrypt(userID, password));
                 var address = this.Address;
                 await this.UserContext.LoginAsync(userID, authenticationToken);
-                await this.authenticationTokens.AddAsync(authenticationToken);
+                await this.authenticationTokens.AddAsync(userID, authenticationToken);
                 await this.configs.AddAsync(userID, address);
                 return authenticationToken;
             }
@@ -284,6 +284,7 @@ namespace JSSoft.Crema.Services
                     this.DebugMethod(authentication, this, nameof(LogoutAsync));
                 });
                 await this.Service.LogoutAsync(authentication.Token);
+                await this.UserContext.LogoutAsync(authentication.ID);
                 await this.configs.RemoveAsync(authenticationID);
             }
             catch (Exception e)

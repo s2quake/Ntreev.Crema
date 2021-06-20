@@ -39,52 +39,45 @@ namespace JSSoft.Crema.Services.Test
     [TestClass]
     public class CreationTest
     {
-        private static CremaBootstrapper app;
-        private static ICremaHost cremaHost;
-        private static Guid token;
-        private static IDataBase dataBase;
+        private static TestApplication app;
+        private static TestServerConfigurator configurator;
+        private static IDataBaseContext dataBaseContext;
 
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
-            app = new CremaBootstrapper();
+            app = new();
+            configurator = new(app);
             app.Initialize(context);
-            cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            token = await cremaHost.OpenAsync();
+            await app.OpenAsync();
+            await configurator.GenerateDataBasesAsync(4);
+            dataBaseContext = app.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
         }
 
         [TestInitialize]
         public async Task InitializeAsync()
         {
-            var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-            var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
-            dataBase = await cremaHost.GetRandomDataBaseAsync();
-            await dataBase.LoadAsync(authentication);
-            await cremaHost.LogoutAsync(authentication);
+            await this.TestContext.InitializeAsync(app);
         }
 
         [TestCleanup]
         public async Task CleanupAsync()
         {
-            if (dataBase != null)
-            {
-                var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-                await dataBase.UnloadAsync(authentication);
-                await cremaHost.LogoutAsync(authentication);
-            }
+            await this.TestContext.ReleaseAsync();
         }
 
         [ClassCleanup]
         public static async Task ClassCleanupAsync()
         {
-            await cremaHost.CloseAsync(token);
+            await app.CloseAsync();
             app.Release();
         }
 
         [TestMethod]
         public async Task BaseTestAsync()
         {
-            var authentication = await cremaHost.LoginRandomAsync(Authority.Member);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
 
             await dataBase.EnterAsync(authentication);
             try
@@ -120,7 +113,8 @@ namespace JSSoft.Crema.Services.Test
         //[TestMethod]
         public async Task GenerateStandardTestAsync()
         {
-            var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
+            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
             await dataBase.EnterAsync(authentication);
             try
             {

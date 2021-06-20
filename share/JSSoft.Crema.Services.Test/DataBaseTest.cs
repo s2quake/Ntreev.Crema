@@ -40,33 +40,30 @@ namespace JSSoft.Crema.Services.Test
     public class DataBaseTest
     {
         private static TestApplication app;
-        private static TestServerHost serverHost;
-        private static ICremaHost cremaHost;
-        private static Guid token;
+        private static TestServerConfigurator configurator;
         private static IDataBaseContext dataBaseContext;
         private static Authentication expiredAuthentication;
 
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
-            app = new ();
-            serverHost = app.Initialize(context);
-            cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            token = await cremaHost.OpenAsync();
-            dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
-            expiredAuthentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-            await serverHost.GenerateDataBasesAsync(20);
-            await serverHost.LoginRandomManyAsync();
-            await serverHost.LoadRandomDataBasesAsync();
-            await serverHost.LockRandomDataBasesAsync();
-            await serverHost.SetPrivateRandomDataBasesAsync();
-            await cremaHost.LogoutAsync(expiredAuthentication);
+            app = new();
+            configurator = new(app);
+            app.Initialize(context);
+            await app.OpenAsync();
+            dataBaseContext = app.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+            expiredAuthentication = app.ExpiredAuthentication;
+            await configurator.GenerateDataBasesAsync(20);
+            await configurator.LoginRandomManyAsync();
+            await configurator.LoadRandomDataBasesAsync();
+            await configurator.LockRandomDataBasesAsync();
+            await configurator.SetPrivateRandomDataBasesAsync();
         }
 
         [ClassCleanup]
         public static async Task ClassCleanupAsync()
         {
-            await cremaHost.CloseAsync(token);
+            await app.CloseAsync();
             app.Release();
         }
 
@@ -91,23 +88,6 @@ namespace JSSoft.Crema.Services.Test
             var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
             var metaData = await dataBase.Dispatcher.InvokeAsync(() => dataBase.GetMetaData());
             Assert.AreEqual(dataBase.DataBaseState, metaData.DataBaseState);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public async Task GetMetaData_Arg0_Null_FailTestAsync()
-        {
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
-            await dataBase.Dispatcher.InvokeAsync(() => dataBase.GetMetaData());
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task GetMetaData_Expired_FailTestAsync()
-        {
-            var authentication = await this.TestContext.LoginRandomAsync();
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
-            await dataBase.Dispatcher.InvokeAsync(() => dataBase.GetMetaData());
         }
 
         [TestMethod]

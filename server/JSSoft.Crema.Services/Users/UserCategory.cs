@@ -98,7 +98,7 @@ namespace JSSoft.Crema.Services.Users
                     this.ValidateMove(authentication, parentPath);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
-                    var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
+                    var oldParentPaths = items.Select(item => item.Parent != null ? item.Parent.Path : null).ToArray();
                     var path = base.Path;
                     var targetName = new CategoryName(parentPath, base.Name);
                     return (items, oldPaths, oldParentPaths, path, targetName);

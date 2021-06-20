@@ -38,14 +38,9 @@ using JSSoft.Library;
 
 namespace JSSoft.Crema.Services.Test
 {
-    class TestApplication : CremaBootstrapper
+    partial class TestApplication : CremaBootstrapper
     {
-        private ICremaHost cremaHost;
-        private Guid token;
-        private UserContextMetaData userInfos;
-        private Authentication expiredAuthentication;
-
-        public TestServerHost Initialize(TestContext context)
+        public void Initialize(TestContext context)
         {
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", context.FullyQualifiedTestClassName);
             var userInfos = UserInfoGenerator.Generate(RandomUtility.Next(500, 1000), RandomUtility.Next(100, 1000));
@@ -53,7 +48,6 @@ namespace JSSoft.Crema.Services.Test
             CremaBootstrapper.CreateRepositoryInternal(this, repositoryPath, "git", "xml", string.Empty, userInfos, dataSet);
             this.BasePath = repositoryPath;
             this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
-            return new TestServerHost(this, userInfos);
         }
 
         public void Release()
@@ -61,75 +55,5 @@ namespace JSSoft.Crema.Services.Test
             DirectoryUtility.Delete(this.BasePath);
             this.Dispose();
         }
-
-        public new object GetService(Type serviceType)
-        {
-            var instance = base.GetService(serviceType);
-            if (instance != null)
-                return instance;
-            return this.cremaHost.GetService(serviceType);
-        }
-
-        public async Task OpenAsync()
-        {
-            var cremaHost = this.cremaHost;
-            var token = await cremaHost.OpenAsync();
-            var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            var userID = Authentication.AdminID;
-            var password = Authentication.AdminID.ToSecureString();
-            var authenticationToken = await cremaHost.LoginAsync(userID, password);
-            var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
-            var userInfos = await userContext.Dispatcher.InvokeAsync(() => userContext.GetMetaData());
-            await cremaHost.LogoutAsync(authentication);
-            this.token = token;
-            this.userInfos = userInfos;
-            this.expiredAuthentication = authentication;
-        }
-
-        public async Task CloseAsync()
-        {
-            await this.cremaHost.CloseAsync(this.token);
-            this.token = Guid.Empty;
-        }
-
-        public Task<Authentication> LoginRandomAsync()
-        {
-            var items = new Authority[] { Authority.Admin, Authority.Member, Authority.Guest };
-            return LoginRandomAsync(items.Random());
-        }
-
-        public Task<Authentication> LoginRandomAsync(Authority authority)
-        {
-            return LoginRandomAsync(authority, DefaultPredicate);
-        }
-
-        public async Task<Authentication> LoginRandomAsync(Authority authority, Func<IUser, bool> predicate)
-        {
-            var cremaHost = this.cremaHost;
-            if (cremaHost.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
-            {
-                var user = await userCollection.GetRandomUserAsync(Test);
-                var name = user.ID;
-                var password = user.GetPassword();
-                var token = await cremaHost.LoginAsync(name, password);
-                return await cremaHost.AuthenticateAsync(token);
-            }
-            throw new NotImplementedException();
-
-            bool Test(IUser user)
-            {
-                if (user.BanInfo.Path != string.Empty)
-                    return false;
-                if (user.UserState == UserState.Online)
-                    return false;
-                if (user.Authority != authority)
-                    return false;
-                return predicate(user);
-            }
-        }
-
-        public Authentication ExpiredAuthentication => this.expiredAuthentication;
-
-        private static bool DefaultPredicate(IUser _) => true;
     }
 }
