@@ -40,19 +40,19 @@ namespace JSSoft.Crema.Services.Test
 {
     partial class TestApplication : CremaBootstrapper
     {
-        public void Initialize(TestContext context)
+        public async Task InitializeAsync(TestContext context)
         {
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", context.FullyQualifiedTestClassName);
             var userInfos = UserInfoGenerator.Generate(RandomUtility.Next(500, 1000), RandomUtility.Next(100, 1000));
             var dataSet = new CremaDataSet();
-            CremaBootstrapper.CreateRepositoryInternal(this, repositoryPath, "git", "xml", string.Empty, userInfos, dataSet);
+            await Task.Run(() => CremaBootstrapper.CreateRepositoryInternal(this, repositoryPath, "git", "xml", string.Empty, userInfos, dataSet));
             this.BasePath = repositoryPath;
             this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
         }
 
-        public void Release()
+        public async Task ReleaseAsync()
         {
-            DirectoryUtility.Delete(this.BasePath);
+            await Task.Run(() => DirectoryUtility.Delete(this.BasePath));
             this.Dispose();
         }
     }

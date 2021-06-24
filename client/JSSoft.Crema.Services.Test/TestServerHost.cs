@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using JSSoft.Crema.ServiceModel;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -21,32 +22,38 @@ namespace JSSoft.Crema.Services.Test
         private readonly StringBuilder outputBuilder = new();
         private readonly List<(string, Authority)> userList = new();
         private Guid id = Guid.NewGuid();
-        private AnonymousPipeServerStream pipeStream;
-        private AnonymousPipeServerStream commandStream;
+        private AnonymousPipeServerStream inputStream;
+        private AnonymousPipeServerStream outputStream;
+        private AnonymousPipeServerStream errorStream;
+        private CancellationTokenSource cancellation;
+        private Task outputTask;
+        private Task errorTask;
+        private StreamWriter inputWriter;
 
         public TestServerHost()
         {
-            this.process.OutputDataReceived += Process_OutputDataReceived;
-            this.process.ErrorDataReceived += Process_ErrorDataReceived;
-            this.process.Exited += Process_Exited;
         }
 
-        public void Start()
+        public async Task StartAsync()
         {
-            this.pipeStream = new AnonymousPipeServerStream(PipeDirection.In, HandleInheritability.Inheritable);
-            this.commandStream = new AnonymousPipeServerStream(PipeDirection.Out, HandleInheritability.Inheritable);
+            this.cancellation = new();
+            this.inputStream = new AnonymousPipeServerStream(PipeDirection.Out, HandleInheritability.Inheritable);
+            this.outputStream = new AnonymousPipeServerStream(PipeDirection.In, HandleInheritability.Inheritable);
+            this.errorStream = new AnonymousPipeServerStream(PipeDirection.In, HandleInheritability.Inheritable);
+            this.inputWriter = new StreamWriter(inputStream) { AutoFlush = true };
             this.errorBuilder.Clear();
             this.manualEvent.Reset();
             this.process.StartInfo.FileName = @"dotnet";
-            this.process.StartInfo.Arguments = $"\"{this.ExecutablePath}\" test \"{this.RepositoryPath}\" --port {this.Port} --separator {this.id} --pipe-in {this.pipeStream.GetClientHandleAsString()} --pipe-out {this.commandStream.GetClientHandleAsString()}";
+            this.process.StartInfo.Arguments = $"\"{this.ExecutablePath}\" test \"{this.RepositoryPath}\" --port {this.Port} --separator {this.id} --pipe-input {this.inputStream.GetClientHandleAsString()} --pipe-output {this.outputStream.GetClientHandleAsString()} --pipe-error {this.errorStream.GetClientHandleAsString()}";
             this.process.StartInfo.WorkingDirectory = this.WorkingPath;
             this.process.StartInfo.UseShellExecute = false;
             this.process.StartInfo.CreateNoWindow = true;
+            this.outputTask = ReadStreamAsync(outputStream, this.OnOutputMessage, this.cancellation.Token);
+            this.errorTask = ReadStreamAsync(errorStream, this.OnErrorMessage, this.cancellation.Token);
             this.process.Start();
-            this.pipeStream.DisposeLocalCopyOfClientHandle();
+            this.inputStream.DisposeLocalCopyOfClientHandle();
             this.IsOpen = true;
-            var sr = new StreamReader(this.pipeStream);
-            var text = sr.ReadLine();
+            this.manualEvent.WaitOne();
 
             if (this.process.HasExited == true)
             {
@@ -54,17 +61,18 @@ namespace JSSoft.Crema.Services.Test
             }
         }
 
-        public void Stop()
+        public async Task StopAsync()
         {
-            var sw = new StreamWriter(this.commandStream);
-            sw.WriteLine("exit");
-            sw.Close();
-            this.commandStream.WaitForPipeDrain();
+            this.cancellation.Cancel();
+            await this.inputWriter.WriteLineAsync("exit");
+            await Task.WhenAll(this.outputTask, this.errorTask);
             this.process.WaitForExit();
             this.process.Kill();
             this.IsOpen = false;
-            this.commandStream.Close();
-            this.pipeStream.Close();
+            this.inputWriter.Close();
+            this.errorStream.Close();
+            this.outputStream.Close();
+            this.inputStream.Close();
         }
 
         public string ExecutablePath { get; set; }
@@ -77,26 +85,29 @@ namespace JSSoft.Crema.Services.Test
 
         public bool IsOpen { get; set; }
 
-        private void Process_Exited(object sender, EventArgs e)
+        private void OnOutputMessage(string text)
         {
-            this.manualEvent.Set();
-        }
-
-        private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            if (e.Data == $"{this.id}")
+            if (text == $"{this.id}")
             {
                 this.manualEvent.Set();
             }
-            else
-            {
-                this.outputBuilder.AppendLine(e.Data);
-            }
         }
 
-        private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        private void OnErrorMessage(string text)
         {
-            this.errorBuilder.AppendLine(e.Data);
+
+        }
+
+        private static async Task ReadStreamAsync(AnonymousPipeServerStream stream, Action<string> action, CancellationToken cancellation)
+        {
+            await Task.Run(() =>
+            {
+                using var reader = new StreamReader(stream);
+                while (cancellation.IsCancellationRequested == false && reader.ReadLine() is string line)
+                {
+                    action(line);
+                }
+            });
         }
     }
 }

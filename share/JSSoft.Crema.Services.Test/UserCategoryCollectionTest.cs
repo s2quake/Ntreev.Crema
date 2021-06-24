@@ -43,7 +43,7 @@ namespace JSSoft.Crema.Services.Test
         public static async Task ClassInitAsync(TestContext context)
         {
             app = new TestApplication();
-            app.Initialize(context);
+            await app.InitializeAsync(context);
             await app.OpenAsync();
             userCategoryCollection = app.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
         }
@@ -52,7 +52,7 @@ namespace JSSoft.Crema.Services.Test
         public static async Task ClassCleanupAsync()
         {
             await app.CloseAsync();
-            app.Release();
+            await app.ReleaseAsync();
         }
 
         [TestMethod]

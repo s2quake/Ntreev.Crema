@@ -48,7 +48,7 @@ namespace JSSoft.Crema.Services.Test
         public static async Task ClassInitializeAsync(TestContext context)
         {
             app = new ();
-            app.Initialize(context);
+            await app.InitializeAsync(context);
             cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
         }
 
@@ -66,9 +66,9 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [ClassCleanup]
-        public static void ClassCleanup()
+        public static async Task ClassCleanupAsync()
         {
-            app.Release();
+            await app.ReleaseAsync();
         }
 
         [TestMethod]

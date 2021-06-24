@@ -32,9 +32,9 @@ namespace JSSoft.Crema.Services.Test
     [TestClass]
     public class CremaHost_AssemblyInitializer
     {
-        private static CremaBootstrapper app;
-        private static ICremaHost cremaHost;
-        private static Authentication authentication;
+        // private static CremaBootstrapper app;
+        // private static ICremaHost cremaHost;
+        // private static Authentication authentication;
 
         [AssemblyInitialize()]
         public static void AssemblyInit(TestContext context)

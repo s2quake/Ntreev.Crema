@@ -45,7 +45,7 @@ namespace JSSoft.Crema.Services.Test
         private static readonly HashSet<int> reservedPort = new();
         private readonly TestServerHost serverHost = new ();
 
-        public void Initialize(TestContext context)
+        public async Task InitializeAsync(TestContext context)
         {
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", context.FullyQualifiedTestClassName);
             var solutionPath = Path.GetFullPath(Path.Combine(context.DeploymentDirectory, "..", "..", "..", "..", ".."));
@@ -57,13 +57,13 @@ namespace JSSoft.Crema.Services.Test
             this.serverHost.RepositoryPath = repositoryPath;
             this.serverHost.WorkingPath = solutionPath;
             this.serverHost.Port = port;
-            this.serverHost.Start();
+            await this.serverHost.StartAsync();
         }
 
-        public void Release()
+        public async Task ReleaseAsync()
         {
             if (this.serverHost.IsOpen == true)
-                this.serverHost.Stop();
+                await this.serverHost.StopAsync();
             this.Dispose();
             ReleasePort(this.serverHost.Port);
         }

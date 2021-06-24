@@ -45,7 +45,7 @@ namespace JSSoft.Crema.Services.Test
         public static async Task ClassInitAsync(TestContext context)
         {
             app = new();
-            app.Initialize(context);
+            await app.InitializeAsync(context);
             await app.OpenAsync();
             userContext = app.GetService(typeof(IUserContext)) as IUserContext;
             expiredAuthentication = app.ExpiredAuthentication;
@@ -55,7 +55,7 @@ namespace JSSoft.Crema.Services.Test
         public static async Task ClassCleanupAsync()
         {
             await app.CloseAsync();
-            app.Release();
+            await app.ReleaseAsync();
         }
 
         [TestInitialize]

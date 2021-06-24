@@ -45,15 +45,15 @@ namespace JSSoft.Crema.Services.TestModule
     class TestCommand : CommandAsyncBase
     {
         private readonly ICremaApplication application;
-        private readonly TestTerminal terminal;
+        private readonly TestCommandContext testCommandContext;
         private readonly Cancellation cancellation;
 
         [ImportingConstructor]
-        public TestCommand(ICremaApplication application, TestTerminal terminal, Cancellation cancellation)
+        public TestCommand(ICremaApplication application, TestCommandContext testCommandContext, Cancellation cancellation)
             : base("test")
         {
             this.application = application;
-            this.terminal = terminal;
+            this.testCommandContext = testCommandContext;
             this.cancellation = cancellation;
         }
 
@@ -99,13 +99,19 @@ namespace JSSoft.Crema.Services.TestModule
         }
 
         [CommandProperty]
-        public string PipeIn
+        public string PipeOutput
         {
             get; set;
         }
 
         [CommandProperty]
-        public string PipeOut
+        public string PipeError
+        {
+            get; set;
+        }
+
+        [CommandProperty]
+        public string PipeInput
         {
             get; set;
         }
@@ -121,46 +127,38 @@ namespace JSSoft.Crema.Services.TestModule
             this.CreateRepository();
             try
             {
-                //Debugger.Launch();
+                using var inputStream = new AnonymousPipeClientStream(PipeDirection.In, this.PipeInput);
+                using var outputStream = new AnonymousPipeClientStream(PipeDirection.Out, this.PipeOutput);
+                using var errorStream = new AnonymousPipeClientStream(PipeDirection.Out, this.PipeError);
 
-
-                using var writeStream = new AnonymousPipeClientStream(PipeDirection.Out, this.PipeIn);
-                using var readStream = new AnonymousPipeClientStream(PipeDirection.In, this.PipeOut);
-
-                using var sw = new StreamWriter(writeStream);
-                
-                sw.AutoFlush = true;
-
-
+                using var inputReader = new StreamReader(inputStream);
+                using var outputWriter = new StreamWriter(outputStream) { AutoFlush = true };
+                using var errorWriter = new StreamWriter(errorStream) { AutoFlush = true };
 
                 this.application.BasePath = this.Path;
                 this.application.Port = this.Port;
                 await this.application.OpenAsync();
-                await this.WriteUserListAsync();
-                await this.Out.WriteLineAsync(this.Separator);
+                await outputWriter.WriteLineAsync(this.Separator);
 
-
-                //this.terminal.Separator = this.Separator;
-                //await this.terminal.StartAsync(this.cancellation.Token);
-                await sw.WriteLineAsync("123123");
-                
-                writeStream.WaitForPipeDrain();
-
-                sw.Close();
-
-                
-                using var sr = new StreamReader(readStream);
-                while(sr.ReadLine() is string line)
+                this.testCommandContext.Out = outputWriter;
+                while (this.cancellation.IsCancellationRequested == false && (await inputReader.ReadLineAsync()) is string line)
                 {
-                    if (line == "exit")
-                        break;
+                    try
+                    {
+                        await this.testCommandContext.ExecuteAsync(line);
+                    }
+                    catch (Exception e)
+                    {
+                        await errorWriter.WriteLineAsync(e.Message);
+                    }
                 }
-                sr.Close();
-
+                await errorWriter.WriteLineAsync();
+                await outputWriter.WriteLineAsync();
                 await this.application.CloseAsync();
             }
             catch (Exception e)
             {
+                await this.Out.WriteLineAsync(e.Message);
                 await this.Error.WriteLineAsync(e.Message);
             }
             finally
@@ -190,43 +188,6 @@ namespace JSSoft.Crema.Services.TestModule
         private void DeleteRepository()
         {
             DirectoryUtility.Delete(this.Path);
-        }
-
-        private async Task WriteUserListAsync()
-        {
-            // var userCollection = this.application.GetService(typeof(IUserCollection)) as IUserCollection;
-            // var users = await userCollection.GetUsersAsync();
-            // var sb = new StringBuilder();
-            // foreach (var item in users)
-            // {
-            //     sb.AppendLine($"{item.ID}: {item.Authority}");
-            // }
-            // this.Out.WriteAsync(sb.ToString());
-        }
-
-        private async Task GenerateDataBasesAsync(int count)
-        {
-
-        }
-
-        private async Task LoginRandomManyAsync()
-        {
-
-        }
-
-        private async Task LoadRandomDataBasesAsync()
-        {
-
-        }
-
-        private async Task LockRandomDataBasesAsync()
-        {
-
-        }
-
-        private async Task SetPrivateRandomDataBasesAsync()
-        {
-
         }
     }
 }

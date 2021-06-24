@@ -42,7 +42,7 @@ namespace JSSoft.Crema.Services.Test
         public static async Task ClassInitAsync(TestContext context)
         {
             app = new TestApplication();
-            app.Initialize(context);
+            await app.InitializeAsync(context);
             await app.OpenAsync();
             authentication = await app.LoginRandomAsync(Authority.Admin);
             dataBaseContext = app.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
@@ -59,7 +59,7 @@ namespace JSSoft.Crema.Services.Test
             await dataBase.UnloadAsync(authentication);
             await app.LogoutAsync(authentication);
             await app.CloseAsync();
-            app.Release();
+            await app.ReleaseAsync();
         }
 
         [TestInitialize]
