@@ -87,6 +87,15 @@ namespace JSSoft.Crema.Services
             return Path.Combine(path, productName, $"{userID}@{addressName}.config");
         }
 
+        public void Clear()
+        {
+            foreach (var item in this.configByID.Values)
+            {
+                item.Commit();
+            }
+            this.configByID.Clear();
+        }
+
         public CremaDispatcher Dispatcher => this.cremaHost.Dispatcher;
 
         private void Remove(string userID)

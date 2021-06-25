@@ -220,6 +220,7 @@ namespace JSSoft.Crema.Services
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.authentications.Release(Authentication.SystemID);
+                    this.configs.Clear();
                     this.serviceToken = Guid.Empty;
                     this.Address = null;
                     this.ServiceState = ServiceState.Closed;
