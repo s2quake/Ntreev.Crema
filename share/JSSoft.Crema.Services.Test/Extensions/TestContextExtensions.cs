@@ -97,7 +97,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
             var authentications = context.Properties[authenticationKey] as HashSet<Authentication>;
             var cremaHost = context.Properties[cremaHostKey] as ICremaHost;
             var query = from item in authentications
-                        where item.IsExpired
+                        where item.IsExpired == false
                         select item;
             foreach (var item in query)
             {
