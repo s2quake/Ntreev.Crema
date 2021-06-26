@@ -15,7 +15,13 @@ namespace JSSoft.Crema.Random
 
         public UserFilter(UserFlags userFlags)
         {
-            this.UserFlags = UserFlags;
+            this.UserFlags = userFlags;
+        }
+
+        public UserFilter(UserFlags userFlags, Func<IUser, bool> predicate)
+        {
+            this.UserFlags = userFlags;
+            this.Predicate = predicate;
         }
 
         public static UserFilter FromExcludedUserIDs(params string[] userIDs)
@@ -36,6 +42,8 @@ namespace JSSoft.Crema.Random
         {
             return filter.PredicateFunc;
         }
+
+        public static UserFilter Empty { get; } = new UserFilter();
 
         private bool PredicateFunc(IUser user)
         {

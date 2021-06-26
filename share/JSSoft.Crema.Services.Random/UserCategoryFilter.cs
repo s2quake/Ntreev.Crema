@@ -29,8 +29,6 @@ namespace JSSoft.Crema.Random
             };
         }
 
-        public IUserCategory[] ExcludedParents { get; set; }
-
         public IUserCategory[] ExcludedCategories { get; set; }
 
         public IUserItem[] ExcludedItems { get; set; }
@@ -43,14 +41,18 @@ namespace JSSoft.Crema.Random
 
         public bool IsLeaf { get; set; }
 
-        public IUserCategory CanMove { get; set; }
+        public IUserCategory TargetToMove { get; set; }
+
+        public Func<IUserCategory, bool> Predicate { get; set; }
+
+        public static UserCategoryFilter Empty { get; } = new UserCategoryFilter();
 
         public static implicit operator Func<IUserCategory, bool>(UserCategoryFilter filter)
         {
-            return filter.Predicate;
+            return filter.PredicateFunc;
         }
 
-        private bool Predicate(IUserCategory userCategory)
+        private bool PredicateFunc(IUserCategory userCategory)
         {
             if (this.HasParent == true && userCategory.Parent == null)
                 return false;
@@ -60,13 +62,13 @@ namespace JSSoft.Crema.Random
                 return false;
             if (this.IsLeaf == true && (userCategory.Categories.Any() == true || userCategory.Users.Any() == true))
                 return false;
-            if (this.CanMove != null && this.CanMove.CanMove(userCategory.Path) == false)
+            if (this.TargetToMove != null && this.TargetToMove.CanMove(userCategory.Path) == false)
                 return false;
             if (this.ExcludedCategories != null && this.ExcludedCategories.Contains(userCategory) == true)
                 return false;
-            if (this.ExcludedParents != null && this.ExcludedParents.Contains(userCategory.Parent) == true)
-                return false;
             if (this.ExcludedItems != null && this.ExcludedItems.Contains(userCategory as IUserItem) == true)
+                return false;
+            if (this.Predicate != null && this.Predicate(userCategory) == false)
                 return false;
 
             return true;

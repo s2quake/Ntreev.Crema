@@ -43,7 +43,7 @@ namespace JSSoft.Crema.Services.Random
         {
             if (userContext.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
             {
-                return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(predicate));
+                return userCollection.Dispatcher.InvokeAsync(() => userCollection.RandomOrDefault(predicate));
             }
             throw new NotImplementedException();
         }
@@ -71,7 +71,7 @@ namespace JSSoft.Crema.Services.Random
         {
             if (userContext.GetService(typeof(IUserCategoryCollection)) is IUserCategoryCollection userCategoryCollection)
             {
-                return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.Random(predicate));
+                return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.RandomOrDefault(predicate));
             }
             throw new NotImplementedException();
         }
@@ -83,7 +83,7 @@ namespace JSSoft.Crema.Services.Random
 
         public static Task<IUserItem> GetRandomUserItemAsync(this IUserContext userContext, Func<IUserItem, bool> predicate)
         {
-            return userContext.Dispatcher.InvokeAsync(() => userContext.Random(predicate));
+            return userContext.Dispatcher.InvokeAsync(() => userContext.RandomOrDefault(predicate));
         }
 
         public static Task<IUserItem> GetRandomUserItemAsync(this IUserContext userContext, Type type)
@@ -93,7 +93,7 @@ namespace JSSoft.Crema.Services.Random
 
         public static Task<IUserItem> GetRandomUserItemAsync(this IUserContext userContext, Type type, Func<IUserItem, bool> predicate)
         {
-            return userContext.Dispatcher.InvokeAsync(() => userContext.Random(item => type.IsAssignableFrom(item.GetType()) && predicate(item)));
+            return userContext.Dispatcher.InvokeAsync(() => userContext.RandomOrDefault(item => type.IsAssignableFrom(item.GetType()) && predicate(item)));
         }
 
         public static async Task<IUserItem> GenerateAsync(this IUserContext context, Authentication authentication)
@@ -128,17 +128,21 @@ namespace JSSoft.Crema.Services.Random
 
         public static async Task<IUserCategory> GenerateCategoryAsync(this IUserContext userContext, Authentication authentication)
         {
-            if (RandomUtility.Within(50) == true)
+            if (userContext.GetService(typeof(IUserCategoryCollection)) is IUserCategoryCollection userCategoryCollection)
             {
-                return await userContext.Root.AddNewCategoryAsync(authentication, RandomUtility.NextIdentifier());
+                if (RandomUtility.Within(50) == true)
+                {
+                    return await userCategoryCollection.Root.AddNewCategoryAsync(authentication, RandomUtility.NextIdentifier());
+                }
+                else
+                {
+                    var category = await userCategoryCollection.GetRandomUserCategoryAsync();
+                    // if (GetLevel(category, (i) => i.Parent) > 4)
+                    //     return false;
+                    return await category.AddNewCategoryAsync(authentication, RandomUtility.NextIdentifier());
+                }
             }
-            else
-            {
-                var category = await userContext.GetRandomUserCategoryAsync();
-                // if (GetLevel(category, (i) => i.Parent) > 4)
-                //     return false;
-                return await category.AddNewCategoryAsync(authentication, RandomUtility.NextIdentifier());
-            }
+            throw new NotImplementedException();
         }
 
         public static async Task<IUser[]> GenerateUsersAsync(this IUserContext userContext, Authentication authentication, int count)

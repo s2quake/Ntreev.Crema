@@ -624,7 +624,7 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        IUserCategory IUserContext.Root => this.Root;
+        IUserItem IUserContext.Root => this.Root;
 
         #endregion
 

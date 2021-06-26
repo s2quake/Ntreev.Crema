@@ -60,7 +60,7 @@ namespace JSSoft.Crema.Services.Test
 
         public Task<IUser> PrepareUserAsync()
         {
-            return PrepareUserAsync(UserFlags.None);
+            return PrepareUserAsync(UserFilter.Empty);
         }
 
         public Task<IUser> PrepareUserAsync(UserFlags userFlags)
@@ -68,22 +68,27 @@ namespace JSSoft.Crema.Services.Test
             return PrepareUserAsync(userFlags, item => true);
         }
 
+        public Task<IUser> PrepareUserAsync(UserFlags userFlags, Func<IUser, bool> predicate)
+        {
+            return PrepareUserAsync(new UserFilter(userFlags, predicate));
+        }
+
         public Task<IUser> PrepareUserAsync(Func<IUser, bool> predicate)
         {
             return PrepareUserAsync(UserFlags.None, predicate);
         }
 
-        public async Task<IUser> PrepareUserAsync(UserFlags userFlags, Func<IUser, bool> predicate)
+        public async Task<IUser> PrepareUserAsync(UserFilter filter)
         {
             var userCollection = this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
             var userCategoryCollection = this.cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            var user = await userCollection.GetRandomUserAsync(userFlags, predicate);
+            var user = await userCollection.GetRandomUserAsync(filter.UserFlags, filter);
             if (user is null)
             {
-                var authority = GetAuthorities(userFlags).Random();
-                var userStates = SelectUserState(userFlags);
-                var banStates = SelectBanState(userFlags);
+                var authority = GetAuthorities(filter.UserFlags).Random();
+                var userStates = SelectUserState(filter.UserFlags);
+                var banStates = SelectBanState(filter.UserFlags);
                 var category = await userCategoryCollection.GetRandomUserCategoryAsync();
                 var newUser = await category.GenerateUserAsync(Authentication.System, authority);
                 var password = newUser.GetPassword();
@@ -96,6 +101,21 @@ namespace JSSoft.Crema.Services.Test
             return user;
         }
 
+        public Task<IUserItem> PrepareUserItemAsync()
+        {
+            return PrepareUserItemAsync(new UserItemFilter());
+        }
+
+        public Task<IUserItem> PrepareUserItemAsync(Type type)
+        {
+            return PrepareUserItemAsync(new UserItemFilter(type));
+        }
+
+        public Task<IUserItem> PrepareUserItemAsync(Type type, Func<IUserItem, bool> predicate)
+        {
+            return PrepareUserItemAsync(new UserItemFilter(type, predicate));
+        }
+
         public async Task<IUserItem> PrepareUserItemAsync(UserItemFilter filter)
         {
             var userCollection = this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
@@ -104,9 +124,25 @@ namespace JSSoft.Crema.Services.Test
             var userItem = await userContext.GetRandomUserItemAsync(filter);
             if (userItem is null)
             {
-                
+                var s = RandomUtility.Within(50);
+                if (filter.Type == typeof(IUser) || s == true)
+                {
+                    var category = await userCategoryCollection.GetRandomUserCategoryAsync();
+                    var user = await category.GenerateUserAsync(Authentication.System);
+                    userItem = user as IUserItem;
+                }
+                else if (filter.Type == typeof(IUserCategory) || s == false)
+                {
+                    var category = await PrepareUserCategoryAsync(filter);
+                    userItem = category as IUserItem;
+                }
             }
             return userItem;
+        }
+
+        public Task<IUserCategory> PrepareUserCategoryAsync()
+        {
+            return PrepareUserCategoryAsync(UserCategoryFilter.Empty);
         }
 
         public async Task<IUserCategory> PrepareUserCategoryAsync(UserCategoryFilter filter)
@@ -128,7 +164,7 @@ namespace JSSoft.Crema.Services.Test
                 {
                     await category.GenerateUserAsync(Authentication.System);
                 }
-                if (filter.CanMove != null)
+                if (filter.TargetToMove != null)
                 {
                     return userCategoryCollection.Root;
                 }

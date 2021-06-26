@@ -1,5 +1,6 @@
 ﻿using JSSoft.Crema.Data;
 using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Crema.Random;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Extensions;
 using JSSoft.Crema.Services.Random;
@@ -52,7 +53,8 @@ namespace JSSoft.Crema.Services.Test.Extensions
             var app = context.Properties[appKey] as TestApplication;
             var cremaHost = context.Properties[cremaHostKey] as ICremaHost;
             var userFlags = AuthorityUtility.ToUserFlags(authority) | UserFlags.NotBanned | UserFlags.Offline;
-            var user = await app.PrepareUserAsync(userFlags, predicate);
+            var userFilter = new UserFilter(userFlags, predicate);
+            var user = await app.PrepareUserAsync(userFilter);
             var password = user.GetPassword();
             var authenticationToken = await cremaHost.LoginAsync(user.ID, password);
             var authentication = await cremaHost.AuthenticateAsync(authenticationToken);

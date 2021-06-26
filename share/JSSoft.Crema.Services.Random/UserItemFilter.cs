@@ -1,4 +1,5 @@
 ﻿using JSSoft.Crema.Services;
+using JSSoft.Library.Random;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,12 @@ namespace JSSoft.Crema.Random
             this.Type = type;
         }
 
+        public UserItemFilter(Type type, Func<IUserItem, bool> predicate)
+        {
+            this.Type = type;
+            this.Predicate = predicate;
+        }
+
         public Type Type { get; set; }
 
         public bool HasParent { get; set; }
@@ -25,14 +32,34 @@ namespace JSSoft.Crema.Random
 
         public bool IsLeaf { get; set; }
 
-        public IUserItem[] ExcludedParents { get; set; }
+        public IUserItem TargetToMove { get; set; }
+
+        public IUserItem[] ExcludedItems { get; set; }
+
+        public Func<IUserItem, bool> Predicate { get; set; }
 
         public static implicit operator Func<IUserItem, bool>(UserItemFilter filter)
         {
-            return filter.Predicate;
+            return filter.PredicateFunc;
         }
 
-        private bool Predicate(IUserItem userItem)
+        public static implicit operator UserCategoryFilter(UserItemFilter filter)
+        {
+            var s = RandomUtility.Within(50);
+            var userCategoryFilter = new UserCategoryFilter
+            {
+                HasParent = filter.HasParent,
+                HasCategories = filter.HasChilds == true && s == true,
+                HasUsers = filter.HasChilds == true && s == true,
+                IsLeaf = filter.IsLeaf,
+                TargetToMove = filter.TargetToMove as IUserCategory,
+                ExcludedItems = filter.ExcludedItems,
+                Predicate = filter.Predicate != null ? (item) => filter.Predicate(item as IUserItem) : (item) => true,
+            };
+            return userCategoryFilter;
+        }
+
+        private bool PredicateFunc(IUserItem userItem)
         {
             if (this.Type != null && this.Type.IsAssignableFrom(userItem.GetType()) == false)
                 return false;
@@ -42,10 +69,21 @@ namespace JSSoft.Crema.Random
                 return false;
             if (this.IsLeaf == true && userItem.Childs.Any() == true)
                 return false;
-            if (this.ExcludedParents != null && this.ExcludedParents.Contains(userItem.Parent) == true)
+            if (this.TargetToMove != null && CanMove(this.TargetToMove, userItem.Path) == false)
+                return false;
+            if (this.ExcludedItems != null && this.ExcludedItems.Contains(userItem) == true)
+                return false;
+            if (this.Predicate != null && this.Predicate(userItem) == false)
                 return false;
 
             return true;
+        }
+
+        private static bool CanMove(IUserItem userItem, string parentPath)
+        {
+            if (userItem.Path == parentPath)
+                return false;
+            return userItem.Path.StartsWith(parentPath) == false;
         }
     }
 }
