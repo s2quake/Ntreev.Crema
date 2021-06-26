@@ -59,6 +59,7 @@ namespace JSSoft.Crema.Services.Test
             return itemList.ToArray();
         }
 
+        [Obsolete]
         public async Task LoginRandomManyAsync()
         {
             var cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;

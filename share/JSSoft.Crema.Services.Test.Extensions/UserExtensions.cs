@@ -19,7 +19,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
     {
         public static SecureString GetPassword(this IUser user)
         {
-            return user.Authority.ToString().ToLower().ToSecureString();
+            return user.Authority.GetPassword();
         }
 
         public static SecureString GetNextPassword(this IUser user)

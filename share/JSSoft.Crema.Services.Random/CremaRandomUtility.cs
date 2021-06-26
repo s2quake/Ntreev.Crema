@@ -34,6 +34,12 @@ namespace JSSoft.Crema.Services.Random
     {
         private static readonly TagInfo[] tags = new TagInfo[] { TagInfo.All, TagInfoUtility.Server, TagInfoUtility.Client, TagInfo.Unused };
 
+        public static Authority NextAuthority()
+        {
+            var items = new Authority[] { Authority.Admin, Authority.Member, Authority.Guest };
+            return items.Random();
+        }
+
         public static async Task GenerateAsync(this IDataBase dataBase, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)

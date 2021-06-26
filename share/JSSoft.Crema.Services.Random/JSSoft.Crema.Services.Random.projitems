@@ -14,10 +14,15 @@
     <Compile Include="$(MSBuildThisFileDirectory)ActionTypeAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ActionTargets.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ActionTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CremaDataCreator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaDataRandomUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CremaDataSetTagsCreator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CremaDataSetTypesCreator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaDataTableCreator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaHostExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaRandomSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CremaRandomUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CremaTypeCreator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBaseContextExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBaseExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableRowExtensions.cs" />
@@ -35,12 +40,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)TypeContextExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeTemplateExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserCategoryCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserCategoryExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserContextExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CremaTypeCreator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CremaDataSetTypesCreator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CremaDataSetTagsCreator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CremaDataCreator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CremaRandomUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserCategoryFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserItemFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserFilter.cs" />
   </ItemGroup>
 </Project>

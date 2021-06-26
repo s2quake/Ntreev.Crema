@@ -106,6 +106,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.ServiceHosts.E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Services.TestModule", "server\JSSoft.Crema.Services.TestModule\JSSoft.Crema.Services.TestModule.csproj", "{06F618B5-DC7D-4C22-B277-36D8BBAA97BA}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.Services.Test.Extensions", "share\JSSoft.Crema.Services.Test.Extensions\JSSoft.Crema.Services.Test.Extensions.shproj", "{CCCEE1C2-7F96-413D-AD38-4A550F5DB251}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		share\JSSoft.Crema.Commands.Spreadsheet\JSSoft.Crema.Commands.Spreadsheet.projitems*{05971a74-2d68-4781-9ceb-df2b48f8ba75}*SharedItemsImports = 13
@@ -133,6 +135,7 @@ Global
 		share\JSSoft.Crema.ServiceHosts.Exceptions\JSSoft.Crema.ServiceHosts.Exceptions.projitems*{b55d4dbf-2621-475c-a551-79ef4e5dbce1}*SharedItemsImports = 13
 		share\JSSoft.Crema.ServiceHosts.Data\JSSoft.Crema.ServiceHosts.Data.projitems*{babab208-95fb-4d06-b801-3fee20f980eb}*SharedItemsImports = 13
 		share\JSSoft.Crema.Services.Extensions\JSSoft.Crema.Services.Extensions.projitems*{c0b74c8e-bcc3-41ae-9a1f-e6fc2ef1dc85}*SharedItemsImports = 5
+		share\JSSoft.Crema.Services.Test.Extensions\JSSoft.Crema.Services.Test.Extensions.projitems*{cccee1c2-7f96-413d-ad38-4a550f5db251}*SharedItemsImports = 13
 		share\JSSoft.Crema.Services.Random\JSSoft.Crema.Services.Random.projitems*{da7e6948-3c9b-48f1-a9e8-4c9b4c540e09}*SharedItemsImports = 5
 		share\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.projitems*{dfd86280-1bb1-40d2-9542-8f605c5c1c89}*SharedItemsImports = 5
 		share\JSSoft.Crema.Services.Test.Extensions\JSSoft.Crema.Services.Test.Extensions.projitems*{ef98e2c2-40d5-43ca-83e4-8803f6f91426}*SharedItemsImports = 5
@@ -303,6 +306,7 @@ Global
 		{97AD6C00-3B71-4E83-97C3-0201BC035471} = {4BB77DD8-CE06-403A-BB8C-E652E9284511}
 		{B55D4DBF-2621-475C-A551-79EF4E5DBCE1} = {4BB77DD8-CE06-403A-BB8C-E652E9284511}
 		{06F618B5-DC7D-4C22-B277-36D8BBAA97BA} = {8D8DC23A-F758-402E-ABA2-5C7C7268B378}
+		{CCCEE1C2-7F96-413D-AD38-4A550F5DB251} = {4BB77DD8-CE06-403A-BB8C-E652E9284511}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D0597CA1-B5A4-4E76-92FA-066003A1D135}

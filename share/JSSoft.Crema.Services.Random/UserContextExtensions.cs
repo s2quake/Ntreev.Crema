@@ -154,13 +154,14 @@ namespace JSSoft.Crema.Services.Random
 
         public static async Task<IUser> GenerateUserAsync(this IUserContext userContext, Authentication authentication)
         {
-            var authorities = new Authority[] { Authority.Admin, Authority.Member, Authority.Guest };
-            var authority = authorities.Random();
             var category = await userContext.GetRandomUserCategoryAsync();
-            var newID = await userContext.GenerateUserIDAsync("user");
-            var newName = newID.Replace("user", "User");
-            var password = authority.ToString().ToLower().ToSecureString();
-            return await category.AddNewUserAsync(authentication, newID, password, newName, authority);
+            return await category.GenerateUserAsync(authentication);
+        }
+
+        public static async Task<IUser> GenerateUserAsync(this IUserContext userContext, Authentication authentication, Authority authority)
+        {
+            var category = await userContext.GetRandomUserCategoryAsync();
+            return await category.GenerateUserAsync(authentication, authority);
         }
 
         public static Task<string> GenerateUserIDAsync(this IUserContext userContext)

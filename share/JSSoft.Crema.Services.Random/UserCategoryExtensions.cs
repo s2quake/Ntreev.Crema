@@ -19,26 +19,41 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Crema.Data.Xml.Schema;
 using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library;
 using JSSoft.Library.Random;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Random
 {
-    public static class UserCategoryCollectionExtensions
+    public static class UserCategoryExtensions
     {
-        public static Task<IUserCategory> GetRandomUserCategoryAsync(this IUserCategoryCollection userCategoryCollection)
+        public static Task<IUser> GenerateUserAsync(this IUserCategory userCategory, Authentication authentication)
         {
-            return GetRandomUserCategoryAsync(userCategoryCollection, DefaultPredicate);
+            var authorities = new Authority[] { Authority.Admin, Authority.Member, Authority.Guest };
+            var authority = authorities.Random();
+            return GenerateUserAsync(userCategory, authentication, authority);
         }
 
-        public static Task<IUserCategory> GetRandomUserCategoryAsync(this IUserCategoryCollection userCategoryCollection, Func<IUserCategory, bool> predicate)
+        public static async Task<IUser> GenerateUserAsync(this IUserCategory userCategory, Authentication authentication, Authority authority)
         {
-            return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.RandomOrDefault(predicate));
+            var userCollection = userCategory.GetService(typeof(IUserCollection)) as IUserCollection;
+            var newID = await userCollection.GenerateNewUserIDAsync("user");
+            var newName = newID.Replace("user", $"{authority}User");
+            var password = authority.ToString().ToLower().ToSecureString();
+            return await userCategory.AddNewUserAsync(authentication, newID, password, newName, authority);
         }
 
-        private static bool DefaultPredicate(IUserCategory _) => true;
+        public static async Task<IUserCategory> GenerateUserCategoryAsync(this IUserCategory userCategory, Authentication authentication)
+        {
+            var name = await userCategory.GenerateNewCategoryNameAsync();
+            return await userCategory.AddNewCategoryAsync(authentication, name);
+        }
     }
 }

@@ -3,12 +3,14 @@
   <PropertyGroup>
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <SharedGUID>a90fa10d-5668-40f3-b554-43ba02ff0a87</SharedGUID>
+    <SharedGUID>cccee1c2-7f96-413d-ad38-4a550f5db251</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>JSSoft.Crema.Services.Test.Extensions</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AuthorityExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AuthorityUtility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaHostExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBaseContextExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBaseExtensions.cs" />

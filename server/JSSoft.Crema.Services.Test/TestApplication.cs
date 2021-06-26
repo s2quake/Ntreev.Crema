@@ -35,6 +35,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Library.IO;
 using JSSoft.Crema.Data;
 using JSSoft.Library;
+using System.Linq;
+using JSSoft.Crema.Random;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -43,7 +45,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task InitializeAsync(TestContext context)
         {
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", context.FullyQualifiedTestClassName);
-            var userInfos = UserInfoGenerator.Generate(RandomUtility.Next(500, 1000), RandomUtility.Next(100, 1000));
+            var userInfos = UserInfoGenerator.Generate(0, 0);
             var dataSet = new CremaDataSet();
             await Task.Run(() => CremaBootstrapper.CreateRepositoryInternal(this, repositoryPath, "git", "xml", string.Empty, userInfos, dataSet));
             this.BasePath = repositoryPath;
@@ -54,6 +56,134 @@ namespace JSSoft.Crema.Services.Test
         {
             await Task.Run(() => DirectoryUtility.Delete(this.BasePath));
             this.Dispose();
+        }
+
+        public Task<IUser> PrepareUserAsync()
+        {
+            return PrepareUserAsync(UserFlags.None);
+        }
+
+        public Task<IUser> PrepareUserAsync(UserFlags userFlags)
+        {
+            return PrepareUserAsync(userFlags, item => true);
+        }
+
+        public Task<IUser> PrepareUserAsync(Func<IUser, bool> predicate)
+        {
+            return PrepareUserAsync(UserFlags.None, predicate);
+        }
+
+        public async Task<IUser> PrepareUserAsync(UserFlags userFlags, Func<IUser, bool> predicate)
+        {
+            var userCollection = this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            var userCategoryCollection = this.cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            var user = await userCollection.GetRandomUserAsync(userFlags, predicate);
+            if (user is null)
+            {
+                var authority = GetAuthorities(userFlags).Random();
+                var userStates = SelectUserState(userFlags);
+                var banStates = SelectBanState(userFlags);
+                var category = await userCategoryCollection.GetRandomUserCategoryAsync();
+                var newUser = await category.GenerateUserAsync(Authentication.System, authority);
+                var password = newUser.GetPassword();
+                if (userStates.Any() == true && userStates.Random() == UserState.Online)
+                    await this.cremaHost.LoginAsync(newUser.ID, password);
+                if (banStates.Any() == true && banStates.Random() == true)
+                    await newUser.BanAsync(Authentication.System, RandomUtility.NextString());
+                return newUser;
+            }
+            return user;
+        }
+
+        public async Task<IUserItem> PrepareUserItemAsync(UserItemFilter filter)
+        {
+            var userCollection = this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            var userCategoryCollection = this.cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            var userItem = await userContext.GetRandomUserItemAsync(filter);
+            if (userItem is null)
+            {
+                
+            }
+            return userItem;
+        }
+
+        public async Task<IUserCategory> PrepareUserCategoryAsync(UserCategoryFilter filter)
+        {
+            var userCollection = this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            var userCategoryCollection = this.cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(filter);
+            if (userCategory is null)
+            {
+                var parent = await userCategoryCollection.GetRandomUserCategoryAsync();
+                var name = await parent.GenerateNewCategoryNameAsync();
+                var category = await parent.AddNewCategoryAsync(Authentication.System, name);
+                if (filter.HasCategories == true)
+                {
+                    await category.GenerateUserCategoryAsync(Authentication.System);
+                }
+                if (filter.HasUsers == true)
+                {
+                    await category.GenerateUserAsync(Authentication.System);
+                }
+                if (filter.CanMove != null)
+                {
+                    return userCategoryCollection.Root;
+                }
+                return category;
+            }
+            return userCategory;
+        }
+
+        private static UserState[] SelectUserState(UserFlags userFlags)
+        {
+            var userStateList = new List<UserState>();
+            var userStateFlag = userFlags & (UserFlags.Online | UserFlags.Offline);
+            if (userFlags.HasFlag(UserFlags.Online) == true)
+            {
+                userStateList.Add(UserState.Online);
+            }
+            if (userFlags.HasFlag(UserFlags.Offline) == true)
+            {
+                userStateList.Add(UserState.None);
+            }
+            return userStateList.ToArray();
+        }
+
+        private static bool[] SelectBanState(UserFlags userFlags)
+        {
+            var banStateList = new List<bool>();
+            var banStateFlag = userFlags & (UserFlags.NotBanned | UserFlags.Banned);
+            if (userFlags.HasFlag(UserFlags.NotBanned) == true)
+            {
+                banStateList.Add(false);
+            }
+            if (userFlags.HasFlag(UserFlags.Banned) == true)
+            {
+                banStateList.Add(true);
+            }
+            return banStateList.ToArray();
+        }
+
+        private static Authority[] GetAuthorities(UserFlags userFlags)
+        {
+            var authorityList = new List<Authority>();
+            var authorityFlag = userFlags & (UserFlags.Admin | UserFlags.Member | UserFlags.Guest);
+            if (userFlags.HasFlag(UserFlags.Admin) == true || authorityFlag == UserFlags.None)
+            {
+                authorityList.Add(Authority.Admin);
+            }
+            if (userFlags.HasFlag(UserFlags.Member) == true || authorityFlag == UserFlags.None)
+            {
+                authorityList.Add(Authority.Member);
+            }
+            if (userFlags.HasFlag(UserFlags.Guest) == true || authorityFlag == UserFlags.None)
+            {
+                authorityList.Add(Authority.Guest);
+            }
+            return authorityList.ToArray();
         }
     }
 }

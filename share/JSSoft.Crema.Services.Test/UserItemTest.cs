@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JSSoft.Library;
 using JSSoft.Crema.Services.Extensions;
+using JSSoft.Crema.Random;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -86,7 +87,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task RenameAsync_Category_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userItem = await userContext.GetRandomUserItemAsync(typeof(IUserCategory), item => item.Parent != null);
+            var userItemFilter = new UserItemFilter() { HasParent = true };
+            var userItem = await userContext.GetRandomUserItemAsync(typeof(IUserCategory), userItemFilter);
             var name = RandomUtility.NextName();
             await userItem.RenameAsync(authentication, name);
             Assert.AreEqual(name, userItem.Name);
@@ -123,7 +125,12 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var rootItem = userContext.Root;
-            var userItem = await userContext.GetRandomUserItemAsync(item => item.Parent != null && item.Parent != rootItem);
+            var userItemFilter = new UserItemFilter()
+            {
+                HasParent = true,
+                ExcludedParents = new[] { rootItem as IUserItem }
+            };
+            var userItem = await userContext.GetRandomUserItemAsync(userItemFilter);
             await userItem.MoveAsync(authentication, rootItem.Path);
             Assert.AreEqual(rootItem, userItem.Parent);
         }
@@ -163,9 +170,10 @@ namespace JSSoft.Crema.Services.Test
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var rootItem = userContext.Root;
             var userItem = await userContext.GetRandomUserItemAsync();
-            var category = await userContext.GetRandomUserCategoryAsync(item => item != userItem.Parent);
-            var name = await category.GenerateNewCategoryNameAsync("folder");
-            var categoryName = new CategoryName(category.Path, name);
+            var userCategoryFilter = UserCategoryFilter.FromExcludedItems(userItem.Parent);
+            var userCategory = await userContext.GetRandomUserCategoryAsync(userCategoryFilter);
+            var name = await userCategory.GenerateNewCategoryNameAsync("folder");
+            var categoryName = new CategoryName(userCategory.Path, name);
             await userItem.MoveAsync(authentication, categoryName);
         }
 
@@ -193,7 +201,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task MoveAsync_PermissionDenied_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
-            var userItem = await userContext.GetRandomUserItemAsync(item => item != userContext.Root);
+            var userItemFilter = new UserItemFilter() { HasParent = true };
+            var userItem = await userContext.GetRandomUserItemAsync(userItemFilter);
             var rootItem = userContext.Root;
             await userItem.MoveAsync(authentication, rootItem.Path);
         }
@@ -202,7 +211,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_Item_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await userContext.GetRandomUserAsync(UserFlags.Offline, item => item.ID != authentication.ID && item.ID != Authentication.AdminID);
+            var userFilter = UserFilter.FromExcludedUserIDs(Authentication.AdminID, authentication.ID);
+            var user = await app.PrepareUserAsync(UserFlags.Offline, userFilter);
             var userItem = user as IUserItem;
             await userItem.DeleteAsync(authentication);
         }
@@ -211,7 +221,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_Category_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userItem = await userContext.GetRandomUserItemAsync(typeof(IUserCategory), item => item.Childs.Any() == false);
+            var userItemFilter = new UserItemFilter() { IsLeaf = true };
+            var userItem = await userContext.GetRandomUserItemAsync(typeof(IUserCategory), userItemFilter);
             await userItem.DeleteAsync(authentication);
         }
 
@@ -245,7 +256,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_HasChild_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userItem = await userContext.GetRandomUserItemAsync(typeof(IUserCategory), item => item.Childs.Any() == true);
+            var userItemFilter = new UserItemFilter(typeof(IUserCategory)) { HasChilds = true };
+            var userItem = await app.PrepareUserItemAsync(userItemFilter);
             await userItem.DeleteAsync(authentication);
         }
 
@@ -274,7 +286,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_Online_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await userContext.GetRandomUserAsync(UserFlags.Online, item => item.ID != authentication.ID && item.ID != Authentication.AdminID);
+            var excludedUsers = UserFilter.FromExcludedUserIDs(Authentication.AdminID, authentication.ID);
+            var user = await app.PrepareUserAsync(UserFlags.Online, excludedUsers);
             var userItem = user as IUserItem;
             await userItem.DeleteAsync(authentication);
         }
@@ -334,7 +347,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task Renamed_UserCategory_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userItem = await userContext.GetRandomUserItemAsync(typeof(IUserCategory), item => item.Parent != null);
+            var userItemFilter = new UserItemFilter() { HasParent = true };
+            var userItem = await userContext.GetRandomUserItemAsync(typeof(IUserCategory), userItemFilter);
             var oldName = userItem.Name;
             var expectedName = RandomUtility.NextName();
             var actualName = string.Empty;
@@ -373,9 +387,10 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItem = await userContext.GetRandomUserItemAsync(typeof(IUser));
-            var category = await userContext.GetRandomUserCategoryAsync(item => item != userItem.Parent);
+            var userCategoryFilter = UserCategoryFilter.FromExcludedItems(userItem.Parent);
+            var userCategory = await userContext.GetRandomUserCategoryAsync(userCategoryFilter);
             var oldParentPath = userItem.Parent.Path;
-            var expectedParentPath = category.Path;
+            var expectedParentPath = userCategory.Path;
             var actualParentPath = string.Empty;
             await userItem.Dispatcher.InvokeAsync(() =>
             {
@@ -403,7 +418,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task Moved_UserCategory_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userItem = await userContext.GetRandomUserItemAsync(typeof(IUserCategory), item => item.Parent != null);
+            var userItemFilter = new UserItemFilter() { HasParent = true };
+            var userItem = await userContext.GetRandomUserItemAsync(typeof(IUserCategory), userItemFilter);
             var parentItem = await userContext.GetRandomUserItemAsync(typeof(IUserCategory), item => item.Path.StartsWith(userItem.Path) == false);
             var oldParentPath = userItem.Parent.Path;
             var expectedParentPath = parentItem.Path;
@@ -442,7 +458,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task Deleted_User_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await userContext.GetRandomUserAsync(UserFlags.Member);
+            var user = await app.PrepareUserAsync(UserFlags.Member | UserFlags.Guest | UserFlags.Offline);
             var userItem = user as IUserItem;
             var expectedUserItem = userItem;
             var actualUserItem = null as IUserItem;
@@ -466,8 +482,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task Deleted_UserCategory_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await userContext.GetRandomUserItemAsync(typeof(IUserCategory), item => item.Parent != null && item.Childs.Any() == false);
-            var userItem = user as IUserItem;
+            var userItemFilter = new UserItemFilter() { HasParent = true, IsLeaf = true };
+            var userItem = await userContext.GetRandomUserItemAsync(typeof(IUserCategory), userItemFilter);
             var expectedUserItem = userItem;
             var actualUserItem = null as IUserItem;
             await userItem.Dispatcher.InvokeAsync(() =>

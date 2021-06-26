@@ -49,8 +49,13 @@ namespace JSSoft.Crema.Services.Test.Extensions
         public static async Task<Authentication> LoginRandomAsync(this TestContext context, Authority authority, Func<IUser, bool> predicate)
         {
             var authentications = context.Properties[authenticationKey] as HashSet<Authentication>;
+            var app = context.Properties[appKey] as TestApplication;
             var cremaHost = context.Properties[cremaHostKey] as ICremaHost;
-            var authentication = await cremaHost.LoginRandomAsync(authority, predicate);
+            var userFlags = AuthorityUtility.ToUserFlags(authority) | UserFlags.NotBanned | UserFlags.Offline;
+            var user = await app.PrepareUserAsync(userFlags, predicate);
+            var password = user.GetPassword();
+            var authenticationToken = await cremaHost.LoginAsync(user.ID, password);
+            var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
             authentications.Add(authentication);
             return authentication;
         }

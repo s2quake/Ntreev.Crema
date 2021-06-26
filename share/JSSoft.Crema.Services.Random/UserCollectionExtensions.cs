@@ -37,7 +37,7 @@ namespace JSSoft.Crema.Services.Random
 
         public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, Func<IUser, bool> predicate)
         {
-            return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(predicate));
+            return userCollection.Dispatcher.InvokeAsync(() => userCollection.RandomOrDefault(predicate));
         }
 
         public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, UserFlags userFlags)
@@ -47,7 +47,7 @@ namespace JSSoft.Crema.Services.Random
 
         public static Task<IUser> GetRandomUserAsync(this IUserCollection userCollection, UserFlags userFlags, Func<IUser, bool> predicate)
         {
-            return userCollection.Dispatcher.InvokeAsync(() => userCollection.Random(item => TestFlags(item, userFlags) == true && predicate(item) == true));
+            return userCollection.Dispatcher.InvokeAsync(() => userCollection.RandomOrDefault(item => TestFlags(item, userFlags) == true && predicate(item) == true));
         }
 
         public static Task<IUser[]> GetRandomUsersAsync(this IUserCollection userCollection)

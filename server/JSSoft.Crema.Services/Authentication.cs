@@ -249,7 +249,7 @@ namespace JSSoft.Crema.Services
 
         class SystemAuthenticationProvider : IAuthenticationProvider
         {
-            public AuthenticationType AuthenticationTypes => AuthenticationType.System;
+            public AuthenticationType AuthenticationTypes => AuthenticationType.System | AuthenticationType.Administrator;
 
             public string ID => Authentication.SystemID;
 
