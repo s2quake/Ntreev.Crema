@@ -36,7 +36,7 @@ using JSSoft.Library.IO;
 using JSSoft.Crema.Data;
 using JSSoft.Library;
 using System.Linq;
-using JSSoft.Crema.Random;
+using JSSoft.Crema.Services.Test.Filters;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -58,48 +58,48 @@ namespace JSSoft.Crema.Services.Test
             this.Dispose();
         }
 
-        public Task<IUser> PrepareUserAsync()
-        {
-            return PrepareUserAsync(UserFilter.Empty);
-        }
+        // public Task<IUser> PrepareUserAsync()
+        // {
+        //     return PrepareUserAsync(UserFilter.Empty);
+        // }
 
-        public Task<IUser> PrepareUserAsync(UserFlags userFlags)
-        {
-            return PrepareUserAsync(userFlags, item => true);
-        }
+        // public Task<IUser> PrepareUserAsync(UserFlags userFlags)
+        // {
+        //     return PrepareUserAsync(userFlags, item => true);
+        // }
 
-        public Task<IUser> PrepareUserAsync(UserFlags userFlags, Func<IUser, bool> predicate)
-        {
-            return PrepareUserAsync(new UserFilter(userFlags, predicate));
-        }
+        // public Task<IUser> PrepareUserAsync(UserFlags userFlags, Func<IUser, bool> predicate)
+        // {
+        //     return PrepareUserAsync(new UserFilter(userFlags, predicate));
+        // }
 
-        public Task<IUser> PrepareUserAsync(Func<IUser, bool> predicate)
-        {
-            return PrepareUserAsync(UserFlags.None, predicate);
-        }
+        // public Task<IUser> PrepareUserAsync(Func<IUser, bool> predicate)
+        // {
+        //     return PrepareUserAsync(UserFlags.None, predicate);
+        // }
 
-        public async Task<IUser> PrepareUserAsync(UserFilter filter)
-        {
-            var userCollection = this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
-            var userCategoryCollection = this.cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-            var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            var user = await userCollection.GetRandomUserAsync(filter.UserFlags, filter);
-            if (user is null)
-            {
-                var authority = GetAuthorities(filter.UserFlags).Random();
-                var userStates = SelectUserState(filter.UserFlags);
-                var banStates = SelectBanState(filter.UserFlags);
-                var category = await userCategoryCollection.GetRandomUserCategoryAsync();
-                var newUser = await category.GenerateUserAsync(Authentication.System, authority);
-                var password = newUser.GetPassword();
-                if (userStates.Any() == true && userStates.Random() == UserState.Online)
-                    await this.cremaHost.LoginAsync(newUser.ID, password);
-                if (banStates.Any() == true && banStates.Random() == true)
-                    await newUser.BanAsync(Authentication.System, RandomUtility.NextString());
-                return newUser;
-            }
-            return user;
-        }
+        // public async Task<IUser> PrepareUserAsync(UserFilter filter)
+        // {
+        //     var userCollection = this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+        //     var userCategoryCollection = this.cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+        //     var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+        //     var user = await userCollection.GetRandomUserAsync(filter.UserFlags, filter);
+        //     if (user is null)
+        //     {
+        //         var authority = GetAuthorities(filter.UserFlags).Random();
+        //         var userStates = SelectUserState(filter.UserFlags);
+        //         var banStates = SelectBanState(filter.UserFlags);
+        //         var category = await userCategoryCollection.GetRandomUserCategoryAsync();
+        //         var newUser = await category.GenerateUserAsync(Authentication.System, authority);
+        //         var password = newUser.GetPassword();
+        //         if (userStates.Any() == true && userStates.Random() == UserState.Online)
+        //             await this.cremaHost.LoginAsync(newUser.ID, password);
+        //         if (banStates.Any() == true && banStates.Random() == true)
+        //             await newUser.BanAsync(Authentication.System, RandomUtility.NextString());
+        //         return newUser;
+        //     }
+        //     return user;
+        // }
 
         public Task<IUserItem> PrepareUserItemAsync()
         {
@@ -160,7 +160,7 @@ namespace JSSoft.Crema.Services.Test
                 {
                     await category.GenerateUserAsync(Authentication.System);
                 }
-                if (filter.TargetToMove != null)
+                if (filter.CategoryToMove != null)
                 {
                     return await rootCategory.GenerateUserCategoryAsync(Authentication.System);
                 }

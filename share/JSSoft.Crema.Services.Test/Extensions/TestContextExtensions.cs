@@ -1,6 +1,5 @@
 ﻿using JSSoft.Crema.Data;
 using JSSoft.Crema.Data.Xml.Schema;
-using JSSoft.Crema.Random;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Extensions;
 using JSSoft.Crema.Services.Random;
@@ -14,6 +13,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using JSSoft.Crema.Services.Test.Filters;
 
 namespace JSSoft.Crema.Services.Test.Extensions
 {

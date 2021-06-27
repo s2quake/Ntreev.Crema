@@ -43,8 +43,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)UserCategoryExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserContextExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UserCategoryFilter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UserItemFilter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UserFilter.cs" />
   </ItemGroup>
 </Project>

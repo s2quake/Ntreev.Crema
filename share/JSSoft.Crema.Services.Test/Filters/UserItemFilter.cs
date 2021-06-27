@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace JSSoft.Crema.Random
+namespace JSSoft.Crema.Services.Test.Filters
 {
     public class UserItemFilter
     {
@@ -53,7 +53,7 @@ namespace JSSoft.Crema.Random
                 HasCategories = filter.HasChilds == true && s == true,
                 HasUsers = filter.HasChilds == true && s == true,
                 IsLeaf = filter.IsLeaf,
-                TargetToMove = filter.TargetToMove as IUserCategory,
+                CategoryToMove = filter.TargetToMove as IUserCategory,
                 ExcludedItems = filter.ExcludedItems,
                 Predicate = filter.Predicate != null ? (item) => filter.Predicate(item as IUserItem) : (item) => true,
             };

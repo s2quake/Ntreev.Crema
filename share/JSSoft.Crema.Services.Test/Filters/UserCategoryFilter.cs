@@ -1,11 +1,12 @@
 ﻿using JSSoft.Crema.Services;
 using JSSoft.Crema.Services.Extensions;
+using JSSoft.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace JSSoft.Crema.Random
+namespace JSSoft.Crema.Services.Test.Filters
 {
     public class UserCategoryFilter
     {
@@ -41,7 +42,9 @@ namespace JSSoft.Crema.Random
 
         public bool IsLeaf { get; set; }
 
-        public IUserCategory TargetToMove { get; set; }
+        public IUserCategory CategoryToMove { get; set; }
+
+        public IUser UserToMove { get; set; }
 
         public Func<IUserCategory, bool> Predicate { get; set; }
 
@@ -62,7 +65,9 @@ namespace JSSoft.Crema.Random
                 return false;
             if (this.IsLeaf == true && (userCategory.Categories.Any() == true || userCategory.Users.Any() == true))
                 return false;
-            if (this.TargetToMove != null && this.TargetToMove.CanMove(userCategory.Path) == false)
+            if (this.CategoryToMove != null && this.CategoryToMove.CanMove(userCategory.Path) == false)
+                return false;
+            if (this.UserToMove != null && CanMove(this.UserToMove, userCategory.Path) == false)
                 return false;
             if (this.ExcludedCategories != null && this.ExcludedCategories.Contains(userCategory) == true)
                 return false;
@@ -72,6 +77,15 @@ namespace JSSoft.Crema.Random
                 return false;
 
             return true;
+        }
+
+        private static bool CanMove(IUser user, string parentPath)
+        {
+            if (user.Path == parentPath)
+                return false;
+            if (NameValidator.VerifyCategoryPath(parentPath) == false)
+                return false;
+            return user.Path.StartsWith(parentPath) == false;
         }
     }
 }

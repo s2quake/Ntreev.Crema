@@ -33,7 +33,7 @@ using System.Linq;
 using JSSoft.Library;
 using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library.IO;
-using JSSoft.Crema.Random;
+using JSSoft.Crema.Services.Test.Filters;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -83,8 +83,9 @@ namespace JSSoft.Crema.Services.Test
         public async Task MoveAsync_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await userCollection.GetRandomUserAsync();
-            var userCategoryFilter = UserCategoryFilter.FromExcludedCategories(user.Category);
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
+            var userCategoryFilter = new UserCategoryFilter() { UserToMove = user };
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(userCategoryFilter);
             await user.MoveAsync(authentication, userCategory.Path);
         }
@@ -93,7 +94,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task MoveAsync_Arg0_Null_FailTestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             await user.MoveAsync(null, "/");
         }
 
@@ -102,7 +104,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task MoveAsync_Arg1_Null_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             await user.MoveAsync(authentication, null);
         }
 
@@ -111,7 +114,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task MoveAsync_Arg1_InvalidPath_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             var categoryPath = RandomUtility.NextInvalidCategoryPath();
             await user.MoveAsync(authentication, categoryPath);
         }
@@ -121,7 +125,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task MoveAsync_Arg1_NotExistsPath_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await app.PrepareUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             var userCategoryFilter = UserCategoryFilter.FromExcludedCategories(user.Category);
             var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
             var categoryPath = new CategoryName(userCategory.Path, RandomUtility.NextName());
@@ -132,7 +137,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task MoveAsync_Expired_FailTestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             await user.MoveAsync(expiredAuthentication, null);
         }
 
@@ -141,7 +147,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task MoveAsync_PermissionDenied_Member_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             var userCategoryFilter = UserCategoryFilter.FromExcludedCategories(user.Category);
             var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
             await user.MoveAsync(authentication, userCategory.Path);
@@ -152,7 +159,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task MoveAsync_PermissionDenied_Guest_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
-            var user = await app.PrepareUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             var userCategoryFilter = UserCategoryFilter.FromExcludedCategories(user.Category);
             var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
             await user.MoveAsync(authentication, userCategory.Path);
@@ -162,8 +170,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(Authentication.AdminID, authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Offline, userFilter);
+            var userFilter = new UserFilter(UserFlags.Offline) { ExcludedUserIDs = new[] { Authentication.AdminID, authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             await user.DeleteAsync(authentication);
         }
 
@@ -171,7 +179,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task DeleteAsync_Arg0_Null_FailTestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             await user.DeleteAsync(null);
         }
 
@@ -179,7 +188,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task DeleteAsync_Expired_FailTestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             await user.DeleteAsync(expiredAuthentication);
         }
 
@@ -197,7 +207,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_PermissionDenied_Member_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             await user.DeleteAsync(authentication);
         }
 
@@ -206,7 +217,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_PermissionDenied_Guest_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             await user.DeleteAsync(authentication);
         }
 
@@ -215,8 +227,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_Online_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(Authentication.AdminID, authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Online, userFilter);
+            var userFilter = new UserFilter(UserFlags.Online) { ExcludedUserIDs = new[] { Authentication.AdminID, authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             await user.DeleteAsync(authentication);
         }
 
@@ -301,8 +313,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task SetUserNameAsync_OtherUser_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
-            var userFilter = UserFilter.FromExcludedUserIDs(Authentication.AdminID, authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Online, userFilter);
+            var userFilter = new UserFilter(UserFlags.Online) { ExcludedUserIDs = new[] { Authentication.AdminID, authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             var password = user.GetPassword();
             var userName = RandomUtility.NextName();
             await user.SetUserNameAsync(authentication, password, userName);
@@ -403,8 +415,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task ResetPasswordAsync_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(userFilter);
+            var userFilter = new UserFilter() { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             await user.ResetPasswordAsync(authentication);
         }
 
@@ -413,8 +425,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task ResetPasswordAsync_Arg0_Null_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(userFilter);
+            var userFilter = new UserFilter() { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             await user.ResetPasswordAsync(null);
         }
 
@@ -423,8 +435,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task ResetPasswordAsync_Expired_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(userFilter);
+            var userFilter = new UserFilter() { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             await user.ResetPasswordAsync(expiredAuthentication);
         }
 
@@ -432,7 +444,7 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(PermissionDeniedException))]
         public async Task ResetPasswordAsync_Admin_FailTestAsync()
         {
-            var authenticationFilter = UserFilter.FromExcludedUserIDs(Authentication.AdminID);
+            var authenticationFilter = new UserFilter() { ExcludedUserIDs = new[] { Authentication.AdminID } };
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin, authenticationFilter);
             var user = await userCollection.GetUserAsync(Authentication.AdminID);
             await user.ResetPasswordAsync(authentication);
@@ -442,8 +454,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task SendMessageAsync_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Online, userFilter);
+            var userFilter = new UserFilter(UserFlags.Online) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             var message = RandomUtility.NextString();
             await user.SendMessageAsync(authentication, message);
         }
@@ -453,8 +465,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task SendMessageAsync_Arg0_Null_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(userFilter);
+            var userFilter = new UserFilter() { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             var message = RandomUtility.NextString();
             await user.SendMessageAsync(null, message);
         }
@@ -464,8 +476,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task SendMessageAsync_Arg1_Null_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(userFilter);
+            var userFilter = new UserFilter() { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             await user.SendMessageAsync(authentication, null);
         }
 
@@ -474,8 +486,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task SendMessageAsync_Arg1_Empty_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(userFilter);
+            var userFilter = new UserFilter() { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             await user.SendMessageAsync(authentication, string.Empty);
         }
 
@@ -484,8 +496,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task SendMessageAsync_Expired_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(userFilter);
+            var userFilter = new UserFilter() { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             await user.SendMessageAsync(expiredAuthentication, null);
         }
 
@@ -494,8 +506,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task SendMessageAsync_Offline_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(userFilter);
+            var userFilter = new UserFilter() { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             var message = RandomUtility.NextString();
             await user.SendMessageAsync(authentication, message);
         }
@@ -504,8 +516,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task KickAsync_Admin_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Admin | UserFlags.Online, userFilter);
+            var userFilter = new UserFilter(UserFlags.Admin | UserFlags.Online) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             var message = RandomUtility.NextString();
             await user.KickAsync(authentication, message);
         }
@@ -514,8 +526,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task KickAsync_Member_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Member | UserFlags.Online, userFilter);
+            var userFilter = new UserFilter(UserFlags.Member | UserFlags.Online) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             var message = RandomUtility.NextString();
             await user.KickAsync(authentication, message);
         }
@@ -524,8 +536,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task KickAsync_Guest_TestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Guest | UserFlags.Online, userFilter);
+            var userFilter = new UserFilter(UserFlags.Guest | UserFlags.Online) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             var message = RandomUtility.NextString();
             await user.KickAsync(authentication, message);
         }
@@ -535,8 +547,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task KickAsync_Arg0_Null_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Online, userFilter);
+            var userFilter = new UserFilter(UserFlags.Online) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             var message = RandomUtility.NextString();
             await user.KickAsync(null, message);
         }
@@ -546,8 +558,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task KickAsync_Arg1_Null_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Online, userFilter);
+            var userFilter = new UserFilter(UserFlags.Online) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             await user.KickAsync(authentication, null);
         }
 
@@ -556,8 +568,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task KickAsync_Arg1_Empty_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Online, userFilter);
+            var userFilter = new UserFilter(UserFlags.Online) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             await user.KickAsync(authentication, string.Empty);
         }
 
@@ -566,8 +578,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task KickAsync_Expired_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Online, userFilter);
+            var userFilter = new UserFilter(UserFlags.Online) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             var message = RandomUtility.NextString();
             await user.KickAsync(expiredAuthentication, message);
         }
@@ -577,8 +589,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task KickAsync_PermissionDenied_Member_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Member);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Online, userFilter);
+            var userFilter = new UserFilter(UserFlags.Online) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             var message = RandomUtility.NextString();
             await user.KickAsync(authentication, message);
         }
@@ -588,8 +600,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task KickAsync_PermissionDenied_Guest_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Guest);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Online, userFilter);
+            var userFilter = new UserFilter(UserFlags.Online) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             var message = RandomUtility.NextString();
             await user.KickAsync(authentication, message);
         }
@@ -599,8 +611,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task KickAsync_Offline_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Offline, userFilter);
+            var userFilter = new UserFilter(UserFlags.Offline) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             var message = RandomUtility.NextString();
             await user.KickAsync(authentication, message);
         }
@@ -620,8 +632,8 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Member | UserFlags.Online | UserFlags.NotBanned, userFilter);
+            var userFilter = new UserFilter(UserFlags.Member | UserFlags.Online | UserFlags.NotBanned) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             await user.BanAsync(authentication, message);
             Assert.AreEqual(UserState.None, user.UserState);
             Assert.AreNotEqual(string.Empty, user.BanInfo.Path);
@@ -632,8 +644,8 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Member | UserFlags.NotBanned, userFilter);
+            var userFilter = new UserFilter(UserFlags.Member | UserFlags.NotBanned) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             await user.BanAsync(authentication, message);
             Assert.AreEqual(UserState.None, user.UserState);
             Assert.AreNotEqual(string.Empty, user.BanInfo.Path);
@@ -644,8 +656,8 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Guest | UserFlags.Online | UserFlags.NotBanned, userFilter);
+            var userFilter = new UserFilter(UserFlags.Guest | UserFlags.Online | UserFlags.NotBanned) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             await user.BanAsync(authentication, message);
             Assert.AreEqual(UserState.None, user.UserState);
             Assert.AreNotEqual(string.Empty, user.BanInfo.Path);
@@ -656,8 +668,8 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Guest | UserFlags.NotBanned, userFilter);
+            var userFilter = new UserFilter(UserFlags.Guest | UserFlags.NotBanned) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             await user.BanAsync(authentication, message);
             Assert.AreEqual(UserState.None, user.UserState);
             Assert.AreNotEqual(string.Empty, user.BanInfo.Path);
@@ -668,7 +680,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task BanAsync_Arg0_Null_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await app.PrepareUserAsync(UserFlags.Member);
+            var userFilter = new UserFilter(UserFlags.Member);
+            var user = await app.PrepareUserAsync(userFilter);
             var message = RandomUtility.NextString();
             await user.BanAsync(null, message);
         }
@@ -678,7 +691,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task BanAsync_Arg1_Null_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await app.PrepareUserAsync(UserFlags.Member);
+            var userFilter = new UserFilter(UserFlags.Member);
+            var user = await app.PrepareUserAsync(userFilter);
             await user.BanAsync(authentication, null);
         }
 
@@ -687,7 +701,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task BanAsync_Arg1_Empty_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await app.PrepareUserAsync(UserFlags.Member);
+            var userFilter = new UserFilter(UserFlags.Member);
+            var user = await app.PrepareUserAsync(userFilter);
             await user.BanAsync(authentication, string.Empty);
         }
 
@@ -695,7 +710,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task BanAsync_Expired_FailTestAsync()
         {
-            var user = await app.PrepareUserAsync(UserFlags.Member);
+            var userFilter = new UserFilter(UserFlags.Member);
+            var user = await app.PrepareUserAsync(userFilter);
             var message = RandomUtility.NextString();
             await user.BanAsync(expiredAuthentication, message);
         }
@@ -706,7 +722,8 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var message = RandomUtility.NextString();
-            var user = await app.PrepareUserAsync(UserFlags.Member | UserFlags.Guest | UserFlags.NotBanned);
+            var userFilter = new UserFilter(UserFlags.Member | UserFlags.Guest | UserFlags.NotBanned);
+            var user = await app.PrepareUserAsync(userFilter);
             await user.BanAsync(authentication, message);
             await user.BanAsync(authentication, message);
         }
@@ -716,8 +733,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task BanAsync_PermissionDenied_Admin_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Admin, userFilter);
+            var userFilter = new UserFilter(UserFlags.Admin) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             var message = RandomUtility.NextString();
             await user.BanAsync(authentication, message);
         }
@@ -727,8 +744,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task BanAsync_PermissionDenied_MemberAuthentication_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Member | UserFlags.Guest, userFilter);
+            var userFilter = new UserFilter(UserFlags.Member | UserFlags.Guest) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             var message = RandomUtility.NextString();
             await user.BanAsync(authentication, message);
         }
@@ -738,8 +755,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task BanAsync_PermissionDenied_GuestAuthentication_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Member | UserFlags.Guest, userFilter);
+            var userFilter = new UserFilter(UserFlags.Member | UserFlags.Guest) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             var message = RandomUtility.NextString();
             await user.BanAsync(authentication, message);
         }
@@ -748,8 +765,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task UnbanAsync_Member_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Member | UserFlags.Banned, userFilter);
+            var userFilter = new UserFilter(UserFlags.Member | UserFlags.Banned) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             await user.UnbanAsync(authentication);
             Assert.AreEqual(string.Empty, user.BanInfo.Path);
         }
@@ -758,8 +775,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task UnbanAsync_Guest_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Guest | UserFlags.Banned, userFilter);
+            var userFilter = new UserFilter(UserFlags.Guest | UserFlags.Banned) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             await user.UnbanAsync(authentication);
             Assert.AreEqual(string.Empty, user.BanInfo.Path);
         }
@@ -785,8 +802,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task UnbanAsync_Member_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
-            var userFilter = UserFilter.FromExcludedUserIDs(authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Member, userFilter);
+            var userFilter = new UserFilter(UserFlags.Member) { ExcludedUserIDs = new[] { authentication.ID } };
+            var user = await app.PrepareUserAsync(userFilter);
             await user.UnbanAsync(authentication);
         }
 
@@ -795,7 +812,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task UnbanAsync_Guest_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
-            var user = await app.PrepareUserAsync(UserFlags.Member);
+            var userFilter = new UserFilter(UserFlags.Member);
+            var user = await app.PrepareUserAsync(userFilter);
             await user.UnbanAsync(authentication);
         }
 
@@ -804,7 +822,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task UnbanAsync_Unbanned_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await app.PrepareUserAsync(UserFlags.Member | UserFlags.NotBanned);
+            var userFilter = new UserFilter(UserFlags.Member | UserFlags.NotBanned);
+            var user = await app.PrepareUserAsync(userFilter);
             await user.UnbanAsync(authentication);
         }
 
@@ -875,7 +894,8 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task Renamed_TestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             await user.Dispatcher.InvokeAsync(() =>
             {
                 user.Renamed += User_Renamed;
@@ -892,7 +912,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task Renamed_FailTestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             user.Renamed += (s, e) => { };
         }
 
@@ -900,7 +921,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task Moved_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             var oldCategory = user.Category;
             var categoryFilter = UserCategoryFilter.FromExcludedCategories(user.Category);
             var category = await userCategoryCollection.GetRandomUserCategoryAsync(categoryFilter);
@@ -929,7 +951,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task Moved_FailTestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             user.Moved += (s, e) => { };
         }
 
@@ -963,7 +986,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task Deleted_FailTestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             user.Deleted += (s, e) => { };
         }
 
@@ -1002,14 +1026,16 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task UserInfoChanged_FailTestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             user.UserInfoChanged += (s, e) => { };
         }
 
         [TestMethod]
         public async Task UserStateChanged_TestAsync()
         {
-            var user = await app.PrepareUserAsync(UserFlags.Offline | UserFlags.NotBanned);
+            var userFilter = new UserFilter(UserFlags.Offline | UserFlags.NotBanned);
+            var user = await app.PrepareUserAsync(userFilter);
             var actualUserState = UserState.None;
             var expectedUserState = UserState.Online;
             await user.Dispatcher.InvokeAsync(() =>
@@ -1038,7 +1064,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task UserStateChanged_FailTestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             user.UserStateChanged += (s, e) => { };
         }
 
@@ -1046,7 +1073,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task UserBanInfoChanged_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await app.PrepareUserAsync(UserFlags.Offline | UserFlags.NotBanned | UserFlags.Member | UserFlags.Guest);
+            var userFilter = new UserFilter(UserFlags.Offline | UserFlags.NotBanned | UserFlags.Member | UserFlags.Guest);
+            var user = await app.PrepareUserAsync(userFilter);
             var actualPath = string.Empty;
             var actualComment = string.Empty;
             var expectedPath = user.Path;
@@ -1080,7 +1108,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task UserBanInfoChanged_FailTestAsync()
         {
-            var user = await userCollection.GetRandomUserAsync();
+            var userFilter = UserFilter.Empty;
+            var user = await userFilter.GetUserAsync(app);
             user.UserBanInfoChanged += (s, e) => { };
         }
     }
