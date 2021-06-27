@@ -13,7 +13,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
-using JSSoft.Crema.Services.Test.Filters;
+using JSSoft.Crema.Services.Test.Extensions.Filters;
 
 namespace JSSoft.Crema.Services.Test.Extensions
 {

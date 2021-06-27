@@ -34,6 +34,7 @@ using System.Text;
 using JSSoft.Crema.Services.Test.Extensions;
 using JSSoft.Crema.Services.Extensions;
 using System.Threading;
+using JSSoft.Crema.Services.Test.Extensions.Filters;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -162,7 +163,8 @@ namespace JSSoft.Crema.Services.Test
         {
             token = await cremaHost.OpenAsync();
             var userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
-            var user = await userCollection.GetRandomUserAsync(item => item.BanInfo.IsBanned == true);
+            var userFilter = new UserFilter(UserFlags.Banned | UserFlags.Member | UserFlags.Guest);
+            var user = await userFilter.GetUserAsync(app);
             var password = user.GetPassword();
             await cremaHost.LoginAsync(user.ID, password);
         }

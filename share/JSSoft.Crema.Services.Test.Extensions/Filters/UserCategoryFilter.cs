@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JSSoft.Crema.Services.Test.Filters
+namespace JSSoft.Crema.Services.Test.Extensions.Filters
 {
     public class UserCategoryFilter
     {

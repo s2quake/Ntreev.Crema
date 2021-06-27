@@ -1,6 +1,7 @@
 ﻿using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Extensions;
 using JSSoft.Crema.Services.Random;
+using JSSoft.Crema.Services.Test.Extensions.Filters;
 using JSSoft.Library;
 using JSSoft.Library.Random;
 using System;
@@ -42,7 +43,9 @@ namespace JSSoft.Crema.Services.Test.Extensions
         {
             if (cremaHost.GetService(typeof(IUserCollection)) is IUserCollection userCollection)
             {
-                var user = await userCollection.GetRandomUserAsync(Test);
+                var userFlags = AuthorityUtility.ToUserFlags(authority) | UserFlags.Offline | UserFlags.NotBanned;
+                var userFilter = new UserFilter(userFlags);
+                var user = await userFilter.GetUserAsync(cremaHost);
                 var name = user.ID;
                 var password = user.GetPassword();
                 var token = await cremaHost.LoginAsync(name, password);

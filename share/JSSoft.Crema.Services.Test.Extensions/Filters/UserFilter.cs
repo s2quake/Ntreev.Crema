@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JSSoft.Crema.Services.Test.Filters
+namespace JSSoft.Crema.Services.Test.Extensions.Filters
 {
     public class UserFilter
     {
@@ -32,9 +32,9 @@ namespace JSSoft.Crema.Services.Test.Filters
         {
             var userFlags = this.UserFlags;
             var cremaHost = serviceProvider.GetService(typeof(ICremaHost)) as ICremaHost;
-            var userCollection = serviceProvider.GetService(typeof(IUserCollection)) as IUserCollection;
-            var userCategoryCollection = serviceProvider.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-            var userContext = serviceProvider.GetService(typeof(IUserContext)) as IUserContext;
+            var userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            var userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
             var user = await userCollection.GetRandomUserAsync(userFlags, this);
             if (user is null)
             {

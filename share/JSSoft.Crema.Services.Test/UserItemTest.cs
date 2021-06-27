@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JSSoft.Library;
 using JSSoft.Crema.Services.Extensions;
-using JSSoft.Crema.Services.Test.Filters;
+using JSSoft.Crema.Services.Test.Extensions.Filters;
 
 namespace JSSoft.Crema.Services.Test
 {

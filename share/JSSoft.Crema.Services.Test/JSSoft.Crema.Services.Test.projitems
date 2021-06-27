@@ -9,9 +9,6 @@
     <Import_RootNamespace>JSSoft.Crema.Services.Test</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Filters\UserCategoryFilter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Filters\UserFilter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Filters\UserItemFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CreationTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaHostTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBaseContextTest.cs" />
