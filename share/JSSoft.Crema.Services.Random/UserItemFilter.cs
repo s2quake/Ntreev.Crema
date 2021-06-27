@@ -1,4 +1,5 @@
 ﻿using JSSoft.Crema.Services;
+using JSSoft.Library.ObjectModel;
 using JSSoft.Library.Random;
 using System;
 using System.Collections.Generic;
@@ -59,6 +60,16 @@ namespace JSSoft.Crema.Random
             return userCategoryFilter;
         }
 
+        public static implicit operator UserFilter(UserItemFilter filter)
+        {
+            var userFilter = new UserFilter
+            {
+                ExcludedUserIDs = filter.ExcludedItems != null ? filter.ExcludedItems.Where(item => item is IUser).Select(item => (item as IUser).ID).ToArray() : null,
+                Predicate = filter.Predicate != null ? (item) => filter.Predicate(item as IUserItem) : (item) => true,
+            };
+            return userFilter;
+        }
+
         private bool PredicateFunc(IUserItem userItem)
         {
             if (this.Type != null && this.Type.IsAssignableFrom(userItem.GetType()) == false)
@@ -82,6 +93,8 @@ namespace JSSoft.Crema.Random
         private static bool CanMove(IUserItem userItem, string parentPath)
         {
             if (userItem.Path == parentPath)
+                return false;
+            if (NameValidator.VerifyCategoryPath(parentPath) == false)
                 return false;
             return userItem.Path.StartsWith(parentPath) == false;
         }

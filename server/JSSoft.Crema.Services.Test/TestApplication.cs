@@ -111,11 +111,6 @@ namespace JSSoft.Crema.Services.Test
             return PrepareUserItemAsync(new UserItemFilter(type));
         }
 
-        public Task<IUserItem> PrepareUserItemAsync(Type type, Func<IUserItem, bool> predicate)
-        {
-            return PrepareUserItemAsync(new UserItemFilter(type, predicate));
-        }
-
         public async Task<IUserItem> PrepareUserItemAsync(UserItemFilter filter)
         {
             var userCollection = this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
@@ -125,13 +120,13 @@ namespace JSSoft.Crema.Services.Test
             if (userItem is null)
             {
                 var s = RandomUtility.Within(50);
-                if (filter.Type == typeof(IUser) || s == true)
+                if (filter.Type == typeof(IUser) || (filter.Type == null && s == true))
                 {
                     var category = await userCategoryCollection.GetRandomUserCategoryAsync();
                     var user = await category.GenerateUserAsync(Authentication.System);
                     userItem = user as IUserItem;
                 }
-                else if (filter.Type == typeof(IUserCategory) || s == false)
+                else if (filter.Type == typeof(IUserCategory) || (filter.Type == null && s == false))
                 {
                     var category = await PrepareUserCategoryAsync(filter);
                     userItem = category as IUserItem;
@@ -151,6 +146,7 @@ namespace JSSoft.Crema.Services.Test
             var userCategoryCollection = this.cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
             var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(filter);
+            var rootCategory = userCategoryCollection.Root;
             if (userCategory is null)
             {
                 var parent = await userCategoryCollection.GetRandomUserCategoryAsync();
@@ -166,7 +162,7 @@ namespace JSSoft.Crema.Services.Test
                 }
                 if (filter.TargetToMove != null)
                 {
-                    return userCategoryCollection.Root;
+                    return await rootCategory.GenerateUserCategoryAsync(Authentication.System);
                 }
                 return category;
             }
