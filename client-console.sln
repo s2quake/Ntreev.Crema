@@ -94,7 +94,7 @@ Global
 		share\JSSoft.Crema.Commands\JSSoft.Crema.Commands.projitems*{3d3128aa-908d-44c4-9efd-0e1a903f5287}*SharedItemsImports = 13
 		share\JSSoft.Crema.ServiceHosts.Users\JSSoft.Crema.ServiceHosts.Users.projitems*{4e857c1f-3ca7-45b7-9b3f-2af6d49071b2}*SharedItemsImports = 13
 		share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
-		share\JSSoft.Crema.Services.Test.Extensions\JSSoft.Crema.Services.Test.Extensions.projitems*{7d108432-b052-4c05-bd09-1cd0b1ec1a5a}*SharedItemsImports = 5
+		share\JSSoft.Crema.Services.Test.Common\JSSoft.Crema.Services.Test.Common.projitems*{7d108432-b052-4c05-bd09-1cd0b1ec1a5a}*SharedItemsImports = 5
 		share\JSSoft.Crema.Services.Test\JSSoft.Crema.Services.Test.projitems*{7d108432-b052-4c05-bd09-1cd0b1ec1a5a}*SharedItemsImports = 5
 		share\JSSoft.Crema.Services.Extensions\JSSoft.Crema.Services.Extensions.projitems*{97ad6c00-3b71-4e83-97c3-0201bc035471}*SharedItemsImports = 13
 		share\JSSoft.Crema.Bot\JSSoft.Crema.Bot.projitems*{9ff36c2b-7320-4b32-9110-0567b3c71707}*SharedItemsImports = 5

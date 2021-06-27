@@ -29,7 +29,7 @@ using JSSoft.Crema.Services.Users.Serializations;
 using System.Collections.Generic;
 using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library.Random;
-using JSSoft.Crema.Services.Test.Extensions;
+using JSSoft.Crema.Services.Test.Common;
 using JSSoft.Crema.Services.Random;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSSoft.Library.IO;

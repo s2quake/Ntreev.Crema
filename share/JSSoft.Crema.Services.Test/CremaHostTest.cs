@@ -31,10 +31,10 @@ using JSSoft.Crema.Services.Random;
 using JSSoft.Crema.ServiceModel;
 using System.Threading.Tasks;
 using System.Text;
-using JSSoft.Crema.Services.Test.Extensions;
+using JSSoft.Crema.Services.Test.Common;
 using JSSoft.Crema.Services.Extensions;
 using System.Threading;
-using JSSoft.Crema.Services.Test.Extensions.Filters;
+using JSSoft.Crema.Services.Test.Common.Extensions;
 
 namespace JSSoft.Crema.Services.Test
 {

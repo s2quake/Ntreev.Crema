@@ -15,7 +15,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace JSSoft.Crema.Services.Test.Extensions
+namespace JSSoft.Crema.Services.Test.Common
 {
     static class UserInfoGenerator
     {

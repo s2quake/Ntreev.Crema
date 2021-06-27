@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>cccee1c2-7f96-413d-ad38-4a550f5db251</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>JSSoft.Crema.Services.Test.Common</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\AuthorityExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\CremaHostExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DataBaseContextExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DataBaseExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableCategoryExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableContextExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeCategoryExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeContextExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\UserCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\UserExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AuthorityUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserCategoryFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserInfoGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserItemFilter.cs" />
+  </ItemGroup>
+</Project>

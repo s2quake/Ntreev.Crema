@@ -3,6 +3,7 @@ using JSSoft.Crema.Data.Xml.Schema;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Extensions;
 using JSSoft.Crema.Services.Random;
+using JSSoft.Crema.Services.Test.Common.Extensions;
 using JSSoft.Library;
 using JSSoft.Library.Linq;
 using JSSoft.Library.Random;
@@ -13,9 +14,8 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
-using JSSoft.Crema.Services.Test.Extensions.Filters;
 
-namespace JSSoft.Crema.Services.Test.Extensions
+namespace JSSoft.Crema.Services.Test.Common
 {
     static class TestContextExtensions
     {

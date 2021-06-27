@@ -1,7 +1,6 @@
 ﻿using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Extensions;
 using JSSoft.Crema.Services.Random;
-using JSSoft.Crema.Services.Test.Extensions.Filters;
 using JSSoft.Library;
 using JSSoft.Library.Random;
 using System;
@@ -10,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JSSoft.Crema.Services.Test.Extensions
+namespace JSSoft.Crema.Services.Test.Common.Extensions
 {
     static partial class CremaHostExtensions
     {

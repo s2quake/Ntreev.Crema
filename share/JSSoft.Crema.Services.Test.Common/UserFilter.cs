@@ -1,7 +1,8 @@
 ﻿using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
 using JSSoft.Crema.Services.Random;
-using JSSoft.Crema.Services.Test.Extensions;
+using JSSoft.Crema.Services.Test.Common;
+using JSSoft.Crema.Services.Test.Common.Extensions;
 using JSSoft.Library.Random;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JSSoft.Crema.Services.Test.Extensions.Filters
+namespace JSSoft.Crema.Services.Test.Common
 {
     public class UserFilter
     {

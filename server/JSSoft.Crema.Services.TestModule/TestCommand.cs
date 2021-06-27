@@ -32,7 +32,7 @@ using JSSoft.Crema.ConsoleHost;
 using System;
 using JSSoft.Crema.Services.TestModule.TestCommands;
 using JSSoft.Library.IO;
-using JSSoft.Crema.Services.Test.Extensions;
+using JSSoft.Crema.Services.Test.Common;
 using JSSoft.Library.Random;
 using System.IO;
 using System.Text;

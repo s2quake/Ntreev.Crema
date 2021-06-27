@@ -24,7 +24,7 @@ using JSSoft.Library.Random;
 using System.Threading.Tasks;
 using JSSoft.Crema.Services.Random;
 using JSSoft.Library.ObjectModel;
-using JSSoft.Crema.Services.Test.Extensions;
+using JSSoft.Crema.Services.Test.Common;
 using JSSoft.Crema.ServiceModel;
 using System;
 using System.Collections;
@@ -33,7 +33,6 @@ using System.Linq;
 using JSSoft.Library;
 using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library.IO;
-using JSSoft.Crema.Services.Test.Extensions.Filters;
 
 namespace JSSoft.Crema.Services.Test
 {

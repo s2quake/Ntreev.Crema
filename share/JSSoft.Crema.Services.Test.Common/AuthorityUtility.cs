@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JSSoft.Crema.Services.Test.Extensions
+namespace JSSoft.Crema.Services.Test.Common
 {
     public static class AuthorityUtility
     {

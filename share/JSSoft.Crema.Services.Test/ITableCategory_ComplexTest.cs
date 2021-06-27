@@ -24,7 +24,7 @@ using JSSoft.Library.Random;
 using System.Threading.Tasks;
 using JSSoft.Crema.Services.Random;
 using JSSoft.Library.ObjectModel;
-using JSSoft.Crema.Services.Test.Extensions;
+using JSSoft.Crema.Services.Test.Common;
 using JSSoft.Crema.ServiceModel;
 
 namespace JSSoft.Crema.Services.Test

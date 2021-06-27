@@ -28,8 +28,9 @@ using System;
 using System.Collections.Generic;
 using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library.Random;
-using JSSoft.Crema.Services.Test.Extensions;
+using JSSoft.Crema.Services.Test.Common;
 using JSSoft.Crema.Services.Random;
+using JSSoft.Crema.Services.Test.Common.Extensions;
 
 namespace JSSoft.Crema.Services.Test
 {
