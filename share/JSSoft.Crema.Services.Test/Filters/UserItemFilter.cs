@@ -1,10 +1,12 @@
 ﻿using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Random;
 using JSSoft.Library.ObjectModel;
 using JSSoft.Library.Random;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test.Filters
 {
@@ -23,6 +25,31 @@ namespace JSSoft.Crema.Services.Test.Filters
         {
             this.Type = type;
             this.Predicate = predicate;
+        }
+        public async Task<IUserItem> GetUserItemAsync(IServiceProvider serviceProvider)
+        {
+            var cremaHost = serviceProvider.GetService(typeof(ICremaHost)) as ICremaHost;
+            var userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            var userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            var userItem = await userContext.GetRandomUserItemAsync(this);
+            if (userItem is null)
+            {
+                var s = RandomUtility.Within(50);
+                if (this.Type == typeof(IUser) || (this.Type == null && s == true))
+                {
+                    var category = await userCategoryCollection.GetRandomUserCategoryAsync();
+                    var user = await category.GenerateUserAsync(Authentication.System);
+                    userItem = user as IUserItem;
+                }
+                else if (this.Type == typeof(IUserCategory) || (this.Type == null && s == false))
+                {
+                    var categoryFilter = (UserCategoryFilter)this;
+                    var category = await categoryFilter.GetUserCategoryAsync(serviceProvider);
+                    userItem = category as IUserItem;
+                }
+            }
+            return userItem;
         }
 
         public Type Type { get; set; }

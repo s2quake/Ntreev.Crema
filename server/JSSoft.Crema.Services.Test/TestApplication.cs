@@ -101,73 +101,73 @@ namespace JSSoft.Crema.Services.Test
         //     return user;
         // }
 
-        public Task<IUserItem> PrepareUserItemAsync()
-        {
-            return PrepareUserItemAsync(new UserItemFilter());
-        }
+        // public Task<IUserItem> PrepareUserItemAsync()
+        // {
+        //     return PrepareUserItemAsync(new UserItemFilter());
+        // }
 
-        public Task<IUserItem> PrepareUserItemAsync(Type type)
-        {
-            return PrepareUserItemAsync(new UserItemFilter(type));
-        }
+        // public Task<IUserItem> PrepareUserItemAsync(Type type)
+        // {
+        //     return PrepareUserItemAsync(new UserItemFilter(type));
+        // }
 
-        public async Task<IUserItem> PrepareUserItemAsync(UserItemFilter filter)
-        {
-            var userCollection = this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
-            var userCategoryCollection = this.cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-            var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            var userItem = await userContext.GetRandomUserItemAsync(filter);
-            if (userItem is null)
-            {
-                var s = RandomUtility.Within(50);
-                if (filter.Type == typeof(IUser) || (filter.Type == null && s == true))
-                {
-                    var category = await userCategoryCollection.GetRandomUserCategoryAsync();
-                    var user = await category.GenerateUserAsync(Authentication.System);
-                    userItem = user as IUserItem;
-                }
-                else if (filter.Type == typeof(IUserCategory) || (filter.Type == null && s == false))
-                {
-                    var category = await PrepareUserCategoryAsync(filter);
-                    userItem = category as IUserItem;
-                }
-            }
-            return userItem;
-        }
+        // public async Task<IUserItem> PrepareUserItemAsync(UserItemFilter filter)
+        // {
+        //     var userCollection = this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+        //     var userCategoryCollection = this.cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+        //     var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+        //     var userItem = await userContext.GetRandomUserItemAsync(filter);
+        //     if (userItem is null)
+        //     {
+        //         var s = RandomUtility.Within(50);
+        //         if (filter.Type == typeof(IUser) || (filter.Type == null && s == true))
+        //         {
+        //             var category = await userCategoryCollection.GetRandomUserCategoryAsync();
+        //             var user = await category.GenerateUserAsync(Authentication.System);
+        //             userItem = user as IUserItem;
+        //         }
+        //         else if (filter.Type == typeof(IUserCategory) || (filter.Type == null && s == false))
+        //         {
+        //             var category = await PrepareUserCategoryAsync(filter);
+        //             userItem = category as IUserItem;
+        //         }
+        //     }
+        //     return userItem;
+        // }
 
-        public Task<IUserCategory> PrepareUserCategoryAsync()
-        {
-            return PrepareUserCategoryAsync(UserCategoryFilter.Empty);
-        }
+        // public Task<IUserCategory> PrepareUserCategoryAsync()
+        // {
+        //     return PrepareUserCategoryAsync(UserCategoryFilter.Empty);
+        // }
 
-        public async Task<IUserCategory> PrepareUserCategoryAsync(UserCategoryFilter filter)
-        {
-            var userCollection = this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
-            var userCategoryCollection = this.cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-            var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(filter);
-            var rootCategory = userCategoryCollection.Root;
-            if (userCategory is null)
-            {
-                var parent = await userCategoryCollection.GetRandomUserCategoryAsync();
-                var name = await parent.GenerateNewCategoryNameAsync();
-                var category = await parent.AddNewCategoryAsync(Authentication.System, name);
-                if (filter.HasCategories == true)
-                {
-                    await category.GenerateUserCategoryAsync(Authentication.System);
-                }
-                if (filter.HasUsers == true)
-                {
-                    await category.GenerateUserAsync(Authentication.System);
-                }
-                if (filter.CategoryToMove != null)
-                {
-                    return await rootCategory.GenerateUserCategoryAsync(Authentication.System);
-                }
-                return category;
-            }
-            return userCategory;
-        }
+        // public async Task<IUserCategory> PrepareUserCategoryAsync(UserCategoryFilter filter)
+        // {
+        //     var userCollection = this.cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+        //     var userCategoryCollection = this.cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+        //     var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+        //     var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(filter);
+        //     var rootCategory = userCategoryCollection.Root;
+        //     if (userCategory is null)
+        //     {
+        //         var parent = await userCategoryCollection.GetRandomUserCategoryAsync();
+        //         var name = await parent.GenerateNewCategoryNameAsync();
+        //         var category = await parent.AddNewCategoryAsync(Authentication.System, name);
+        //         if (filter.HasCategories == true)
+        //         {
+        //             await category.GenerateUserCategoryAsync(Authentication.System);
+        //         }
+        //         if (filter.HasUsers == true)
+        //         {
+        //             await category.GenerateUserAsync(Authentication.System);
+        //         }
+        //         if (filter.CategoryToMove != null)
+        //         {
+        //             return await rootCategory.GenerateUserCategoryAsync(Authentication.System);
+        //         }
+        //         return category;
+        //     }
+        //     return userCategory;
+        // }
 
         private static UserState[] SelectUserState(UserFlags userFlags)
         {

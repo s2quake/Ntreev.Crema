@@ -1,10 +1,12 @@
 ﻿using JSSoft.Crema.Services;
 using JSSoft.Crema.Services.Extensions;
+using JSSoft.Crema.Services.Random;
 using JSSoft.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Test.Filters
 {
@@ -12,6 +14,36 @@ namespace JSSoft.Crema.Services.Test.Filters
     {
         public UserCategoryFilter()
         {
+        }
+
+        public async Task<IUserCategory> GetUserCategoryAsync(IServiceProvider serviceProvider)
+        {
+            var cremaHost = serviceProvider.GetService(typeof(ICremaHost)) as ICremaHost;
+            var userCollection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+            var userCategoryCollection = cremaHost.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(this);
+            var rootCategory = userCategoryCollection.Root;
+            if (userCategory is null)
+            {
+                var parent = await userCategoryCollection.GetRandomUserCategoryAsync();
+                var name = await parent.GenerateNewCategoryNameAsync();
+                var category = await parent.AddNewCategoryAsync(Authentication.System, name);
+                if (this.HasCategories == true)
+                {
+                    await category.GenerateUserCategoryAsync(Authentication.System);
+                }
+                if (this.HasUsers == true)
+                {
+                    await category.GenerateUserAsync(Authentication.System);
+                }
+                if (this.CategoryToMove != null)
+                {
+                    return await rootCategory.GenerateUserCategoryAsync(Authentication.System);
+                }
+                return category;
+            }
+            return userCategory;
         }
 
         public static UserCategoryFilter FromExcludedCategories(params IUserCategory[] categories)

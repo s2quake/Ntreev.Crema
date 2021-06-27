@@ -80,7 +80,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItemFilter = new UserItemFilter(typeof(IUser));
-            var userItem = await app.PrepareUserItemAsync(userItemFilter);
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             await userItem.RenameAsync(authentication, RandomUtility.NextName());
         }
 
@@ -89,7 +89,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItemFilter = new UserItemFilter(typeof(IUserCategory)) { HasParent = true };
-            var userItem = await app.PrepareUserItemAsync(userItemFilter);
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var name = RandomUtility.NextName();
             await userItem.RenameAsync(authentication, name);
             Assert.AreEqual(name, userItem.Name);
@@ -99,7 +99,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task RenameAsync_Arg0_Null_FailTestAsync()
         {
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             await userItem.RenameAsync(null, RandomUtility.NextName());
         }
 
@@ -108,7 +109,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task RenameAsync_Arg1_Null_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             await userItem.RenameAsync(authentication, null);
         }
 
@@ -116,7 +118,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task RenameAsync_Expired_FailTestAsync()
         {
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var name = RandomUtility.NextName();
             await userItem.RenameAsync(expiredAuthentication, name);
         }
@@ -126,9 +129,9 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItemFilter = new UserItemFilter() { HasParent = true };
-            var userItem = await app.PrepareUserItemAsync(userItemFilter);
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var parentItemFilter = new UserItemFilter(typeof(IUserCategory)) { TargetToMove = userItem };
-            var parentItem = await app.PrepareUserItemAsync(parentItemFilter);
+            var parentItem = await parentItemFilter.GetUserItemAsync(app);
             await userItem.MoveAsync(authentication, parentItem.Path);
             Assert.AreEqual(parentItem, userItem.Parent);
         }
@@ -138,7 +141,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task MoveAsync_Arg0_Null_FailTestAsync()
         {
             var rootItem = userContext.Root;
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             await userItem.MoveAsync(null, rootItem.Path);
         }
 
@@ -147,7 +151,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task MoveAsync_Arg1_Null_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             await userItem.MoveAsync(authentication, null);
         }
 
@@ -157,7 +162,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItemFilter = new UserItemFilter() { HasParent = true };
-            var userItem = await app.PrepareUserItemAsync(userItemFilter);
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             await userItem.MoveAsync(authentication, string.Empty);
         }
 
@@ -167,7 +172,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItemFilter = new UserItemFilter() { HasParent = true };
-            var userItem = await app.PrepareUserItemAsync();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var userCategoryFilter = UserCategoryFilter.FromExcludedItems(userItem.Parent);
             var userCategory = await userContext.GetRandomUserCategoryAsync(userCategoryFilter);
             var name = await userCategory.GenerateNewCategoryNameAsync("folder");
@@ -180,7 +185,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task MoveAsync_SameParent_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var categoryPath = userItem.Parent.Path;
             await userItem.MoveAsync(authentication, categoryPath);
         }
@@ -189,7 +195,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task MoveAsync_Expired_FailTestAsync()
         {
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var rootItem = userContext.Root;
             await userItem.MoveAsync(expiredAuthentication, rootItem.Path);
         }
@@ -200,7 +207,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var userItemFilter = new UserItemFilter() { HasParent = true };
-            var userItem = await app.PrepareUserItemAsync(userItemFilter);
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var rootItem = userContext.Root;
             await userItem.MoveAsync(authentication, rootItem.Path);
         }
@@ -209,8 +216,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_Item_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userFilter = UserFilter.FromExcludedUserIDs(Authentication.AdminID, authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Offline, userFilter);
+            var userFilter = new UserFilter(UserFlags.Offline) { ExcludedUserIDs = new[] { Authentication.AdminID, authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             var userItem = user as IUserItem;
             await userItem.DeleteAsync(authentication);
         }
@@ -220,7 +227,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItemFilter = new UserItemFilter(typeof(IUserCategory)) { IsLeaf = true };
-            var userItem = await app.PrepareUserItemAsync(userItemFilter);
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             await userItem.DeleteAsync(authentication);
         }
 
@@ -228,7 +235,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task DeleteAsync_Arg0_Null_FailTestAsync()
         {
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             await userItem.DeleteAsync(null);
         }
 
@@ -236,7 +244,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(AuthenticationExpiredException))]
         public async Task DeleteAsync_Expired_FailTestAsync()
         {
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             await userItem.DeleteAsync(expiredAuthentication);
         }
 
@@ -245,7 +254,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_PermissionDenied_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
-            var userItem = await app.PrepareUserItemAsync(typeof(IUser));
+            var userItemFilter = new UserItemFilter(typeof(IUser));
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             await userItem.DeleteAsync(authentication);
         }
 
@@ -255,7 +265,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItemFilter = new UserItemFilter(typeof(IUserCategory)) { HasChilds = true };
-            var userItem = await app.PrepareUserItemAsync(userItemFilter);
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             await userItem.DeleteAsync(authentication);
         }
 
@@ -284,8 +294,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_Online_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var excludedUsers = UserFilter.FromExcludedUserIDs(Authentication.AdminID, authentication.ID);
-            var user = await app.PrepareUserAsync(UserFlags.Online, excludedUsers);
+            var userFilter = new UserFilter(UserFlags.Online) { ExcludedUserIDs = new[] { Authentication.AdminID, authentication.ID } };
+            var user = await userFilter.GetUserAsync(app);
             var userItem = user as IUserItem;
             await userItem.DeleteAsync(authentication);
         }
@@ -293,7 +303,8 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task Name_User_TestAsync()
         {
-            var userItem = await app.PrepareUserItemAsync(typeof(IUser));
+            var userItemFilter = new UserItemFilter(typeof(IUser));
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var condition = IdentifierValidator.Verify(userItem.Name);
             Assert.IsTrue(condition);
         }
@@ -302,7 +313,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task Name_UserCategory_TestAsync()
         {
             var userItemFilter = new UserItemFilter(typeof(IUserCategory)) { HasParent = true };
-            var userItem = await app.PrepareUserItemAsync(userItemFilter);
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var condition = NameValidator.VerifyName(userItem.Name);
             Assert.IsTrue(condition);
         }
@@ -310,7 +321,8 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task Path_TestAsync()
         {
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var condition = NameValidator.VerifyPath(userItem.Path);
             Assert.IsTrue(condition);
         }
@@ -319,7 +331,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task Child_Dispatcher_FailTestAsync()
         {
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             Assert.Fail($"{userItem.Childs.Any()}");
         }
 
@@ -328,7 +341,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task Renamed_User_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userItem = await app.PrepareUserItemAsync(typeof(IUser));
+            var userItemFilter = new UserItemFilter(typeof(IUser));
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             await userItem.Dispatcher.InvokeAsync(() =>
             {
                 userItem.Renamed += UserItem_Renamed;
@@ -347,7 +361,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItemFilter = new UserItemFilter(typeof(IUserCategory)) { HasParent = true };
-            var userItem = await app.PrepareUserItemAsync(userItemFilter);
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var oldName = userItem.Name;
             var expectedName = RandomUtility.NextName();
             var actualName = string.Empty;
@@ -377,7 +391,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task Renamed_FailTestAsync()
         {
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             userItem.Renamed += (s, e) => { };
         }
 
@@ -385,7 +400,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task Moved_User_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userItem = await app.PrepareUserItemAsync(typeof(IUser));
+            var userItemFilter = new UserItemFilter(typeof(IUser));
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var userCategoryFilter = UserCategoryFilter.FromExcludedItems(userItem.Parent);
             var userCategory = await userContext.GetRandomUserCategoryAsync(userCategoryFilter);
             var oldParentPath = userItem.Parent.Path;
@@ -418,9 +434,9 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItemFilter = new UserItemFilter(typeof(IUserCategory)) { HasParent = true };
-            var userItem = await app.PrepareUserItemAsync(userItemFilter);
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var parentItemFilter = new UserItemFilter(typeof(IUserCategory)) { TargetToMove = userItem };
-            var parentItem = await app.PrepareUserItemAsync(parentItemFilter);
+            var parentItem = await parentItemFilter.GetUserItemAsync(app);
             var oldParentPath = userItem.Parent.Path;
             var expectedParentPath = parentItem.Path;
             var actualParentPath = string.Empty;
@@ -450,7 +466,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task Moved_FailTestAsync()
         {
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             userItem.Moved += (s, e) => { };
         }
 
@@ -458,7 +475,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task Deleted_User_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await app.PrepareUserAsync(UserFlags.Member | UserFlags.Guest | UserFlags.Offline);
+            var userFilter = new UserFilter(UserFlags.Member | UserFlags.Guest | UserFlags.Offline);
+            var user = await userFilter.GetUserAsync(app);
             var userItem = user as IUserItem;
             var expectedUserItem = userItem;
             var actualUserItem = null as IUserItem;
@@ -483,7 +501,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userItemFilter = new UserItemFilter(typeof(IUserCategory)) { HasParent = true, IsLeaf = true };
-            var userItem = await app.PrepareUserItemAsync(userItemFilter);
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             var expectedUserItem = userItem;
             var actualUserItem = null as IUserItem;
             await userItem.Dispatcher.InvokeAsync(() =>
@@ -506,7 +524,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task Deleted_FailTestAsync()
         {
-            var userItem = await app.PrepareUserItemAsync();
+            var userItemFilter = new UserItemFilter();
+            var userItem = await userItemFilter.GetUserItemAsync(app);
             userItem.Deleted += (s, e) => { };
         }
     }

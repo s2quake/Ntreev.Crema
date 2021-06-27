@@ -54,7 +54,7 @@ namespace JSSoft.Crema.Services.Test.Extensions
             var cremaHost = context.Properties[cremaHostKey] as ICremaHost;
             var userFlags = AuthorityUtility.ToUserFlags(authority) | UserFlags.NotBanned | UserFlags.Offline;
             var userFilter = new UserFilter(userFlags, predicate);
-            var user = await app.PrepareUserAsync(userFilter);
+            var user = await userFilter.GetUserAsync(app);
             var password = user.GetPassword();
             var authenticationToken = await cremaHost.LoginAsync(user.ID, password);
             var authentication = await cremaHost.AuthenticateAsync(authenticationToken);

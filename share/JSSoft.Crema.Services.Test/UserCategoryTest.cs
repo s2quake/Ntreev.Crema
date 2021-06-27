@@ -84,7 +84,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var name = RandomUtility.NextName();
             await userCategory.RenameAsync(authentication, name);
             Assert.AreEqual(name, userCategory.Name);
@@ -95,7 +95,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task RenameAsync_Arg0_Null_FailTestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var name = RandomUtility.NextName();
             await userCategory.RenameAsync(null, name);
         }
@@ -106,7 +106,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.RenameAsync(authentication, null);
         }
 
@@ -116,7 +116,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.RenameAsync(authentication, string.Empty);
         }
 
@@ -126,7 +126,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var name = RandomUtility.NextInvalidName();
             await userCategory.RenameAsync(authentication, name);
         }
@@ -147,7 +147,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var name = RandomUtility.NextName();
             await userCategory.RenameAsync(authentication, name);
         }
@@ -158,7 +158,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var name = RandomUtility.NextName();
             await userCategory.RenameAsync(authentication, name);
         }
@@ -168,7 +168,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task RenameAsync_Expired_FailTestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var name = RandomUtility.NextName();
             await userCategory.RenameAsync(expiredAuthentication, null);
         }
@@ -178,9 +178,9 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var parentCategoryFilter = new UserCategoryFilter() { CategoryToMove = userCategory };
-            var parentCategory = await app.PrepareUserCategoryAsync(parentCategoryFilter);
+            var parentCategory = await parentCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.MoveAsync(authentication, parentCategory.Path);
             Assert.AreEqual(parentCategory, userCategory.Parent);
         }
@@ -190,9 +190,9 @@ namespace JSSoft.Crema.Services.Test
         public async Task MoveAsync_Arg0_Null_FailTestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var parentCategoryFilter = new UserCategoryFilter() { CategoryToMove = userCategory };
-            var parentCategory = await app.PrepareUserCategoryAsync(parentCategoryFilter);
+            var parentCategory = await parentCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.MoveAsync(null, parentCategory.Path);
         }
 
@@ -202,7 +202,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.MoveAsync(authentication, null);
         }
 
@@ -211,9 +211,9 @@ namespace JSSoft.Crema.Services.Test
         public async Task MoveAsync_Expired_TestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var parentCategoryFilter = new UserCategoryFilter() { CategoryToMove = userCategory };
-            var parentCategory = await app.PrepareUserCategoryAsync(parentCategoryFilter);
+            var parentCategory = await parentCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.MoveAsync(expiredAuthentication, parentCategory.Path);
         }
 
@@ -224,7 +224,7 @@ namespace JSSoft.Crema.Services.Test
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategory = userCategoryCollection.Root;
             var parentCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var parentCategory = await app.PrepareUserCategoryAsync(parentCategoryFilter);
+            var parentCategory = await parentCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.MoveAsync(authentication, parentCategory.Path);
         }
 
@@ -234,7 +234,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var parentCategory = userCategory.Parent;
             await userCategory.MoveAsync(authentication, parentCategory.Path);
         }
@@ -245,9 +245,9 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var parentCategoryFilter = new UserCategoryFilter() { CategoryToMove = userCategory };
-            var parentCategory = await app.PrepareUserCategoryAsync(parentCategoryFilter);
+            var parentCategory = await parentCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.MoveAsync(authentication, parentCategory.Path);
         }
 
@@ -257,9 +257,9 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var parentCategoryFilter = new UserCategoryFilter() { CategoryToMove = userCategory };
-            var parentCategory = await app.PrepareUserCategoryAsync(parentCategoryFilter);
+            var parentCategory = await parentCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.MoveAsync(authentication, parentCategory.Path);
         }
 
@@ -269,7 +269,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true, HasCategories = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var parentCategory = await userCategory.Dispatcher.InvokeAsync(() => userCategory.Categories.Random());
             await userCategory.MoveAsync(authentication, parentCategory.Path);
         }
@@ -279,7 +279,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true, IsLeaf = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.DeleteAsync(authentication);
         }
 
@@ -288,7 +288,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_Arg0_Null_FailTestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true, IsLeaf = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.DeleteAsync(null);
         }
 
@@ -297,7 +297,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task DeleteAsync_Expired_FailTestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true, IsLeaf = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.DeleteAsync(expiredAuthentication);
         }
 
@@ -307,7 +307,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true, HasCategories = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.DeleteAsync(authentication);
         }
 
@@ -317,7 +317,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true, HasUsers = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.DeleteAsync(authentication);
         }
 
@@ -327,7 +327,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true, IsLeaf = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.DeleteAsync(authentication);
         }
 
@@ -337,7 +337,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true, IsLeaf = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.DeleteAsync(authentication);
         }
 
@@ -355,7 +355,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var name = await userCategory.GenerateNewCategoryNameAsync(RandomUtility.NextName());
             var newCategory = await userCategory.AddNewCategoryAsync(authentication, name);
             Assert.AreEqual(name, newCategory.Name);
@@ -367,7 +367,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task AddNewCategoryAsync_Arg0_Null_TestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var name = await userCategory.GenerateNewCategoryNameAsync(RandomUtility.NextName());
             await userCategory.AddNewCategoryAsync(null, name);
         }
@@ -378,7 +378,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.AddNewCategoryAsync(authentication, null);
         }
 
@@ -388,7 +388,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.AddNewCategoryAsync(authentication, string.Empty);
         }
 
@@ -397,7 +397,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task AddNewCategoryAsync_Expired_TestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var name = await userCategory.GenerateNewCategoryNameAsync(RandomUtility.NextName());
             await userCategory.AddNewCategoryAsync(expiredAuthentication, name);
         }
@@ -408,7 +408,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var name = await userCategory.GenerateNewCategoryNameAsync(RandomUtility.NextInvalidName());
             await userCategory.AddNewCategoryAsync(authentication, name);
         }
@@ -419,7 +419,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true, HasCategories = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var name = await userCategory.Dispatcher.InvokeAsync(() => userCategory.Categories.Random().Name);
             await userCategory.AddNewCategoryAsync(authentication, name);
         }
@@ -430,7 +430,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true, HasCategories = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var name = await userCategory.Dispatcher.InvokeAsync(() => userCategory.Categories.Random().Name);
             await userCategory.AddNewCategoryAsync(authentication, name);
         }
@@ -441,7 +441,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true, HasCategories = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var name = await userCategory.Dispatcher.InvokeAsync(() => userCategory.Categories.Random().Name);
             await userCategory.AddNewCategoryAsync(authentication, name);
         }
@@ -451,7 +451,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
@@ -470,7 +470,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
@@ -484,7 +484,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
             var userName = RandomUtility.NextName();
@@ -497,7 +497,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
             var userName = RandomUtility.NextName();
@@ -510,7 +510,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var userName = RandomUtility.NextName();
@@ -523,7 +523,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
@@ -536,7 +536,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
@@ -549,7 +549,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
@@ -562,7 +562,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task AddNewUserAsync_Expired_TestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
@@ -576,7 +576,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
@@ -590,7 +590,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var userID = await userCollection.GenerateNewUserIDAsync();
             var authority = userContext.GetRandomAuthority();
             var password = userContext.GetPassword(authority);
@@ -604,7 +604,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var user = await userCollection.GetRandomUserAsync();
             var userID = user.ID;
             var authority = userContext.GetRandomAuthority();
@@ -617,7 +617,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task Name_TestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             Assert.AreNotEqual(string.Empty, userCategory.Name);
         }
 
@@ -632,7 +632,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task Path_TestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             NameValidator.ValidateCategoryPath(userCategory.Path);
         }
 
@@ -640,7 +640,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task Parent_TestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             Assert.IsNotNull(userCategory.Parent);
         }
 
@@ -655,7 +655,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task Categories_TestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasCategories = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.Dispatcher.InvokeAsync(() =>
             {
                 foreach (var item in userCategory.Categories)
@@ -670,7 +670,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task Categories_Dispatcher_TestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasCategories = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             foreach (var item in userCategory.Categories)
             {
                 Assert.Fail();
@@ -681,7 +681,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task Users_TestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasUsers = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await userCategory.Dispatcher.InvokeAsync(() =>
             {
                 foreach (var item in userCategory.Users)
@@ -696,7 +696,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task Users_Dispatcher_TestAsync()
         {
             var userCategoryFilter = new UserCategoryFilter() { HasUsers = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             foreach (var item in userCategory.Users)
             {
                 Assert.Fail();
@@ -708,7 +708,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var oldName = userCategory.Name;
             var expectedName = RandomUtility.NextName();
             var actualName = string.Empty;
@@ -739,9 +739,9 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var parentCategoryFilter = new UserCategoryFilter() { CategoryToMove = userCategory };
-            var parentCategory = await app.PrepareUserCategoryAsync(parentCategoryFilter);
+            var parentCategory = await parentCategoryFilter.GetUserCategoryAsync(app);
             var oldParentPath = userCategory.Parent.Path;
             var expectedParentPath = parentCategory.Path;
             var actualParentPath = string.Empty;
@@ -771,7 +771,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryFilter = new UserCategoryFilter() { HasParent = true, IsLeaf = true };
-            var userCategory = await app.PrepareUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             var actualCategory = userCategory;
             await userCategory.Dispatcher.InvokeAsync(() =>
             {
