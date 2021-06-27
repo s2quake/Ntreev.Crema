@@ -184,7 +184,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task MoveAsync_SameParent_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userItemFilter = new UserItemFilter();
+            var userItemFilter = new UserItemFilter() { HasParent = true };
             var userItem = await userItemFilter.GetUserItemAsync(app);
             var categoryPath = userItem.Parent.Path;
             await userItem.MoveAsync(authentication, categoryPath);

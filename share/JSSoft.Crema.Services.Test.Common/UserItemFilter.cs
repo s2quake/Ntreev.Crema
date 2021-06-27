@@ -38,8 +38,8 @@ namespace JSSoft.Crema.Services.Test.Common
                 var s = RandomUtility.Within(50);
                 if (this.Type == typeof(IUser) || (this.Type == null && s == true))
                 {
-                    var category = await userCategoryCollection.GetRandomUserCategoryAsync();
-                    var user = await category.GenerateUserAsync(Authentication.System);
+                    var userFilter = (UserFilter)this;
+                    var user = await userFilter.GetUserAsync(serviceProvider);
                     userItem = user as IUserItem;
                 }
                 else if (this.Type == typeof(IUserCategory) || (this.Type == null && s == false))
@@ -119,11 +119,13 @@ namespace JSSoft.Crema.Services.Test.Common
 
         private static bool CanMove(IUserItem userItem, string parentPath)
         {
-            if (userItem.Path == parentPath)
+            if (userItem.Parent == null)
+                return false;
+            if (userItem.Parent.Path == parentPath)
                 return false;
             if (NameValidator.VerifyCategoryPath(parentPath) == false)
                 return false;
-            return userItem.Path.StartsWith(parentPath) == false;
+            return parentPath.StartsWith(userItem.Path) == false;
         }
     }
 }

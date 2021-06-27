@@ -41,12 +41,5 @@ namespace JSSoft.Crema.Services.Extensions
                 return NameUtility.GenerateNewName(name, names);
             });
         }
-
-        public static bool CanMove(this IUserCategory category, string parentPath)
-        {
-            if (category.Path == parentPath)
-                return false;
-            return category.Path.StartsWith(parentPath) == false;
-        }
     }
 }

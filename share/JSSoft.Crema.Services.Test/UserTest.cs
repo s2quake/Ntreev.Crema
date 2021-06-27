@@ -86,7 +86,7 @@ namespace JSSoft.Crema.Services.Test
             var userFilter = UserFilter.Empty;
             var user = await userFilter.GetUserAsync(app);
             var userCategoryFilter = new UserCategoryFilter() { UserToMove = user };
-            var userCategory = await userCategoryCollection.GetRandomUserCategoryAsync(userCategoryFilter);
+            var userCategory = await userCategoryFilter.GetUserCategoryAsync(app);
             await user.MoveAsync(authentication, userCategory.Path);
         }
 
@@ -927,7 +927,7 @@ namespace JSSoft.Crema.Services.Test
             var user = await userFilter.GetUserAsync(app);
             var oldCategory = user.Category;
             var categoryFilter = UserCategoryFilter.FromExcludedCategories(user.Category);
-            var category = await userCategoryCollection.GetRandomUserCategoryAsync(categoryFilter);
+            var category = await categoryFilter.GetUserCategoryAsync(app);
             var actualPath = string.Empty;
             var expectedPath = new ItemName(category.Path, user.ID).ToString();
             await user.Dispatcher.InvokeAsync(() =>
