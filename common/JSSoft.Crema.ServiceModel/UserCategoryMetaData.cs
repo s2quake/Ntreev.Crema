@@ -20,17 +20,18 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Library;
+using System;
 using System.Runtime.Serialization;
 
 namespace JSSoft.Crema.ServiceModel
 {
     [DataContract(Namespace = SchemaUtility.Namespace)]
-    public struct UserContextMetaData
+    public struct UserCategoryMetaData
     {
         [DataMember]
-        public UserCategoryMetaData[] Categories { get; set; }
+        public string Path { get; set; }
 
         [DataMember]
-        public UserMetaData[] Users { get; set; }
+        public Guid Guid { get; set; }
     }
 }

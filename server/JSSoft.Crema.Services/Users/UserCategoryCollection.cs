@@ -65,17 +65,17 @@ namespace JSSoft.Crema.Services.Users
                     this.ValidateAddNew(authentication, name, parentPath);
                     return new CategoryName(parentPath, name);
                 });
-                var taskID = GuidUtility.FromName(categoryName);
                 var itemPaths = new string[] { categoryName };
                 await this.Repository.LockAsync(authentication, this, nameof(AddNewAsync), itemPaths);
                 using var userContextSet = await UserContextSet.CreateEmptyAsync(authentication, this.Context, itemPaths);
                 await this.InvokeCategoryCreateAsync(authentication, categoryName);
                 var result = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication);
                     var category = this.BaseAddNew(name, parentPath, authentication);
+                    category.Guid = Guid.NewGuid();
+                    this.CremaHost.Sign(authentication);
                     this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
-                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                    this.Context.InvokeTaskCompletedEvent(authentication, category.Guid);
                     return category;
                 });
                 return result;

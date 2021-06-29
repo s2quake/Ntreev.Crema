@@ -44,6 +44,8 @@ namespace JSSoft.Crema.Services.Test.Common
                 var banStates = SelectBanState(userFlags);
                 var category = await userCategoryCollection.GetRandomUserCategoryAsync();
                 var newUser = await category.GenerateUserAsync(Authentication.System, authority);
+                if (newUser is null)
+                    throw new InvalidOperationException();
                 var password = newUser.GetPassword();
                 if (userStates.Any() == true && userStates.Random() == UserState.Online)
                     await cremaHost.LoginAsync(newUser.ID, password);

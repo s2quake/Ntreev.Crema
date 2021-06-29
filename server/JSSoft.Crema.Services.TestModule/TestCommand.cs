@@ -169,7 +169,7 @@ namespace JSSoft.Crema.Services.TestModule
 
         private void CreateRepository()
         {
-            var userInfos = UserInfoGenerator.Generate(RandomUtility.Next(100, 200), RandomUtility.Next(100, 200));
+            var userInfos = UserInfoGenerator.Generate(0, 0);
             var dataSet = new CremaDataSet();
             try
             {

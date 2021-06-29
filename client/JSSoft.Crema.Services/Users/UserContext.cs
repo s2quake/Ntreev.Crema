@@ -73,9 +73,10 @@ namespace JSSoft.Crema.Services.Users
                 var metaData = result.Value;
                 foreach (var item in metaData.Categories)
                 {
-                    if (item == this.Root.Path)
+                    if (item.Path == this.Root.Path)
                         continue;
-                    this.Categories.Prepare(item);
+                    var category = this.Categories.Prepare(item.Path);
+                    category.Guid = item.Guid;
                 }
                 foreach (var item in metaData.Users)
                 {
@@ -83,6 +84,7 @@ namespace JSSoft.Crema.Services.Users
                     var user = this.Users.BaseAddNew(itemName.Name, itemName.CategoryPath);
                     user.Initialize(item.UserInfo, item.BanInfo);
                     user.SetUserState(item.UserState);
+                    user.Guid = item.Guid;
                 }
                 this.subscribeToken = subscribeToken;
             });
@@ -247,7 +249,11 @@ namespace JSSoft.Crema.Services.Users
             {
                 var query = from UserCategory item in this.Categories
                             orderby item.Path
-                            select item.Path;
+                            select new UserCategoryMetaData()
+                            {
+                                Path = item.Path,
+                                Guid = item.Guid
+                            };
 
                 metaData.Categories = query.ToArray();
             }
@@ -477,7 +483,7 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        async void IUserContextEventCallback.OnUserItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, UserInfo?[] args)
+        async void IUserContextEventCallback.OnUserItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, Guid[] guids, UserInfo?[] args)
         {
             try
             {
@@ -492,10 +498,12 @@ namespace JSSoft.Crema.Services.Users
                         for (var i = 0; i < itemPaths.Length; i++)
                         {
                             var itemPath = itemPaths[i];
+                            var guid = guids[i];
                             if (NameValidator.VerifyCategoryPath(itemPath) == true)
                             {
                                 var categoryName = new CategoryName(itemPath);
                                 var category = this.Categories.Prepare(itemPath);
+                                category.Guid = guid;
                                 categories.Add(category);
                                 userItems[i] = category;
                             }
@@ -504,6 +512,7 @@ namespace JSSoft.Crema.Services.Users
                                 var userInfo = (UserInfo)args[i];
                                 var user = this.Users.BaseAddNew(userInfo.ID, userInfo.CategoryPath);
                                 user.Initialize(userInfo, BanInfo.Empty);
+                                user.Guid = guid;
                                 users.Add(user);
                                 userItems[i] = user;
                             }
@@ -959,7 +968,7 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        IUserCategory IUserContext.Root => this.Root;
+        IUserItem IUserContext.Root => this.Root;
 
         #endregion
 

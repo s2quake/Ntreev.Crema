@@ -20,6 +20,7 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Library;
+using System;
 using System.Runtime.Serialization;
 
 namespace JSSoft.Crema.ServiceModel
@@ -29,6 +30,9 @@ namespace JSSoft.Crema.ServiceModel
     {
         [DataMember]
         public string Path { get; set; }
+
+        [DataMember]
+        public Guid Guid { get; set; }
 
         [DataMember]
         public UserInfo UserInfo { get; set; }

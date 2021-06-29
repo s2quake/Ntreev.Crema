@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System;
 using JSSoft.Library.ObjectModel;
 
 namespace JSSoft.Crema.ServiceModel
@@ -36,5 +37,7 @@ namespace JSSoft.Crema.ServiceModel
         }
 
         public IContainer<_I> Users => this.Items;
+
+        public Guid Guid { get; set; }
     }
 }

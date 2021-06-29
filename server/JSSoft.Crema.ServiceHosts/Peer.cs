@@ -68,7 +68,14 @@ namespace JSSoft.Crema.ServiceHosts
 
         public Authentication this[Guid authenticationToken]
         {
-            get => this.authenticaitonByToken[authenticationToken];
+            get
+            {
+                if (authenticationToken == Authentication.System.Token)
+                {
+                    return Authentication.System;
+                }
+                return this.authenticaitonByToken[authenticationToken];
+            }
         }
 
         public Authentication[] Authentications => this.authenticaitonByToken.Values.ToArray();

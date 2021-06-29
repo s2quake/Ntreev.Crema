@@ -506,7 +506,7 @@ namespace JSSoft.Crema.Services.Test
         public async Task SendMessageAsync_Offline_FailTestAsync()
         {
             var authentication = await TestContext.LoginRandomAsync();
-            var userFilter = new UserFilter() { ExcludedUserIDs = new[] { authentication.ID } };
+            var userFilter = new UserFilter(UserFlags.Offline) { ExcludedUserIDs = new[] { authentication.ID } };
             var user = await userFilter.GetUserAsync(app);
             var message = RandomUtility.NextString();
             await user.SendMessageAsync(authentication, message);

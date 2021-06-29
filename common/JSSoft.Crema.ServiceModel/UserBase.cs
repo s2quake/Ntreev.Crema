@@ -101,6 +101,8 @@ namespace JSSoft.Crema.ServiceModel
 
         public Authority Authority => this.userInfo.Authority;
 
+        public Guid Guid { get; set; }
+
         public bool IsOnline
         {
             get => this.UserState.HasFlag(UserState.Online);

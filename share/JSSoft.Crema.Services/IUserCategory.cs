@@ -43,6 +43,8 @@ namespace JSSoft.Crema.Services
 
         string Path { get; }
 
+        Guid Guid { get; }
+
         IUserCategory Parent { get; }
 
         [DispatcherProperty(typeof(IUserContext))]

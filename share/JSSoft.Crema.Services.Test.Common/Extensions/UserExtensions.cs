@@ -19,6 +19,8 @@ namespace JSSoft.Crema.Services.Test.Common.Extensions
     {
         public static SecureString GetPassword(this IUser user)
         {
+            if (user is null)
+                throw new ArgumentNullException(nameof(user));
             return user.Authority.GetPassword();
         }
 

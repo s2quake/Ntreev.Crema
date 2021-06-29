@@ -83,7 +83,7 @@ namespace JSSoft.Crema.Commands.Consoles
             var uri = new Uri(path, UriKind.RelativeOrAbsolute);
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                if (uri.Scheme != Uri.UriSchemeFile)
+                if (uri.IsAbsoluteUri == true && uri.Scheme != Uri.UriSchemeFile)
                 {
                     return this.DriveItems.First(item => item.Name == uri.Scheme);
                 }

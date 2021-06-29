@@ -52,6 +52,8 @@ namespace JSSoft.Crema.Services
 
         string Path { get; }
 
+        Guid Guid { get; }
+
         Authority Authority { get; }
 
         IUserCategory Category { get; }

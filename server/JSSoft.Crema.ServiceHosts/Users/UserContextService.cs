@@ -88,7 +88,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
             var result = new ResultBase<UserInfo>();
             var category = await this.GetCategoryAsync(categoryPath);
             var user = await category.AddNewUserAsync(authentication, userID, ToSecureString(userID, password), userName, authority);
-            result.TaskID = GuidUtility.FromName(categoryPath + userID);
+            result.TaskID = user.Guid;
             result.Value = user.UserInfo;
             result.SignatureDate = authentication.SignatureDate;
             return result;
@@ -99,9 +99,9 @@ namespace JSSoft.Crema.ServiceHosts.Users
             var authentication = this.peer[authenticationToken];
             var result = new ResultBase();
             var categoryName = new CategoryName(categoryPath);
-            var category = await this.GetCategoryAsync(categoryName.ParentPath);
-            await category.AddNewCategoryAsync(authentication, categoryName.Name);
-            result.TaskID = GuidUtility.FromName(categoryPath);
+            var parent = await this.GetCategoryAsync(categoryName.ParentPath);
+            var category = await parent.AddNewCategoryAsync(authentication, categoryName.Name);
+            result.TaskID = category.Guid;
             result.SignatureDate = authentication.SignatureDate;
             return result;
         }
@@ -290,8 +290,9 @@ namespace JSSoft.Crema.ServiceHosts.Users
             var exceptionUserID = e.InvokeID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.Items.Select(item => item.Path).ToArray();
+            var guids = e.Items.Select(item => item.Guid).ToArray();
             var arguments = e.Arguments.Select(item => item is UserInfo userInfo ? (UserInfo?)userInfo : null).ToArray();
-            this.InvokeEvent(() => this.Callback?.OnUserItemsCreated(callbackInfo, itemPaths, arguments));
+            this.InvokeEvent(() => this.Callback?.OnUserItemsCreated(callbackInfo, itemPaths, guids, arguments));
         }
 
         private void UserContext_ItemsRenamed(object sender, Services.ItemsRenamedEventArgs<IUserItem> e)

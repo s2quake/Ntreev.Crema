@@ -247,7 +247,11 @@ namespace JSSoft.Crema.Services.Users
             {
                 var query = from UserCategory item in this.Categories
                             orderby item.Path
-                            select item.Path;
+                            select new UserCategoryMetaData()
+                            {
+                                Path = item.Path,
+                                Guid = item.Guid
+                            };
 
                 metaData.Categories = query.ToArray();
             }
@@ -278,7 +282,11 @@ namespace JSSoft.Crema.Services.Users
                 {
                     var query = from UserCategory item in this.Categories
                                 orderby item.Path
-                                select item.Path;
+                                select new UserCategoryMetaData()
+                                {
+                                    Path = item.Path,
+                                    Guid = item.Guid
+                                };
 
                     metaData.Categories = query.ToArray();
                 }
@@ -359,7 +367,8 @@ namespace JSSoft.Crema.Services.Users
                     var relativeUri = UriUtility.MakeRelativeOfDirectory(this.BasePath, item);
                     var segments = StringUtility.Split(relativeUri, PathUtility.SeparatorChar, true);
                     var categoryName = CategoryName.Create(relativeUri);
-                    this.Categories.Prepare(categoryName);
+                    var category = this.Categories.Prepare(categoryName);
+                    category.Guid = Guid.NewGuid();
                 }
 
                 var settings = ObjectSerializerSettings.Empty;
@@ -374,6 +383,7 @@ namespace JSSoft.Crema.Services.Users
                     var user = this.Users.AddNew(userInfo.ID, itemName.CategoryPath);
                     user.Initialize((UserInfo)userInfo, (BanInfo)userInfo.BanInfo);
                     user.Password = UserContext.StringToSecureString(userInfo.Password);
+                    user.Guid = Guid.NewGuid();
                 }
 
                 this.CremaHost.Info($"{nameof(UserContext)} Initialized");

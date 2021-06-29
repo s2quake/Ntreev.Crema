@@ -34,7 +34,7 @@ namespace JSSoft.Crema.ServiceHosts.Users
         void OnUsersStateChanged(CallbackInfo callbackInfo, string[] userIDs, UserState[] states);
 
         [OperationContract]
-        void OnUserItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, UserInfo?[] args);
+        void OnUserItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, Guid[] guids, UserInfo?[] args);
 
         [OperationContract]
         void OnUserItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames);

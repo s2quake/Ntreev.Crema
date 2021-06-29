@@ -22,6 +22,7 @@
 using JSSoft.Crema.ServiceHosts.Users;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Properties;
+using JSSoft.Library;
 using JSSoft.Library.ObjectModel;
 using System;
 using System.Collections;
@@ -79,8 +80,18 @@ namespace JSSoft.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
                 });
+                Console.WriteLine($"before: {userID}");
                 var result = await this.Service.NewUserAsync(authentication.Token, userID, categoryPath, UserContext.Encrypt(userID, password), userName, authority);
                 await this.Context.WaitAsync(result.TaskID);
+                if (this[userID] is null)
+                {
+                    Console.WriteLine($"keys: {result.TaskID}");
+                    foreach(var item in this.Keys)
+                    {
+                        Console.WriteLine($"    {item}");
+                    }
+                    throw new NotSupportedException();
+                }
                 return this[userID];
             }
             catch (Exception e)

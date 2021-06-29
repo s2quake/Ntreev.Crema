@@ -81,7 +81,6 @@ namespace JSSoft.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
                     this.ValidateUserCreate(authentication, userID, categoryPath, password, userName, authority);
                 });
-                var taskID = GuidUtility.FromName(categoryPath + userID);
                 var userSet = await this.CreateDataForCreateAsync(authentication, userID, categoryPath, password, userName, authority);
                 using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, true);
                 var userPaths = new string[] { categoryPath + userID };
@@ -93,9 +92,10 @@ namespace JSSoft.Crema.Services.Users
                     var userInfo = userContextSet.GetUserInfo(categoryPath + userID);
                     user.Initialize((UserInfo)userInfo, (BanInfo)userInfo.BanInfo);
                     user.Password = UserContext.StringToSecureString(userInfo.Password);
+                    user.Guid = Guid.NewGuid();
                     this.CremaHost.Sign(authentication);
                     this.InvokeUsersCreatedEvent(authentication, new User[] { user });
-                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                    this.Context.InvokeTaskCompletedEvent(authentication, user.Guid);
                     return user;
                 });
                 return newUser;

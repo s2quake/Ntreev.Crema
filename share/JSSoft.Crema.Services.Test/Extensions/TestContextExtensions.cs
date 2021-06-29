@@ -10,6 +10,7 @@ using JSSoft.Library.Random;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security;
 using System.Text;
@@ -55,6 +56,12 @@ namespace JSSoft.Crema.Services.Test.Common
             var userFlags = AuthorityUtility.ToUserFlags(authority) | UserFlags.NotBanned | UserFlags.Offline;
             var userFilter = new UserFilter(userFlags, predicate);
             var user = await userFilter.GetUserAsync(app);
+            if (user is null)
+            {
+                Console.WriteLine("qwer");
+                Trace.WriteLine("weqrwqrqwre");
+                int eqr = 0;
+            }
             var password = user.GetPassword();
             var authenticationToken = await cremaHost.LoginAsync(user.ID, password);
             var authentication = await cremaHost.AuthenticateAsync(authenticationToken);
