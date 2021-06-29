@@ -80,7 +80,6 @@ namespace JSSoft.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
                 });
-                Console.WriteLine($"before: {userID}");
                 var result = await this.Service.NewUserAsync(authentication.Token, userID, categoryPath, UserContext.Encrypt(userID, password), userName, authority);
                 await this.Context.WaitAsync(result.TaskID);
                 if (this[userID] is null)
@@ -159,6 +158,7 @@ namespace JSSoft.Crema.Services.Users
             var comment = EventMessageBuilder.LoginUser(authentication, users);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(comment);
+            Console.WriteLine($"InvokeUsersLoggedInEvent: {users.Length}");
             this.OnUsersLoggedIn(new ItemsEventArgs<IUser>(authentication, users));
         }
 
@@ -436,6 +436,14 @@ namespace JSSoft.Crema.Services.Users
 
         protected virtual void OnUsersLoggedIn(ItemsEventArgs<IUser> e)
         {
+            if (usersLoggedIn != null)
+            {
+                Console.WriteLine("OnUsersLoggedIn");
+            }
+            else
+            {
+                Console.WriteLine("null");
+            }
             this.usersLoggedIn?.Invoke(this, e);
         }
 

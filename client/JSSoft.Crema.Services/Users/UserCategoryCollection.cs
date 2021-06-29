@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Crema.Services.Properties;
 using JSSoft.Crema.ServiceHosts.Users;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Library.ObjectModel;
@@ -230,12 +231,43 @@ namespace JSSoft.Crema.Services.Users
 
         bool IUserCategoryCollection.Contains(string categoryPath)
         {
+            if (categoryPath is null)
+                throw new ArgumentNullException(nameof(categoryPath));
+
+            this.Dispatcher.VerifyAccess();
             return this.Contains(categoryPath);
         }
 
         IUserCategory IUserCategoryCollection.Root => this.Root;
 
-        IUserCategory IUserCategoryCollection.this[string categoryPath] => this[categoryPath];
+        IUserCategory IUserCategoryCollection.this[string categoryPath]
+        {
+            get
+            {
+                if (categoryPath is null)
+                    throw new ArgumentNullException(nameof(categoryPath));
+
+                this.Dispatcher.VerifyAccess();
+                if (categoryPath == string.Empty)
+                    throw new ArgumentException("Empty string is not allowed.");
+                if (this.Contains(categoryPath) == false)
+                    throw new CategoryNotFoundException(categoryPath);
+                return base[categoryPath];
+            }
+        }
+
+        #endregion
+
+        #region IReadOnlyCollection<IUserCategory>
+
+        int IReadOnlyCollection<IUserCategory>.Count
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return this.Count;
+            }
+        }
 
         #endregion
 
@@ -243,12 +275,20 @@ namespace JSSoft.Crema.Services.Users
 
         IEnumerator<IUserCategory> IEnumerable<IUserCategory>.GetEnumerator()
         {
-            return this.GetEnumerator();
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in this)
+            {
+                yield return item;
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in this)
+            {
+                yield return item;
+            }
         }
 
         #endregion

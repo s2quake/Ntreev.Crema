@@ -86,10 +86,11 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void Contains_est()
+        public async Task Contains_TestAsync()
         {
-            var userID = userCollection.Dispatcher.Invoke(() => userCollection.Random().ID);
-            var contains = userCollection.Dispatcher.Invoke(() => userCollection.Contains(userID));
+            var userFilter = new UserFilter();
+            var user = await userFilter.GetUserAsync(app);
+            var contains = await userCollection.Dispatcher.InvokeAsync(() => userCollection.Contains(user.ID));
             Assert.IsTrue(contains);
         }
 
@@ -102,27 +103,30 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Contains_Dispatcher_FailTest()
+        public async Task Contains_Dispatcher_FailTestAsync()
         {
-            var userID = userCollection.Dispatcher.Invoke(() => userCollection.Random().ID);
-            userCollection.Contains(userID);
+            var userFilter = new UserFilter();
+            var user = await userFilter.GetUserAsync(app);
+            userCollection.Contains(user.ID);
             Assert.Fail();
         }
 
         [TestMethod]
-        public void Indexer_Test()
+        public async Task Indexer_TestAsync()
         {
-            var userID = userCollection.Dispatcher.Invoke(() => userCollection.Random().ID);
-            var user = userCollection.Dispatcher.Invoke(() => userCollection[userID]);
-            Assert.AreEqual(userID, user.ID);
+            var userFilter = new UserFilter();
+            var user1 = await userFilter.GetUserAsync(app);
+            var user2 = await userCollection.Dispatcher.InvokeAsync(() => userCollection[user1.ID]);
+            Assert.AreEqual(user1, user2);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Indexer_Dispatcher_FailTest()
+        public async Task Indexer_Dispatcher_FailTestAsync()
         {
-            var userID = userCollection.Dispatcher.Invoke(() => userCollection.Random().ID);
-            var user = userCollection[userID];
+            var userFilter = new UserFilter();
+            var user1 = await userFilter.GetUserAsync(app);
+            var user2 = userCollection[user1.ID];
             Assert.Fail();
         }
 
@@ -193,8 +197,10 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var userCategoryCollection = userCollection.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-            var user = await userCollection.GetRandomUserAsync();
-            var category = await userCategoryCollection.GetRandomUserCategoryAsync(item => item != user.Category);
+            var userFilter = new UserFilter();
+            var user = await userFilter.GetUserAsync(app);
+            var categoryFilter = new UserCategoryFilter() { ExcludedCategories = new[] { user.Category } };
+            var category = await categoryFilter.GetUserCategoryAsync(app);
             var oldCategory = user.Category;
             var actualPath = string.Empty;
             var actualCategoryPath = string.Empty;
@@ -232,20 +238,22 @@ namespace JSSoft.Crema.Services.Test
         public async Task UsersDeleted_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user = await userCollection.GetRandomUserAsync(UserFlags.Offline);
-            var actualUserPath = user.Path;
+            var userFilter1 = new UserFilter(UserFlags.Offline | UserFlags.Member | UserFlags.Guest) { ExcludedUserIDs = new[] { Authentication.AdminID, authentication.ID } };
+            var user1 = await userFilter1.GetUserAsync(app);
+            var actualUserPath = user1.Path;
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersDeleted += UserCollection_UsersDeleted;
             });
-            await user.DeleteAsync(authentication);
+            await user1.DeleteAsync(authentication);
             Assert.AreEqual(string.Empty, actualUserPath);
-            Assert.IsNull(user.Category);
+            Assert.IsNull(user1.Category);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersDeleted -= UserCollection_UsersDeleted;
             });
-            var user2 = await userCollection.GetRandomUserAsync(UserFlags.Offline);
+            var userFilter2 = new UserFilter(UserFlags.Offline | UserFlags.Member | UserFlags.Guest) { ExcludedUserIDs = new[] { Authentication.AdminID, authentication.ID } };
+            var user2 = await userFilter2.GetUserAsync(app);
             var userPath2 = user2.Path;
             await user2.DeleteAsync(authentication);
             Assert.AreNotEqual(string.Empty, userPath2);
@@ -266,9 +274,9 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersStateChanged_TestAsync()
         {
-            var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             var actualState = UserState.None;
-            var user = await userCollection.GetRandomUserAsync(item => item.UserState == UserState.None && item.BanInfo.IsBanned == false);
+            var userFilter = new UserFilter(UserFlags.Offline | UserFlags.NotBanned);
+            var user = await userFilter.GetUserAsync(app);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersStateChanged += UserCollection_UsersStateChanged;
@@ -299,9 +307,9 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersChanged_TestAsync()
         {
-            var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            var authentication = await cremaHost.LoginRandomAsync();
-            var user = await userCollection.GetUserAsync(authentication.ID);
+            var userFilter = new UserFilter(UserFlags.Offline | UserFlags.NotBanned);
+            var user = await userFilter.GetUserAsync(app);
+            var authentication = await this.TestContext.LoginAsync(user.ID);
             var actualUserName = user.UserName;
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
@@ -334,19 +342,23 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersLoggedIn_TestAsync()
         {
-            var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
+            var userFilter1 = new UserFilter(UserFlags.Offline | UserFlags.NotBanned);
+            var user1 = await userFilter1.GetUserAsync(app);
+            var userFilter2 = new UserFilter(UserFlags.Offline | UserFlags.NotBanned) { ExcludedUserIDs = new[] { user1.ID } };
+            var user2 = await userFilter2.GetUserAsync(app);
             var actualUserID = string.Empty;
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersLoggedIn += UserCollection_UsersLoggedIn;
             });
-            var authentication1 = await cremaHost.LoginRandomAsync();
+            Console.WriteLine(user1.UserState);
+            var authentication1 = await this.TestContext.LoginAsync(user1.ID);
             Assert.AreEqual(authentication1.ID, actualUserID);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersLoggedIn -= UserCollection_UsersLoggedIn;
             });
-            var authentication2 = await cremaHost.LoginRandomAsync();
+            var authentication2 = await this.TestContext.LoginAsync(user2.ID);
             Assert.AreEqual(authentication1.ID, actualUserID);
             Assert.AreNotEqual(authentication2.ID, actualUserID);
 
@@ -367,9 +379,8 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task UsersLoggedOut_TestAsync()
         {
-            var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            var authentication1 = await cremaHost.LoginRandomAsync();
-            var authentication2 = await cremaHost.LoginRandomAsync();
+            var authentication1 = await this.TestContext.LoginRandomAsync();
+            var authentication2 = await this.TestContext.LoginRandomAsync();
             var user1 = await userCollection.GetUserAsync(authentication1.ID);
             var user2 = await userCollection.GetUserAsync(authentication2.ID);
             var actualUserID = string.Empty;
@@ -377,13 +388,13 @@ namespace JSSoft.Crema.Services.Test
             {
                 userCollection.UsersLoggedOut += UserCollection_UsersLoggedOut;
             });
-            await cremaHost.LogoutAsync(authentication1);
+            await this.TestContext.LogoutAsync(authentication1);
             Assert.AreEqual(user1.ID, actualUserID);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersLoggedOut -= UserCollection_UsersLoggedOut;
             });
-            await cremaHost.LogoutAsync(authentication2);
+            await this.TestContext.LogoutAsync(authentication2);
             Assert.AreEqual(user1.ID, actualUserID);
             Assert.AreNotEqual(user2.ID, actualUserID);
 
@@ -406,9 +417,9 @@ namespace JSSoft.Crema.Services.Test
         {
             var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var authentication1 = await cremaHost.LoginRandomAsync();
+            var authentication1 = await this.TestContext.LoginRandomAsync();
+            var authentication2 = await this.TestContext.LoginRandomAsync();
             var user1 = await userCollection.GetUserAsync(authentication1.ID);
-            var authentication2 = await cremaHost.LoginRandomAsync();
             var user2 = await userCollection.GetUserAsync(authentication2.ID);
             var actualUserID = string.Empty;
             var actualMessage = string.Empty;
@@ -448,7 +459,10 @@ namespace JSSoft.Crema.Services.Test
         public async Task UsersBanChanged_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var user1 = await userCollection.GetRandomUserAsync(item => item.Authority != Authority.Admin && item.BanInfo.IsBanned == false);
+            var userFilter1 = new UserFilter(UserFlags.Member | UserFlags.Guest | UserFlags.NotBanned);
+            var user1 = await userFilter1.GetUserAsync(app);
+            var userFilter2 = new UserFilter(UserFlags.Member | UserFlags.Guest | UserFlags.Banned) { ExcludedUserIDs = new[] { user1.ID } };
+            var user2 = await userFilter2.GetUserAsync(app);
             var actualUserID = string.Empty;
             var actualMessage = string.Empty;
             var actualBanType = BanChangeType.Unban;
@@ -461,12 +475,11 @@ namespace JSSoft.Crema.Services.Test
             Assert.AreEqual(user1.ID, actualUserID);
             Assert.AreEqual(expectedMessage, actualMessage);
             Assert.AreEqual(BanChangeType.Ban, actualBanType);
-            var user2 = await userCollection.GetRandomUserAsync(item => item.Authority != Authority.Admin && item.BanInfo.IsBanned == false);
             await userCollection.Dispatcher.InvokeAsync(() =>
             {
                 userCollection.UsersBanChanged -= UserCollection_UsersBanChanged;
             });
-            await user2.BanAsync(authentication, RandomUtility.NextString());
+            await user2.UnbanAsync(authentication);
             Assert.AreEqual(user1.ID, actualUserID);
             Assert.AreEqual(expectedMessage, actualMessage);
             Assert.AreEqual(BanChangeType.Ban, actualBanType);
@@ -493,8 +506,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task MessageReceived_Test()
         {
             var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            var authentication1 = await cremaHost.LoginRandomAsync();
-            var authentication2 = await cremaHost.LoginRandomAsync();
+            var authentication1 = await this.TestContext.LoginRandomAsync();
+            var authentication2 = await this.TestContext.LoginRandomAsync();
             var user1 = await userCollection.GetUserAsync(authentication1.ID);
             var user2 = await userCollection.GetUserAsync(authentication2.ID);
             var actualMessage = string.Empty;

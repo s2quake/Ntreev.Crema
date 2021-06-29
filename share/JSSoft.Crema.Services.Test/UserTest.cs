@@ -41,7 +41,6 @@ namespace JSSoft.Crema.Services.Test
     public class UserTest
     {
         private static TestApplication app;
-        private static TestServerConfigurator configurator;
         private static IUserCategoryCollection userCategoryCollection;
         private static IUserCollection userCollection;
         private static Authentication expiredAuthentication;
@@ -50,7 +49,6 @@ namespace JSSoft.Crema.Services.Test
         public static async Task ClassInitAsync(TestContext context)
         {
             app = new();
-            configurator = new(app);
             await app.InitializeAsync(context);
             await app.OpenAsync();
             userCategoryCollection = app.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
@@ -582,6 +580,17 @@ namespace JSSoft.Crema.Services.Test
             var user = await userFilter.GetUserAsync(app);
             var message = RandomUtility.NextString();
             await user.KickAsync(expiredAuthentication, message);
+        }
+
+        [TestMethod]
+        public async Task KickAsync_KickedUserExpired_TestAsync()
+        {
+            var authentication = await TestContext.LoginRandomAsync(Authority.Admin);
+            var authentication1 = await TestContext.LoginRandomAsync();
+            var user1 = await userCollection.GetUserAsync(authentication1.ID);
+            var message = RandomUtility.NextString();
+            await user1.KickAsync(authentication, message);
+            Assert.IsTrue(authentication1.IsExpired);
         }
 
         [TestMethod]

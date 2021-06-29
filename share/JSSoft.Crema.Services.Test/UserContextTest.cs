@@ -305,8 +305,10 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsMoved_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userItem = await userContext.GetRandomUserItemAsync(PredicateItem);
-            var parentItem1 = await userContext.GetRandomUserItemAsync(item => PredicateParentItem(item, userItem));
+            var userItemFilter = new UserItemFilter() { HasParent = true };
+            var userItem = await userItemFilter.GetUserItemAsync(app);
+            var parentItemFilter = new UserItemFilter() { TargetToMove = userItem };
+            var parentItem1 = await parentItemFilter.GetUserItemAsync(app);
             var actualPath = string.Empty;
             var actualOldPath = string.Empty;
             var actualOldParentPath = string.Empty;
@@ -320,7 +322,7 @@ namespace JSSoft.Crema.Services.Test
             Assert.AreEqual(userItem.Path, actualPath);
             Assert.AreEqual(expectedOldPath, actualOldPath);
             Assert.AreEqual(expectedOldParentPath, actualOldParentPath);
-            var parentItem2 = await userContext.GetRandomUserItemAsync(item => PredicateParentItem(item, userItem));
+            var parentItem2 = await parentItemFilter.GetUserItemAsync(app);
             await userContext.Dispatcher.InvokeAsync(() =>
             {
                 userContext.ItemsMoved -= UserContext_ItemsMoved;
@@ -336,28 +338,6 @@ namespace JSSoft.Crema.Services.Test
                 actualPath = userItem.Path;
                 actualOldPath = e.OldPaths.Single();
                 actualOldParentPath = e.OldParentPaths.Single();
-            }
-
-            bool PredicateItem(IUserItem userItem)
-            {
-                if (userItem.Childs.Any() == true)
-                    return false;
-                if (userItem.Parent == null)
-                    return false;
-                return true;
-            }
-
-            bool PredicateParentItem(IUserItem userItem, IUserItem targetItem)
-            {
-                if (userItem is not IUserCategory category)
-                    return false;
-                if (targetItem.Parent == category)
-                    return false;
-                if (targetItem == userItem)
-                    return false;
-                if (category.Parent == null)
-                    return false;
-                return true;
             }
         }
 

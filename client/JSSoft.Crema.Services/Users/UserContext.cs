@@ -832,7 +832,7 @@ namespace JSSoft.Crema.Services.Users
                         for (var i = 0; i < userIDs.Length; i++)
                         {
                             var user = this.Users[userIDs[i]];
-                            user.IsOnline = false;
+                            user.SetKickInfo(authentication);
                             users[i] = user;
                         }
                         this.Users.InvokeUsersKickedEvent(authentication, users, comments);

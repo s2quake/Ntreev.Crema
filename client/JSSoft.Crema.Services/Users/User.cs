@@ -42,7 +42,7 @@ namespace JSSoft.Crema.Services.Users
 
         public async Task LoginAsync(Guid authenticationToken)
         {
-            var taskID = GuidUtility.FromName(this.ID);
+            var taskID = GuidUtility.FromName($"{authenticationToken}");
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.Authentication = new Authentication(new UserAuthenticationProvider(this), authenticationToken);
@@ -360,6 +360,15 @@ namespace JSSoft.Crema.Services.Users
                 base.BanInfo = banInfo;
             else
                 base.BanInfo = BanInfo.Empty;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void SetKickInfo(Authentication authentication)
+        {
+            this.IsOnline = false;
+            if (this.Authentication != null)
+                this.Authentication.InvokeExpiredEvent(authentication.ID, string.Empty);
+            this.Authentication = null;
         }
 
         public string ID => this.Name;

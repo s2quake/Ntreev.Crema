@@ -56,7 +56,7 @@ namespace JSSoft.Crema.Services.Users
                     this.ValidateLogin(password);
                     var users = new User[] { this };
                     var authentication = new Authentication(new UserAuthenticationProvider(this), Guid.NewGuid());
-                    var taskID = GuidUtility.FromName(this.ID);
+                    var taskID = GuidUtility.FromName($"{authentication.Token}");
                     if (this.Authentication != null)
                     {
                         throw new CremaException("b722d687-0a8d-4999-ad54-cf38c0c25d6f");
