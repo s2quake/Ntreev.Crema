@@ -257,7 +257,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsRenamed_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var category = await userContext.GetRandomUserCategoryAsync(item => item.Parent != null);
+            var categoryFilter = new UserCategoryFilter() { HasParent = true };
+            var category = await categoryFilter.GetUserCategoryAsync(app);
             var actualName = string.Empty;
             var actualPath = string.Empty;
             var actualOldName = string.Empty;
@@ -349,10 +350,11 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task ItemsDeleted_TestAsync()
+        public async Task ItemsDeleted_User_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var userItem1 = await userContext.GetRandomUserItemAsync(Predicate);
+            var userFilter1 = new UserFilter() { ExcludedUserIDs = new[] { Authentication.AdminID, authentication.ID } };
+            var userItem1 = (await userFilter1.GetUserAsync(app)) as IUserItem;
             var actualPath = string.Empty;
             var expectedPath = userItem1.Path;
             await userContext.Dispatcher.InvokeAsync(() =>
@@ -365,7 +367,8 @@ namespace JSSoft.Crema.Services.Test
             {
                 userContext.ItemsDeleted -= UserContext_ItemsDeleted;
             });
-            var userItem2 = await userContext.GetRandomUserItemAsync(Predicate);
+            var userFilter2 = new UserFilter() { ExcludedUserIDs = new[] { Authentication.AdminID, authentication.ID } };
+            var userItem2 = (await userFilter2.GetUserAsync(app)) as IUserItem;
             await userItem2.DeleteAsync(authentication);
             Assert.AreEqual(expectedPath, actualPath);
 
@@ -374,24 +377,35 @@ namespace JSSoft.Crema.Services.Test
                 var userItem = e.Items.Single();
                 actualPath = e.ItemPaths.Single();
             }
+        }
 
-            static bool Predicate(IUserItem userItem)
+        [TestMethod]
+        public async Task ItemsDeleted_UserCategory_TestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var userCategoryFilter1 = new UserCategoryFilter() { HasParent = true, IsLeaf = true };
+            var userItem1 = (await userCategoryFilter1.GetUserCategoryAsync(app)) as IUserItem;
+            var actualPath = string.Empty;
+            var expectedPath = userItem1.Path;
+            await userContext.Dispatcher.InvokeAsync(() =>
             {
-                if (userItem is IUser user)
-                {
-                    if (user.ID == Authentication.AdminID)
-                        return false;
-                    if (user.UserState == UserState.Online)
-                        return false;
-                }
-                if (userItem is IUserCategory)
-                {
-                    if (userItem.Parent == null)
-                        return false;
-                    if (userItem.Childs.Any() == true)
-                        return false;
-                }
-                return true;
+                userContext.ItemsDeleted += UserContext_ItemsDeleted;
+            });
+            await userItem1.DeleteAsync(authentication);
+            Assert.AreEqual(expectedPath, actualPath);
+            await userContext.Dispatcher.InvokeAsync(() =>
+            {
+                userContext.ItemsDeleted -= UserContext_ItemsDeleted;
+            });
+            var userCategoryFilter2 = new UserCategoryFilter() { HasParent = true, IsLeaf = true };
+            var userItem2 = (await userCategoryFilter2.GetUserCategoryAsync(app)) as IUserItem;
+            await userItem2.DeleteAsync(authentication);
+            Assert.AreEqual(expectedPath, actualPath);
+
+            void UserContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<IUserItem> e)
+            {
+                var userItem = e.Items.Single();
+                actualPath = e.ItemPaths.Single();
             }
         }
 

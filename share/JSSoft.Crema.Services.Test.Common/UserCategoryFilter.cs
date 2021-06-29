@@ -128,7 +128,7 @@ namespace JSSoft.Crema.Services.Test.Common
                 return false;
             if (NameValidator.VerifyCategoryPath(parentPath) == false)
                 return false;
-            return user.Path.StartsWith(parentPath) == false;
+            return parentPath.StartsWith(user.Path) == false;
         }
     }
 }

@@ -35,14 +35,20 @@ namespace JSSoft.Crema.Services.Test.Common
             var userItem = await userContext.GetRandomUserItemAsync(this);
             if (userItem is null)
             {
-                var s = RandomUtility.Within(50);
-                if (this.Type == typeof(IUser) || (this.Type == null && s == true))
+                var type = this.Type;
+                if (type == null && this.TargetToMove != null)
+                    type = typeof(IUserCategory);
+                if (type == null && RandomUtility.Within(50) == true)
+                    type = typeof(IUser);
+                else
+                    type = typeof(IUserCategory);
+                if (type == typeof(IUser))
                 {
                     var userFilter = (UserFilter)this;
                     var user = await userFilter.GetUserAsync(serviceProvider);
                     userItem = user as IUserItem;
                 }
-                else if (this.Type == typeof(IUserCategory) || (this.Type == null && s == false))
+                else
                 {
                     var categoryFilter = (UserCategoryFilter)this;
                     var category = await categoryFilter.GetUserCategoryAsync(serviceProvider);
