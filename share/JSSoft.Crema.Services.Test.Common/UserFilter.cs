@@ -74,7 +74,6 @@ namespace JSSoft.Crema.Services.Test.Common
                 return false;
             if (this.Predicate != null && this.Predicate(user) == false)
                 return false;
-
             return true;
         }
 

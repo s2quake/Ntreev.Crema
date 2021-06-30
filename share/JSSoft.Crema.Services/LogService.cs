@@ -68,7 +68,7 @@ namespace JSSoft.Crema.Services
             {
                 Layout = consoleLayout,
             };
-            var fileRule = new LoggingRule(name, GetLevel(this.logLevel), NLog.LogLevel.Fatal, fileTarget)
+            var fileRule = new LoggingRule(name, NLog.LogLevel.Debug, NLog.LogLevel.Fatal, fileTarget)
             {
                 RuleName = $"{name}_file"
             };

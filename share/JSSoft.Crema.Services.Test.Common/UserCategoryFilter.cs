@@ -97,7 +97,7 @@ namespace JSSoft.Crema.Services.Test.Common
                 return false;
             if (this.IsLeaf == true && (userCategory.Categories.Any() == true || userCategory.Users.Any() == true))
                 return false;
-            if (this.CategoryToMove != null && CanMove(this.CategoryToMove, userCategory.Path) == false)
+            if (this.CategoryToMove != null && CanMove(this.CategoryToMove, userCategory) == false)
                 return false;
             if (this.UserToMove != null && CanMove(this.UserToMove, userCategory.Path) == false)
                 return false;
@@ -111,15 +111,15 @@ namespace JSSoft.Crema.Services.Test.Common
             return true;
         }
 
-        private static bool CanMove(IUserCategory userCategory, string parentPath)
+        private static bool CanMove(IUserCategory userCategory, IUserCategory parentCategory)
         {
             if (userCategory.Parent == null)
                 return false;
-            if (userCategory.Parent.Path == parentPath)
+            if (userCategory.Parent.Path == parentCategory.Path)
                 return false;
-            if (NameValidator.VerifyCategoryPath(parentPath) == false)
+            if (parentCategory.Categories.ContainsKey(userCategory.Name) == true)
                 return false;
-            return parentPath.StartsWith(userCategory.Path) == false;
+            return parentCategory.Path.StartsWith(userCategory.Path) == false;
         }
 
         private static bool CanMove(IUser user, string parentPath)

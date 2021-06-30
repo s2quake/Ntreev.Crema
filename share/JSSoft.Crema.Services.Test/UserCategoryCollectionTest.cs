@@ -30,6 +30,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using JSSoft.Crema.Services.Extensions;
+using System.Linq;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -55,50 +56,70 @@ namespace JSSoft.Crema.Services.Test
             await app.ReleaseAsync();
         }
 
+        [TestInitialize]
+        public async Task TestInitializeAsync()
+        {
+            await this.TestContext.InitializeAsync(app);
+        }
+
+        [TestCleanup]
+        public async Task TestCleanupAsync()
+        {
+            await this.TestContext.ReleaseAsync();
+        }
+
+        public TestContext TestContext { get; set; }
+
         [TestMethod]
-        public void CountTest()
+        public void Count_Test()
         {
             userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection.Count);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void CountTest_Dispatcher_Fail()
+        public void Count_Dispatcher_FailTest()
         {
             var count = userCategoryCollection.Count;
             Assert.Fail();
         }
 
         [TestMethod]
-        public void Contains_Test()
+        public async Task Contains_TestAsync()
         {
-            var categoryPath = userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection.Random().Path);
+            var categoryFilter = new UserCategoryFilter() { HasParent = true };
+            var category = await categoryFilter.GetUserCategoryAsync(app);
+            var categoryPath = category.Path;
             var contains = userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection.Contains(categoryPath));
             Assert.IsTrue(contains);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ContainsTest_Arg0_Null_Test()
+        public void Contains_Arg0_Null_Test()
         {
             userCategoryCollection.Contains(null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void ContainsTest_Dispatcher_Fail()
+        public async Task Contains_Dispatcher_FailTestAsync()
         {
-            var categoryPath = userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection.Random().Path);
+            var categoryFilter = new UserCategoryFilter() { HasParent = true };
+            var category = await categoryFilter.GetUserCategoryAsync(app);
+            var categoryPath = category.Path;
             userCategoryCollection.Contains(categoryPath);
             Assert.Fail();
         }
 
         [TestMethod]
-        public void Indexer_Test()
+        public async Task Indexer_TestAsync()
         {
-            var categoryPath = userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection.Random().Path);
-            var category = userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection[categoryPath]);
-            Assert.AreEqual(categoryPath, category.Path);
+            var categoryFilter = new UserCategoryFilter() { HasParent = true };
+            var category1 = await categoryFilter.GetUserCategoryAsync(app);
+            var categoryPath = category1.Path;
+            var category2 = userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection[categoryPath]);
+            Assert.AreEqual(category1, category2);
         }
 
         [TestMethod]
@@ -120,7 +141,8 @@ namespace JSSoft.Crema.Services.Test
         [ExpectedException(typeof(CategoryNotFoundException))]
         public async Task Indexer_Arg0_Nonexistent_FailTestAsync()
         {
-            var category = await userCategoryCollection.GetRandomUserCategoryAsync();
+            var categoryFilter = new UserCategoryFilter() { HasParent = true };
+            var category = await categoryFilter.GetUserCategoryAsync(app);
             var name = await category.GenerateNewCategoryNameAsync();
             var categoryName = new CategoryName(category.Path, name);
             await userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection[categoryName]);
@@ -128,83 +150,150 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void IndexerTest_Dispatcher_Fail()
+        public async Task IndexerTest_Dispatcher_FailTestAsync()
         {
-            var categoryPath = userCategoryCollection.Dispatcher.Invoke(() => userCategoryCollection.Random().Path);
-            var category = userCategoryCollection[categoryPath];
+            var categoryFilter = new UserCategoryFilter() { HasParent = true };
+            var category1 = await categoryFilter.GetUserCategoryAsync(app);
+            var categoryPath = category1.Path;
+            var category2 = userCategoryCollection[categoryPath];
             Assert.Fail();
         }
 
         [TestMethod]
-        public void CategoriesCreatedTest()
+        public async Task CategoriesCreated_TestAsync()
         {
-            userCategoryCollection.Dispatcher.Invoke(() =>
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var parent = await userCategoryCollection.GetRandomUserCategoryAsync();
+            var expectedName = await parent.GenerateNewCategoryNameAsync();
+            var expectedPath = new CategoryName(parent.Path, expectedName);
+            var actualName = string.Empty;
+            var actualPath = string.Empty;
+            await userCategoryCollection.AddCategoriesCreatedEventHandlerAsync(UserCategoryCollection_CategoriesCreated);
+            var category1 = await parent.AddNewCategoryAsync(authentication, expectedName);
+            Assert.AreEqual(expectedName, actualName);
+            Assert.AreEqual(expectedPath, actualPath);
+            await userCategoryCollection.RemoveCategoriesCreatedEventHandlerAsync(UserCategoryCollection_CategoriesCreated);
+            var category2 = parent.GenerateUserCategoryAsync(authentication);
+            Assert.AreEqual(expectedName, actualName);
+            Assert.AreEqual(expectedPath, actualPath);
+
+            void UserCategoryCollection_CategoriesCreated(object sender, ItemsCreatedEventArgs<IUserCategory> e)
             {
-                userCategoryCollection.CategoriesCreated += UserCategoryCollection_CategoriesCreated;
-                userCategoryCollection.CategoriesCreated -= UserCategoryCollection_CategoriesCreated;
-            });
+                var category = e.Items.Single();
+                actualName = category.Name;
+                actualPath = category.Path;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void CategoriesCreated_Dispatcher_Fail()
+        public void CategoriesCreated_Dispatcher_FailTest()
         {
-            userCategoryCollection.CategoriesCreated += UserCategoryCollection_CategoriesCreated;
+            userCategoryCollection.CategoriesCreated += (s, e) => { };
         }
 
         [TestMethod]
-        public void CategoriesRenamedTest()
+        public async Task CategoriesRenamed_TestAsync()
         {
-            userCategoryCollection.Dispatcher.Invoke(() =>
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var categoryFilter = new UserCategoryFilter() { HasParent = true };
+            var category = await categoryFilter.GetUserCategoryAsync(app);
+            var parent = category.Parent;
+            var oldName = category.Name;
+            var expectedName = await parent.GenerateNewCategoryNameAsync();
+            Console.WriteLine($"expectedName: {expectedName}");
+            await parent.Dispatcher.InvokeAsync(() =>
             {
-                userCategoryCollection.CategoriesRenamed += UserCategoryCollection_CategoriesRenamed;
-                userCategoryCollection.CategoriesRenamed -= UserCategoryCollection_CategoriesRenamed;
+                foreach (var item in parent.Categories)
+                {
+                    Console.WriteLine($"childName: {item.Name}");
+                }
             });
+            var actualName = string.Empty;
+            await userCategoryCollection.AddCategoriesRenamedEventHandlerAsync(UserCategoryCollection_CategoriesRenamed);
+            await category.RenameAsync(authentication, expectedName);
+            Assert.AreEqual(expectedName, actualName);
+            await userCategoryCollection.RemoveCategoriesRenamedEventHandlerAsync(UserCategoryCollection_CategoriesRenamed);
+            await category.RenameAsync(authentication, oldName);
+            Assert.AreEqual(expectedName, actualName);
+
+            void UserCategoryCollection_CategoriesRenamed(object sender, ItemsRenamedEventArgs<IUserCategory> e)
+            {
+                var category = e.Items.Single();
+                actualName = category.Name;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void CategoriesRenamed_Dispatcher_Fail()
         {
-            userCategoryCollection.CategoriesRenamed += UserCategoryCollection_CategoriesRenamed;
+            userCategoryCollection.CategoriesRenamed += (s, e) => { };
         }
 
         [TestMethod]
-        public void CategoriesMovedTest()
+        public async Task CategoriesMoved_TestAsync()
         {
-            userCategoryCollection.Dispatcher.Invoke(() =>
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var categoryFilter = new UserCategoryFilter() { HasParent = true };
+            var category = await categoryFilter.GetUserCategoryAsync(app);
+            var parentFilter = new UserCategoryFilter() { CategoryToMove = category };
+            var parent1 = await parentFilter.GetUserCategoryAsync(app);
+            var expectedPath = new CategoryName(parent1.Path, category.Name);
+            var actualPath = string.Empty;
+            await userCategoryCollection.AddCategoriesMovedEventHandlerAsync(UserCategoryCollection_CategoriesMoved);
+            await category.MoveAsync(authentication, parent1.Path);
+            Assert.AreEqual(expectedPath, actualPath);
+            await userCategoryCollection.RemoveCategoriesMovedEventHandlerAsync(UserCategoryCollection_CategoriesMoved);
+            var parent2 = await parentFilter.GetUserCategoryAsync(app);
+            await category.MoveAsync(authentication, parent2.Path);
+            Assert.AreEqual(expectedPath, actualPath);
+
+            void UserCategoryCollection_CategoriesMoved(object sender, ItemsMovedEventArgs<IUserCategory> e)
             {
-                userCategoryCollection.CategoriesMoved += UserCategoryCollection_CategoriesMoved;
-                userCategoryCollection.CategoriesMoved -= UserCategoryCollection_CategoriesMoved;
-            });
+                var category = e.Items.Single();
+                actualPath = category.Path;
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void CategoriesMoved_Dispatcher_Fail()
+        public void CategoriesMoved_Dispatcher_FailTest()
         {
-            userCategoryCollection.CategoriesMoved += UserCategoryCollection_CategoriesMoved;
+            userCategoryCollection.CategoriesMoved += (s, e) => { };
         }
 
         [TestMethod]
-        public void CategoriesDeletedTest()
+        public async Task CategoriesDeleted_TestAsync()
         {
-            userCategoryCollection.Dispatcher.Invoke(() =>
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var categoryFilter = new UserCategoryFilter() { HasParent = true, IsLeaf = true };
+            var category1 = await categoryFilter.GetUserCategoryAsync(app);
+            var expectedPath = category1.Path;
+            var actualPath = string.Empty;
+            await userCategoryCollection.AddCategoriesDeletedEventHandlerAsync(UserCategoryCollection_CategoriesDeleted);
+            await category1.DeleteAsync(authentication);
+            Assert.AreEqual(expectedPath, actualPath);
+            await userCategoryCollection.RemoveCategoriesDeletedEventHandlerAsync(UserCategoryCollection_CategoriesDeleted);
+            var category2 = await categoryFilter.GetUserCategoryAsync(app);
+            await category2.DeleteAsync(authentication);
+            Assert.AreEqual(expectedPath, actualPath);
+
+            void UserCategoryCollection_CategoriesDeleted(object sender, ItemsDeletedEventArgs<IUserCategory> e)
             {
-                userCategoryCollection.CategoriesDeleted += UserCategoryCollection_CategoriesDeleted;
-                userCategoryCollection.CategoriesDeleted -= UserCategoryCollection_CategoriesDeleted;
-            });
+                actualPath = e.ItemPaths.Single();
+            }
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void CategoriesDeleted_Dispatcher_Fail()
+        public void CategoriesDeleted_Dispatcher_FailTest()
         {
-            userCategoryCollection.CategoriesDeleted += UserCategoryCollection_CategoriesDeleted;
+            userCategoryCollection.CategoriesDeleted += (s, e) => { };
         }
 
         [TestMethod]
-        public void GetEnumeratorTest()
+        public void GetEnumerator_Test()
         {
             userCategoryCollection.Dispatcher.Invoke(() =>
             {
@@ -218,7 +307,7 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GetEnumeratorTest_Dispatcher_Fail()
+        public void GetEnumerator_Dispatcher_FailTest()
         {
             var enumerator = (userCategoryCollection as IEnumerable).GetEnumerator();
             while (enumerator.MoveNext())
@@ -228,7 +317,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public void GetGenericEnumeratorTest()
+        public void GetGenericEnumerator_Test()
         {
             userCategoryCollection.Dispatcher.Invoke(() =>
             {
@@ -242,33 +331,13 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void GetGenericEnumeratorTest_Dispatcher_Fail()
+        public void GetGenericEnumerator_Dispatcher_FailTest()
         {
             var enumerator = (userCategoryCollection as IEnumerable<IUserCategory>).GetEnumerator();
             while (enumerator.MoveNext())
             {
                 Assert.Fail();
             }
-        }
-
-        private void UserCategoryCollection_CategoriesCreated(object sender, ItemsCreatedEventArgs<IUserCategory> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserCategoryCollection_CategoriesRenamed(object sender, ItemsRenamedEventArgs<IUserCategory> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserCategoryCollection_CategoriesMoved(object sender, ItemsMovedEventArgs<IUserCategory> e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void UserCategoryCollection_CategoriesDeleted(object sender, ItemsDeletedEventArgs<IUserCategory> e)
-        {
-            throw new NotImplementedException();
         }
     }
 }

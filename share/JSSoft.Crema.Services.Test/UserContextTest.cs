@@ -225,16 +225,10 @@ namespace JSSoft.Crema.Services.Test
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var actualPath = string.Empty;
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.ItemsCreated += UserContext_ItemsCreated;
-            });
+            await userContext.AddItemsCreatedEventHandlerAsync(UserContext_ItemsCreated);
             var userItem1 = await userContext.GenerateAsync(authentication);
             Assert.AreEqual(userItem1.Path, actualPath);
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.ItemsCreated -= UserContext_ItemsCreated;
-            });
+            await userContext.RemoveItemsCreatedEventHandlerAsync(UserContext_ItemsCreated);
             var userItem2 = await userContext.GenerateAsync(authentication);
             Assert.AreEqual(userItem1.Path, actualPath);
             Assert.AreNotEqual(userItem2.Path, actualPath);
@@ -266,19 +260,13 @@ namespace JSSoft.Crema.Services.Test
             var expectedName = await category.Parent.GenerateNewCategoryNameAsync();
             var expectedOldName = category.Name;
             var expectedOldPath = category.Path;
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.ItemsRenamed += UserContext_ItemsRenamed;
-            });
+            await userContext.AddItemsRenamedEventHandlerAsync(UserContext_ItemsRenamed);
             await category.RenameAsync(authentication, expectedName);
             Assert.AreEqual(expectedName, actualName);
             Assert.AreEqual(category.Path, actualPath);
             Assert.AreEqual(expectedOldName, actualOldName);
             Assert.AreEqual(expectedOldPath, actualOldPath);
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.ItemsRenamed -= UserContext_ItemsRenamed;
-            });
+            await userContext.RemoveItemsRenamedEventHandlerAsync(UserContext_ItemsRenamed);
             await category.RenameAsync(authentication, RandomUtility.NextName());
             Assert.AreEqual(expectedName, actualName);
             Assert.AreNotEqual(category.Path, actualPath);
@@ -315,19 +303,13 @@ namespace JSSoft.Crema.Services.Test
             var actualOldParentPath = string.Empty;
             var expectedOldPath = userItem.Path;
             var expectedOldParentPath = userItem.Parent.Path;
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.ItemsMoved += UserContext_ItemsMoved;
-            });
+            await userContext.AddItemsMovedEventHandlerAsync(UserContext_ItemsMoved);
             await userItem.MoveAsync(authentication, parentItem1.Path);
             Assert.AreEqual(userItem.Path, actualPath);
             Assert.AreEqual(expectedOldPath, actualOldPath);
             Assert.AreEqual(expectedOldParentPath, actualOldParentPath);
             var parentItem2 = await parentItemFilter.GetUserItemAsync(app);
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.ItemsMoved -= UserContext_ItemsMoved;
-            });
+            await userContext.RemoveItemsMovedEventHandlerAsync(UserContext_ItemsMoved);
             await userItem.MoveAsync(authentication, parentItem2.Path);
             Assert.AreNotEqual(userItem.Path, actualPath);
             Assert.AreEqual(expectedOldPath, actualOldPath);
@@ -357,16 +339,10 @@ namespace JSSoft.Crema.Services.Test
             var userItem1 = (await userFilter1.GetUserAsync(app)) as IUserItem;
             var actualPath = string.Empty;
             var expectedPath = userItem1.Path;
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.ItemsDeleted += UserContext_ItemsDeleted;
-            });
+            await userContext.AddItemsDeletedEventHandlerAsync(UserContext_ItemsDeleted);
             await userItem1.DeleteAsync(authentication);
             Assert.AreEqual(expectedPath, actualPath);
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.ItemsDeleted -= UserContext_ItemsDeleted;
-            });
+            await userContext.RemoveItemsDeletedEventHandlerAsync(UserContext_ItemsDeleted);
             var userFilter2 = new UserFilter() { ExcludedUserIDs = new[] { Authentication.AdminID, authentication.ID } };
             var userItem2 = (await userFilter2.GetUserAsync(app)) as IUserItem;
             await userItem2.DeleteAsync(authentication);
@@ -387,16 +363,10 @@ namespace JSSoft.Crema.Services.Test
             var userItem1 = (await userCategoryFilter1.GetUserCategoryAsync(app)) as IUserItem;
             var actualPath = string.Empty;
             var expectedPath = userItem1.Path;
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.ItemsDeleted += UserContext_ItemsDeleted;
-            });
+            await userContext.AddItemsDeletedEventHandlerAsync(UserContext_ItemsDeleted);
             await userItem1.DeleteAsync(authentication);
             Assert.AreEqual(expectedPath, actualPath);
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.ItemsDeleted -= UserContext_ItemsDeleted;
-            });
+            await userContext.RemoveItemsDeletedEventHandlerAsync(UserContext_ItemsDeleted);
             var userCategoryFilter2 = new UserCategoryFilter() { HasParent = true, IsLeaf = true };
             var userItem2 = (await userCategoryFilter2.GetUserCategoryAsync(app)) as IUserItem;
             await userItem2.DeleteAsync(authentication);
@@ -424,16 +394,10 @@ namespace JSSoft.Crema.Services.Test
             var password = user.GetPassword();
             var actualPath = string.Empty;
             var expectedName = RandomUtility.NextName();
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.ItemsChanged += UserContext_ItemsChanged;
-            });
+            await userContext.AddItemsChangedEventHandlerAsync(UserContext_ItemsChanged);
             await user.SetUserNameAsync(authentication, password, expectedName);
             Assert.AreEqual(user.Path, actualPath);
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.ItemsChanged -= UserContext_ItemsChanged;
-            });
+            await userContext.RemoveItemsChangedEventHandlerAsync(UserContext_ItemsChanged);
             await user.SetUserNameAsync(authentication, password, RandomUtility.NextName());
             Assert.AreEqual(user.Path, actualPath);
 
@@ -458,16 +422,10 @@ namespace JSSoft.Crema.Services.Test
             var user = await userContext.GetUserAsync(authentication.ID);
             var password = user.GetPassword();
             var actualTaskID = Guid.Empty;
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.TaskCompleted += UserContext_TaskCompleted;
-            });
+            await userContext.AddTaskCompletedEventHandlerAsync(UserContext_TaskCompleted);
             var expectedTaskID = await (user.SetUserNameAsync(authentication, password, RandomUtility.NextName()) as Task<Guid>);
             Assert.AreEqual(expectedTaskID, actualTaskID);
-            await userContext.Dispatcher.InvokeAsync(() =>
-            {
-                userContext.TaskCompleted -= UserContext_TaskCompleted;
-            });
+            await userContext.RemoveTaskCompletedEventHandlerAsync(UserContext_TaskCompleted);
             expectedTaskID = await (user.SetUserNameAsync(authentication, password, RandomUtility.NextName()) as Task<Guid>);
             Assert.AreNotEqual(expectedTaskID, actualTaskID);
 

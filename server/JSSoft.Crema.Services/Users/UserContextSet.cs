@@ -283,11 +283,11 @@ namespace JSSoft.Crema.Services.Users
 
         #region IDisposable
 
-        async void IDisposable.Dispose()
+        void IDisposable.Dispose()
         {
             try
             {
-                await this.Repository.Dispatcher.InvokeAsync(() => this.Repository.Unlock(Authentication.System, this, nameof(IDisposable.Dispose), this.Paths));
+                this.Repository.Dispatcher.Invoke(() => this.Repository.Unlock(Authentication.System, this, nameof(IDisposable.Dispose), this.Paths));
             }
             catch (Exception e)
             {

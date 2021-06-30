@@ -49,7 +49,7 @@ namespace JSSoft.Crema.Services.Test.Common
                 var userID = NameUtility.GenerateNewName(name, usersByID.Keys);
                 var password = name.Encrypt();
                 var userName = Regex.Replace(userID, $"{name}(\\d+)", $"{userNameByAuthority[authority]}$1");
-                var categoryPath = categoryPaths.Skip((int)(categoryCount * 0.75)).Random();
+                var categoryPath = categoryPaths.Skip((int)(categoryCount * 0.75)).RandomOrDefault() ?? "/";
                 var isBanned = authority != Authority.Admin && RandomUtility.Within(10);
                 var banInfo = isBanned == true ? new BanInfo()
                 {

@@ -107,5 +107,65 @@ namespace JSSoft.Crema.Services.Extensions
             }
             throw new NotImplementedException();
         }
+        
+        public static Task AddItemsCreatedEventHandlerAsync(this IUserContext userContext, ItemsCreatedEventHandler<IUserItem> handler)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.ItemsCreated += handler);
+        }
+
+        public static Task AddItemsRenamedEventHandlerAsync(this IUserContext userContext, ItemsRenamedEventHandler<IUserItem> handler)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.ItemsRenamed += handler);
+        }
+
+        public static Task AddItemsMovedEventHandlerAsync(this IUserContext userContext, ItemsMovedEventHandler<IUserItem> handler)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.ItemsMoved += handler);
+        }
+
+        public static Task AddItemsDeletedEventHandlerAsync(this IUserContext userContext, ItemsDeletedEventHandler<IUserItem> handler)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.ItemsDeleted += handler);
+        }
+
+        public static Task AddItemsChangedEventHandlerAsync(this IUserContext userContext, ItemsEventHandler<IUserItem> handler)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.ItemsChanged += handler);
+        }
+
+        public static Task AddTaskCompletedEventHandlerAsync(this IUserContext userContext, TaskCompletedEventHandler handler)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.TaskCompleted += handler);
+        }
+
+        public static Task RemoveItemsCreatedEventHandlerAsync(this IUserContext userContext, ItemsCreatedEventHandler<IUserItem> handler)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.ItemsCreated -= handler);
+        }
+
+        public static Task RemoveItemsRenamedEventHandlerAsync(this IUserContext userContext, ItemsRenamedEventHandler<IUserItem> handler)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.ItemsRenamed -= handler);
+        }
+
+        public static Task RemoveItemsMovedEventHandlerAsync(this IUserContext userContext, ItemsMovedEventHandler<IUserItem> handler)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.ItemsMoved -= handler);
+        }
+
+        public static Task RemoveItemsDeletedEventHandlerAsync(this IUserContext userContext, ItemsDeletedEventHandler<IUserItem> handler)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.ItemsDeleted -= handler);
+        }
+
+        public static Task RemoveItemsChangedEventHandlerAsync(this IUserContext userContext, ItemsEventHandler<IUserItem> handler)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.ItemsChanged -= handler);
+        }
+
+        public static Task RemoveTaskCompletedEventHandlerAsync(this IUserContext userContext, TaskCompletedEventHandler handler)
+        {
+            return userContext.Dispatcher.InvokeAsync(() => userContext.TaskCompleted -= handler);
+        }
     }
 }

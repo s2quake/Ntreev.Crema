@@ -40,7 +40,6 @@ namespace JSSoft.Crema.Services.Test
     public class DataBaseContextTest
     {
         private static TestApplication app;
-        private static TestServerConfigurator configurator;
         private static IDataBaseContext dataBaseContext;
         private static Authentication expiredAuthentication;
 
@@ -48,14 +47,10 @@ namespace JSSoft.Crema.Services.Test
         public static async Task ClassInitAsync(TestContext context)
         {
             app = new();
-            configurator = new(app);
             await app.InitializeAsync(context);
             await app.OpenAsync();
             dataBaseContext = app.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
             expiredAuthentication = app.ExpiredAuthentication;
-            await configurator.GenerateDataBasesAsync(20);
-            await configurator.LoginRandomManyAsync();
-            await configurator.LoadRandomDataBasesAsync();
         }
 
         [ClassCleanup]
@@ -374,8 +369,10 @@ namespace JSSoft.Crema.Services.Test
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var actualDataBaseName = string.Empty;
             var actualComment = string.Empty;
-            var dataBase1 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded);
-            var dataBase2 = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded, item => item.Name != dataBase1.Name);
+            var datatBaseFilter1 = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase1 = await datatBaseFilter1.GetDataBaseAsync(app);
+            var datatBaseFilter2 = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { ExcludedDataBaseNames = new[] { dataBase1.Name } };
+            var dataBase2 = await datatBaseFilter2.GetDataBaseAsync(app);
             var dataBaseName1 = dataBase1.Name;
             var dataBaseName2 = dataBase2.Name;
             var expectedDataBaseName = dataBase1.Name;

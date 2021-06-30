@@ -347,17 +347,11 @@ namespace JSSoft.Crema.Services.Test
             var userFilter2 = new UserFilter(UserFlags.Offline | UserFlags.NotBanned) { ExcludedUserIDs = new[] { user1.ID } };
             var user2 = await userFilter2.GetUserAsync(app);
             var actualUserID = string.Empty;
-            await userCollection.Dispatcher.InvokeAsync(() =>
-            {
-                userCollection.UsersLoggedIn += UserCollection_UsersLoggedIn;
-            });
+            await userCollection.AddUsersLoggedInEventHandlerAsync(UserCollection_UsersLoggedIn);
             Console.WriteLine(user1.UserState);
             var authentication1 = await this.TestContext.LoginAsync(user1.ID);
             Assert.AreEqual(authentication1.ID, actualUserID);
-            await userCollection.Dispatcher.InvokeAsync(() =>
-            {
-                userCollection.UsersLoggedIn -= UserCollection_UsersLoggedIn;
-            });
+            await userCollection.RemoveUsersLoggedInEventHandlerAsync(UserCollection_UsersLoggedIn);
             var authentication2 = await this.TestContext.LoginAsync(user2.ID);
             Assert.AreEqual(authentication1.ID, actualUserID);
             Assert.AreNotEqual(authentication2.ID, actualUserID);
@@ -384,16 +378,10 @@ namespace JSSoft.Crema.Services.Test
             var user1 = await userCollection.GetUserAsync(authentication1.ID);
             var user2 = await userCollection.GetUserAsync(authentication2.ID);
             var actualUserID = string.Empty;
-            await userCollection.Dispatcher.InvokeAsync(() =>
-            {
-                userCollection.UsersLoggedOut += UserCollection_UsersLoggedOut;
-            });
+            await userCollection.AddUsersLoggedOutEventHandlerAsync(UserCollection_UsersLoggedOut);
             await this.TestContext.LogoutAsync(authentication1);
             Assert.AreEqual(user1.ID, actualUserID);
-            await userCollection.Dispatcher.InvokeAsync(() =>
-            {
-                userCollection.UsersLoggedOut -= UserCollection_UsersLoggedOut;
-            });
+            await userCollection.RemoveUsersLoggedOutEventHandlerAsync(UserCollection_UsersLoggedOut);
             await this.TestContext.LogoutAsync(authentication2);
             Assert.AreEqual(user1.ID, actualUserID);
             Assert.AreNotEqual(user2.ID, actualUserID);
@@ -424,17 +412,11 @@ namespace JSSoft.Crema.Services.Test
             var actualUserID = string.Empty;
             var actualMessage = string.Empty;
             var expectedMessage = RandomUtility.NextString();
-            await userCollection.Dispatcher.InvokeAsync(() =>
-            {
-                userCollection.UsersKicked += UserCollection_UsersKicked;
-            });
+            await userCollection.AddUsersKickedEventHandlerAsync(UserCollection_UsersKicked);
             await user1.KickAsync(authentication, expectedMessage);
             Assert.AreEqual(user1.ID, actualUserID);
             Assert.AreEqual(expectedMessage, actualMessage);
-            await userCollection.Dispatcher.InvokeAsync(() =>
-            {
-                userCollection.UsersKicked -= UserCollection_UsersKicked;
-            });
+            await userCollection.RemoveUsersKickedEventHandlerAsync(UserCollection_UsersKicked);
             await user2.KickAsync(authentication, RandomUtility.NextString());
             Assert.AreEqual(user1.ID, actualUserID);
             Assert.AreEqual(expectedMessage, actualMessage);
@@ -467,18 +449,12 @@ namespace JSSoft.Crema.Services.Test
             var actualMessage = string.Empty;
             var actualBanType = BanChangeType.Unban;
             var expectedMessage = RandomUtility.NextString();
-            await userCollection.Dispatcher.InvokeAsync(() =>
-            {
-                userCollection.UsersBanChanged += UserCollection_UsersBanChanged;
-            });
+            await userCollection.AddUsersBanChangedEventHandlerAsync(UserCollection_UsersBanChanged);
             await user1.BanAsync(authentication, expectedMessage);
             Assert.AreEqual(user1.ID, actualUserID);
             Assert.AreEqual(expectedMessage, actualMessage);
             Assert.AreEqual(BanChangeType.Ban, actualBanType);
-            await userCollection.Dispatcher.InvokeAsync(() =>
-            {
-                userCollection.UsersBanChanged -= UserCollection_UsersBanChanged;
-            });
+            await userCollection.RemoveUsersBanChangedEventHandlerAsync(UserCollection_UsersBanChanged);
             await user2.UnbanAsync(authentication);
             Assert.AreEqual(user1.ID, actualUserID);
             Assert.AreEqual(expectedMessage, actualMessage);
@@ -515,19 +491,13 @@ namespace JSSoft.Crema.Services.Test
             var actualUserID = string.Empty;
             var actualSenderID = string.Empty;
             var expectedMessage = RandomUtility.NextString();
-            await userCollection.Dispatcher.InvokeAsync(() =>
-            {
-                userCollection.MessageReceived += UserCollection_MessageReceived;
-            });
+            await userCollection.AddMessageReceivedEventHandlerAsync(UserCollection_MessageReceived);
             await user2.SendMessageAsync(authentication1, expectedMessage);
             Assert.AreEqual(expectedMessage, actualMessage);
             Assert.AreEqual(MessageType.None, actualMessageType);
             Assert.AreEqual(user2.ID, actualUserID);
             Assert.AreEqual(user1.ID, actualSenderID);
-            await userCollection.Dispatcher.InvokeAsync(() =>
-            {
-                userCollection.MessageReceived -= UserCollection_MessageReceived;
-            });
+            await userCollection.RemoveMessageReceivedEventHandlerAsync(UserCollection_MessageReceived);
             await user1.SendMessageAsync(authentication2, RandomUtility.NextString());
             Assert.AreEqual(expectedMessage, actualMessage);
             Assert.AreEqual(MessageType.None, actualMessageType);

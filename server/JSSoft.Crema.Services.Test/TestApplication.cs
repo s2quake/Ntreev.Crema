@@ -53,7 +53,7 @@ namespace JSSoft.Crema.Services.Test
 
         public async Task ReleaseAsync()
         {
-            await Task.Run(() => DirectoryUtility.Delete(this.BasePath));
+            // await Task.Run(() => DirectoryUtility.Delete(this.BasePath));
             this.Dispose();
         }
     }

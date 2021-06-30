@@ -25,9 +25,49 @@ namespace JSSoft.Crema.Services.Extensions
 {
     public static class UserCategoryCollectionExtensions
     {
-        public static Task<bool> ContainsAsync(this IUserCategoryCollection categories, string categoryPath)
+        public static Task<bool> ContainsAsync(this IUserCategoryCollection userCategoryCollection, string categoryPath)
         {
-            return categories.Dispatcher.InvokeAsync(() => categories.Contains(categoryPath));
+            return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.Contains(categoryPath));
+        }
+
+        public static Task AddCategoriesCreatedEventHandlerAsync(this IUserCategoryCollection userCategoryCollection, ItemsCreatedEventHandler<IUserCategory> handler)
+        {
+            return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.CategoriesCreated += handler);
+        }
+
+        public static Task AddCategoriesRenamedEventHandlerAsync(this IUserCategoryCollection userCategoryCollection, ItemsRenamedEventHandler<IUserCategory> handler)
+        {
+            return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.CategoriesRenamed += handler);
+        }
+
+        public static Task AddCategoriesMovedEventHandlerAsync(this IUserCategoryCollection userCategoryCollection, ItemsMovedEventHandler<IUserCategory> handler)
+        {
+            return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.CategoriesMoved += handler);
+        }
+
+        public static Task AddCategoriesDeletedEventHandlerAsync(this IUserCategoryCollection userCategoryCollection, ItemsDeletedEventHandler<IUserCategory> handler)
+        {
+            return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.CategoriesDeleted += handler);
+        }
+
+        public static Task RemoveCategoriesCreatedEventHandlerAsync(this IUserCategoryCollection userCategoryCollection, ItemsCreatedEventHandler<IUserCategory> handler)
+        {
+            return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.CategoriesCreated -= handler);
+        }
+
+        public static Task RemoveCategoriesRenamedEventHandlerAsync(this IUserCategoryCollection userCategoryCollection, ItemsRenamedEventHandler<IUserCategory> handler)
+        {
+            return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.CategoriesRenamed -= handler);
+        }
+
+        public static Task RemoveCategoriesMovedEventHandlerAsync(this IUserCategoryCollection userCategoryCollection, ItemsMovedEventHandler<IUserCategory> handler)
+        {
+            return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.CategoriesMoved -= handler);
+        }
+
+        public static Task RemoveCategoriesDeletedEventHandlerAsync(this IUserCategoryCollection userCategoryCollection, ItemsDeletedEventHandler<IUserCategory> handler)
+        {
+            return userCategoryCollection.Dispatcher.InvokeAsync(() => userCategoryCollection.CategoriesDeleted -= handler);
         }
     }
 }
