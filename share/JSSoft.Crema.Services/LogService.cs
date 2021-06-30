@@ -57,11 +57,13 @@ namespace JSSoft.Crema.Services
         {
             var fileName = Path.Combine(path, $"{name}.txt");
             var archiveFileName = Path.Combine(path, $"{name}.{{#}}.txt");
+            var fileLayout = new SimpleLayout("${longdate}|${level:uppercase=true}|${message}${onexception:${newline}${exception:format=tostring}}");
             var fileTarget = new FileTarget($"{name}_file")
             {
                 FileName = fileName,
                 ArchiveFileName = archiveFileName,
                 ArchiveEvery = FileArchivePeriod.Day,
+                Layout = fileLayout
             };
             var consoleLayout = new SimpleLayout("${message}");
             var consoleTarget = new ConsoleTarget($"{name}_console")
