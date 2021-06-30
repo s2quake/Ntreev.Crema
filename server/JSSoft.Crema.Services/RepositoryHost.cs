@@ -189,7 +189,6 @@ namespace JSSoft.Crema.Services
             if (paths.Distinct().Count() != paths.Length)
             {
                 System.Diagnostics.Debugger.Break();
-                throw new NotImplementedException("sdalkfjasdlkfj;laskjfaldsjk");
             }
             foreach (var item in paths)
             {
@@ -199,12 +198,7 @@ namespace JSSoft.Crema.Services
             }
             foreach (var item in paths)
             {
-                if (item == "/NewCategory3/")
-                {
-                    int wqer=0;
-                }
                 this.paths.Add(item);
-                Console.WriteLine($"add: {item}");
             }
             this.CremaHost.Debug($"[{authentication}] {target.GetType().Name}.{methodName} Lock{Environment.NewLine}{string.Join(Environment.NewLine, paths)}");
         }
@@ -215,7 +209,6 @@ namespace JSSoft.Crema.Services
             if (paths.Distinct().Count() != paths.Length)
             {
                 System.Diagnostics.Debugger.Break();
-                throw new NotImplementedException("sdalkfjasdlkfj;laskjfaldsjk");
             }
             foreach (var item in paths)
             {
@@ -228,12 +221,7 @@ namespace JSSoft.Crema.Services
             }
             foreach (var item in paths)
             {
-                Console.WriteLine($"removed: {item}");
                 this.paths.Remove(item);
-            }
-            if (this.paths.Any() == true)
-            {
-                int qwer=0;
             }
             this.CremaHost.Debug($"[{authentication}] {target.GetType().Name}.{methodName} Unlock{Environment.NewLine}{string.Join(Environment.NewLine, paths)}");
         }
