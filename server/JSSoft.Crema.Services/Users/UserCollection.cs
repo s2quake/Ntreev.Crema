@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Properties;
+using JSSoft.Crema.Services.Users.Arguments;
 using JSSoft.Crema.Services.Users.Serializations;
 using JSSoft.Library;
 using JSSoft.Library.ObjectModel;
@@ -142,16 +143,24 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        public Task InvokeUserMoveAsync(Authentication authentication, UserInfo userInfo, string newCategoryPath, string userPath, string[] lockPaths)
+        public Task InvokeUserMoveAsync(Authentication authentication, UserMoveArguments args)
         {
-            var message = EventMessageBuilder.MoveUser(authentication, userInfo.ID, userInfo.Name, userInfo.CategoryPath, newCategoryPath);
+            var userInfo = args.UserInfo;
+            var userID = userInfo.ID;
+            var userName = userInfo.Name;
+            var categoryPath = userInfo.CategoryPath;
+            var newCategoryPath = args.NewCategoryPath;
+            var userPath = args.UserPath;
+            var lockPaths = args.LockPaths;
+            var context = this.Context;
+            var message = EventMessageBuilder.MoveUser(authentication, userID, userName, categoryPath, newCategoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeUserMoveAsync), lockPaths);
                 try
                 {
                     var userSet = this.ReadDataForPath(authentication, userPath, lockPaths);
-                    var userContextSet = new UserContextSet(this.Context, userSet, false);
+                    var userContextSet = new UserContextSet(context, userSet, false);
                     this.Repository.MoveUser(userContextSet, userInfo.Path, newCategoryPath);
                     this.Repository.Commit(authentication, message);
                 }
@@ -163,8 +172,12 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        public Task InvokeUserDeleteAsync(Authentication authentication, UserInfo userInfo, string userPath, string[] lockPaths)
+        public Task InvokeUserDeleteAsync(Authentication authentication, UserDeleteArguments args)
         {
+            var userInfo = args.UserInfo;
+            var userPath = args.UserPath;
+            var lockPaths = args.LockPaths;
+            var context = this.Context;
             var message = EventMessageBuilder.DeleteUser(authentication, userInfo.ID);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
@@ -172,7 +185,7 @@ namespace JSSoft.Crema.Services.Users
                 try
                 {
                     var userSet = this.ReadDataForPath(authentication, userPath, lockPaths);
-                    var userContextSet = new UserContextSet(this.Context, userSet, false);
+                    var userContextSet = new UserContextSet(context, userSet, false);
                     this.Repository.DeleteUser(userContextSet, userInfo.Path);
                     this.Repository.Commit(authentication, message);
                 }
@@ -196,16 +209,21 @@ namespace JSSoft.Crema.Services.Users
             return dataSet;
         }
 
-        public Task<UserInfo> InvokeUserNameSetAsync(Authentication authentication, string userID, string userName, string userPath, string[] lockPaths)
+        public Task<UserInfo> InvokeUserNameSetAsync(Authentication authentication, UserSetNameArguments args)
         {
-            var message = EventMessageBuilder.SetUserName(authentication, userID, userName);
+            var userInfo = args.UserInfo;
+            var userName = args.UserName;
+            var userPath = args.UserPath;
+            var lockPaths = args.LockPaths;
+            var context = this.Context;
+            var message = EventMessageBuilder.SetUserName(authentication, userInfo.ID, userInfo.Name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeUserNameSetAsync), lockPaths);
                 try
                 {
                     var userSet = this.ReadDataForChange(authentication, userPath, lockPaths);
-                    var userContextSet = new UserContextSet(this.Context, userSet, false);
+                    var userContextSet = new UserContextSet(context, userSet, false);
                     this.Repository.ModifyUser(userContextSet, userPath, userName);
                     this.Repository.Commit(authentication, message);
                     return (UserInfo)userContextSet.GetUserInfo(userPath);
@@ -218,16 +236,21 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        public Task<UserSerializationInfo> InvokeUserPasswordSetAsync(Authentication authentication, string userID, string userName, SecureString password, string userPath, string[] lockPaths)
+        public Task<UserSerializationInfo> InvokeUserPasswordSetAsync(Authentication authentication, UserSetPasswordArguments args)
         {
-            var message = EventMessageBuilder.SetPassword(authentication, userID, userName);
+            var password = args.Password;
+            var userInfo = args.UserInfo;
+            var userPath = args.UserPath;
+            var lockPaths = args.LockPaths;
+            var context = this.Context;
+            var message = EventMessageBuilder.SetPassword(authentication, userInfo.ID, userInfo.Name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeUserPasswordSetAsync), lockPaths);
                 try
                 {
                     var userSet = this.ReadDataForChange(authentication, userPath, lockPaths);
-                    var userContextSet = new UserContextSet(this.Context, userSet, false);
+                    var userContextSet = new UserContextSet(context, userSet, false);
                     this.Repository.ModifyUser(userContextSet, userPath, password);
                     this.Repository.Commit(authentication, message);
                     return userContextSet.GetUserInfo(userPath);
@@ -240,16 +263,21 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        public Task<UserSerializationInfo> InvokeUserPasswordResetAsync(Authentication authentication, string userID, string userName, SecureString password, string userPath, string[] lockPaths)
+        public Task<UserSerializationInfo> InvokeUserPasswordResetAsync(Authentication authentication, UserResetPasswordArguments args)
         {
-            var message = EventMessageBuilder.ResetPassword(authentication, userID, userName);
+            var password = args.Password;
+            var userInfo = args.UserInfo;
+            var userPath = args.UserPath;
+            var lockPaths = args.LockPaths;
+            var context = this.Context;
+            var message = EventMessageBuilder.ResetPassword(authentication, userInfo.ID, userInfo.Name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeUserPasswordSetAsync), lockPaths);
                 try
                 {
                     var userSet = this.ReadDataForChange(authentication, userPath, lockPaths);
-                    var userContextSet = new UserContextSet(this.Context, userSet, false);
+                    var userContextSet = new UserContextSet(context, userSet, false);
                     this.Repository.ModifyUser(userContextSet, userPath, password);
                     this.Repository.Commit(authentication, message);
                     return userContextSet.GetUserInfo(userPath);
@@ -262,16 +290,21 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        public Task<UserSerializationInfo> InvokeUserBanAsync(Authentication authentication, string userID, string userName, string comment, string userPath, string[] lockPaths)
+        public Task<UserSerializationInfo> InvokeUserBanAsync(Authentication authentication, UserBanArguments args)
         {
-            var message = EventMessageBuilder.BanUser(authentication, userID, userName, comment);
+            var userInfo = args.UserInfo;
+            var comment = args.Comment;
+            var userPath = args.UserPath;
+            var lockPaths = args.LockPaths;
+            var context = this.Context;
+            var message = EventMessageBuilder.BanUser(authentication, userInfo.ID, userInfo.Name, comment);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeUserBanAsync), lockPaths);
                 try
                 {
                     var userSet = this.ReadDataForChange(authentication, userPath, lockPaths);
-                    var userContextSet = new UserContextSet(this.Context, userSet, false);
+                    var userContextSet = new UserContextSet(context, userSet, false);
                     this.Repository.BanUser(userContextSet, userPath, comment);
                     this.Repository.Commit(authentication, message);
                     return userContextSet.GetUserInfo(userPath);
@@ -284,16 +317,20 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        public Task<UserSerializationInfo> InvokeUserUnbanAsync(Authentication authentication, string userID, string userName, string userPath, string[] lockPaths)
+        public Task<UserSerializationInfo> InvokeUserUnbanAsync(Authentication authentication, UserUnbanArguments args)
         {
-            var message = EventMessageBuilder.UnbanUser(authentication, userID, userName);
+            var userInfo = args.UserInfo;
+            var userPath = args.UserPath;
+            var lockPaths = args.LockPaths;
+            var context = this.Context;
+            var message = EventMessageBuilder.UnbanUser(authentication, userInfo.ID, userInfo.Name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeUserUnbanAsync), lockPaths);
                 try
                 {
                     var userSet = this.ReadDataForChange(authentication, userPath, lockPaths);
-                    var userContextSet = new UserContextSet(this.Context, userSet, false);
+                    var userContextSet = new UserContextSet(context, userSet, false);
                     this.Repository.UnbanUser(userContextSet, userPath);
                     this.Repository.Commit(authentication, message);
                     return userContextSet.GetUserInfo(userPath);

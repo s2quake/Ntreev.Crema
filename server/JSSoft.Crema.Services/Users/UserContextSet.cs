@@ -32,63 +32,34 @@ using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Users
 {
-    class UserContextSet : IDisposable
+    class UserContextSet
     {
         private readonly Dictionary<string, UserSerializationInfo> users = new();
         private readonly Dictionary<string, UserSerializationInfo> usersToCreate = new();
         private readonly Dictionary<string, UserSerializationInfo> usersToDelete = new();
         private readonly SignatureDateProvider signatureDateProvider;
+        private readonly string basePath;
+        private readonly UserRepositoryHost Repository;
+        private readonly IObjectSerializer serializer;
 
         public UserContextSet(UserContext userContext, UserSet userSet, bool userCreation)
         {
-            this.UserContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
-            // this.UserContext.Dispatcher.VerifyAccess();
-            this.Paths = userSet.ItemPaths;
-            try
+            this.basePath = userContext.BasePath;
+            this.Repository = userContext.Repository;
+            this.serializer = userContext.Serializer;
+            foreach (var item in userSet.Infos)
             {
-                foreach (var item in userSet.Infos)
+                if (userCreation == true)
                 {
-                    var user = userContext.Users[item.ID, item.CategoryPath];
-                    if (user == null)
-                    {
-                        if (userCreation == false)
-                        {
-                            throw new UserNotFoundException(item.ID);
-                        }
-                        else
-                        {
-                            this.usersToCreate.Add(item.Path, item);
-                        }
-                    }
-                    else
-                    {
-                        this.users.Add(item.Path, item);
-                    }
+                    this.usersToCreate.Add(item.Path, item);
                 }
-                this.signatureDateProvider = userSet.SignatureDateProvider;
+                else
+                {
+                    this.users.Add(item.Path, item);
+                }
             }
-            catch
-            {
-                this.Repository.Dispatcher.Invoke(() => this.Repository.Unlock(Authentication.System, this, nameof(UserContextSet), userSet.ItemPaths));
-                throw;
-            }
+            this.signatureDateProvider = userSet.SignatureDateProvider;
         }
-
-        // public static Task<UserContextSet> CreateAsync(UserContext userContext, UserSet userSet, bool userCreation)
-        // {
-        //     return userContext.Dispatcher.InvokeAsync(() => new UserContextSet(userContext, userSet, userCreation));
-        // }
-
-        // public static Task<UserContextSet> CreateEmptyAsync(Authentication authentication, UserContext userContext, string[] itemPaths)
-        // {
-        //     var userSet = new UserSet
-        //     {
-        //         ItemPaths = itemPaths,
-        //         Infos = new UserSerializationInfo[] { },
-        //         SignatureDateProvider = new SignatureDateProvider(authentication.ID),
-        //     };
-        //     return userContext.Dispatcher.InvokeAsync(() => new UserContextSet(userContext, userSet, false));
-        // }
 
         public static UserContextSet CreateEmpty(Authentication authentication, UserContext userContext, string[] itemPaths)
         {
@@ -103,8 +74,8 @@ namespace JSSoft.Crema.Services.Users
 
         public void SetUserCategoryPath(string categoryPath, string newCategoryPath)
         {
-            var itemPath1 = new RepositoryPath(this.UserContext.BasePath, categoryPath);
-            var itemPath2 = new RepositoryPath(this.UserContext.BasePath, newCategoryPath);
+            var itemPath1 = new RepositoryPath(this.basePath, categoryPath);
+            var itemPath2 = new RepositoryPath(this.basePath, newCategoryPath);
 
             if (itemPath1.IsExists == false)
                 throw new DirectoryNotFoundException();
@@ -120,10 +91,10 @@ namespace JSSoft.Crema.Services.Users
                     continue;
 
                 var userInfoCategoryPath = Regex.Replace(userInfo.CategoryPath, "^" + categoryPath, newCategoryPath);
-                var repositoryPath1 = new RepositoryPath(this.UserContext.BasePath, path);
-                var repositoryPath2 = new RepositoryPath(this.UserContext.BasePath, userInfoCategoryPath + userInfo.ID);
-                repositoryPath1.ValidateExists(this.Serializer, typeof(UserSerializationInfo));
-                repositoryPath2.ValidateNotExists(this.Serializer, typeof(UserSerializationInfo));
+                var repositoryPath1 = new RepositoryPath(this.basePath, path);
+                var repositoryPath2 = new RepositoryPath(this.basePath, userInfoCategoryPath + userInfo.ID);
+                repositoryPath1.ValidateExists(this.serializer, typeof(UserSerializationInfo));
+                repositoryPath2.ValidateNotExists(this.serializer, typeof(UserSerializationInfo));
                 userInfo.CategoryPath = userInfoCategoryPath;
                 userInfo.ModificationInfo = signatureDate;
                 this.users[path] = userInfo;
@@ -135,7 +106,7 @@ namespace JSSoft.Crema.Services.Users
 
         public void DeleteUserCategory(string categoryPath)
         {
-            var itemPath = new RepositoryPath(this.UserContext.BasePath, categoryPath);
+            var itemPath = new RepositoryPath(this.basePath, categoryPath);
             this.Repository.Delete(itemPath);
         }
 
@@ -151,7 +122,7 @@ namespace JSSoft.Crema.Services.Users
             this.Serialize();
             foreach (var item in this.usersToCreate)
             {
-                var repositoryPath = new RepositoryPath(this.UserContext.BasePath, item.Key);
+                var repositoryPath = new RepositoryPath(this.basePath, item.Key);
                 this.Repository.Add(repositoryPath);
             }
         }
@@ -164,10 +135,10 @@ namespace JSSoft.Crema.Services.Users
         public void MoveUser(string userPath, string categoryPath)
         {
             var userInfo = this.users[userPath];
-            var repositoryPath1 = new RepositoryPath(this.UserContext.BasePath, userInfo.Path);
-            var repositoryPath2 = new RepositoryPath(this.UserContext.BasePath, categoryPath + userInfo.ID);
-            repositoryPath1.ValidateExists(this.Serializer, typeof(UserSerializationInfo));
-            repositoryPath2.ValidateNotExists(this.Serializer, typeof(UserSerializationInfo));
+            var repositoryPath1 = new RepositoryPath(this.basePath, userInfo.Path);
+            var repositoryPath2 = new RepositoryPath(this.basePath, categoryPath + userInfo.ID);
+            repositoryPath1.ValidateExists(this.serializer, typeof(UserSerializationInfo));
+            repositoryPath2.ValidateNotExists(this.serializer, typeof(UserSerializationInfo));
             userInfo.CategoryPath = categoryPath;
             userInfo.ModificationInfo = this.signatureDateProvider.Provide();
             this.users[userPath] = userInfo;
@@ -180,7 +151,7 @@ namespace JSSoft.Crema.Services.Users
             var userInfo = this.users[userPath];
             this.users.Remove(userPath);
             this.usersToDelete.Add(userPath, userInfo);
-            var repositoryPaths = this.usersToDelete.Keys.Select(item => new RepositoryPath(this.UserContext.BasePath, item)).ToArray();
+            var repositoryPaths = this.usersToDelete.Keys.Select(item => new RepositoryPath(this.basePath, item)).ToArray();
             this.Repository.DeleteRange(repositoryPaths);
         }
 
@@ -257,21 +228,19 @@ namespace JSSoft.Crema.Services.Users
             throw new NotImplementedException();
         }
 
-        public string[] Paths { get; }
-
         private void Serialize()
         {
             foreach (var item in this.users)
             {
                 var path = item.Key;
                 var userInfo = item.Value;
-                var itemPath1 = new RepositoryPath(this.UserContext.BasePath, path);
-                var itemPath2 = new RepositoryPath(this.UserContext.BasePath, userInfo.Path);
+                var itemPath1 = new RepositoryPath(this.basePath, path);
+                var itemPath2 = new RepositoryPath(this.basePath, userInfo.Path);
 
-                itemPath1.ValidateExists(this.Serializer, typeof(UserSerializationInfo));
+                itemPath1.ValidateExists(this.serializer, typeof(UserSerializationInfo));
                 if (itemPath1 != itemPath2)
                 {
-                    itemPath2.ValidateNotExists(this.Serializer, typeof(UserSerializationInfo));
+                    itemPath2.ValidateNotExists(this.serializer, typeof(UserSerializationInfo));
                 }
                 this.Repository.Write(path, userInfo, false);
             }
@@ -284,29 +253,5 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        private UserRepositoryHost Repository => this.UserContext.Repository;
-
-        private IObjectSerializer Serializer => this.UserContext.Serializer;
-
-        private UserContext UserContext { get; }
-
-        private CremaHost CremaHost => this.UserContext.CremaHost;
-
-        #region IDisposable
-
-        void IDisposable.Dispose()
-        {
-            // try
-            // {
-            //     this.Repository.Dispatcher.Invoke(() => this.Repository.Unlock(Authentication.System, this, nameof(IDisposable.Dispose), this.Paths));
-            // }
-            // catch (Exception e)
-            // {
-            //     this.CremaHost.Fatal(e);
-            //     throw;
-            // }
-        }
-
-        #endregion
     }
 }

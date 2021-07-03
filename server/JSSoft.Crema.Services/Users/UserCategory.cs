@@ -214,10 +214,10 @@ namespace JSSoft.Crema.Services.Users
         private (string[] userPaths, string[] lockPaths) GetPathForData(CategoryName targetName)
         {
             var targetPaths = new string[]
-                {
-                    targetName.ParentPath,
-                    targetName,
-                };
+            {
+                targetName.ParentPath,
+                targetName,
+            };
             var items = EnumerableUtility.FamilyTree(this as IUserItem, item => item.Childs);
             var users = items.Where(item => item is User).Select(item => item as User).ToArray();
             var userPaths = users.Select(item => item.Path).ToArray();
@@ -226,40 +226,40 @@ namespace JSSoft.Crema.Services.Users
             return (userPaths, lockPaths);
         }
 
-        public async Task<UserSet> ReadDataForPathAsync(Authentication authentication, CategoryName targetName)
-        {
-            var tuple = await this.Dispatcher.InvokeAsync(() =>
-            {
-                var targetPaths = new string[]
-                {
-                    targetName.ParentPath,
-                    targetName,
-                };
-                var items = EnumerableUtility.FamilyTree(this as IUserItem, item => item.Childs);
-                var users = items.Where(item => item is User).Select(item => item as User).ToArray();
-                var userPaths = users.Select(item => item.Path).ToArray();
-                var itemPaths = items.Select(item => item.Path).ToArray();
-                var paths = itemPaths.Concat(targetPaths).Distinct().OrderBy(item => item).ToArray();
-                return (userPaths, paths);
-            });
-            return await this.Repository.Dispatcher.InvokeAsync((Func<UserSet>)(() =>
-            {
-                this.Repository.Lock(authentication, this, nameof(ReadDataForPathAsync), tuple.paths);
-                var userInfoList = new List<UserSerializationInfo>(tuple.userPaths.Length);
-                foreach (var item in tuple.userPaths)
-                {
-                    var userInfo = this.Repository.Read(item);
-                    userInfoList.Add(userInfo);
-                }
-                var dataSet = new UserSet()
-                {
-                    ItemPaths = tuple.paths,
-                    Infos = userInfoList.ToArray(),
-                    SignatureDateProvider = new SignatureDateProvider(authentication.ID),
-                };
-                return dataSet;
-            }));
-        }
+        // public async Task<UserSet> ReadDataForPathAsync(Authentication authentication, CategoryName targetName)
+        // {
+        //     var tuple = await this.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         var targetPaths = new string[]
+        //         {
+        //             targetName.ParentPath,
+        //             targetName,
+        //         };
+        //         var items = EnumerableUtility.FamilyTree(this as IUserItem, item => item.Childs);
+        //         var users = items.Where(item => item is User).Select(item => item as User).ToArray();
+        //         var userPaths = users.Select(item => item.Path).ToArray();
+        //         var itemPaths = items.Select(item => item.Path).ToArray();
+        //         var paths = itemPaths.Concat(targetPaths).Distinct().OrderBy(item => item).ToArray();
+        //         return (userPaths, paths);
+        //     });
+        //     return await this.Repository.Dispatcher.InvokeAsync((Func<UserSet>)(() =>
+        //     {
+        //         this.Repository.Lock(authentication, this, nameof(ReadDataForPathAsync), tuple.paths);
+        //         var userInfoList = new List<UserSerializationInfo>(tuple.userPaths.Length);
+        //         foreach (var item in tuple.userPaths)
+        //         {
+        //             var userInfo = this.Repository.Read(item);
+        //             userInfoList.Add(userInfo);
+        //         }
+        //         var dataSet = new UserSet()
+        //         {
+        //             ItemPaths = tuple.paths,
+        //             Infos = userInfoList.ToArray(),
+        //             SignatureDateProvider = new SignatureDateProvider(authentication.ID),
+        //         };
+        //         return dataSet;
+        //     }));
+        // }
 
         public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 

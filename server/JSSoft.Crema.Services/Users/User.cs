@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Properties;
+using JSSoft.Crema.Services.Users.Arguments;
 using JSSoft.Crema.Services.Users.Serializations;
 using JSSoft.Library;
 using JSSoft.Library.Linq;
@@ -133,20 +134,17 @@ namespace JSSoft.Crema.Services.Users
                     throw new ArgumentNullException(nameof(categoryPath));
 
                 this.ValidateExpired();
-                var (items, oldPaths, oldCategoryPaths, userInfo, userPath, lockPaths) = await this.Dispatcher.InvokeAsync(() =>
+                var args = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, categoryPath);
                     this.ValidateMove(authentication, categoryPath);
-                    var items = EnumerableUtility.One(this).ToArray();
-                    var oldPaths = items.Select(item => item.Path).ToArray();
-                    var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
-                    var userInfo = this.UserInfo;
-                    var targetName = new ItemName(categoryPath, base.Name);
-                    var (userPath, lockPaths) = this.GetPathForData(targetName);
-                    return (items, oldPaths, oldCategoryPaths, userInfo, userPath, lockPaths);
+                    return new UserMoveArguments(this, categoryPath);
                 });
+                var items = args.Items;
+                var oldPaths = args.OldPaths;
+                var oldCategoryPaths = args.OldCategoryPaths;
                 var taskID = Guid.NewGuid();
-                await this.Container.InvokeUserMoveAsync(authentication, userInfo, categoryPath, userPath, lockPaths);
+                await this.Container.InvokeUserMoveAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
@@ -177,20 +175,17 @@ namespace JSSoft.Crema.Services.Users
                 var repository = this.Repository;
                 var cremaHost = this.CremaHost;
                 var context = this.Context;
-                var (items, oldPaths, userInfo, userPath, lockPaths) = await this.Dispatcher.InvokeAsync(() =>
+                var args = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     this.ValidateDelete(authentication);
                     this.CremaHost.Sign(authentication);
-                    var items = EnumerableUtility.One(this).ToArray();
-                    var oldPaths = items.Select(item => item.Path).ToArray();
-                    var userInfo = base.UserInfo;
-                    var targetName = new ItemName(userInfo.Path);
-                    var (userPath, lockPaths) = this.GetPathForData(targetName);
-                    return (items, oldPaths, userInfo, userPath, lockPaths);
+                    return new UserDeleteArguments(this);
                 });
                 var taskID = Guid.NewGuid();
-                await this.Container.InvokeUserDeleteAsync(authentication, userInfo, userPath, lockPaths);
+                var items = args.Items;
+                var oldPaths = args.OldPaths;
+                await this.Container.InvokeUserDeleteAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     base.Delete(authentication);
@@ -221,20 +216,16 @@ namespace JSSoft.Crema.Services.Users
                     throw new ArgumentNullException(nameof(userName));
 
                 this.ValidateExpired();
-                var (items, userID, userPath, lockPaths) = await this.Dispatcher.InvokeAsync(() =>
+                var args = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetUserNameAsync), this);
                     this.ValidateSetUserName(authentication, password, userName);
                     this.CremaHost.Sign(authentication);
-                    var items = EnumerableUtility.One(this).ToArray();
-                    var userID = this.ID;
-                    var userInfo = base.UserInfo;
-                    var userPath = userInfo.Path;
-                    var lockPaths = new[] { userInfo.Path };
-                    return (items, userID, userPath, lockPaths);
+                    return new UserSetNameArguments(this, userName);
                 });
                 var taskID = Guid.NewGuid();
-                var userInfo = await this.Container.InvokeUserNameSetAsync(authentication, userID, userName, userPath, lockPaths);
+                var items = args.Items;
+                var userInfo = await this.Container.InvokeUserNameSetAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
@@ -265,20 +256,16 @@ namespace JSSoft.Crema.Services.Users
                     throw new ArgumentNullException(nameof(newPassword));
 
                 this.ValidateExpired();
-                var (items, userID, userName, userPath, lockPaths) = await this.Dispatcher.InvokeAsync(() =>
+                var args = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPasswordAsync), this);
                     this.ValidateSetPassword(authentication, password, newPassword);
                     this.CremaHost.Sign(authentication);
-                    var items = EnumerableUtility.One(this).ToArray();
-                    var userID = this.ID;
-                    var userName = this.UserName;
-                    var userPath = this.Path;
-                    var lockPaths = new[] { this.Path };
-                    return (items, userID, userName, userPath, lockPaths);
+                    return new UserSetPasswordArguments(this, newPassword);
                 });
                 var taskID = Guid.NewGuid();
-                var userInfo = await this.Container.InvokeUserPasswordSetAsync(authentication, userID, userName, newPassword, userPath, lockPaths);
+                var items = args.Items;
+                var userInfo = await this.Container.InvokeUserPasswordSetAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
@@ -306,21 +293,16 @@ namespace JSSoft.Crema.Services.Users
                     throw new AuthenticationExpiredException(nameof(authentication));
 
                 this.ValidateExpired();
-                var (items, userID, userName, userPath, lockPaths) = await this.Dispatcher.InvokeAsync(() =>
+                var args = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPasswordAsync), this);
                     this.ValidateResetPassword(authentication);
                     this.CremaHost.Sign(authentication);
-                    var items = EnumerableUtility.One(this).ToArray();
-                    var userID = this.ID;
-                    var userName = this.UserName;
-                    var userPath = this.Path;
-                    var lockPaths = new[] { this.Path };
-                    return (items, userID, userName, userPath, lockPaths);
+                    return new UserResetPasswordArguments(this);
                 });
-                var password = $"{this.UserInfo.Authority}".ToLower();
                 var taskID = Guid.NewGuid();
-                var userInfo = await this.Container.InvokeUserPasswordResetAsync(authentication, userID, userName, password.ToSecureString(), userPath, lockPaths);
+                var items = args.Items;
+                var userInfo = await this.Container.InvokeUserPasswordResetAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
@@ -418,22 +400,16 @@ namespace JSSoft.Crema.Services.Users
                     throw new ArgumentNullException(nameof(comment));
 
                 this.ValidateExpired();
-                var (items, comments, userID, userName, userPath, lockPaths) = await this.Dispatcher.InvokeAsync(() =>
+                var args = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BanAsync), this, comment);
                     this.ValidateBan(authentication, comment);
-                    var items = EnumerableUtility.One(this).ToArray();
-                    var comments = Enumerable.Repeat(comment, items.Length).ToArray();
-                    var userInfo = base.UserInfo;
-                    var userID = this.ID;
-                    var userName = this.UserName;
-                    var userPath = this.Path;
-                    var lockPaths = new[] { userPath };
-                    return (items, comments, userID, userName, userPath, lockPaths);
+                    return new UserBanArguments(this, comment);
                 });
                 var taskID = Guid.NewGuid();
-
-                var userInfo = await this.Container.InvokeUserBanAsync(authentication, userID, userName, comment, userPath, lockPaths);
+                var items = args.Items;
+                var comments = args.Comments;
+                var userInfo = await this.Container.InvokeUserBanAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     base.Ban(authentication, (BanInfo)userInfo.BanInfo);
@@ -456,7 +432,7 @@ namespace JSSoft.Crema.Services.Users
                 this.CremaHost.Error(e);
                 throw;
             }
-        }
+    }
 
         public async Task<Guid> UnbanAsync(Authentication authentication)
         {
@@ -468,20 +444,15 @@ namespace JSSoft.Crema.Services.Users
                     throw new AuthenticationExpiredException(nameof(authentication));
 
                 this.ValidateExpired();
-                var (items, userID, userName, userPath, lockPaths) = await this.Dispatcher.InvokeAsync(() =>
+                var args = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnbanAsync), this);
                     this.ValidateUnban(authentication);
-                    var items = EnumerableUtility.One(this).ToArray();
-                    var userInfo = base.UserInfo;
-                    var userID = this.ID;
-                    var userName = this.UserName;
-                    var userPath = this.Path;
-                    var lockPaths = new[] { userPath };
-                    return (items, userID, userName, userPath, lockPaths);
+                    return new UserUnbanArguments(this);
                 });
                 var taskID = Guid.NewGuid();
-                await this.Container.InvokeUserUnbanAsync(authentication, userID, userName, userPath, lockPaths);
+                var items = args.Items;
+                await this.Container.InvokeUserUnbanAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
