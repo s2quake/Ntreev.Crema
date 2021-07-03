@@ -20,17 +20,10 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.ServiceModel;
-using JSSoft.Crema.Services.Properties;
-using JSSoft.Crema.Services.Users.Serializations;
 using JSSoft.Library;
 using JSSoft.Library.Linq;
-using JSSoft.Library.ObjectModel;
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Security;
-using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services.Users.Arguments
 {

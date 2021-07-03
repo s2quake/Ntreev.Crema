@@ -432,7 +432,7 @@ namespace JSSoft.Crema.Services.Users
                 this.CremaHost.Error(e);
                 throw;
             }
-    }
+        }
 
         public async Task<Guid> UnbanAsync(Authentication authentication)
         {
