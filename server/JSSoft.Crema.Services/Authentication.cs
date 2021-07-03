@@ -93,8 +93,8 @@ namespace JSSoft.Crema.Services
         {
             get
             {
-                if (this.isExpired == true)
-                    throw new InvalidOperationException();
+                // if (this.isExpired == true)
+                //     throw new InvalidOperationException();
                 return this.provider.ID;
             }
         }
@@ -103,8 +103,8 @@ namespace JSSoft.Crema.Services
         {
             get
             {
-                if (this.isExpired == true)
-                    throw new InvalidOperationException();
+                // if (this.isExpired == true)
+                //     throw new InvalidOperationException();
                 return this.provider.Name;
             }
         }

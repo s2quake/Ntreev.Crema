@@ -39,10 +39,10 @@ namespace JSSoft.Crema.Services.Users
         private readonly Dictionary<string, UserSerializationInfo> usersToDelete = new();
         private readonly SignatureDateProvider signatureDateProvider;
 
-        private UserContextSet(UserContext userContext, UserSet userSet, bool userCreation)
+        public UserContextSet(UserContext userContext, UserSet userSet, bool userCreation)
         {
             this.UserContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
-            this.UserContext.Dispatcher.VerifyAccess();
+            // this.UserContext.Dispatcher.VerifyAccess();
             this.Paths = userSet.ItemPaths;
             try
             {
@@ -74,12 +74,23 @@ namespace JSSoft.Crema.Services.Users
             }
         }
 
-        public static Task<UserContextSet> CreateAsync(UserContext userContext, UserSet userSet, bool userCreation)
-        {
-            return userContext.Dispatcher.InvokeAsync(() => new UserContextSet(userContext, userSet, userCreation));
-        }
+        // public static Task<UserContextSet> CreateAsync(UserContext userContext, UserSet userSet, bool userCreation)
+        // {
+        //     return userContext.Dispatcher.InvokeAsync(() => new UserContextSet(userContext, userSet, userCreation));
+        // }
 
-        public static Task<UserContextSet> CreateEmptyAsync(Authentication authentication, UserContext userContext, string[] itemPaths)
+        // public static Task<UserContextSet> CreateEmptyAsync(Authentication authentication, UserContext userContext, string[] itemPaths)
+        // {
+        //     var userSet = new UserSet
+        //     {
+        //         ItemPaths = itemPaths,
+        //         Infos = new UserSerializationInfo[] { },
+        //         SignatureDateProvider = new SignatureDateProvider(authentication.ID),
+        //     };
+        //     return userContext.Dispatcher.InvokeAsync(() => new UserContextSet(userContext, userSet, false));
+        // }
+
+        public static UserContextSet CreateEmpty(Authentication authentication, UserContext userContext, string[] itemPaths)
         {
             var userSet = new UserSet
             {
@@ -87,7 +98,7 @@ namespace JSSoft.Crema.Services.Users
                 Infos = new UserSerializationInfo[] { },
                 SignatureDateProvider = new SignatureDateProvider(authentication.ID),
             };
-            return userContext.Dispatcher.InvokeAsync(() => new UserContextSet(userContext, userSet, false));
+            return new UserContextSet(userContext, userSet, false);
         }
 
         public void SetUserCategoryPath(string categoryPath, string newCategoryPath)
@@ -285,15 +296,15 @@ namespace JSSoft.Crema.Services.Users
 
         void IDisposable.Dispose()
         {
-            try
-            {
-                this.Repository.Dispatcher.Invoke(() => this.Repository.Unlock(Authentication.System, this, nameof(IDisposable.Dispose), this.Paths));
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Fatal(e);
-                throw;
-            }
+            // try
+            // {
+            //     this.Repository.Dispatcher.Invoke(() => this.Repository.Unlock(Authentication.System, this, nameof(IDisposable.Dispose), this.Paths));
+            // }
+            // catch (Exception e)
+            // {
+            //     this.CremaHost.Fatal(e);
+            //     throw;
+            // }
         }
 
         #endregion

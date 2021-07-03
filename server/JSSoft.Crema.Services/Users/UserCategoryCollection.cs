@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Properties;
+using JSSoft.Crema.Services.Users.Serializations;
 using JSSoft.Library;
 using JSSoft.Library.ObjectModel;
 using System;
@@ -65,9 +66,6 @@ namespace JSSoft.Crema.Services.Users
                     this.ValidateAddNew(authentication, name, parentPath);
                     return new CategoryName(parentPath, name);
                 });
-                var itemPaths = new string[] { categoryName };
-                await this.Repository.LockAsync(authentication, this, nameof(AddNewAsync), itemPaths);
-                using var userContextSet = await UserContextSet.CreateEmptyAsync(authentication, this.Context, itemPaths);
                 await this.InvokeCategoryCreateAsync(authentication, categoryName);
                 var result = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -89,11 +87,14 @@ namespace JSSoft.Crema.Services.Users
 
         public Task InvokeCategoryCreateAsync(Authentication authentication, string categoryPath)
         {
+            var itemPaths = new string[] { categoryPath };
             var message = EventMessageBuilder.CreateUserCategory(authentication, categoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
+                using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeCategoryCreateAsync), itemPaths);
                 try
                 {
+                    var userContextSet = UserContextSet.CreateEmpty(authentication, this.Context, itemPaths);
                     this.Repository.CreateUserCategory(categoryPath);
                     this.Repository.Commit(authentication, message);
                 }
@@ -105,14 +106,34 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        public Task InvokeCategoryRenameAsync(Authentication authentication, string categoryPath, string name, UserContextSet userContextSet)
+        public UserSet ReadDataForPath(Authentication authentication, string[] userPaths, string[] lockPaths)
+        {
+            var userInfoList = new List<UserSerializationInfo>(userPaths.Length);
+            foreach (var item in userPaths)
+            {
+                var userInfo = this.Repository.Read(item);
+                userInfoList.Add(userInfo);
+            }
+            var dataSet = new UserSet()
+            {
+                ItemPaths = lockPaths,
+                Infos = userInfoList.ToArray(),
+                SignatureDateProvider = new SignatureDateProvider(authentication.ID),
+            };
+            return dataSet;
+        }
+
+        public Task InvokeCategoryRenameAsync(Authentication authentication, string categoryPath, string name, string[] userPaths, string[] lockPaths)
         {
             var newCategoryPath = new CategoryName(categoryPath) { Name = name, };
             var message = EventMessageBuilder.RenameUserCategory(authentication, categoryPath, name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
+                using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeCategoryRenameAsync), lockPaths);
                 try
                 {
+                    var userSet = this.ReadDataForPath(authentication, userPaths, lockPaths);
+                    var userContextSet = new UserContextSet(this.Context, userSet, false);
                     this.Repository.RenameUserCategory(userContextSet, categoryPath, newCategoryPath);
                     this.Repository.Commit(authentication, message);
                 }
@@ -124,15 +145,18 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        public Task InvokeCategoryMoveAsync(Authentication authentication, string categoryPath, string parentPath, UserContextSet userContextSet)
+        public Task InvokeCategoryMoveAsync(Authentication authentication, string categoryPath, string parentPath, string[] userPaths, string[] lockPaths)
         {
             var categoryName = new CategoryName(categoryPath);
             var newCategoryPath = new CategoryName(parentPath, categoryName.Name);
             var message = EventMessageBuilder.MoveUserCategory(authentication, categoryPath, categoryName.ParentPath, parentPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
+                using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeCategoryMoveAsync), lockPaths);
                 try
                 {
+                    var userSet = this.ReadDataForPath(authentication, userPaths, lockPaths);
+                    var userContextSet = new UserContextSet(this.Context, userSet, false);
                     this.Repository.MoveUserCategory(userContextSet, categoryPath, newCategoryPath);
                     this.Repository.Commit(authentication, message);
                 }
@@ -144,13 +168,16 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        public Task InvokeCategoryDeleteAsync(Authentication authentication, string categoryPath, UserContextSet userContextSet)
+        public Task InvokeCategoryDeleteAsync(Authentication authentication, string categoryPath, string[] userPaths, string[] lockPaths)
         {
             var message = EventMessageBuilder.DeleteUserCategory(authentication, categoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
+                using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeCategoryDeleteAsync), lockPaths);
                 try
                 {
+                    var userSet = this.ReadDataForPath(authentication, userPaths, lockPaths);
+                    var userContextSet = new UserContextSet(this.Context, userSet, false);
                     this.Repository.DeleteUserCategory(userContextSet, categoryPath);
                     this.Repository.Commit(authentication, message);
                 }

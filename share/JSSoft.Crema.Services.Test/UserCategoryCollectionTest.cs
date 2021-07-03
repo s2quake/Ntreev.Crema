@@ -35,6 +35,7 @@ using System.Linq;
 namespace JSSoft.Crema.Services.Test
 {
     [TestClass]
+    [DoNotParallelize]
     public class UserCategoryCollectionTest
     {
         private static TestApplication app;

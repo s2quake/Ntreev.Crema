@@ -49,7 +49,7 @@ namespace JSSoft.Crema.Services.Users
                     throw new ArgumentNullException(nameof(name));
 
                 this.ValidateExpired();
-                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                var (items, oldNames, oldPaths, path, userPaths, lockPaths) = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
                     this.ValidateRename(authentication, name);
@@ -58,17 +58,18 @@ namespace JSSoft.Crema.Services.Users
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var path = base.Path;
                     var targetName = new CategoryName(base.Path) { Name = name };
-                    return (items, oldNames, oldPaths, path, targetName);
+                    var (userPaths, lockPaths) = this.GetPathForData(targetName);
+                    return (items, oldNames, oldPaths, path, userPaths, lockPaths);
                 });
+
                 var taskID = Guid.NewGuid();
-                var userSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
-                await this.Container.InvokeCategoryRenameAsync(authentication, tuple.path, name, userContextSet);
+
+                await this.Container.InvokeCategoryRenameAsync(authentication, path, name, userPaths, lockPaths);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     base.Name = name;
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
+                    this.Container.InvokeCategoriesRenamedEvent(authentication, items, oldNames, oldPaths);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
@@ -92,7 +93,7 @@ namespace JSSoft.Crema.Services.Users
                     throw new ArgumentNullException(nameof(parentPath));
 
                 this.ValidateExpired();
-                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                var (items, oldPaths, oldParentPaths, path, userPaths, lockPaths) = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, parentPath);
                     this.ValidateMove(authentication, parentPath);
@@ -101,17 +102,16 @@ namespace JSSoft.Crema.Services.Users
                     var oldParentPaths = items.Select(item => item.Parent != null ? item.Parent.Path : null).ToArray();
                     var path = base.Path;
                     var targetName = new CategoryName(parentPath, base.Name);
-                    return (items, oldPaths, oldParentPaths, path, targetName);
+                    var (userPaths, lockPaths) = this.GetPathForData(targetName);
+                    return (items, oldPaths, oldParentPaths, path, userPaths, lockPaths);
                 });
                 var taskID = Guid.NewGuid();
-                var userSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
-                await this.Container.InvokeCategoryMoveAsync(authentication, tuple.path, parentPath, userContextSet);
+                await this.Container.InvokeCategoryMoveAsync(authentication, path, parentPath, userPaths, lockPaths);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Parent = this.Container[parentPath];
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths);
+                    this.Container.InvokeCategoriesMovedEvent(authentication, items, oldPaths, oldParentPaths);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
@@ -137,24 +137,24 @@ namespace JSSoft.Crema.Services.Users
                 var repository = this.Repository;
                 var cremaHost = this.CremaHost;
                 var context = this.Context;
-                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                var (items, oldPaths, path, userPaths, lockPaths) = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     this.ValidateDelete(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var path = base.Path;
-                    return (items, oldPaths, path);
+                    var targetName = new CategoryName(path);
+                    var (userPaths, lockPaths) = this.GetPathForData(targetName);
+                    return (items, oldPaths, path, userPaths, lockPaths);
                 });
                 var taskID = Guid.NewGuid();
-                var userSet = await this.ReadDataForPathAsync(authentication, new CategoryName(tuple.path));
-                using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
-                await this.Container.InvokeCategoryDeleteAsync(authentication, tuple.path, userContextSet);
+                await this.Container.InvokeCategoryDeleteAsync(authentication, path, userPaths, lockPaths);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Dispose();
                     cremaHost.Sign(authentication);
-                    container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
+                    container.InvokeCategoriesDeletedEvent(authentication, items, oldPaths);
                     context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
@@ -209,6 +209,21 @@ namespace JSSoft.Crema.Services.Users
             base.ValidateDelete();
             if (this.Items.Any() == true || this.Categories.Any() == true)
                 throw new InvalidOperationException(Resources.Exception_CannotDeletePathWithItems);
+        }
+
+        private (string[] userPaths, string[] lockPaths) GetPathForData(CategoryName targetName)
+        {
+            var targetPaths = new string[]
+                {
+                    targetName.ParentPath,
+                    targetName,
+                };
+            var items = EnumerableUtility.FamilyTree(this as IUserItem, item => item.Childs);
+            var users = items.Where(item => item is User).Select(item => item as User).ToArray();
+            var userPaths = users.Select(item => item.Path).ToArray();
+            var itemPaths = items.Select(item => item.Path).ToArray();
+            var lockPaths = itemPaths.Concat(targetPaths).Distinct().OrderBy(item => item).ToArray();
+            return (userPaths, lockPaths);
         }
 
         public async Task<UserSet> ReadDataForPathAsync(Authentication authentication, CategoryName targetName)
