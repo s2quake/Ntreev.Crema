@@ -20,37 +20,57 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Users.Serializations;
+using JSSoft.Library;
 using JSSoft.Library.Linq;
+using JSSoft.Library.ObjectModel;
+using System.Data;
 using System.Linq;
+using System.Security;
 
 namespace JSSoft.Crema.Services.Users.Arguments
 {
-    class UserSetNameArguments : UserArgumentsBase
+    class UserCreateArguments : UserArgumentsBase
     {
-        public UserSetNameArguments(User user, string userName)
+        public UserCreateArguments(string userID, string categoryPath, SecureString password, string userName, Authority authority)
         {
-            var items = EnumerableUtility.One(user).ToArray();
-            var userID = user.ID;
-            var userInfo = user.UserInfo;
-            var userPath = userInfo.Path;
-            var lockPaths = new[] { userInfo.Path };
+            this.UserID = userID;
+            this.CategoryPath = categoryPath;
+            this.Password = password;
             this.UserName = userName;
-            this.Items = items;
-            this.UserInfo = userInfo;
-            this.UserPath = userPath;
-            this.LockPaths = lockPaths;
+            this.Authority = authority;
+            this.UserPath = categoryPath + userID;
+            this.LockPaths = new[] { categoryPath, categoryPath + userID, };
         }
 
-        public UserSet Read(Authentication authentication, UserRepositoryHost repository)
+        public UserSet Create(Authentication authentication)
         {
-            return ReadDataForChange(authentication, repository, this.UserPath, this.LockPaths);
+            var userInfo = new UserSerializationInfo()
+            {
+                ID = this.UserID,
+                Password = UserContext.SecureStringToString(this.Password).Encrypt(),
+                Name = this.UserName,
+                Authority = this.Authority,
+                CategoryPath = this.CategoryPath,
+            };
+            var dataSet = new UserSet()
+            {
+                ItemPaths = this.LockPaths,
+                Infos = new UserSerializationInfo[] { userInfo },
+                SignatureDateProvider = new SignatureDateProvider(authentication.ID),
+            };
+            return dataSet;
         }
+
+        public string UserID { get; }
+
+        public string CategoryPath { get; }
+
+        public SecureString Password { get; }
 
         public string UserName { get; }
 
-        public User[] Items { get; }
-
-        public UserInfo UserInfo { get; }
+        public Authority Authority { get; }
 
         public string UserPath { get; }
 

@@ -474,43 +474,43 @@ namespace JSSoft.Crema.Services.Users
             return UserContext.SecureStringToString(this.Password) == UserContext.SecureStringToString(password).Encrypt();
         }
 
-        public async Task<UserSet> ReadDataForChangeAsync(Authentication authentication)
-        {
-            var tuple = await this.Dispatcher.InvokeAsync(() =>
-            {
-                var paths = new string[]
-                {
-                    this.Path
-                };
-                var path = this.Path;
-                return (paths, path);
-            });
-            return await this.Repository.Dispatcher.InvokeAsync(() =>
-            {
-                this.Repository.Lock(authentication, this, nameof(ReadDataForChangeAsync), tuple.paths);
-                var userInfo = this.Repository.Read(tuple.path);
-                var dataSet = new UserSet()
-                {
-                    ItemPaths = tuple.paths,
-                    Infos = new UserSerializationInfo[] { userInfo },
-                    SignatureDateProvider = new SignatureDateProvider(authentication.ID),
-                };
-                return dataSet;
-            });
-        }
+        // public async Task<UserSet> ReadDataForChangeAsync(Authentication authentication)
+        // {
+        //     var tuple = await this.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         var paths = new string[]
+        //         {
+        //             this.Path
+        //         };
+        //         var path = this.Path;
+        //         return (paths, path);
+        //     });
+        //     return await this.Repository.Dispatcher.InvokeAsync(() =>
+        //     {
+        //         this.Repository.Lock(authentication, this, nameof(ReadDataForChangeAsync), tuple.paths);
+        //         var userInfo = this.Repository.Read(tuple.path);
+        //         var dataSet = new UserSet()
+        //         {
+        //             ItemPaths = tuple.paths,
+        //             Infos = new UserSerializationInfo[] { userInfo },
+        //             SignatureDateProvider = new SignatureDateProvider(authentication.ID),
+        //         };
+        //         return dataSet;
+        //     });
+        // }
 
-        private (string userPath, string[] lockPaths) GetPathForData(ItemName targetName)
-        {
-            var items = new string[]
-            {
-                targetName.CategoryPath,
-                targetName,
-                this.Path
-            };
-            var lockPaths = items.Distinct().ToArray();
-            var userPath = this.Path;
-            return (userPath, lockPaths);
-        }
+        // private (string userPath, string[] lockPaths) GetPathForData(ItemName targetName)
+        // {
+        //     var items = new string[]
+        //     {
+        //         targetName.CategoryPath,
+        //         targetName,
+        //         this.Path
+        //     };
+        //     var lockPaths = items.Distinct().ToArray();
+        //     var userPath = this.Path;
+        //     return (userPath, lockPaths);
+        // }
 
         // public async Task<UserSet> ReadDataForPathAsync(Authentication authentication, ItemName targetName)
         // {

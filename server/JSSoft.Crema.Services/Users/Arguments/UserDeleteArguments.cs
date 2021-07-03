@@ -43,6 +43,11 @@ namespace JSSoft.Crema.Services.Users.Arguments
             this.LockPaths = lockPaths;
         }
 
+        public UserSet Read(Authentication authentication, UserRepositoryHost repository)
+        {
+            return ReadDataForPath(authentication, repository, this.UserPath, this.LockPaths);
+        }
+
         public User[] Items { get; }
 
         public string[] OldPaths { get; }

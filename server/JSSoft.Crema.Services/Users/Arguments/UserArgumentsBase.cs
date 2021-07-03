@@ -19,6 +19,8 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Crema.Services.Users.Serializations;
+using JSSoft.Library;
 using JSSoft.Library.ObjectModel;
 using System.Linq;
 
@@ -37,6 +39,30 @@ namespace JSSoft.Crema.Services.Users.Arguments
             var lockPaths = items.Distinct().ToArray();
             var userPath = path;
             return (userPath, lockPaths);
+        }
+
+        protected static UserSet ReadDataForPath(Authentication authentication, UserRepositoryHost repository, string userPath, string[] lockPaths)
+        {
+            var userInfo = (UserSerializationInfo)repository.Read(userPath);
+            var dataSet = new UserSet()
+            {
+                ItemPaths = lockPaths,
+                Infos = new UserSerializationInfo[] { userInfo },
+                SignatureDateProvider = new SignatureDateProvider(authentication.ID),
+            };
+            return dataSet;
+        }
+
+        protected static UserSet ReadDataForChange(Authentication authentication, UserRepositoryHost repository, string userPath, string[] lockPaths)
+        {
+            var userInfo = repository.Read(userPath);
+            var dataSet = new UserSet()
+            {
+                ItemPaths = lockPaths,
+                Infos = new[] { userInfo },
+                SignatureDateProvider = new SignatureDateProvider(authentication.ID),
+            };
+            return dataSet;
         }
     }
 }
