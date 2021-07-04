@@ -34,13 +34,16 @@ namespace JSSoft.Crema.Services.Users.Arguments
     {
         public UserCreateArguments(string userID, string categoryPath, SecureString password, string userName, Authority authority)
         {
+            var userPath = categoryPath + userID;
             this.UserID = userID;
             this.CategoryPath = categoryPath;
             this.Password = password;
             this.UserName = userName;
             this.Authority = authority;
-            this.UserPath = categoryPath + userID;
-            this.LockPaths = new[] { categoryPath, categoryPath + userID, };
+            this.UserPaths = new[] { userPath };
+            this.UserNames = new[] { userName };
+            this.UserPath = userPath;
+            this.LockPaths = new[] { categoryPath, userPath, };
         }
 
         public UserSet Create(Authentication authentication)
@@ -71,6 +74,10 @@ namespace JSSoft.Crema.Services.Users.Arguments
         public string UserName { get; }
 
         public Authority Authority { get; }
+
+        public string[] UserPaths { get; }
+
+        public string[] UserNames { get; }
 
         public string UserPath { get; }
 

@@ -20,46 +20,51 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.ServiceModel;
-using JSSoft.Library;
 using JSSoft.Library.Linq;
+using JSSoft.Library.ObjectModel;
+using System.Data;
 using System.Linq;
-using System.Security;
 
 namespace JSSoft.Crema.Services.Users.Arguments
 {
-    class UserResetPasswordArguments : UserArgumentsBase
+    class UserCategoryRenameArguments : UserCategoryArgumentsBase
     {
-        public UserResetPasswordArguments(User user)
+        public UserCategoryRenameArguments(UserCategory userCategory, string name)
         {
-            var items = EnumerableUtility.One(user).ToArray();
-            var userInfo = user.UserInfo;
-            var userPath = user.Path;
-            var lockPaths = new[] { userPath };
-            this.UserID = userInfo.ID;
-            this.UserName = userInfo.Name;
-            this.Password = $"{userInfo.Authority}".ToLower().ToSecureString();
+            var items = EnumerableUtility.One(userCategory).ToArray();
+            var oldNames = items.Select(item => item.Name).ToArray();
+            var oldPaths = items.Select(item => item.Path).ToArray();
+            var path = userCategory.Path;
+            var targetName = new CategoryName(userCategory.Path) { Name = name };
+            var (userPaths, lockPaths) = GetPathForData(userCategory, targetName);
+            this.Name = name;
+            this.CategoryPath = userCategory.Path;
+            this.NewCategoryPath = new CategoryName(userCategory.Path) { Name = name, };
             this.Items = items;
-            this.UserInfo = userInfo;
-            this.UserPath = userPath;
+            this.OldNames = oldNames;
+            this.OldPaths = oldPaths;
+            this.UserPaths = userPaths;
             this.LockPaths = lockPaths;
         }
 
         public UserSet Read(Authentication authentication, UserRepositoryHost repository)
         {
-            return ReadDataForChange(authentication, repository, this.UserPath, this.LockPaths);
+            return ReadDataForPath(authentication, repository, this.UserPaths, this.LockPaths);
         }
 
-        public string UserID { get; }
+        public string Name { get; }
 
-        public string UserName { get; }
+        public string CategoryPath { get; }
 
-        public SecureString Password { get; }
+        public string NewCategoryPath { get; }
 
-        public User[] Items { get; }
+        public UserCategory[] Items { get; }
 
-        public UserInfo UserInfo { get; }
+        public string[] OldNames { get; }
 
-        public string UserPath { get; }
+        public string[] OldPaths { get; }
+
+        public string[] UserPaths { get; }
 
         public string[] LockPaths { get; }
     }

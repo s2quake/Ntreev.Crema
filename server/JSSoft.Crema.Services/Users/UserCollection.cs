@@ -59,18 +59,6 @@ namespace JSSoft.Crema.Services.Users
             return this.BaseAddNew(name, categoryPath, null);
         }
 
-        // public UserSet ReadDataForPath(Authentication authentication, string userPath, string[] lockPaths)
-        // {
-        //     var userInfo = (UserSerializationInfo)this.Repository.Read(userPath);
-        //     var dataSet = new UserSet()
-        //     {
-        //         ItemPaths = lockPaths,
-        //         Infos = new UserSerializationInfo[] { userInfo },
-        //         SignatureDateProvider = new SignatureDateProvider(authentication.ID),
-        //     };
-        //     return dataSet;
-        // }
-
         public async Task<User> AddNewAsync(Authentication authentication, string userID, string categoryPath, SecureString password, string userName, Authority authority)
         {
             try
@@ -119,23 +107,19 @@ namespace JSSoft.Crema.Services.Users
 
         public Task<UserSerializationInfo> InvokeUserCreateAsync(Authentication authentication, UserCreateArguments args)
         {
-            var userPath = args.UserPath;
-            var userPaths = new[] { args.UserPath };
-            var userNames = new[] { args.UserName };
-            var lockPaths = args.LockPaths;
             var context = this.Context;
-            var message = EventMessageBuilder.CreateUser(authentication, userPaths, userNames);
             var repository = this.Repository;
+            var message = EventMessageBuilder.CreateUser(authentication, args.UserPaths, args.UserNames);
             return repository.Dispatcher.InvokeAsync(() =>
             {
-                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserMoveAsync), lockPaths);
+                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserMoveAsync), args.LockPaths);
                 try
                 {
                     var userSet = args.Create(authentication);
                     var userContextSet = new UserContextSet(context, userSet, true);
-                    repository.CreateUser(userContextSet, userPaths);
+                    repository.CreateUser(userContextSet, args.UserPaths);
                     repository.Commit(authentication, message);
-                    return userContextSet.GetUserInfo(userPath);
+                    return userContextSet.GetUserInfo(args.UserPath);
                 }
                 catch
                 {
@@ -147,24 +131,17 @@ namespace JSSoft.Crema.Services.Users
 
         public Task InvokeUserMoveAsync(Authentication authentication, UserMoveArguments args)
         {
-            var userInfo = args.UserInfo;
-            var userID = userInfo.ID;
-            var userName = userInfo.Name;
-            var categoryPath = userInfo.CategoryPath;
-            var newCategoryPath = args.NewCategoryPath;
-            var userPath = args.UserPath;
-            var lockPaths = args.LockPaths;
             var context = this.Context;
             var repository = this.Repository;
-            var message = EventMessageBuilder.MoveUser(authentication, userID, userName, categoryPath, newCategoryPath);
+            var message = EventMessageBuilder.MoveUser(authentication, args.UserID, args.UserName, args.CategoryPath, args.NewCategoryPath);
             return repository.Dispatcher.InvokeAsync(() =>
             {
-                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserMoveAsync), lockPaths);
+                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserMoveAsync), args.LockPaths);
                 try
                 {
                     var userSet = args.Read(authentication, repository);
                     var userContextSet = new UserContextSet(context, userSet, false);
-                    repository.MoveUser(userContextSet, userInfo.Path, newCategoryPath);
+                    repository.MoveUser(userContextSet, args.UserPath, args.NewCategoryPath);
                     repository.Commit(authentication, message);
                 }
                 catch
@@ -177,19 +154,17 @@ namespace JSSoft.Crema.Services.Users
 
         public Task InvokeUserDeleteAsync(Authentication authentication, UserDeleteArguments args)
         {
-            var userInfo = args.UserInfo;
-            var lockPaths = args.LockPaths;
             var context = this.Context;
             var repository = this.Repository;
-            var message = EventMessageBuilder.DeleteUser(authentication, userInfo.ID);
+            var message = EventMessageBuilder.DeleteUser(authentication, args.UserID);
             return repository.Dispatcher.InvokeAsync(() =>
             {
-                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserDeleteAsync), lockPaths);
+                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserDeleteAsync), args.LockPaths);
                 try
                 {
                     var userSet = args.Read(authentication, repository);
                     var userContextSet = new UserContextSet(context, userSet, false);
-                    repository.DeleteUser(userContextSet, userInfo.Path);
+                    repository.DeleteUser(userContextSet, args.UserPath);
                     repository.Commit(authentication, message);
                 }
                 catch
@@ -200,37 +175,21 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        // public UserSet ReadDataForChange(Authentication authentication, string userPath, string[] lockPaths)
-        // {
-        //     var userInfo = this.Repository.Read(userPath);
-        //     var dataSet = new UserSet()
-        //     {
-        //         ItemPaths = lockPaths,
-        //         Infos = new[] { userInfo },
-        //         SignatureDateProvider = new SignatureDateProvider(authentication.ID),
-        //     };
-        //     return dataSet;
-        // }
-
         public Task<UserInfo> InvokeUserNameSetAsync(Authentication authentication, UserSetNameArguments args)
         {
-            var userInfo = args.UserInfo;
-            var userName = args.UserName;
-            var userPath = args.UserPath;
-            var lockPaths = args.LockPaths;
             var context = this.Context;
             var repository = this.Repository;
-            var message = EventMessageBuilder.SetUserName(authentication, userInfo.ID, userInfo.Name);
+            var message = EventMessageBuilder.SetUserName(authentication, args.UserID, args.UserName);
             return repository.Dispatcher.InvokeAsync(() =>
             {
-                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserNameSetAsync), lockPaths);
+                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserNameSetAsync), args.LockPaths);
                 try
                 {
                     var userSet = args.Read(authentication, repository);
                     var userContextSet = new UserContextSet(context, userSet, false);
-                    repository.ModifyUser(userContextSet, userPath, userName);
+                    repository.ModifyUser(userContextSet, args.UserPath, args.NewUserName);
                     repository.Commit(authentication, message);
-                    return (UserInfo)userContextSet.GetUserInfo(userPath);
+                    return (UserInfo)userContextSet.GetUserInfo(args.UserPath);
                 }
                 catch
                 {
@@ -242,23 +201,19 @@ namespace JSSoft.Crema.Services.Users
 
         public Task<UserSerializationInfo> InvokeUserPasswordSetAsync(Authentication authentication, UserSetPasswordArguments args)
         {
-            var password = args.Password;
-            var userInfo = args.UserInfo;
-            var userPath = args.UserPath;
-            var lockPaths = args.LockPaths;
             var context = this.Context;
             var repository = this.Repository;
-            var message = EventMessageBuilder.SetPassword(authentication, userInfo.ID, userInfo.Name);
+            var message = EventMessageBuilder.SetPassword(authentication, args.UserID, args.UserName);
             return repository.Dispatcher.InvokeAsync(() =>
             {
-                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserPasswordSetAsync), lockPaths);
+                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserPasswordSetAsync), args.LockPaths);
                 try
                 {
                     var userSet = args.Read(authentication, repository);
                     var userContextSet = new UserContextSet(context, userSet, false);
-                    repository.ModifyUser(userContextSet, userPath, password);
+                    repository.ModifyUser(userContextSet, args.UserPath, args.Password);
                     repository.Commit(authentication, message);
-                    return userContextSet.GetUserInfo(userPath);
+                    return userContextSet.GetUserInfo(args.UserPath);
                 }
                 catch
                 {
@@ -270,23 +225,19 @@ namespace JSSoft.Crema.Services.Users
 
         public Task<UserSerializationInfo> InvokeUserPasswordResetAsync(Authentication authentication, UserResetPasswordArguments args)
         {
-            var password = args.Password;
-            var userInfo = args.UserInfo;
-            var userPath = args.UserPath;
-            var lockPaths = args.LockPaths;
             var context = this.Context;
             var repository = this.Repository;
-            var message = EventMessageBuilder.ResetPassword(authentication, userInfo.ID, userInfo.Name);
+            var message = EventMessageBuilder.ResetPassword(authentication, args.UserID, args.UserName);
             return repository.Dispatcher.InvokeAsync(() =>
             {
-                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserPasswordSetAsync), lockPaths);
+                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserPasswordSetAsync), args.LockPaths);
                 try
                 {
                     var userSet = args.Read(authentication, repository);
                     var userContextSet = new UserContextSet(context, userSet, false);
-                    repository.ModifyUser(userContextSet, userPath, password);
+                    repository.ModifyUser(userContextSet, args.UserPath, args.Password);
                     repository.Commit(authentication, message);
-                    return userContextSet.GetUserInfo(userPath);
+                    return userContextSet.GetUserInfo(args.UserPath);
                 }
                 catch
                 {
@@ -298,23 +249,19 @@ namespace JSSoft.Crema.Services.Users
 
         public Task<UserSerializationInfo> InvokeUserBanAsync(Authentication authentication, UserBanArguments args)
         {
-            var userInfo = args.UserInfo;
-            var comment = args.Comment;
-            var userPath = args.UserPath;
-            var lockPaths = args.LockPaths;
             var context = this.Context;
             var repository = this.Repository;
-            var message = EventMessageBuilder.BanUser(authentication, userInfo.ID, userInfo.Name, comment);
+            var message = EventMessageBuilder.BanUser(authentication, args.UserID, args.UserName, args.Comment);
             return repository.Dispatcher.InvokeAsync(() =>
             {
-                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserBanAsync), lockPaths);
+                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserBanAsync), args.LockPaths);
                 try
                 {
                     var userSet = args.Read(authentication, repository);
                     var userContextSet = new UserContextSet(context, userSet, false);
-                    repository.BanUser(userContextSet, userPath, comment);
+                    repository.BanUser(userContextSet, args.UserPath, args.Comment);
                     repository.Commit(authentication, message);
-                    return userContextSet.GetUserInfo(userPath);
+                    return userContextSet.GetUserInfo(args.UserPath);
                 }
                 catch
                 {
@@ -326,22 +273,19 @@ namespace JSSoft.Crema.Services.Users
 
         public Task<UserSerializationInfo> InvokeUserUnbanAsync(Authentication authentication, UserUnbanArguments args)
         {
-            var userInfo = args.UserInfo;
-            var userPath = args.UserPath;
-            var lockPaths = args.LockPaths;
             var context = this.Context;
             var repository = this.Repository;
-            var message = EventMessageBuilder.UnbanUser(authentication, userInfo.ID, userInfo.Name);
+            var message = EventMessageBuilder.UnbanUser(authentication, args.UserID, args.UserName);
             return repository.Dispatcher.InvokeAsync(() =>
             {
-                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserUnbanAsync), lockPaths);
+                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeUserUnbanAsync), args.LockPaths);
                 try
                 {
                     var userSet = args.Read(authentication, repository);
                     var userContextSet = new UserContextSet(context, userSet, false);
-                    repository.UnbanUser(userContextSet, userPath);
+                    repository.UnbanUser(userContextSet, args.UserPath);
                     repository.Commit(authentication, message);
-                    return userContextSet.GetUserInfo(userPath);
+                    return userContextSet.GetUserInfo(args.UserPath);
                 }
                 catch
                 {
@@ -465,26 +409,6 @@ namespace JSSoft.Crema.Services.Users
             this.CremaHost.Info(comment);
             this.OnMessageReceived(new MessageEventArgs(authentication, users, message, MessageType.Notification));
         }
-
-        // public UserSet CreateDataForCreate(Authentication authentication, string userID, string categoryPath, SecureString password, string userName, Authority authority, string[] lockPaths)
-        // {
-        //     var userInfo = new UserSerializationInfo()
-        //     {
-        //         ID = userID,
-        //         Password = UserContext.SecureStringToString(password).Encrypt(),
-        //         Name = userName,
-        //         Authority = authority,
-        //         CategoryPath = categoryPath,
-        //     };
-        //     var dataSet = new UserSet()
-        //     {
-        //         ItemPaths = lockPaths,
-        //         Infos = new UserSerializationInfo[] { userInfo },
-        //         SignatureDateProvider = new SignatureDateProvider(authentication.ID),
-        //     };
-        //     return dataSet;
-        //     // });
-        // }
 
         public UserRepositoryHost Repository => this.Context.Repository;
 

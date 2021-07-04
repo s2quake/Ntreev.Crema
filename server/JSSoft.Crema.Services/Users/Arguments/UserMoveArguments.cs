@@ -37,7 +37,10 @@ namespace JSSoft.Crema.Services.Users.Arguments
             var userInfo = user.UserInfo;
             var targetName = new ItemName(categoryPath, user.ID);
             var (userPath, lockPaths) = GetPathForData(user.Path, targetName);
+            this.CategoryPath = userInfo.CategoryPath;
             this.NewCategoryPath = categoryPath;
+            this.UserID = userInfo.ID;
+            this.UserName = userInfo.Name;
             this.Items = items;
             this.OldPaths = oldPaths;
             this.OldCategoryPaths = oldCategoryPaths;
@@ -51,7 +54,13 @@ namespace JSSoft.Crema.Services.Users.Arguments
             return ReadDataForPath(authentication, repository, this.UserPath, this.LockPaths);
         }
 
+        public string CategoryPath { get; }
+
         public string NewCategoryPath { get; }
+
+        public string UserID { get; }
+
+        public string UserName { get; }
 
         public User[] Items { get; }
 

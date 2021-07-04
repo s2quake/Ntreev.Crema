@@ -20,46 +20,41 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.ServiceModel;
-using JSSoft.Library;
 using JSSoft.Library.Linq;
+using JSSoft.Library.ObjectModel;
+using System.Data;
 using System.Linq;
-using System.Security;
 
 namespace JSSoft.Crema.Services.Users.Arguments
 {
-    class UserResetPasswordArguments : UserArgumentsBase
+    class UserCategoryDeleteArguments : UserCategoryArgumentsBase
     {
-        public UserResetPasswordArguments(User user)
+        public UserCategoryDeleteArguments(UserCategory userCategory)
         {
-            var items = EnumerableUtility.One(user).ToArray();
-            var userInfo = user.UserInfo;
-            var userPath = user.Path;
-            var lockPaths = new[] { userPath };
-            this.UserID = userInfo.ID;
-            this.UserName = userInfo.Name;
-            this.Password = $"{userInfo.Authority}".ToLower().ToSecureString();
+            var items = EnumerableUtility.One(userCategory).ToArray();
+            var oldPaths = items.Select(item => item.Path).ToArray();
+            var path = userCategory.Path;
+            var targetName = new CategoryName(path);
+            var (userPaths, lockPaths) = GetPathForData(userCategory, targetName);
+            this.CategoryPath = userCategory.Path;
             this.Items = items;
-            this.UserInfo = userInfo;
-            this.UserPath = userPath;
+            this.OldPaths = oldPaths;
+            this.UserPaths = userPaths;
             this.LockPaths = lockPaths;
         }
 
         public UserSet Read(Authentication authentication, UserRepositoryHost repository)
         {
-            return ReadDataForChange(authentication, repository, this.UserPath, this.LockPaths);
+            return ReadDataForPath(authentication, repository, this.UserPaths, this.LockPaths);
         }
 
-        public string UserID { get; }
+        public string CategoryPath { get; }
 
-        public string UserName { get; }
+        public UserCategory[] Items { get; }
 
-        public SecureString Password { get; }
+        public string[] OldPaths { get; }
 
-        public User[] Items { get; }
-
-        public UserInfo UserInfo { get; }
-
-        public string UserPath { get; }
+        public string[] UserPaths { get; }
 
         public string[] LockPaths { get; }
     }

@@ -24,11 +24,8 @@ using JSSoft.Crema.Services.Properties;
 using JSSoft.Crema.Services.Users.Arguments;
 using JSSoft.Crema.Services.Users.Serializations;
 using JSSoft.Library;
-using JSSoft.Library.Linq;
-using JSSoft.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
@@ -140,16 +137,13 @@ namespace JSSoft.Crema.Services.Users
                     this.ValidateMove(authentication, categoryPath);
                     return new UserMoveArguments(this, categoryPath);
                 });
-                var items = args.Items;
-                var oldPaths = args.OldPaths;
-                var oldCategoryPaths = args.OldCategoryPaths;
                 var taskID = Guid.NewGuid();
                 await this.Container.InvokeUserMoveAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
                     base.Move(authentication, categoryPath);
-                    this.Container.InvokeUsersMovedEvent(authentication, items, oldPaths, oldCategoryPaths);
+                    this.Container.InvokeUsersMovedEvent(authentication, args.Items, args.OldPaths, args.OldCategoryPaths);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
@@ -183,14 +177,12 @@ namespace JSSoft.Crema.Services.Users
                     return new UserDeleteArguments(this);
                 });
                 var taskID = Guid.NewGuid();
-                var items = args.Items;
-                var oldPaths = args.OldPaths;
                 await this.Container.InvokeUserDeleteAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     base.Delete(authentication);
                     cremaHost.Sign(authentication);
-                    container.InvokeUsersDeletedEvent(authentication, items, oldPaths);
+                    container.InvokeUsersDeletedEvent(authentication, args.Items, args.OldPaths);
                     context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
@@ -224,13 +216,12 @@ namespace JSSoft.Crema.Services.Users
                     return new UserSetNameArguments(this, userName);
                 });
                 var taskID = Guid.NewGuid();
-                var items = args.Items;
                 var userInfo = await this.Container.InvokeUserNameSetAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
                     base.UpdateUserInfo(userInfo);
-                    this.Container.InvokeUsersChangedEvent(authentication, items);
+                    this.Container.InvokeUsersChangedEvent(authentication, args.Items);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
@@ -264,14 +255,13 @@ namespace JSSoft.Crema.Services.Users
                     return new UserSetPasswordArguments(this, newPassword);
                 });
                 var taskID = Guid.NewGuid();
-                var items = args.Items;
                 var userInfo = await this.Container.InvokeUserPasswordSetAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
                     this.Password = UserContext.StringToSecureString(userInfo.Password);
                     base.UpdateUserInfo((UserInfo)userInfo);
-                    this.Container.InvokeUsersChangedEvent(authentication, items);
+                    this.Container.InvokeUsersChangedEvent(authentication, args.Items);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
@@ -301,14 +291,13 @@ namespace JSSoft.Crema.Services.Users
                     return new UserResetPasswordArguments(this);
                 });
                 var taskID = Guid.NewGuid();
-                var items = args.Items;
                 var userInfo = await this.Container.InvokeUserPasswordResetAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
                     this.Password = UserContext.StringToSecureString(userInfo.Password);
                     base.UpdateUserInfo((UserInfo)userInfo);
-                    this.Container.InvokeUsersChangedEvent(authentication, items);
+                    this.Container.InvokeUsersChangedEvent(authentication, args.Items);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
@@ -407,21 +396,19 @@ namespace JSSoft.Crema.Services.Users
                     return new UserBanArguments(this, comment);
                 });
                 var taskID = Guid.NewGuid();
-                var items = args.Items;
-                var comments = args.Comments;
                 var userInfo = await this.Container.InvokeUserBanAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     base.Ban(authentication, (BanInfo)userInfo.BanInfo);
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeUsersBannedEvent(authentication, items, comments);
+                    this.Container.InvokeUsersBannedEvent(authentication, args.Items, args.Comments);
                     if (this.IsOnline == true)
                     {
                         this.Authentication.InvokeExpiredEvent(authentication.ID, comment);
                         this.Authentication = null;
                         this.IsOnline = false;
-                        this.Container.InvokeUsersStateChangedEvent(authentication, items);
-                        this.Container.InvokeUsersLoggedOutEvent(authentication, items, new CloseInfo(CloseReason.Banned, comment));
+                        this.Container.InvokeUsersStateChangedEvent(authentication, args.Items);
+                        this.Container.InvokeUsersLoggedOutEvent(authentication, args.Items, new CloseInfo(CloseReason.Banned, comment));
                     }
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
@@ -451,13 +438,12 @@ namespace JSSoft.Crema.Services.Users
                     return new UserUnbanArguments(this);
                 });
                 var taskID = Guid.NewGuid();
-                var items = args.Items;
                 await this.Container.InvokeUserUnbanAsync(authentication, args);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
                     base.Unban(authentication);
-                    this.Container.InvokeUsersUnbannedEvent(authentication, items);
+                    this.Container.InvokeUsersUnbannedEvent(authentication, args.Items);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
@@ -473,72 +459,6 @@ namespace JSSoft.Crema.Services.Users
         {
             return UserContext.SecureStringToString(this.Password) == UserContext.SecureStringToString(password).Encrypt();
         }
-
-        // public async Task<UserSet> ReadDataForChangeAsync(Authentication authentication)
-        // {
-        //     var tuple = await this.Dispatcher.InvokeAsync(() =>
-        //     {
-        //         var paths = new string[]
-        //         {
-        //             this.Path
-        //         };
-        //         var path = this.Path;
-        //         return (paths, path);
-        //     });
-        //     return await this.Repository.Dispatcher.InvokeAsync(() =>
-        //     {
-        //         this.Repository.Lock(authentication, this, nameof(ReadDataForChangeAsync), tuple.paths);
-        //         var userInfo = this.Repository.Read(tuple.path);
-        //         var dataSet = new UserSet()
-        //         {
-        //             ItemPaths = tuple.paths,
-        //             Infos = new UserSerializationInfo[] { userInfo },
-        //             SignatureDateProvider = new SignatureDateProvider(authentication.ID),
-        //         };
-        //         return dataSet;
-        //     });
-        // }
-
-        // private (string userPath, string[] lockPaths) GetPathForData(ItemName targetName)
-        // {
-        //     var items = new string[]
-        //     {
-        //         targetName.CategoryPath,
-        //         targetName,
-        //         this.Path
-        //     };
-        //     var lockPaths = items.Distinct().ToArray();
-        //     var userPath = this.Path;
-        //     return (userPath, lockPaths);
-        // }
-
-        // public async Task<UserSet> ReadDataForPathAsync(Authentication authentication, ItemName targetName)
-        // {
-        //     var tuple = await this.Dispatcher.InvokeAsync(() =>
-        //     {
-        //         var items = new string[]
-        //         {
-        //             targetName.CategoryPath,
-        //             targetName,
-        //             this.Path
-        //         };
-        //         var paths = items.Distinct().ToArray();
-        //         var path = this.Path;
-        //         return (paths, path);
-        //     });
-        //     return await this.Repository.Dispatcher.InvokeAsync(() =>
-        //     {
-        //         this.Repository.Lock(authentication, this, nameof(ReadDataForPathAsync), tuple.paths);
-        //         var userInfo = (UserSerializationInfo)this.Repository.Read(tuple.path);
-        //         var dataSet = new UserSet()
-        //         {
-        //             ItemPaths = tuple.paths,
-        //             Infos = new UserSerializationInfo[] { userInfo },
-        //             SignatureDateProvider = new SignatureDateProvider(authentication.ID),
-        //         };
-        //         return dataSet;
-        //     });
-        // }
 
         public Authentication Authentication { get; set; }
 

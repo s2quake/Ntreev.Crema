@@ -36,6 +36,7 @@ namespace JSSoft.Crema.Services.Users.Arguments
             var userInfo = user.UserInfo;
             var targetName = new ItemName(userInfo.Path);
             var (userPath, lockPaths) = GetPathForData(user.Path, targetName);
+            this.UserID = userInfo.ID;
             this.Items = items;
             this.OldPaths = oldPaths;
             this.UserInfo = userInfo;
@@ -47,6 +48,8 @@ namespace JSSoft.Crema.Services.Users.Arguments
         {
             return ReadDataForPath(authentication, repository, this.UserPath, this.LockPaths);
         }
+
+        public string UserID { get; }
 
         public User[] Items { get; }
 

@@ -21,6 +21,7 @@
 
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services.Properties;
+using JSSoft.Crema.Services.Users.Arguments;
 using JSSoft.Crema.Services.Users.Serializations;
 using JSSoft.Library;
 using JSSoft.Library.ObjectModel;
@@ -87,103 +88,108 @@ namespace JSSoft.Crema.Services.Users
 
         public Task InvokeCategoryCreateAsync(Authentication authentication, string categoryPath)
         {
+            var context = this.Context;
+            var repository = this.Repository;
             var itemPaths = new string[] { categoryPath };
             var message = EventMessageBuilder.CreateUserCategory(authentication, categoryPath);
-            return this.Repository.Dispatcher.InvokeAsync(() =>
+            return repository.Dispatcher.InvokeAsync(() =>
             {
-                using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeCategoryCreateAsync), itemPaths);
+                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeCategoryCreateAsync), itemPaths);
                 try
                 {
-                    var userContextSet = UserContextSet.CreateEmpty(authentication, this.Context, itemPaths);
-                    this.Repository.CreateUserCategory(categoryPath);
-                    this.Repository.Commit(authentication, message);
+                    var userContextSet = UserContextSet.CreateEmpty(authentication, context, itemPaths);
+                    repository.CreateUserCategory(categoryPath);
+                    repository.Commit(authentication, message);
                 }
                 catch
                 {
-                    this.Repository.Revert();
+                    repository.Revert();
                     throw;
                 }
             });
         }
 
-        public UserSet ReadDataForPath(Authentication authentication, string[] userPaths, string[] lockPaths)
-        {
-            var userInfoList = new List<UserSerializationInfo>(userPaths.Length);
-            foreach (var item in userPaths)
-            {
-                var userInfo = this.Repository.Read(item);
-                userInfoList.Add(userInfo);
-            }
-            var dataSet = new UserSet()
-            {
-                ItemPaths = lockPaths,
-                Infos = userInfoList.ToArray(),
-                SignatureDateProvider = new SignatureDateProvider(authentication.ID),
-            };
-            return dataSet;
-        }
+        // public UserSet ReadDataForPath(Authentication authentication, string[] userPaths, string[] lockPaths)
+        // {
+        //     var userInfoList = new List<UserSerializationInfo>(userPaths.Length);
+        //     foreach (var item in userPaths)
+        //     {
+        //         var userInfo = this.Repository.Read(item);
+        //         userInfoList.Add(userInfo);
+        //     }
+        //     var dataSet = new UserSet()
+        //     {
+        //         ItemPaths = lockPaths,
+        //         Infos = userInfoList.ToArray(),
+        //         SignatureDateProvider = new SignatureDateProvider(authentication.ID),
+        //     };
+        //     return dataSet;
+        // }
 
-        public Task InvokeCategoryRenameAsync(Authentication authentication, string categoryPath, string name, string[] userPaths, string[] lockPaths)
+        public Task InvokeCategoryRenameAsync(Authentication authentication, UserCategoryRenameArguments args)
         {
-            var newCategoryPath = new CategoryName(categoryPath) { Name = name, };
-            var message = EventMessageBuilder.RenameUserCategory(authentication, categoryPath, name);
-            return this.Repository.Dispatcher.InvokeAsync(() =>
+            var context = this.Context;
+            var repository = this.Repository;
+            var message = EventMessageBuilder.RenameUserCategory(authentication, args.CategoryPath, args.Name);
+            return repository.Dispatcher.InvokeAsync(() =>
             {
-                using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeCategoryRenameAsync), lockPaths);
+                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeCategoryRenameAsync), args.LockPaths);
                 try
                 {
-                    var userSet = this.ReadDataForPath(authentication, userPaths, lockPaths);
-                    var userContextSet = new UserContextSet(this.Context, userSet, false);
-                    this.Repository.RenameUserCategory(userContextSet, categoryPath, newCategoryPath);
-                    this.Repository.Commit(authentication, message);
+                    var userSet = args.Read(authentication, repository);
+                    var userContextSet = new UserContextSet(context, userSet, false);
+                    repository.RenameUserCategory(userContextSet, args.CategoryPath, args.NewCategoryPath);
+                    repository.Commit(authentication, message);
                 }
                 catch
                 {
-                    this.Repository.Revert();
+                    repository.Revert();
                     throw;
                 }
             });
         }
 
-        public Task InvokeCategoryMoveAsync(Authentication authentication, string categoryPath, string parentPath, string[] userPaths, string[] lockPaths)
+        public Task InvokeCategoryMoveAsync(Authentication authentication, UserCategoryMoveArguments args)
         {
-            var categoryName = new CategoryName(categoryPath);
-            var newCategoryPath = new CategoryName(parentPath, categoryName.Name);
-            var message = EventMessageBuilder.MoveUserCategory(authentication, categoryPath, categoryName.ParentPath, parentPath);
-            return this.Repository.Dispatcher.InvokeAsync(() =>
+            var context = this.Context;
+            var repository = this.Repository;
+            var message = EventMessageBuilder.MoveUserCategory(authentication, args.CategoryPath, args.ParentPath, args.NewParentPath);
+            return repository.Dispatcher.InvokeAsync(() =>
             {
-                using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeCategoryMoveAsync), lockPaths);
+                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeCategoryMoveAsync), args.LockPaths);
                 try
                 {
-                    var userSet = this.ReadDataForPath(authentication, userPaths, lockPaths);
-                    var userContextSet = new UserContextSet(this.Context, userSet, false);
-                    this.Repository.MoveUserCategory(userContextSet, categoryPath, newCategoryPath);
-                    this.Repository.Commit(authentication, message);
+                    var userSet = args.Read(authentication, repository);
+                    var userContextSet = new UserContextSet(context, userSet, false);
+                    repository.MoveUserCategory(userContextSet, args.CategoryPath, args.NewCategoryPath);
+                    repository.Commit(authentication, message);
                 }
                 catch
                 {
-                    this.Repository.Revert();
+                    repository.Revert();
                     throw;
                 }
             });
         }
 
-        public Task InvokeCategoryDeleteAsync(Authentication authentication, string categoryPath, string[] userPaths, string[] lockPaths)
+        public Task InvokeCategoryDeleteAsync(Authentication authentication, UserCategoryDeleteArguments args)
         {
-            var message = EventMessageBuilder.DeleteUserCategory(authentication, categoryPath);
-            return this.Repository.Dispatcher.InvokeAsync(() =>
+            var context = this.Context;
+            var repository = this.Repository;
+            var message = EventMessageBuilder.DeleteUserCategory(authentication, args.CategoryPath);
+            return repository.Dispatcher.InvokeAsync(() =>
             {
-                using var locker = new RepositoryHostLock(this.Repository, authentication, this, nameof(InvokeCategoryDeleteAsync), lockPaths);
+                using var locker = new RepositoryHostLock(repository, authentication, this, nameof(InvokeCategoryDeleteAsync), args.LockPaths);
                 try
                 {
-                    var userSet = this.ReadDataForPath(authentication, userPaths, lockPaths);
-                    var userContextSet = new UserContextSet(this.Context, userSet, false);
-                    this.Repository.DeleteUserCategory(userContextSet, categoryPath);
-                    this.Repository.Commit(authentication, message);
+                    var userSet = args.Read(authentication, repository);
+                    var userContextSet = new UserContextSet(context, userSet, false);
+                    repository.DeleteUserCategory(userContextSet, args.CategoryPath);
+                    repository.Commit(authentication, message);
                 }
                 catch
                 {
-                    this.Repository.Revert();
+                    repository.Revert();
                     throw;
                 }
             });

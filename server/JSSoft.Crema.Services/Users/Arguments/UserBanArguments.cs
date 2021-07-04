@@ -35,6 +35,8 @@ namespace JSSoft.Crema.Services.Users.Arguments
             var userPath = user.Path;
             var lockPaths = new[] { userPath };
             this.Comment = comment;
+            this.UserID = userInfo.ID;
+            this.UserName = userInfo.Name;
             this.Items = items;
             this.Comments = comments;
             this.UserInfo = userInfo;
@@ -48,6 +50,10 @@ namespace JSSoft.Crema.Services.Users.Arguments
         }
 
         public string Comment { get; }
+
+        public string UserID { get; }
+
+        public string UserName { get; }
 
         public User[] Items { get; }
 
