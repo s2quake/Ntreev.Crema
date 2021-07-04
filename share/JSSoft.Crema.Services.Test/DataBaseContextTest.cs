@@ -270,10 +270,10 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task IndexerByDataBaseID_TestAsync()
         {
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync();
-            var dataBaseID = dataBase.ID;
+            var dataBase1 = await dataBaseContext.GetRandomDataBaseAsync();
+            var dataBaseID = dataBase1.ID;
             var dataBase2 = await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext[dataBaseID]);
-            Assert.AreEqual(dataBase, dataBase2);
+            Assert.AreEqual(dataBase1, dataBase2);
         }
 
         [TestMethod]
@@ -471,7 +471,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsResetting_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.NotLocked | DataBaseFlags.Public);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
             var expectedDataBase = dataBase;
             var actualDataBase = null as IDataBase;
             await dataBaseContext.AddItemsResettingEventHandlerAsync(DataBaseContext_ItemsResetting);
@@ -502,7 +503,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsReset_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.NotLocked | DataBaseFlags.Public);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
             var expectedDataBase = dataBase;
             var actualDataBase = null as IDataBase;
             await dataBaseContext.AddItemsResetEventHandlerAsync(DataBaseContext_ItemsReset);
@@ -533,7 +535,8 @@ namespace JSSoft.Crema.Services.Test
         public async Task ItemsAuthenticationEntered_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync();
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.NotLocked | DataBaseFlags.Public);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
             var expectedDataBase = dataBase;
             var expectedUserID = authentication.ID;
             var actualDataBase = null as IDataBase;
@@ -568,7 +571,8 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task ItemsAuthenticationLeft_TestAsync()
         {
-            var dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.Loaded);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
             var authentications = await dataBase.GetAuthenticationInfosAsync();
             var authenticationIDs = authentications.Select(item => item.ID).ToArray();
             var authentication = await this.TestContext.LoginRandomAsync(item => authenticationIDs.Contains(item.ID) == false);

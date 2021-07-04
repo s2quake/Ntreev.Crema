@@ -109,23 +109,6 @@ namespace JSSoft.Crema.Services.Users
             });
         }
 
-        // public UserSet ReadDataForPath(Authentication authentication, string[] userPaths, string[] lockPaths)
-        // {
-        //     var userInfoList = new List<UserSerializationInfo>(userPaths.Length);
-        //     foreach (var item in userPaths)
-        //     {
-        //         var userInfo = this.Repository.Read(item);
-        //         userInfoList.Add(userInfo);
-        //     }
-        //     var dataSet = new UserSet()
-        //     {
-        //         ItemPaths = lockPaths,
-        //         Infos = userInfoList.ToArray(),
-        //         SignatureDateProvider = new SignatureDateProvider(authentication.ID),
-        //     };
-        //     return dataSet;
-        // }
-
         public Task InvokeCategoryRenameAsync(Authentication authentication, UserCategoryRenameArguments args)
         {
             var context = this.Context;

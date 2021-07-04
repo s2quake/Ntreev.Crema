@@ -35,13 +35,67 @@ namespace JSSoft.Crema.Services.Test.Common
                 var comment = RandomUtility.NextString();
                 var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
                 var dataBaseFlags = this.DataBaseFlags;
-                dataBase = await dataBaseContext.AddNewDataBaseAsync(Authentication.System, dataBaseName, comment);
+                var accessType = this.AccessType;
+                dataBase = await dataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
                 if (dataBaseFlags.HasFlag(DataBaseFlags.Loaded) == true)
+                {
                     await dataBase.LoadAsync(authentication);
+                }
                 if (dataBaseFlags.HasFlag(DataBaseFlags.Private) == true)
+                {
+                    var isLoaded = dataBase.IsLoaded;
+                    var userFlags = UserFlags.Offline | UserFlags.NotBanned;
+                    var excludeList = new List<string>() { authentication.ID };
+                    if (isLoaded == false)
+                        await dataBase.LoadAsync(authentication);
                     await dataBase.SetPrivateAsync(authentication);
+                    if (accessType.HasFlag(AccessType.Master) == true)
+                    {
+                        foreach (var item in new[] { UserFlags.Admin, UserFlags.Member })
+                        {
+                            var userFilter = new UserFilter(userFlags | item) { ExcludedUserIDs = excludeList.ToArray() };
+                            var user = await userFilter.GetUserAsync(serviceProvider);
+                            await dataBase.AddAccessMemberAsync(authentication, user.ID, AccessType.Master);
+                            excludeList.Add(user.ID);
+                        }
+                    }
+                    if (accessType.HasFlag(AccessType.Developer) == true)
+                    {
+                        foreach (var item in new[] { UserFlags.Admin, UserFlags.Member })
+                        {
+                            var userFilter = new UserFilter(userFlags | item) { ExcludedUserIDs = excludeList.ToArray() };
+                            var user = await userFilter.GetUserAsync(serviceProvider);
+                            await dataBase.AddAccessMemberAsync(authentication, user.ID, AccessType.Developer);
+                            excludeList.Add(user.ID);
+                        }
+                    }
+                    if (accessType.HasFlag(AccessType.Editor) == true)
+                    {
+                        foreach (var item in new[] { UserFlags.Admin, UserFlags.Member })
+                        {
+                            var userFilter = new UserFilter(userFlags | item) { ExcludedUserIDs = excludeList.ToArray() };
+                            var user = await userFilter.GetUserAsync(serviceProvider);
+                            await dataBase.AddAccessMemberAsync(authentication, user.ID, AccessType.Editor);
+                            excludeList.Add(user.ID);
+                        }
+                    }
+                    if (accessType.HasFlag(AccessType.Guest) == true)
+                    {
+                        foreach (var item in new[] { UserFlags.Admin, UserFlags.Member, UserFlags.Guest })
+                        {
+                            var userFilter = new UserFilter(userFlags | item) { ExcludedUserIDs = excludeList.ToArray() };
+                            var user = await userFilter.GetUserAsync(serviceProvider);
+                            await dataBase.AddAccessMemberAsync(authentication, user.ID, AccessType.Guest);
+                            excludeList.Add(user.ID);
+                        }
+                    }
+                    if (isLoaded == false)
+                        await dataBase.UnloadAsync(authentication);
+                }
                 if (dataBaseFlags.HasFlag(DataBaseFlags.Locked) == true)
+                {
                     await dataBase.LockAsync(authentication, RandomUtility.NextString());
+                }
                 await cremaHost.LogoutAsync(authentication);
             }
             return dataBase;
@@ -49,7 +103,13 @@ namespace JSSoft.Crema.Services.Test.Common
 
         public string[] ExcludedDataBaseNames { get; set; }
 
+        // public string[] IncludedIDs { get; set; }
+
+        // public string[] ExcludedIDs { get; set; }
+
         public DataBaseFlags DataBaseFlags { get; set; }
+
+        public AccessType AccessType { get; set; }
 
         public Func<IDataBase, bool> Predicate { get; set; }
 
@@ -64,6 +124,12 @@ namespace JSSoft.Crema.Services.Test.Common
                 return false;
             if (this.ExcludedDataBaseNames != null && this.ExcludedDataBaseNames.Contains(dataBase.Name) == true)
                 return false;
+            if (this.AccessType != AccessType.None && TestAccessType(dataBase, this.AccessType) == false)
+                return false;
+            // if (this.IncludedIDs != null && TestEnter(dataBase, this.IncludedIDs) == false)
+            //     return false;
+            // if (this.ExcludedIDs != null && TestLeft(dataBase, this.ExcludedIDs) == false)
+            //     return false;
             if (this.Predicate != null && this.Predicate(dataBase) == false)
                 return false;
             return true;
@@ -102,5 +168,41 @@ namespace JSSoft.Crema.Services.Test.Common
                 return false;
             return true;
         }
+
+        private static bool TestAccessType(IDataBase dataBase, AccessType accessType)
+        {
+            if (dataBase.IsPrivate == true)
+            {
+                if (accessType.HasFlag(AccessType.Master) == true && dataBase.AccessInfo.Members.Any(item => item.AccessType == AccessType.Master) == false)
+                    return false;
+                if (accessType.HasFlag(AccessType.Developer) == true && dataBase.AccessInfo.Members.Any(item => item.AccessType == AccessType.Developer) == false)
+                    return false;
+                if (accessType.HasFlag(AccessType.Editor) == true && dataBase.AccessInfo.Members.Any(item => item.AccessType == AccessType.Editor) == false)
+                    return false;
+                if (accessType.HasFlag(AccessType.Guest) == true && dataBase.AccessInfo.Members.Any(item => item.AccessType == AccessType.Guest) == false)
+                    return false;
+            }
+            return true;
+        }
+
+        // private static bool TestEnter(IDataBase dataBase, string[] includedIDs)
+        // {
+        //     foreach (var item in dataBase.AuthenticationInfos)
+        //     {
+        //         if (includedIDs.Contains(item.ID) == true)
+        //             return true;
+        //     }
+        //     return false;
+        // }
+
+        // private static bool TestLeft(IDataBase dataBase, string[] excludedIDs)
+        // {
+        //     foreach (var item in dataBase.AuthenticationInfos)
+        //     {
+        //         if (excludedIDs.Contains(item.ID) == true)
+        //             return false;
+        //     }
+        //     return true;
+        // }
     }
 }

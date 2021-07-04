@@ -443,10 +443,9 @@ namespace JSSoft.Crema.Services.Data
 
                 foreach (var item in dataBases)
                 {
-                    if (caches.ContainsKey(item) == false)
-                        this.AddBase(item, new DataBase(this, item));
-                    else
-                        this.AddBase(item, new DataBase(this, item, caches[item]));
+                    var dataBase = caches.ContainsKey(item) == false ? new DataBase(this, item) : new DataBase(this, item, caches[item]);
+                    this.AddBase(item, dataBase);
+                    this.dataBaseByID.Add(dataBase.ID, dataBase);
                 }
                 this.CremaHost.Info($"{nameof(DataBaseContext)} Initialized");
             });
@@ -816,9 +815,12 @@ namespace JSSoft.Crema.Services.Data
         private void DeleteCaches(DataBaseInfo dataBaseInfo)
         {
             var directoryName = Path.GetDirectoryName(this.cachePath);
-            var name = $"{dataBaseInfo.ID}";
-            var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => Path.GetFileNameWithoutExtension(item) == name).ToArray();
-            FileUtility.Delete(files);
+            if (Directory.Exists(directoryName) == true)
+            {
+                var name = $"{dataBaseInfo.ID}";
+                var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => Path.GetFileNameWithoutExtension(item) == name).ToArray();
+                FileUtility.Delete(files);
+            }
         }
 
         #region IDataBaseContext
