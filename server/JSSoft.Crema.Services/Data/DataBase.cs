@@ -556,6 +556,9 @@ namespace JSSoft.Crema.Services.Data
 
         public bool Contains(Authentication authentication)
         {
+            this.Dispatcher.VerifyAccess();
+            if (this.IsLoaded == false)
+                throw new InvalidOperationException();
             return this.authentications.Contains(authentication);
         }
 
@@ -588,6 +591,13 @@ namespace JSSoft.Crema.Services.Data
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (revision is null)
+                    throw new ArgumentNullException(nameof(revision));
+
                 this.ValidateExpired();
                 var name = await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -1549,6 +1559,8 @@ namespace JSSoft.Crema.Services.Data
 
         private void ValidateRevert(Authentication authentication, string revision)
         {
+            if (revision == string.Empty)
+                throw new ArgumentException("empty string is not allowed", nameof(revision));
             if (authentication.IsSystem == false && authentication.IsAdmin == false)
                 throw new PermissionDeniedException();
             if (base.DataBaseState != DataBaseState.Unloaded)

@@ -43,7 +43,6 @@ namespace JSSoft.Crema.Services.Data
                     this.CremaHost.Sign(authentication);
 
                 });
-
                 var taskID = Guid.NewGuid();
                 var filterExpression = string.Join(";", dataSet.Tables);
                 var targetSet = await this.GetDataSetAsync(authentication, null, filterExpression, ReadTypes.OmitContent);

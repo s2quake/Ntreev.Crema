@@ -732,7 +732,81 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task RevertAsync_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
+            var logs = await dataBase.GetLogAsync(authentication, null);
+            var log = logs.Skip(1).Random();
+            await dataBase.RevertAsync(authentication, log.Revision);
+        }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task RevertAsync_Arg0_Null_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
+            var logs = await dataBase.GetLogAsync(authentication, null);
+            var log = logs.Skip(1).Random();
+            await dataBase.RevertAsync(null, log.Revision);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task RevertAsync_Arg1_Null_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
+            var logs = await dataBase.GetLogAsync(authentication, null);
+            var log = logs.Skip(1).Random();
+            await dataBase.RevertAsync(authentication, null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public async Task RevertAsync_Arg1_Empty_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
+            await dataBase.RevertAsync(authentication, string.Empty);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task RevertAsync_Arg1_InvalidRevision_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            var invalidRevision = RandomUtility.NextString();
+            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
+            await dataBase.RevertAsync(authentication, invalidRevision);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
+        public async Task RevertAsync_Arg0_Expired_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.UnloadAsync(authentication);
+            var logs = await dataBase.GetLogAsync(authentication, null);
+            var log = logs.Skip(1).Random();
+            await dataBase.RevertAsync(expiredAuthentication, log.Revision);
         }
 
         [TestMethod]
@@ -744,7 +818,35 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task Contains_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            await dataBase.EnterAsync(authentication);
+            var condition1 = await dataBase.ContainsAsync(authentication);
+            Assert.IsTrue(condition1);
+            await dataBase.LeaveAsync(authentication);
+            var condition2 = await dataBase.ContainsAsync(authentication);
+            Assert.IsFalse(condition2);
+        }
 
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task Contains_NotLoaded_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            await dataBase.ContainsAsync(authentication);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task Contains_Dispatcher_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            dataBase.Contains(authentication);
         }
 
         [TestMethod]

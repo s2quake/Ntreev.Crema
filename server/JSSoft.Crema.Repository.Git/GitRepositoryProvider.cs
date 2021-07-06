@@ -198,6 +198,10 @@ namespace JSSoft.Crema.Repository.Git
                     GitCommandItem.FromPretty("format:%H"),
                 };
                 var revisions = revisionsCommand.ReadLines();
+                if (revisions.Contains(revision) == false)
+                {
+                    throw new InvalidOperationException($"'{revision}' is invalid revision.");
+                }
                 foreach (var item in revisions)
                 {
                     if (item == revision)
@@ -230,7 +234,7 @@ namespace JSSoft.Crema.Repository.Git
                 {
                     new GitCommandItem("abort"),
                 };
-                abortCommand.Run();
+                abortCommand.TryRun();
                 throw;
             }
         }
