@@ -40,5 +40,10 @@ namespace JSSoft.Crema.Services.Extensions
         {
             return typeCategoryCollection.Dispatcher.InvokeAsync(() => typeCategoryCollection.ToArray());
         }
+
+        public static Task<int> GetCountAsync(this ITypeCategoryCollection typeCategoryCollection)
+        {
+            return typeCategoryCollection.Dispatcher.InvokeAsync(() => typeCategoryCollection.Count);
+        }
     }
 }

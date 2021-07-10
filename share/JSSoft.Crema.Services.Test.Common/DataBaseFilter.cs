@@ -43,54 +43,7 @@ namespace JSSoft.Crema.Services.Test.Common
                 }
                 if (dataBaseFlags.HasFlag(DataBaseFlags.Private) == true)
                 {
-                    var isLoaded = dataBase.IsLoaded;
-                    var userFlags = UserFlags.Offline | UserFlags.NotBanned;
-                    var excludeList = new List<string>() { authentication.ID };
-                    if (isLoaded == false)
-                        await dataBase.LoadAsync(authentication);
-                    await dataBase.SetPrivateAsync(authentication);
-                    if (accessType.HasFlag(AccessType.Master) == true)
-                    {
-                        foreach (var item in new[] { UserFlags.Admin, UserFlags.Member })
-                        {
-                            var userFilter = new UserFilter(userFlags | item) { ExcludedUserIDs = excludeList.ToArray() };
-                            var user = await userFilter.GetUserAsync(serviceProvider);
-                            await dataBase.AddAccessMemberAsync(authentication, user.ID, AccessType.Master);
-                            excludeList.Add(user.ID);
-                        }
-                    }
-                    if (accessType.HasFlag(AccessType.Developer) == true)
-                    {
-                        foreach (var item in new[] { UserFlags.Admin, UserFlags.Member })
-                        {
-                            var userFilter = new UserFilter(userFlags | item) { ExcludedUserIDs = excludeList.ToArray() };
-                            var user = await userFilter.GetUserAsync(serviceProvider);
-                            await dataBase.AddAccessMemberAsync(authentication, user.ID, AccessType.Developer);
-                            excludeList.Add(user.ID);
-                        }
-                    }
-                    if (accessType.HasFlag(AccessType.Editor) == true)
-                    {
-                        foreach (var item in new[] { UserFlags.Admin, UserFlags.Member })
-                        {
-                            var userFilter = new UserFilter(userFlags | item) { ExcludedUserIDs = excludeList.ToArray() };
-                            var user = await userFilter.GetUserAsync(serviceProvider);
-                            await dataBase.AddAccessMemberAsync(authentication, user.ID, AccessType.Editor);
-                            excludeList.Add(user.ID);
-                        }
-                    }
-                    if (accessType.HasFlag(AccessType.Guest) == true)
-                    {
-                        foreach (var item in new[] { UserFlags.Admin, UserFlags.Member, UserFlags.Guest })
-                        {
-                            var userFilter = new UserFilter(userFlags | item) { ExcludedUserIDs = excludeList.ToArray() };
-                            var user = await userFilter.GetUserAsync(serviceProvider);
-                            await dataBase.AddAccessMemberAsync(authentication, user.ID, AccessType.Guest);
-                            excludeList.Add(user.ID);
-                        }
-                    }
-                    if (isLoaded == false)
-                        await dataBase.UnloadAsync(authentication);
+                    await this.InitializeAccessAsync(serviceProvider, dataBase, authentication, accessType);
                 }
                 if (dataBaseFlags.HasFlag(DataBaseFlags.Locked) == true)
                 {
@@ -99,6 +52,58 @@ namespace JSSoft.Crema.Services.Test.Common
                 await cremaHost.LogoutAsync(authentication);
             }
             return dataBase;
+        }
+
+        private async Task InitializeAccessAsync(IServiceProvider serviceProvider, IDataBase dataBase, Authentication authentication, AccessType accessType)
+        {
+            var isLoaded = dataBase.IsLoaded;
+            var userFlags = UserFlags.Offline | UserFlags.NotBanned;
+            var excludeList = new List<string>() { authentication.ID };
+            if (isLoaded == false)
+                await dataBase.LoadAsync(authentication);
+            await dataBase.SetPrivateAsync(authentication);
+            if (accessType.HasFlag(AccessType.Master) == true)
+            {
+                foreach (var item in new[] { UserFlags.Admin, UserFlags.Member })
+                {
+                    var userFilter = new UserFilter(userFlags | item) { ExcludedUserIDs = excludeList.ToArray() };
+                    var user = await userFilter.GetUserAsync(serviceProvider);
+                    await dataBase.AddAccessMemberAsync(authentication, user.ID, AccessType.Master);
+                    excludeList.Add(user.ID);
+                }
+            }
+            if (accessType.HasFlag(AccessType.Developer) == true)
+            {
+                foreach (var item in new[] { UserFlags.Admin, UserFlags.Member })
+                {
+                    var userFilter = new UserFilter(userFlags | item) { ExcludedUserIDs = excludeList.ToArray() };
+                    var user = await userFilter.GetUserAsync(serviceProvider);
+                    await dataBase.AddAccessMemberAsync(authentication, user.ID, AccessType.Developer);
+                    excludeList.Add(user.ID);
+                }
+            }
+            if (accessType.HasFlag(AccessType.Editor) == true)
+            {
+                foreach (var item in new[] { UserFlags.Admin, UserFlags.Member })
+                {
+                    var userFilter = new UserFilter(userFlags | item) { ExcludedUserIDs = excludeList.ToArray() };
+                    var user = await userFilter.GetUserAsync(serviceProvider);
+                    await dataBase.AddAccessMemberAsync(authentication, user.ID, AccessType.Editor);
+                    excludeList.Add(user.ID);
+                }
+            }
+            if (accessType.HasFlag(AccessType.Guest) == true)
+            {
+                foreach (var item in new[] { UserFlags.Admin, UserFlags.Member, UserFlags.Guest })
+                {
+                    var userFilter = new UserFilter(userFlags | item) { ExcludedUserIDs = excludeList.ToArray() };
+                    var user = await userFilter.GetUserAsync(serviceProvider);
+                    await dataBase.AddAccessMemberAsync(authentication, user.ID, AccessType.Guest);
+                    excludeList.Add(user.ID);
+                }
+            }
+            if (isLoaded == false)
+                await dataBase.UnloadAsync(authentication);
         }
 
         public string[] ExcludedDataBaseNames { get; set; }
@@ -112,6 +117,8 @@ namespace JSSoft.Crema.Services.Test.Common
         public AccessType AccessType { get; set; }
 
         public Func<IDataBase, bool> Predicate { get; set; }
+
+        public int LogCount { get; set; }
 
         public static implicit operator Func<IDataBase, bool>(DataBaseFilter filter)
         {

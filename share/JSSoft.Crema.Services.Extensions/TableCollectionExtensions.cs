@@ -31,6 +31,11 @@ namespace JSSoft.Crema.Services.Extensions
             return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.Contains(tableName));
         }
 
+        public static Task<int> GetCountAsync(this ITableCollection tableCollection)
+        {
+            return tableCollection.Dispatcher.InvokeAsync(() => tableCollection.Count);
+        }
+
         public static Task<ITable> GetTableAsync(this ITableCollection tableCollection, string tableName)
         {
             return tableCollection.Dispatcher.InvokeAsync(() => tableCollection[tableName]);

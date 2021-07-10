@@ -41,6 +41,11 @@ namespace JSSoft.Crema.Services.Extensions
             return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.ToArray());
         }
 
+        public static Task<int> GetCountAsync(this ITypeCollection typeCollection)
+        {
+            return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.Count);
+        }
+
         public static Task AddTypesStateChangedAsync(this ITypeCollection typeCollection, ItemsEventHandler<IType> handler)
         {
             return typeCollection.Dispatcher.InvokeAsync(() => typeCollection.TypesStateChanged += handler);

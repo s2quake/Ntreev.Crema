@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library.Random;
 using System;
 using System.Linq;
@@ -28,25 +29,21 @@ namespace JSSoft.Crema.Services.Random
 {
     public static class TableContextExtensions
     {
-        public static async Task AddRandomItemsAsync(this ITableContext tableContext, Authentication authentication)
+        public static async Task AddRandomItemsAsync(this ITableContext tableContext, Authentication authentication, DataBaseSettings settings)
         {
-            await AddRandomCategoriesAsync(tableContext, authentication);
-            await AddRandomTablesAsync(tableContext, authentication);
-            await AddRandomChildTablesAsync(tableContext, authentication, 10);
-            await AddRandomDerivedTablesAsync(tableContext, authentication, 10);
+            await AddRandomCategoriesAsync(tableContext, authentication, settings);
+            await AddRandomTablesAsync(tableContext, authentication, settings);
+            await AddRandomChildTablesAsync(tableContext, authentication, settings);
+            await AddRandomDerivedTablesAsync(tableContext, authentication, settings);
         }
 
-        public static Task AddRandomCategoriesAsync(this ITableContext tableContext, Authentication authentication)
+        public static async Task AddRandomCategoriesAsync(this ITableContext tableContext, Authentication authentication, DataBaseSettings settings)
         {
-            var minCount = CremaRandomSettings.TableContext.MinTableCategoryCount;
-            var maxCount = CremaRandomSettings.TableContext.MaxTableCategoryCount;
+            var minCount = settings.TableContext.MinTableCategoryCount;
+            var maxCount = settings.TableContext.MaxTableCategoryCount;
             var count = RandomUtility.Next(minCount, maxCount);
-            return AddRandomCategoriesAsync(tableContext, authentication, count);
-        }
-
-        public static async Task AddRandomCategoriesAsync(this ITableContext tableContext, Authentication authentication, int tryCount)
-        {
-            for (var i = 0; i < tryCount; i++)
+            var tableCategoryCollection = tableContext.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
+            while (await tableCategoryCollection.GetCountAsync() < count)
             {
                 await tableContext.AddRandomCategoryAsync(authentication);
             }
@@ -73,29 +70,25 @@ namespace JSSoft.Crema.Services.Random
             }
         }
 
-        public static Task AddRandomTablesAsync(this ITableContext tableContext, Authentication authentication)
+        public static async Task AddRandomTablesAsync(this ITableContext tableContext, Authentication authentication, DataBaseSettings settings)
         {
-            var minCount = CremaRandomSettings.TableContext.MinTableCount;
-            var maxCount = CremaRandomSettings.TableContext.MaxTableCount;
+            var minCount = settings.TableContext.MinTableCount;
+            var maxCount = settings.TableContext.MaxTableCount;
             var count = RandomUtility.Next(minCount, maxCount);
-            return AddRandomTablesAsync(tableContext, authentication, count);
-        }
-
-        public static async Task AddRandomTablesAsync(this ITableContext tableContext, Authentication authentication, int tryCount)
-        {
-            for (var i = 0; i < tryCount; i++)
+            var tableCollection = tableContext.GetService(typeof(ITableCollection)) as ITableCollection;
+            while (await tableCollection.GetCountAsync() < count)
             {
-                await AddRandomTableAsync(tableContext, authentication);
+                await AddRandomTableAsync(tableContext, authentication, settings);
             }
         }
 
-        public static Task<ITable> AddRandomTableAsync(this ITableContext tableContext, Authentication authentication)
+        public static Task<ITable> AddRandomTableAsync(this ITableContext tableContext, Authentication authentication, DataBaseSettings settings)
         {
             var category = tableContext.Categories.Random();
-            return AddRandomTableAsync(category, authentication);
+            return AddRandomTableAsync(category, authentication, settings);
         }
 
-        public static async Task<ITable> AddRandomTableAsync(this ITableCategory category, Authentication authentication)
+        public static async Task<ITable> AddRandomTableAsync(this ITableCategory category, Authentication authentication, DataBaseSettings settings)
         {
             var template = await category.NewTableAsync(authentication);
             await template.InitializeRandomAsync(authentication);
@@ -105,8 +98,8 @@ namespace JSSoft.Crema.Services.Random
             {
                 foreach (var item in tables)
                 {
-                    var minCount = CremaRandomSettings.TableContext.MinRowCount;
-                    var maxCount = CremaRandomSettings.TableContext.MaxRowCount;
+                    var minCount = settings.TableContext.MinRowCount;
+                    var maxCount = settings.TableContext.MaxRowCount;
                     var count = RandomUtility.Next(minCount, maxCount);
                     await item.AddRandomRowsAsync(authentication, count);
                 }
@@ -118,11 +111,23 @@ namespace JSSoft.Crema.Services.Random
             }
         }
 
-        public static async Task AddRandomDerivedTablesAsync(this ITableContext tableContext, Authentication authentication, int tryCount)
+        public static async Task AddRandomDerivedTablesAsync(this ITableContext tableContext, Authentication authentication, DataBaseSettings settings)
         {
-            for (var i = 0; i < tryCount; i++)
+            var minCount = settings.TableContext.MinDerivedTableCount;
+            var maxCount = settings.TableContext.MaxDerivedTableCount;
+            var count = RandomUtility.Next(minCount, maxCount);
+            while (await GetDerivedTableCountAsync() < count)
             {
                 await AddRandomDerivedTableAsync(tableContext, authentication);
+            }
+
+            Task<int> GetDerivedTableCountAsync()
+            {
+                var tableCollection = tableContext.GetService(typeof(ITableCollection)) as ITableCollection;
+                return tableCollection.Dispatcher.InvokeAsync(() =>
+                {
+                    return tableCollection.Where(item => item.TemplatedParent != null).Count();
+                });
             }
         }
 
@@ -141,18 +146,30 @@ namespace JSSoft.Crema.Services.Random
             return await table.InheritAsync(authentication, tableName, category.Path, copyData);
         }
 
-        public static async Task AddRandomChildTablesAsync(this ITableContext tableContext, Authentication authentication, int tryCount)
+        public static async Task AddRandomChildTablesAsync(this ITableContext tableContext, Authentication authentication, DataBaseSettings settings)
         {
-            for (var i = 0; i < tryCount; i++)
+            var minCount = settings.TableContext.MinChildTableCount;
+            var maxCount = settings.TableContext.MaxChildTableCount;
+            var count = RandomUtility.Next(minCount, maxCount);
+            while (await GetChildTableCountAsync() < count)
             {
-                await AddRandomChildTableAsync(tableContext, authentication);
+                await AddRandomChildTableAsync(tableContext, authentication, settings);
+            }
+
+            Task<int> GetChildTableCountAsync()
+            {
+                var tableCollection = tableContext.GetService(typeof(ITableCollection)) as ITableCollection;
+                return tableCollection.Dispatcher.InvokeAsync(() =>
+                {
+                    return tableCollection.Where(item => item.Parent != null && item.TemplatedParent == null).Count();
+                });
             }
         }
 
-        public static Task<ITable> AddRandomChildTableAsync(this ITableContext tableContext, Authentication authentication)
+        public static Task<ITable> AddRandomChildTableAsync(this ITableContext tableContext, Authentication authentication, DataBaseSettings settings)
         {
             var table = tableContext.Tables.Random(item => item.TemplatedParent == null && item.Parent == null);
-            return table.AddRandomChildTableAsync(authentication);
+            return table.AddRandomChildTableAsync(authentication, settings);
         }
 
         public static Task<ITableItem> GetRandomTableItemAsync(this ITableContext tableContext)

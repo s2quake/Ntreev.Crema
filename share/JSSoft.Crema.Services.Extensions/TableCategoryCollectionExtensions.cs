@@ -31,6 +31,11 @@ namespace JSSoft.Crema.Services.Extensions
             return tableCategoryCollection.Dispatcher.InvokeAsync(() => tableCategoryCollection.Contains(categoryPath));
         }
 
+        public static Task<int> GetCountAsync(this ITableCategoryCollection tableCategoryCollection)
+        {
+            return tableCategoryCollection.Dispatcher.InvokeAsync(() => tableCategoryCollection.Count);
+        }
+
         public static Task<ITableCategory> GetCategoryAsync(this ITableCategoryCollection tableCategoryCollection, string categoryPath)
         {
             return tableCategoryCollection.Dispatcher.InvokeAsync(() => tableCategoryCollection[categoryPath]);

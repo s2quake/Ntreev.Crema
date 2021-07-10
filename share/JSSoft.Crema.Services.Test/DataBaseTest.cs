@@ -735,7 +735,7 @@ namespace JSSoft.Crema.Services.Test
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.InitializeRandomItemsAsync(authentication, DataBaseSettings.Default);
             await dataBase.UnloadAsync(authentication);
             var logs = await dataBase.GetLogAsync(authentication, null);
             var log = logs.Skip(1).Random();
@@ -749,7 +749,7 @@ namespace JSSoft.Crema.Services.Test
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.InitializeRandomItemsAsync(authentication, DataBaseSettings.Default);
             await dataBase.UnloadAsync(authentication);
             var logs = await dataBase.GetLogAsync(authentication, null);
             var log = logs.Skip(1).Random();
@@ -763,7 +763,7 @@ namespace JSSoft.Crema.Services.Test
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.InitializeRandomItemsAsync(authentication, DataBaseSettings.Default);
             await dataBase.UnloadAsync(authentication);
             var logs = await dataBase.GetLogAsync(authentication, null);
             var log = logs.Skip(1).Random();
@@ -777,7 +777,7 @@ namespace JSSoft.Crema.Services.Test
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.InitializeRandomItemsAsync(authentication, DataBaseSettings.Default);
             await dataBase.UnloadAsync(authentication);
             await dataBase.RevertAsync(authentication, string.Empty);
         }
@@ -790,7 +790,7 @@ namespace JSSoft.Crema.Services.Test
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
             var invalidRevision = RandomUtility.NextString();
-            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.InitializeRandomItemsAsync(authentication, DataBaseSettings.Default);
             await dataBase.UnloadAsync(authentication);
             await dataBase.RevertAsync(authentication, invalidRevision);
         }
@@ -802,7 +802,7 @@ namespace JSSoft.Crema.Services.Test
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.InitializeRandomItemsAsync(authentication, DataBaseSettings.Default);
             await dataBase.UnloadAsync(authentication);
             var logs = await dataBase.GetLogAsync(authentication, null);
             var log = logs.Skip(1).Random();

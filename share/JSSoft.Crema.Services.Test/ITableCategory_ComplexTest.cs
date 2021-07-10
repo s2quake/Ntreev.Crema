@@ -49,7 +49,7 @@ namespace JSSoft.Crema.Services.Test
             dataBase = await dataBaseContext.GetRandomDataBaseAsync(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
             await dataBase.LoadAsync(authentication);
             await dataBase.EnterAsync(authentication);
-            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.InitializeRandomItemsAsync(authentication, DataBaseSettings.Default);
             category = await dataBase.GetRandomTableCategoryAsync(item => item.Parent != null);
         }
 

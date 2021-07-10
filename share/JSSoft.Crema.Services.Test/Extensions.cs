@@ -82,9 +82,7 @@ namespace JSSoft.Crema.Services.Test
 
         public static async Task InitializeAsync(this IDataBase dataBase, Authentication authentication)
         {
-            await dataBase.InitializeRandomItemsAsync(authentication);
+            await dataBase.InitializeRandomItemsAsync(authentication, DataBaseSettings.Default);
         }
-
-      
     }
 }

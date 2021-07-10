@@ -28,7 +28,7 @@ namespace JSSoft.Crema.Services.Random
 {
     public static class TableExtensions
     {
-        public static async Task<ITable> AddRandomChildTableAsync(this ITable table, Authentication authentication)
+        public static async Task<ITable> AddRandomChildTableAsync(this ITable table, Authentication authentication, DataBaseSettings settings)
         {
             var copyData = RandomUtility.NextBoolean();
             var template = await table.NewTableAsync(authentication);
@@ -38,8 +38,8 @@ namespace JSSoft.Crema.Services.Random
             {
                 foreach (var item in tables)
                 {
-                    var minCount = CremaRandomSettings.TableContext.MinRowCount;
-                    var maxCount = CremaRandomSettings.TableContext.MaxRowCount;
+                    var minCount = settings.TableContext.MinRowCount;
+                    var maxCount = settings.TableContext.MaxRowCount;
                     var count = RandomUtility.Next(minCount, maxCount);
                     await AddRandomRowsAsync(item, authentication, count);
                 }

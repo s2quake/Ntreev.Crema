@@ -43,18 +43,6 @@ namespace JSSoft.Crema.Services.Test
             AppUtility.ProductVersion = "1.0.0.0";
             AppUtility.UserAppDataPath = Path.Combine(context.TestRunResultsDirectory, "AppData");
 
-            CremaRandomSettings.TypeContext.MinTypeCount = 1;
-            CremaRandomSettings.TypeContext.MaxTypeCount = 3;
-            CremaRandomSettings.TypeContext.MinTypeCategoryCount = 1;
-            CremaRandomSettings.TypeContext.MaxTypeCategoryCount = 3;
-
-            CremaRandomSettings.TableContext.MinRowCount = 1;
-            CremaRandomSettings.TableContext.MaxRowCount = 10;
-            CremaRandomSettings.TableContext.MinTableCount = 1;
-            CremaRandomSettings.TableContext.MaxTableCount = 3;
-            CremaRandomSettings.TableContext.MinTableCategoryCount = 1;
-            CremaRandomSettings.TableContext.MaxTableCategoryCount = 3;
-
             TableTemplateExtensions.MinColumnCount = 2;
             TableTemplateExtensions.MaxColumnCount = 5;
 

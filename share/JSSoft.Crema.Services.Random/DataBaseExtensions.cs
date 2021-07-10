@@ -28,20 +28,14 @@ namespace JSSoft.Crema.Services.Random
     {
         static DataBaseExtensions()
         {
-
         }
 
-        public static Task InitializeRandomItemsAsync(this IDataBase dataBase, Authentication authentication)
+        public static async Task InitializeRandomItemsAsync(this IDataBase dataBase, Authentication authentication, DataBaseSettings settings)
         {
-            return InitializeRandomItemsAsync(dataBase, authentication, false);
-        }
-
-        public static async Task InitializeRandomItemsAsync(this IDataBase dataBase, Authentication authentication, bool transaction)
-        {
-            if (transaction == true)
-                await InitializeRandomItemsTransactionAsync(dataBase, authentication);
+            if (settings.Transaction == true)
+                await InitializeRandomItemsTransactionAsync(dataBase, authentication, settings);
             else
-                await InitializeRandomItemsStandardAsync(dataBase, authentication);
+                await InitializeRandomItemsStandardAsync(dataBase, authentication, settings);
         }
 
         public static Task GenerateTableAsync(this IDataBase dataBase, Authentication authentication)
@@ -117,7 +111,7 @@ namespace JSSoft.Crema.Services.Random
             }
             throw new NotImplementedException();
         }
-    
+
         public static Task<IType> GetRandomTypeAsync(this IDataBase dataBase)
         {
             return GetRandomTypeAsync(dataBase, DefaultPredicate);
@@ -146,22 +140,30 @@ namespace JSSoft.Crema.Services.Random
             throw new NotImplementedException();
         }
 
-        private static async Task InitializeRandomItemsTransactionAsync(this IDataBase dataBase, Authentication authentication)
+        private static async Task InitializeRandomItemsTransactionAsync(this IDataBase dataBase, Authentication authentication, DataBaseSettings settings)
         {
             var trans = await dataBase.BeginTransactionAsync(authentication);
-            var typeContext = dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
-            var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
-            await typeContext.AddRandomItemsAsync(authentication);
-            await tableContext.AddRandomItemsAsync(authentication);
-            await trans.CommitAsync(authentication);
+            try
+            {
+                var typeContext = dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
+                var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
+                await typeContext.AddRandomItemsAsync(authentication, settings);
+                await tableContext.AddRandomItemsAsync(authentication, settings);
+                await trans.CommitAsync(authentication);
+            }
+            catch (Exception e)
+            {
+                await trans.RollbackAsync(authentication);
+                throw e;
+            }
         }
 
-        private static async Task InitializeRandomItemsStandardAsync(this IDataBase dataBase, Authentication authentication)
+        private static async Task InitializeRandomItemsStandardAsync(this IDataBase dataBase, Authentication authentication, DataBaseSettings settings)
         {
             var typeContext = dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
             var tableContext = dataBase.GetService(typeof(ITableContext)) as ITableContext;
-            await typeContext.AddRandomItemsAsync(authentication);
-            await tableContext.AddRandomItemsAsync(authentication);
+            await typeContext.AddRandomItemsAsync(authentication, settings);
+            await tableContext.AddRandomItemsAsync(authentication, settings);
         }
 
         private static bool DefaultPredicate(ITableItem _) => true;

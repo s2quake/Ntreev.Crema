@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library.Random;
 using System;
 using System.Threading.Tasks;
@@ -27,23 +28,19 @@ namespace JSSoft.Crema.Services.Random
 {
     public static class TypeContextExtensions
     {
-        public static async Task AddRandomItemsAsync(this ITypeContext typeContext, Authentication authentication)
+        public static async Task AddRandomItemsAsync(this ITypeContext typeContext, Authentication authentication, DataBaseSettings settings)
         {
-            await AddRandomCategoriesAsync(typeContext, authentication);
-            await AddRandomTypesAsync(typeContext, authentication);
+            await AddRandomCategoriesAsync(typeContext, authentication, settings);
+            await AddRandomTypesAsync(typeContext, authentication, settings);
         }
 
-        public static Task AddRandomCategoriesAsync(this ITypeContext typeContext, Authentication authentication)
+        public static async Task AddRandomCategoriesAsync(this ITypeContext typeContext, Authentication authentication, DataBaseSettings settings)
         {
-            var minCount = CremaRandomSettings.TypeContext.MinTypeCategoryCount;
-            var maxCount = CremaRandomSettings.TypeContext.MaxTypeCategoryCount;
+            var minCount = settings.TypeContext.MinTypeCategoryCount;
+            var maxCount = settings.TypeContext.MaxTypeCategoryCount;
             var count = RandomUtility.Next(minCount, maxCount);
-            return AddRandomCategoriesAsync(typeContext, authentication, count);
-        }
-
-        public static async Task AddRandomCategoriesAsync(this ITypeContext typeContext, Authentication authentication, int tryCount)
-        {
-            for (var i = 0; i < tryCount; i++)
+            var typeCategoryCollection = typeContext.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
+            while (await typeCategoryCollection.GetCountAsync() < count)
             {
                 await typeContext.AddRandomCategoryAsync(authentication);
             }
@@ -70,17 +67,13 @@ namespace JSSoft.Crema.Services.Random
             }
         }
 
-        public static Task AddRandomTypesAsync(this ITypeContext typeContext, Authentication authentication)
+        public static async Task AddRandomTypesAsync(this ITypeContext typeContext, Authentication authentication, DataBaseSettings settings)
         {
-            var minCount = CremaRandomSettings.TypeContext.MinTypeCount;
-            var maxCount = CremaRandomSettings.TypeContext.MaxTypeCount;
+            var minCount = settings.TypeContext.MinTypeCount;
+            var maxCount = settings.TypeContext.MaxTypeCount;
             var count = RandomUtility.Next(minCount, maxCount);
-            return AddRandomTypesAsync(typeContext, authentication, count);
-        }
-
-        public static async Task AddRandomTypesAsync(this ITypeContext typeContext, Authentication authentication, int tryCount)
-        {
-            for (var i = 0; i < tryCount; i++)
+            var typeCollection = typeContext.GetService(typeof(ITypeCollection)) as ITypeCollection;
+            while (await typeCollection.GetCountAsync() < count)
             {
                 await AddRandomTypeAsync(typeContext, authentication);
             }
@@ -115,7 +108,6 @@ namespace JSSoft.Crema.Services.Random
         private static int GetLevel<T>(T category, Func<T, T> parentFunc)
         {
             var level = 0;
-
             var parent = parentFunc(category);
             while (parent != null)
             {
