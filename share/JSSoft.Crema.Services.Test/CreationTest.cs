@@ -41,17 +41,14 @@ namespace JSSoft.Crema.Services.Test
     public class CreationTest
     {
         private static TestApplication app;
-        private static TestServerConfigurator configurator;
         private static IDataBaseContext dataBaseContext;
 
         [ClassInitialize]
         public static async Task ClassInitAsync(TestContext context)
         {
             app = new();
-            configurator = new(app);
             await app.InitializeAsync(context);
             await app.OpenAsync();
-            await configurator.GenerateDataBasesAsync(4);
             dataBaseContext = app.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
         }
 

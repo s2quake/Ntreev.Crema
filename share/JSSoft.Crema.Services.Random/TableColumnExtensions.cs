@@ -20,6 +20,7 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Data;
+using JSSoft.Library.ObjectModel;
 using JSSoft.Library.Random;
 using System.Linq;
 using System.Threading.Tasks;
@@ -166,7 +167,8 @@ namespace JSSoft.Crema.Services.Random
                         var domain = template.Domain;
                         var dataBase = domain.GetService(typeof(IDataBase)) as IDataBase;
                         var typeContext = dataBase.GetService(typeof(ITypeContext)) as ITypeContext;
-                        var type = typeContext.Types[dataType];
+                        var typeName = new ItemName(dataType);
+                        var type = typeContext.Types[typeName.Name, typeName.CategoryPath];
                         return await type.GetRandomStringAsync();
                     }
                     catch (System.NullReferenceException e)

@@ -452,7 +452,14 @@ namespace JSSoft.Crema.Services.Data
             return this.Contains(typeName);
         }
 
+        bool ITypeCollection.Contains(string typeName, string categoryPath)
+        {
+            return this.Contains(typeName, categoryPath);
+        }
+
         IType ITypeCollection.this[string typeName] => this[typeName];
+
+        IType ITypeCollection.this[string typeName, string categoryPath] => this[typeName, categoryPath];
 
         #endregion
 

@@ -34,111 +34,111 @@ using JSSoft.Crema.Services.Test.Common.Extensions;
 
 namespace JSSoft.Crema.Services.Test
 {
-    class TestServerConfigurator
-    {
-        private readonly TestApplication app;
+    // class TestServerConfigurator
+    // {
+    //     private readonly TestApplication app;
 
-        public TestServerConfigurator(TestApplication app)
-        {
-            this.app = app;
-        }
+    //     public TestServerConfigurator(TestApplication app)
+    //     {
+    //         this.app = app;
+    //     }
 
-        public async Task<IDataBase[]> GenerateDataBasesAsync(int count)
-        {
-            var cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
-            var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-            var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
-            var itemList = new List<IDataBase>(count);
-            for (var i = 0; i < count; i++)
-            {
-                var dataBaseName = await dataBaseContext.GenerateNewDataBaseNameAsync(RandomUtility.NextName());
-                var comment = RandomUtility.NextString();
-                var item = await dataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
-                itemList.Add(item);
-            }
-            await cremaHost.LogoutAsync(authentication);
-            return itemList.ToArray();
-        }
+    //     public async Task<IDataBase[]> GenerateDataBasesAsync(int count)
+    //     {
+    //         var cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
+    //         var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+    //         var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+    //         var itemList = new List<IDataBase>(count);
+    //         for (var i = 0; i < count; i++)
+    //         {
+    //             var dataBaseName = await dataBaseContext.GenerateNewDataBaseNameAsync(RandomUtility.NextName());
+    //             var comment = RandomUtility.NextString();
+    //             var item = await dataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
+    //             itemList.Add(item);
+    //         }
+    //         await cremaHost.LogoutAsync(authentication);
+    //         return itemList.ToArray();
+    //     }
 
-        [Obsolete]
-        public async Task LoginRandomManyAsync()
-        {
-            var cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
-            var userCollcection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
-            var count = await userCollcection.Dispatcher.InvokeAsync(() => userCollcection.Count);
-            await cremaHost.LoginRandomManyAsync((int)(count * 0.25));
-        }
+    //     [Obsolete]
+    //     public async Task LoginRandomManyAsync()
+    //     {
+    //         var cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
+    //         var userCollcection = cremaHost.GetService(typeof(IUserCollection)) as IUserCollection;
+    //         var count = await userCollcection.Dispatcher.InvokeAsync(() => userCollcection.Count);
+    //         await cremaHost.LoginRandomManyAsync((int)(count * 0.25));
+    //     }
 
-        public async Task LoadRandomDataBasesAsync()
-        {
-            var cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
-            var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
-            var dataBases = await dataBaseContext.GetDataBasesAsync();
-            for (var i = 0; i < dataBases.Length; i++)
-            {
-                if (i % 2 == 0)
-                {
-                    var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-                    var dataBase = dataBases[i];
-                    await dataBase.LoadAsync(authentication);
-                    await cremaHost.LogoutAsync(authentication);
-                }
-            }
-        }
+    //     public async Task LoadRandomDataBasesAsync()
+    //     {
+    //         var cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
+    //         var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+    //         var dataBases = await dataBaseContext.GetDataBasesAsync();
+    //         for (var i = 0; i < dataBases.Length; i++)
+    //         {
+    //             if (i % 2 == 0)
+    //             {
+    //                 var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+    //                 var dataBase = dataBases[i];
+    //                 await dataBase.LoadAsync(authentication);
+    //                 await cremaHost.LogoutAsync(authentication);
+    //             }
+    //         }
+    //     }
 
-        public async Task SetPrivateRandomDataBasesAsync()
-        {
-            var cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
-            var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
-            var dataBases = await dataBaseContext.GetDataBasesAsync();
-            for (var i = 0; i < dataBases.Length; i++)
-            {
-                if (i % 3 == 0)
-                {
-                    var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-                    var dataBase = dataBases[i];
-                    var userCollection = dataBaseContext.GetService(typeof(IUserCollection)) as IUserCollection;
-                    var admins = new Queue<IUser>(await userCollection.GetRandomUsersAsync(UserFlags.Admin, item => item.ID != authentication.ID));
-                    var members = new Queue<IUser>(await userCollection.GetRandomUsersAsync(UserFlags.Member));
-                    var guests = new Queue<IUser>(await userCollection.GetRandomUsersAsync(UserFlags.Guest));
-                    var isLoaded = dataBase.IsLoaded;
-                    if (isLoaded == false)
-                        await dataBase.LoadAsync(authentication);
-                    await dataBase.SetPrivateAsync(authentication);
-                    for (var j = 0; j < 3; j++)
-                    {
-                        await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Master);
-                        await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Developer);
-                        await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Editor);
-                        await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Guest);
-                        await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Master);
-                        await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Developer);
-                        await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Editor);
-                        await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Guest);
-                        await dataBase.AddAccessMemberAsync(authentication, guests.Dequeue().ID, AccessType.Guest);
-                    }
-                    if (isLoaded == false)
-                        await dataBase.UnloadAsync(authentication);
-                    await cremaHost.LogoutAsync(authentication);
-                }
-            }
-        }
+    //     public async Task SetPrivateRandomDataBasesAsync()
+    //     {
+    //         var cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
+    //         var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+    //         var dataBases = await dataBaseContext.GetDataBasesAsync();
+    //         for (var i = 0; i < dataBases.Length; i++)
+    //         {
+    //             if (i % 3 == 0)
+    //             {
+    //                 var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+    //                 var dataBase = dataBases[i];
+    //                 var userCollection = dataBaseContext.GetService(typeof(IUserCollection)) as IUserCollection;
+    //                 var admins = new Queue<IUser>(await userCollection.GetRandomUsersAsync(UserFlags.Admin, item => item.ID != authentication.ID));
+    //                 var members = new Queue<IUser>(await userCollection.GetRandomUsersAsync(UserFlags.Member));
+    //                 var guests = new Queue<IUser>(await userCollection.GetRandomUsersAsync(UserFlags.Guest));
+    //                 var isLoaded = dataBase.IsLoaded;
+    //                 if (isLoaded == false)
+    //                     await dataBase.LoadAsync(authentication);
+    //                 await dataBase.SetPrivateAsync(authentication);
+    //                 for (var j = 0; j < 3; j++)
+    //                 {
+    //                     await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Master);
+    //                     await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Developer);
+    //                     await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Editor);
+    //                     await dataBase.AddAccessMemberAsync(authentication, admins.Dequeue().ID, AccessType.Guest);
+    //                     await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Master);
+    //                     await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Developer);
+    //                     await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Editor);
+    //                     await dataBase.AddAccessMemberAsync(authentication, members.Dequeue().ID, AccessType.Guest);
+    //                     await dataBase.AddAccessMemberAsync(authentication, guests.Dequeue().ID, AccessType.Guest);
+    //                 }
+    //                 if (isLoaded == false)
+    //                     await dataBase.UnloadAsync(authentication);
+    //                 await cremaHost.LogoutAsync(authentication);
+    //             }
+    //         }
+    //     }
 
-        public async Task LockRandomDataBasesAsync()
-        {
-            var cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
-            var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
-            var dataBases = await dataBaseContext.GetDataBasesAsync();
-            for (var i = 0; i < dataBases.Length; i++)
-            {
-                if (i % 4 == 0)
-                {
-                    var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
-                    var dataBase = dataBases[i];
-                    await dataBase.LockAsync(authentication, RandomUtility.NextString());
-                    await cremaHost.LogoutAsync(authentication);
-                }
-            }
-        }
-    }
+    //     public async Task LockRandomDataBasesAsync()
+    //     {
+    //         var cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
+    //         var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+    //         var dataBases = await dataBaseContext.GetDataBasesAsync();
+    //         for (var i = 0; i < dataBases.Length; i++)
+    //         {
+    //             if (i % 4 == 0)
+    //             {
+    //                 var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+    //                 var dataBase = dataBases[i];
+    //                 await dataBase.LockAsync(authentication, RandomUtility.NextString());
+    //                 await cremaHost.LogoutAsync(authentication);
+    //             }
+    //         }
+    //     }
+    // }
 }

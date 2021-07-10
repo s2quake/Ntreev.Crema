@@ -28,7 +28,11 @@ namespace JSSoft.Crema.Services
     {
         bool Contains(string typeName);
 
+        bool Contains(string typeName, string categoryName);
+
         IType this[string typeName] { get; }
+
+        IType this[string typeName, string categoryPath] { get; }
 
         event ItemsEventHandler<IType> TypesStateChanged;
 
