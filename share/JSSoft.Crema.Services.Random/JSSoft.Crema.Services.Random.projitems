@@ -36,6 +36,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TypeMemberExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableTemplateExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeCategoryCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeCategoryExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeContextExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeTemplateExtensions.cs" />

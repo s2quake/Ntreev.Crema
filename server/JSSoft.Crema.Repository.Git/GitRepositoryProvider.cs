@@ -200,7 +200,7 @@ namespace JSSoft.Crema.Repository.Git
                 var revisions = revisionsCommand.ReadLines();
                 if (revisions.Contains(revision) == false)
                 {
-                    throw new InvalidOperationException($"'{revision}' is invalid revision.");
+                    throw new ArgumentException($"'{revision}' is invalid revision.", nameof(revision));
                 }
                 foreach (var item in revisions)
                 {

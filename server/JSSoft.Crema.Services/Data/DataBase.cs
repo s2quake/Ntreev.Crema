@@ -542,6 +542,7 @@ namespace JSSoft.Crema.Services.Data
                     base.DataBaseState = DataBaseState.None;
                     this.CremaHost.Sign(authentication);
                     this.DeleteCache();
+                    base.Delete(authentication);
                     this.DataBaseContext.InvokeItemsDeletedEvent(authentication, new DataBase[] { this }, new string[] { tuple.Name });
                     this.DataBaseContext.InvokeTaskCompletedEvent(authentication, taskID);
                 });
@@ -566,11 +567,16 @@ namespace JSSoft.Crema.Services.Data
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetLogAsync), this);
-                    this.ValidateGetLog(authentication);
+                    this.ValidateGetLog(authentication, revision);
                     var remotePath = this.IsLoaded == true ? this.BasePath : this.CremaHost.GetPath(CremaPath.RepositoryDataBases);
                     return (remotePath, base.Name);
                 });
@@ -670,10 +676,12 @@ namespace JSSoft.Crema.Services.Data
             }
         }
 
-        public void ValidateGetDataSet(Authentication authentication)
+        public void ValidateGetDataSet(Authentication authentication, string revision)
         {
+            if (revision == string.Empty)
+                throw new ArgumentException("empty string is not allowed", nameof(revision));
             if (this.IsLoaded == false)
-                throw new NotImplementedException();
+                throw new InvalidOperationException(Resources.Exception_DataBaseHasNotBeenLoaded);
             this.VerifyAccessType(authentication, AccessType.Guest);
         }
 
@@ -788,17 +796,34 @@ namespace JSSoft.Crema.Services.Data
                 return this.CremaHost.GetService(serviceType);
         }
 
-        public Task<CremaDataSet> GetDataSetAsync(Authentication authentication, DataSetType dataSetType, string filterExpression, string revision)
+        public async Task<CremaDataSet> GetDataSetAsync(Authentication authentication, DataSetType dataSetType, string filterExpression, string revision)
         {
-            this.ValidateGetDataSet(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, dataSetType, filterExpression, revision);
-            return dataSetType switch
+            try
             {
-                DataSetType.All => this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.All),
-                DataSetType.OmitContent => this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.OmitContent),
-                DataSetType.TypeOnly => this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.TypeOnly),
-                _ => throw new NotImplementedException(),
-            };
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateGetDataSet(authentication, revision);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, dataSetType, filterExpression, revision);
+                });
+                return dataSetType switch
+                {
+                    DataSetType.All => await this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.All),
+                    DataSetType.OmitContent => await this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.OmitContent),
+                    DataSetType.TypeOnly => await this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.TypeOnly),
+                    _ => throw new NotImplementedException("a"),
+                };
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw e;
+            }
         }
 
         public async Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision, string filterExpression, ReadTypes readType)
@@ -807,8 +832,11 @@ namespace JSSoft.Crema.Services.Data
             try
             {
                 var uri = await this.Repository.Dispatcher.InvokeAsync(() => this.Repository.GetUri(this.BasePath, revision));
-                var exportPath = await this.Repository.Dispatcher.InvokeAsync(() => this.Repository.Export(uri, tempPath));
-                return await Task.Run(() => CremaDataSet.ReadFromDirectory(exportPath, filterExpression, readType));
+                return await Task.Run(() =>
+                {
+                    var exportPath = this.Repository.Export(uri, tempPath);
+                    return CremaDataSet.ReadFromDirectory(exportPath, filterExpression, readType);
+                });
             }
             finally
             {
@@ -1551,8 +1579,10 @@ namespace JSSoft.Crema.Services.Data
                 throw new PermissionDeniedException();
         }
 
-        private void ValidateGetLog(Authentication authentication)
+        private void ValidateGetLog(Authentication authentication, string revision)
         {
+            if (revision == string.Empty)
+                throw new ArgumentException("empty string is not allowed", nameof(revision));
             if (this.VerifyAccessType(authentication, AccessType.Guest) == false)
                 throw new PermissionDeniedException();
         }
@@ -1565,6 +1595,8 @@ namespace JSSoft.Crema.Services.Data
                 throw new PermissionDeniedException();
             if (base.DataBaseState != DataBaseState.Unloaded)
                 throw new InvalidOperationException(Resources.Exception_LoadedDataBaseCannotRevert);
+            if (this.VerifyAccessType(authentication, AccessType.Owner) == false)
+                throw new PermissionDeniedException();
         }
 
         private void ReadAccessInfo()
@@ -1774,6 +1806,15 @@ namespace JSSoft.Crema.Services.Data
         async Task<ITransaction> IDataBase.BeginTransactionAsync(Authentication authentication)
         {
             return await this.BeginTransactionAsync(authentication);
+        }
+
+        AuthenticationInfo[] IDataBase.AuthenticationInfos
+        {
+            get
+            {
+                this.Dispatcher.VerifyAccess();
+                return this.AuthenticationInfos;
+            }
         }
 
         #endregion

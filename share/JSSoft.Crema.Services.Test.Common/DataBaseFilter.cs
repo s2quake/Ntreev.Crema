@@ -36,10 +36,15 @@ namespace JSSoft.Crema.Services.Test.Common
                 var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
                 var dataBaseFlags = this.DataBaseFlags;
                 var accessType = this.AccessType;
+                var settings = this.Settings;
                 dataBase = await dataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
                 if (dataBaseFlags.HasFlag(DataBaseFlags.Loaded) == true)
                 {
                     await dataBase.LoadAsync(authentication);
+                }
+                if (settings != null)
+                {
+                    await this.Initialize(dataBase, authentication, settings);
                 }
                 if (dataBaseFlags.HasFlag(DataBaseFlags.Private) == true)
                 {
@@ -52,6 +57,16 @@ namespace JSSoft.Crema.Services.Test.Common
                 await cremaHost.LogoutAsync(authentication);
             }
             return dataBase;
+        }
+
+        private async Task Initialize(IDataBase dataBase, Authentication authentication, DataBaseSettings settings)
+        {
+            var isLoaded = dataBase.IsLoaded;
+            if (isLoaded == false)
+                await dataBase.LoadAsync(authentication);
+            await dataBase.InitializeRandomItemsAsync(authentication, settings);
+                if (isLoaded == false)
+                await dataBase.UnloadAsync(authentication);
         }
 
         private async Task InitializeAccessAsync(IServiceProvider serviceProvider, IDataBase dataBase, Authentication authentication, AccessType accessType)
@@ -108,9 +123,7 @@ namespace JSSoft.Crema.Services.Test.Common
 
         public string[] ExcludedDataBaseNames { get; set; }
 
-        // public string[] IncludedIDs { get; set; }
-
-        // public string[] ExcludedIDs { get; set; }
+        public DataBaseSettings Settings { get;set;}
 
         public DataBaseFlags DataBaseFlags { get; set; }
 

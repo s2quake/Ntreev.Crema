@@ -133,6 +133,13 @@ namespace JSSoft.Crema.ServiceModel
             return this.Contains(memberID);
         }
 
+        public bool IsNotMember(string memberID)
+        {
+            if (this.IsPrivate == false)
+                return false;
+            return this.Contains(memberID) == false;
+        }
+
         public bool CanPrivate(string userID)
         {
             if (this.IsPrivate == false)

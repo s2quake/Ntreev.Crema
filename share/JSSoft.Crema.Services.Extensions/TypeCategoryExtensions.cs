@@ -29,6 +29,20 @@ namespace JSSoft.Crema.Services.Extensions
 {
     public static class TypeCategoryExtensions
     {
+        public static Task<string> GenerateNewCategoryNameAsync(this ITypeCategory typeCategory)
+        {
+            return GenerateNewCategoryNameAsync(typeCategory, "NewCategory");
+        }
+
+        public static Task<string> GenerateNewCategoryNameAsync(this ITypeCategory typeCategory, string name)
+        {
+            return typeCategory.Dispatcher.InvokeAsync(() =>
+            {
+                var names = typeCategory.Categories.Select(item => item.Name);
+                return NameUtility.GenerateNewName(name, names);
+            });
+        }
+
         public static Task<IType[]> GetAllTypesAsync(this ITypeCategory category, Func<IType, bool> predicate)
         {
             return category.Dispatcher.InvokeAsync(() =>

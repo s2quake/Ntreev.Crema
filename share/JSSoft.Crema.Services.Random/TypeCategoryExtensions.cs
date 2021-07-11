@@ -19,27 +19,25 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Extensions;
 using JSSoft.Library;
+using JSSoft.Library.Random;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security;
+using System.Threading.Tasks;
 
-namespace JSSoft.Crema.Services.Extensions
+namespace JSSoft.Crema.Services.Random
 {
-    public static class UserCategoryExtensions
+    public static class TypeCategoryExtensions
     {
-        public static Task<string> GenerateNewCategoryNameAsync(this IUserCategory userCategory)
+        public static async Task<ITypeCategory> GenerateTypeCategoryAsync(this ITypeCategory typeCategory, Authentication authentication)
         {
-            return GenerateNewCategoryNameAsync(userCategory, "NewCategory");
-        }
-
-        public static Task<string> GenerateNewCategoryNameAsync(this IUserCategory userCategory, string name)
-        {
-            return userCategory.Dispatcher.InvokeAsync(() =>
-            {
-                var names = userCategory.Categories.Select(item => item.Name);
-                return NameUtility.GenerateNewName(name, names);
-            });
+            var name = await typeCategory.GenerateNewCategoryNameAsync();
+            return await typeCategory.AddNewCategoryAsync(authentication, name);
         }
     }
 }

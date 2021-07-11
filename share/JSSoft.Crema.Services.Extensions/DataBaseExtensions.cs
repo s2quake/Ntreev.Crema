@@ -145,7 +145,7 @@ namespace JSSoft.Crema.Services.Extensions
             }
             throw new NotImplementedException();
         }
-        
+
         public static Task<ITypeItem> GetTypeItemAsync(this IDataBase dataBase, string itemPath)
         {
             if (dataBase.GetService(typeof(ITypeContext)) is ITypeContext typeContext)
@@ -198,6 +198,136 @@ namespace JSSoft.Crema.Services.Extensions
                 return typeCategoryCollection.GetCategoriesAsync();
             }
             throw new NotImplementedException();
+        }
+        
+        public static Task AddRenamedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.Renamed += handler);
+        }
+
+        public static Task AddDeletedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.Deleted += handler);
+        }
+
+        public static Task AddLoadedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.Loaded += handler);
+        }
+
+        public static Task AddUnloadedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.Unloaded += handler);
+        }
+
+        public static Task AddResettingEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.Resetting += handler);
+        }
+
+        public static Task AddResetEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.Reset += handler);
+        }
+
+        public static Task AddAuthenticationEnteredEventHandlerAsync(this IDataBase dataBase, EventHandler<AuthenticationEventArgs> handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.AuthenticationEntered += handler);
+        }
+
+        public static Task AddAuthenticationLeftEventHandlerAsync(this IDataBase dataBase, EventHandler<AuthenticationEventArgs> handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.AuthenticationLeft += handler);
+        }
+
+        public static Task AddDataBaseInfoChangedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfoChanged += handler);
+        }
+
+        public static Task AddDataBaseStateChangedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseStateChanged += handler);
+        }
+
+        public static Task AddLockChangedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.LockChanged += handler);
+        }
+
+        public static Task AddAccessChangedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessChanged += handler);
+        }
+
+        public static Task AddTaskCompletedEventHandlerAsync(this IDataBase dataBase, TaskCompletedEventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.TaskCompleted += handler);
+        }
+
+        public static Task RemoveRenamedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.Renamed -= handler);
+        }
+
+        public static Task RemoveDeletedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.Deleted -= handler);
+        }
+
+        public static Task RemoveLoadedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.Loaded -= handler);
+        }
+
+        public static Task RemoveUnloadedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.Unloaded -= handler);
+        }
+
+        public static Task RemoveResettingEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.Resetting -= handler);
+        }
+
+        public static Task RemoveResetEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.Reset -= handler);
+        }
+
+        public static Task RemoveAuthenticationEnteredEventHandlerAsync(this IDataBase dataBase, EventHandler<AuthenticationEventArgs> handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.AuthenticationEntered -= handler);
+        }
+
+        public static Task RemoveAuthenticationLeftEventHandlerAsync(this IDataBase dataBase, EventHandler<AuthenticationEventArgs> handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.AuthenticationLeft -= handler);
+        }
+
+        public static Task RemoveDataBaseInfoChangedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfoChanged -= handler);
+        }
+
+        public static Task RemoveDataBaseStateChangedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseStateChanged -= handler);
+        }
+
+        public static Task RemoveLockChangedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.LockChanged -= handler);
+        }
+
+        public static Task RemoveAccessChangedEventHandlerAsync(this IDataBase dataBase, EventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessChanged -= handler);
+        }
+
+        public static Task RemoveTaskCompletedEventHandlerAsync(this IDataBase dataBase, TaskCompletedEventHandler handler)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => dataBase.TaskCompleted -= handler);
         }
     }
 }
