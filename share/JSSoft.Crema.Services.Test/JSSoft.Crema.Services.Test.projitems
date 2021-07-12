@@ -9,7 +9,10 @@
     <Import_RootNamespace>JSSoft.Crema.Services.Test</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_EnterAsyncTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_LeaveAsyncTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_LoadAsyncTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_UnLoadAsyncTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBaseTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CreationTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaHostTest.cs" />

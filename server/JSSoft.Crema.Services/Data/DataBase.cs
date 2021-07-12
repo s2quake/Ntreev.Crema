@@ -1537,7 +1537,7 @@ namespace JSSoft.Crema.Services.Data
             if (this.IsLoaded == false)
                 throw new InvalidOperationException(Resources.Exception_DataBaseHasNotBeenLoaded);
             if (this.authentications.Contains(authentication) == true)
-                throw new ArgumentException(Resources.Exception_AlreadyInDataBase, nameof(authentication));
+                throw new InvalidOperationException(Resources.Exception_AlreadyInDataBase);
             if (this.VerifyAccessType(authentication, AccessType.Guest) == false)
                 throw new PermissionDeniedException();
         }
@@ -1547,7 +1547,7 @@ namespace JSSoft.Crema.Services.Data
             if (this.IsLoaded == false)
                 throw new InvalidOperationException(Resources.Exception_DataBaseHasNotBeenLoaded);
             if (this.authentications.Contains(authentication) == false)
-                throw new ArgumentException(Resources.Exception_NotInDataBase, nameof(authentication));
+                throw new InvalidOperationException(Resources.Exception_NotInDataBase);
         }
 
         private void ValidateLoad(Authentication authentication)
