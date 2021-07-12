@@ -844,8 +844,44 @@ namespace JSSoft.Crema.Services.Test
             };
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
             var accessInfo = dataBase.AccessInfo;
-            var userIDs = accessInfo.Members.Where(item => item.AccessType == AccessType.Master).Select(item => item.UserID).ToArray();
-            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member, item => userIDs.Contains(item.ID) == true);
+            var userID = accessInfo.Members.Where(item => item.AccessType == AccessType.Developer).Random().UserID;
+            var authentication = await this.TestContext.LoginAsync(userID);
+            var logs = await dataBase.GetLogAsync(authentication, null);
+            var log = logs.Skip(1).Random();
+            await dataBase.RevertAsync(authentication, log.Revision);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task RevertAsync_Private_Editor_FailTestAsync()
+        {
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Private | DataBaseFlags.NotLocked)
+            {
+                Settings = DataBaseSettings.Default,
+                AccessType = AccessType.Editor
+            };
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            var accessInfo = dataBase.AccessInfo;
+            var userID = accessInfo.Members.Where(item => item.AccessType == AccessType.Editor).Random().UserID;
+            var authentication = await this.TestContext.LoginAsync(userID);
+            var logs = await dataBase.GetLogAsync(authentication, null);
+            var log = logs.Skip(1).Random();
+            await dataBase.RevertAsync(authentication, log.Revision);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task RevertAsync_Private_Guest_FailTestAsync()
+        {
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Private | DataBaseFlags.NotLocked)
+            {
+                Settings = DataBaseSettings.Default,
+                AccessType = AccessType.Guest
+            };
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            var accessInfo = dataBase.AccessInfo;
+            var userID = accessInfo.Members.Where(item => item.AccessType == AccessType.Guest).Random().UserID;
+            var authentication = await this.TestContext.LoginAsync(userID);
             var logs = await dataBase.GetLogAsync(authentication, null);
             var log = logs.Skip(1).Random();
             await dataBase.RevertAsync(authentication, log.Revision);
@@ -1068,7 +1104,168 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task CopyAsync_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase1 = await dataBaseFilter.GetDataBaseAsync(app);
+            var expectedName = await dataBaseContext.GenerateNewDataBaseNameAsync();
+            var comment = RandomUtility.NextString();
+            var dataBase2 = await dataBase1.CopyAsync(authentication, expectedName, comment, false);
+            Assert.AreEqual(expectedName, dataBase2.Name);
+        }
 
+        [TestMethod]
+        public async Task CopyAsync_Force_TestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase1 = await dataBaseFilter.GetDataBaseAsync(app);
+            var expectedName = await dataBaseContext.GenerateNewDataBaseNameAsync();
+            var comment = RandomUtility.NextString();
+            var dataBase2 = await dataBase1.CopyAsync(authentication, expectedName, comment, true);
+            Assert.AreEqual(expectedName, dataBase2.Name);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task CopyAsync_Arg0_Null_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase1 = await dataBaseFilter.GetDataBaseAsync(app);
+            var expectedName = await dataBaseContext.GenerateNewDataBaseNameAsync();
+            var comment = RandomUtility.NextString();
+            var dataBase2 = await dataBase1.CopyAsync(null, expectedName, comment, false);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task CopyAsync_Arg1_Null_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase1 = await dataBaseFilter.GetDataBaseAsync(app);
+            var comment = RandomUtility.NextString();
+            var dataBase2 = await dataBase1.CopyAsync(authentication, null, comment, false);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task CopyAsync_Arg2_Null_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase1 = await dataBaseFilter.GetDataBaseAsync(app);
+            var expectedName = await dataBaseContext.GenerateNewDataBaseNameAsync();
+            var dataBase2 = await dataBase1.CopyAsync(authentication, expectedName, null, false);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public async Task CopyAsync_Arg2_Empty_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase1 = await dataBaseFilter.GetDataBaseAsync(app);
+            var expectedName = await dataBaseContext.GenerateNewDataBaseNameAsync();
+            var dataBase2 = await dataBase1.CopyAsync(authentication, expectedName, string.Empty, false);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AuthenticationExpiredException))]
+        public async Task CopyAsync_Expired_FailTestAsync()
+        {
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase1 = await dataBaseFilter.GetDataBaseAsync(app);
+            var expectedName = await dataBaseContext.GenerateNewDataBaseNameAsync();
+            var dataBase2 = await dataBase1.CopyAsync(expiredAuthentication, expectedName, null, false);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task CopyAsync_Loaded_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase1 = await dataBaseFilter.GetDataBaseAsync(app);
+            var expectedName = await dataBaseContext.GenerateNewDataBaseNameAsync();
+            var dataBase2 = await dataBase1.CopyAsync(authentication, expectedName, null, false);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task CopyAsync_Member_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase1 = await dataBaseFilter.GetDataBaseAsync(app);
+            var expectedName = await dataBaseContext.GenerateNewDataBaseNameAsync();
+            var comment = RandomUtility.NextString();
+            var dataBase2 = await dataBase1.CopyAsync(authentication, expectedName, comment, false);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public async Task CopyAsync_Guest_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase1 = await dataBaseFilter.GetDataBaseAsync(app);
+            var expectedName = await dataBaseContext.GenerateNewDataBaseNameAsync();
+            var comment = RandomUtility.NextString();
+            var dataBase2 = await dataBase1.CopyAsync(authentication, expectedName, comment, false);
+        }
+
+        [TestMethod]
+        public async Task CopyAsync_Private_Owner_TestAsync()
+        {
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Private | DataBaseFlags.NotLocked);
+            var dataBase1 = await dataBaseFilter.GetDataBaseAsync(app);
+            var accessInfo = dataBase1.AccessInfo;
+            var expectedName = await dataBaseContext.GenerateNewDataBaseNameAsync();
+            var comment = RandomUtility.NextString();
+            var authentication = await this.TestContext.LoginAsync(accessInfo.UserID);
+            var dataBase2 = await dataBase1.CopyAsync(authentication, expectedName, comment, false);
+        }
+
+        public async Task CopyAsync_Private_Member_TestAsync(AccessType accessType)
+        {
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Private | DataBaseFlags.NotLocked)
+            {
+                AccessType = accessType
+            };
+            var dataBase1 = await dataBaseFilter.GetDataBaseAsync(app);
+            var accessInfo = dataBase1.AccessInfo;
+            var expectedName = await dataBaseContext.GenerateNewDataBaseNameAsync();
+            var comment = RandomUtility.NextString();
+            var authentication = await this.TestContext.LoginRandomAsync(item => accessInfo.GetAccessType(item.ID) == accessType);
+            var dataBase2 = await dataBase1.CopyAsync(authentication, expectedName, comment, false);
+        }
+
+        [TestMethod]
+        public Task CopyAsync_Private_Master_TestAsync()
+        {
+            return this.CopyAsync_Private_Member_TestAsync(AccessType.Master);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public Task CopyAsync_Private_Developer_TestAsync()
+        {
+            return this.CopyAsync_Private_Member_TestAsync(AccessType.Developer);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public Task CopyAsync_Private_Editor_TestAsync()
+        {
+            return this.CopyAsync_Private_Member_TestAsync(AccessType.Editor);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public Task CopyAsync_Private_Guest_TestAsync()
+        {
+            return this.CopyAsync_Private_Member_TestAsync(AccessType.Guest);
         }
 
         [TestMethod]
@@ -1437,19 +1634,83 @@ namespace JSSoft.Crema.Services.Test
         [TestMethod]
         public async Task LockChanged_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            var expectedDataBase = dataBase;
+            var actualDataBase = null as IDataBase;
+            var comment = RandomUtility.NextString();
+            await dataBase.AddLockChangedEventHandlerAsync(DataBase_LockChanged);
+            await dataBase.LockAsync(authentication, comment);
+            await dataBase.UnlockAsync(authentication);
+            Assert.AreEqual(expectedDataBase, actualDataBase);
 
+            await dataBase.RemoveLockChangedEventHandlerAsync(DataBase_LockChanged);
+            actualDataBase = null;
+            await dataBase.LockAsync(authentication, comment);
+            Assert.IsNull(actualDataBase);
+
+            void DataBase_LockChanged(object sender, EventArgs e)
+            {
+                if (object.Equals(sender, dataBase) == true)
+                {
+                    actualDataBase = sender as IDataBase;
+                }
+            }
         }
 
         [TestMethod]
         public async Task AccessChanged_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            var expectedDataBase = dataBase;
+            var actualDataBase = null as IDataBase;
+            await dataBase.AddAccessChangedEventHandlerAsync(DataBase_AccessChanged);
+            await dataBase.SetPrivateAsync(authentication);
+            await dataBase.SetPublicAsync(authentication);
+            Assert.AreEqual(expectedDataBase, actualDataBase);
 
+            await dataBase.RemoveAccessChangedEventHandlerAsync(DataBase_AccessChanged);
+            actualDataBase = null;
+            await dataBase.SetPrivateAsync(authentication);
+            Assert.IsNull(actualDataBase);
+
+            void DataBase_AccessChanged(object sender, EventArgs e)
+            {
+                if (object.Equals(sender, dataBase) == true)
+                {
+                    actualDataBase = sender as IDataBase;
+                }
+            }
         }
 
         [TestMethod]
         public async Task TaskCompleted_TestAsync()
         {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked);
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            var expectedDataBase = dataBase;
+            var actualDataBase = null as IDataBase;
+            await dataBase.AddTaskCompletedEventHandlerAsync(DataBase_TaskCompleted);
+            await dataBase.SetPrivateAsync(authentication);
+            await dataBase.SetPublicAsync(authentication);
+            Assert.AreEqual(expectedDataBase, actualDataBase);
 
+            await dataBase.AddTaskCompletedEventHandlerAsync(DataBase_TaskCompleted);
+            actualDataBase = null;
+            await dataBase.SetPrivateAsync(authentication);
+            Assert.IsNull(actualDataBase);
+
+            void DataBase_TaskCompleted(object sender, EventArgs e)
+            {
+                if (object.Equals(sender, dataBase) == true)
+                {
+                    actualDataBase = sender as IDataBase;
+                }
+            }
         }
     }
 }

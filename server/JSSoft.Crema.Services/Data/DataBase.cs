@@ -682,7 +682,8 @@ namespace JSSoft.Crema.Services.Data
                 throw new ArgumentException("empty string is not allowed", nameof(revision));
             if (this.IsLoaded == false)
                 throw new InvalidOperationException(Resources.Exception_DataBaseHasNotBeenLoaded);
-            this.VerifyAccessType(authentication, AccessType.Guest);
+            if (this.VerifyAccessType(authentication, AccessType.Guest) == false)
+                throw new PermissionDeniedException();
         }
 
         public bool VerifyAccess(Authentication authentication)

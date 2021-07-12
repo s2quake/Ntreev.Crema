@@ -161,6 +161,17 @@ namespace JSSoft.Crema.Services.Data
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (dataBase is null)
+                    throw new ArgumentNullException(nameof(dataBase));
+                if (newDataBaseName is null)
+                    throw new ArgumentNullException(nameof(newDataBaseName));
+                if (comment is null)
+                    throw new ArgumentNullException(nameof(comment));
+
                 this.ValidateExpired();
                 var dataBaseName = await this.Dispatcher.InvokeAsync(() =>
                 {
