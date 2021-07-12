@@ -22,6 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\UserExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AuthorityUtility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBaseFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITestContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserCategoryFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserInfoGenerator.cs" />

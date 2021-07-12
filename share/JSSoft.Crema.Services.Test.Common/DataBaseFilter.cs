@@ -28,12 +28,13 @@ namespace JSSoft.Crema.Services.Test.Common
         {
             var cremaHost = serviceProvider.GetService(typeof(ICremaHost)) as ICremaHost;
             var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+            var testContext = serviceProvider.GetService(typeof(ITestContext)) as ITestContext;
             var dataBase = await dataBaseContext.GetRandomDataBaseAsync(this);
             if (dataBase is null)
             {
                 var dataBaseName = await dataBaseContext.GenerateNewDataBaseNameAsync();
                 var comment = RandomUtility.NextString();
-                var authentication = await cremaHost.LoginRandomAsync(Authority.Admin);
+                var authentication = await testContext.LoginRandomAsync(Authority.Admin);
                 var dataBaseFlags = this.DataBaseFlags;
                 var accessType = this.AccessType;
                 var settings = this.Settings;
@@ -54,7 +55,7 @@ namespace JSSoft.Crema.Services.Test.Common
                 {
                     await dataBase.LockAsync(authentication, RandomUtility.NextString());
                 }
-                await cremaHost.LogoutAsync(authentication);
+                // await cremaHost.LogoutAsync(authentication);
             }
             return dataBase;
         }

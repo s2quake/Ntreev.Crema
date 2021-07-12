@@ -39,8 +39,10 @@ using System.Linq;
 
 namespace JSSoft.Crema.Services.Test
 {
-    partial class TestApplication : CremaBootstrapper
+    partial class TestApplication : CremaBootstrapper, ITestContext
     {
+        private TestContext context;
+
         public async Task InitializeAsync(TestContext context)
         {
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", context.FullyQualifiedTestClassName);
@@ -49,12 +51,34 @@ namespace JSSoft.Crema.Services.Test
             await Task.Run(() => CremaBootstrapper.CreateRepositoryInternal(this, repositoryPath, "git", "xml", string.Empty, userInfos, dataSet));
             this.BasePath = repositoryPath;
             this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
+            this.context = context;
         }
 
         public async Task ReleaseAsync()
         {
-            // await Task.Run(() => DirectoryUtility.Delete(this.BasePath));
+            await Task.Delay(1);
+            this.context = null;
             this.Dispose();
         }
+
+        protected override object GetInstance(System.Type type)
+        {
+            if (type == typeof(ITestContext))
+                return this;
+            return base.GetInstance(type);
+        }
+
+        #region ITestContext
+
+        Task<Authentication> ITestContext.LoginRandomAsync(Authority authority)
+        {
+            if (this.context != null)
+            {
+                return this.context.LoginRandomAsync(authority);
+            }
+            throw new NotImplementedException();
+        }
+
+        #endregion
     }
 }
