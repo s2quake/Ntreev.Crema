@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_LeaveAsyncTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_LoadAsyncTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_RenameAsyncTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_RevertAsyncTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_UnLoadAsyncTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBaseTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CreationTest.cs" />

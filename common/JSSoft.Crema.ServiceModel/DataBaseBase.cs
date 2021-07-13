@@ -649,9 +649,10 @@ namespace JSSoft.Crema.ServiceModel
         public virtual void OnValidateRename(IAuthentication authentication, object target, string oldName, string newName)
         {
             this.ValidateInvokeMethod(authentication);
-            if (this.VerifyAccessType(authentication, AccessType.Master) == false)
-                throw new PermissionDeniedException();
             NameValidator.ValidateName(newName);
+            
+            if (this.VerifyAccessType(authentication, AccessType.Owner) == false)
+                throw new PermissionDeniedException();
 
             if (this.TypeCategory != null)
             {
@@ -671,7 +672,7 @@ namespace JSSoft.Crema.ServiceModel
             if (authentication.IsAdmin == false)
                 throw new PermissionDeniedException();
 
-            if (this.VerifyAccessType(authentication, AccessType.Master) == false)
+            if (this.VerifyAccessType(authentication, AccessType.Owner) == false)
                 throw new PermissionDeniedException();
 
             if (this.TypeCategory != null)

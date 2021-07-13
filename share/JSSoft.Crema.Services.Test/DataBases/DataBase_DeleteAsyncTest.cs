@@ -155,7 +155,8 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public Task DeleteAsync_Private_Admin_Master_TestAsync()
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public Task DeleteAsync_Private_Admin_Master_FailTestAsync()
         {
             return this.DeleteAsync_Private_TestAsync(Authority.Admin, AccessType.Master);
         }

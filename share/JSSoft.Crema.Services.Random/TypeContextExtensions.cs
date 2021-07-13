@@ -42,6 +42,8 @@ namespace JSSoft.Crema.Services.Random
             var typeCategoryCollection = typeContext.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
             while (await typeCategoryCollection.GetCountAsync() < count)
             {
+                if (typeContext is null)
+                    throw new ArgumentNullException(nameof(typeContext));
                 await typeContext.AddRandomCategoryAsync(authentication);
             }
         }

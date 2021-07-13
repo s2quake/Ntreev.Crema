@@ -50,7 +50,6 @@ namespace JSSoft.Crema.Services
         public LogService()
             : this("global", Path.Combine(AppUtility.UserAppDataPath, "logs"))
         {
-
         }
 
         public LogService(string name, string path)

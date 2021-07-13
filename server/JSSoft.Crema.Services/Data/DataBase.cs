@@ -1596,7 +1596,7 @@ namespace JSSoft.Crema.Services.Data
                 throw new PermissionDeniedException();
             if (base.DataBaseState != DataBaseState.Unloaded)
                 throw new InvalidOperationException(Resources.Exception_LoadedDataBaseCannotRevert);
-            if (this.VerifyAccessType(authentication, AccessType.Owner) == false)
+            if (this.VerifyAccessType(authentication, AccessType.Master) == false)
                 throw new PermissionDeniedException();
         }
 

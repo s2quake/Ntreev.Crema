@@ -207,7 +207,8 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public Task RenameAsync_Private_Admin_Master_TestAsync()
+        [ExpectedException(typeof(PermissionDeniedException))]
+        public Task RenameAsync_Private_Admin_Master_FailTestAsync()
         {
             return this.RenameAsync_Private_TestAsync(Authority.Admin, AccessType.Master);
         }
