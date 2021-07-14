@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_DeleteAsyncTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_EnterAsyncTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_GetLogAsyncTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_LeaveAsyncTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_LoadAsyncTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_RenameAsyncTest.cs" />

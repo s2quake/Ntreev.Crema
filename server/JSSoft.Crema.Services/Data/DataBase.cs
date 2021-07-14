@@ -336,6 +336,14 @@ namespace JSSoft.Crema.Services.Data
                 var repository = await Task.Run(() => this.repositoryProvider.CreateInstance(repositorySetting));
                 this.Dispatcher = new CremaDispatcher(this);
                 this.Repository = new DataBaseRepositoryHost(this, repository);
+                this.Repository.Changed += (s, e) => 
+                {
+                    var dataBaseInfo = base.DataBaseInfo;
+                    var repositoryInfo = this.Repository.RepositoryInfo;
+                    dataBaseInfo.Revision = this.Repository.RepositoryInfo.Revision;
+                    dataBaseInfo.ModificationInfo = repositoryInfo.ModificationInfo;
+                    base.DataBaseInfo = dataBaseInfo;
+                };
                 var cache = await this.ReadCacheAsync(repository.RepositoryInfo);
 
                 await this.ResetDataBaseAsync(authentication, cache.Item1, cache.Item2);
