@@ -87,9 +87,9 @@ namespace JSSoft.Crema.Data
 
         public static CremaDataSetFilter Default { get; } = new CremaDataSetFilter();
 
-        internal string TypeExpression => string.Join(';', this.Types);
+        internal string TypeExpression => string.Join(";", this.Types);
 
-        internal string TableExpression => string.Join(';', this.Tables);
+        internal string TableExpression => string.Join(";", this.Tables);
 
         private static bool Filter(string[] patterns, string basePath, string itemPath)
         {
