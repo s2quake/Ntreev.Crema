@@ -84,12 +84,12 @@ namespace JSSoft.Crema.ServiceHosts.Data
             };
         }
 
-        public async Task<ResultBase<CremaDataSet>> GetDataSetAsync(Guid authenticationToken, string dataBaseName, DataSetType dataSetType, string filterExpression, string revision)
+        public async Task<ResultBase<CremaDataSet>> GetDataSetAsync(Guid authenticationToken, string dataBaseName, CremaDataSetFilter filter, string revision)
         {
             var authentication = this.peer[authenticationToken];
             var result = new ResultBase<CremaDataSet>();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            result.Value = await dataBase.GetDataSetAsync(authentication, dataSetType, filterExpression, revision);
+            result.Value = await dataBase.GetDataSetAsync(authentication, filter, revision);
             result.SignatureDate = authentication.SignatureDate;
             return result;
         }

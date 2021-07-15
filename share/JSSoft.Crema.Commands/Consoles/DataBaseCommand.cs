@@ -20,6 +20,7 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Crema.Commands.Consoles.Properties;
+using JSSoft.Crema.Data;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
 using JSSoft.Library;
@@ -193,13 +194,17 @@ namespace JSSoft.Crema.Commands.Consoles
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        [CommandMethodStaticProperty(typeof(DataSetTypeProperties))]
+        [System.Obsolete("DataSetTypeProperty 구현 필요")]
         public async Task ViewAsync([CommandCompletion(nameof(GetDataBaseNamesAsync))] string dataBaseName, string revision = null)
         {
             var sb = new StringBuilder();
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            var dataSet = await dataBase.GetDataSetAsync(authentication, DataSetTypeProperties.DataSetType, FilterProperties.FilterExpression, revision);
+            var filter = new CremaDataSetFilter()
+            {
+                TableExpression = FilterProperties.FilterExpression
+            };
+            var dataSet = await dataBase.GetDataSetAsync(authentication, filter, revision);
             var props = dataSet.ToDictionary(DataSetTypeProperties.TableOnly == true, DataSetTypeProperties.TypeOnly == true);
             var format = FormatProperties.Format;
             sb.AppendLine(props, format);

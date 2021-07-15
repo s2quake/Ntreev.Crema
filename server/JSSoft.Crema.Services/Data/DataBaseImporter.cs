@@ -44,8 +44,12 @@ namespace JSSoft.Crema.Services.Data
 
                 });
                 var taskID = Guid.NewGuid();
-                var filterExpression = string.Join(";", dataSet.Tables);
-                var targetSet = await this.GetDataSetAsync(authentication, null, filterExpression, ReadTypes.OmitContent);
+                var filter = new CremaDataSetFilter()
+                {
+                    Tables = dataSet.Tables.Select(item => item.Name).ToArray(),
+                    OmitContent = true
+                };
+                var targetSet = await this.GetDataSetAsync(authentication, filter, null);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.LockTypes(authentication, targetSet, comment);

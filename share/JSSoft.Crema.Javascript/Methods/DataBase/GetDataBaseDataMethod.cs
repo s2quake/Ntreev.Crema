@@ -35,7 +35,7 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class GetDataBaseDataMethod : ScriptFuncTaskBase<string, DataSetType, string, string, string>
+    class GetDataBaseDataMethod : ScriptFuncTaskBase<string, string, string, string>
     {
         [ImportingConstructor]
         public GetDataBaseDataMethod(ICremaHost cremaHost)
@@ -44,11 +44,11 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override async Task<string> OnExecuteAsync(string dataBaseName, DataSetType dataSetType, string filterExpression, string revision)
+        protected override async Task<string> OnExecuteAsync(string dataBaseName, string filterExpression, string revision)
         {
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
             var authentication = this.Context.GetAuthentication(this);
-            var dataSet = await dataBase.GetDataSetAsync(authentication, dataSetType, filterExpression, revision);
+            var dataSet = await dataBase.GetDataSetAsync(authentication, CremaDataSetFilter.Default, revision);
             return dataSet.GetXml();
         }
 

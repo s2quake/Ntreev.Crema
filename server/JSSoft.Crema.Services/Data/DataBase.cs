@@ -336,7 +336,7 @@ namespace JSSoft.Crema.Services.Data
                 var repository = await Task.Run(() => this.repositoryProvider.CreateInstance(repositorySetting));
                 this.Dispatcher = new CremaDispatcher(this);
                 this.Repository = new DataBaseRepositoryHost(this, repository);
-                this.Repository.Changed += (s, e) => 
+                this.Repository.Changed += (s, e) =>
                 {
                     var dataBaseInfo = base.DataBaseInfo;
                     var repositoryInfo = this.Repository.RepositoryInfo;
@@ -805,7 +805,7 @@ namespace JSSoft.Crema.Services.Data
                 return this.CremaHost.GetService(serviceType);
         }
 
-        public async Task<CremaDataSet> GetDataSetAsync(Authentication authentication, DataSetType dataSetType, string filterExpression, string revision)
+        public async Task<CremaDataSet> GetDataSetAsync(Authentication authentication, CremaDataSetFilter filter, string revision)
         {
             try
             {
@@ -818,38 +818,27 @@ namespace JSSoft.Crema.Services.Data
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ValidateGetDataSet(authentication, revision);
-                    this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, dataSetType, filterExpression, revision);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, revision);
                 });
-                return dataSetType switch
+                var tempPath = PathUtility.GetTempPath(false);
+                try
                 {
-                    DataSetType.All => await this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.All),
-                    DataSetType.OmitContent => await this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.OmitContent),
-                    DataSetType.TypeOnly => await this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.TypeOnly),
-                    _ => throw new NotImplementedException("a"),
-                };
+                    return await Task.Run(() =>
+                    {
+                        var uri = this.Repository.GetUri(this.BasePath, revision);
+                        var exportPath = this.Repository.Export(uri, tempPath);
+                        return CremaDataSet.ReadFromDirectory(exportPath, filter);
+                    });
+                }
+                finally
+                {
+                    DirectoryUtility.Delete(tempPath);
+                }
             }
             catch (Exception e)
             {
                 this.CremaHost.Error(e);
                 throw e;
-            }
-        }
-
-        public async Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision, string filterExpression, ReadTypes readType)
-        {
-            var tempPath = PathUtility.GetTempPath(false);
-            try
-            {
-                var uri = await this.Repository.Dispatcher.InvokeAsync(() => this.Repository.GetUri(this.BasePath, revision));
-                return await Task.Run(() =>
-                {
-                    var exportPath = this.Repository.Export(uri, tempPath);
-                    return CremaDataSet.ReadFromDirectory(exportPath, filterExpression, readType);
-                });
-            }
-            finally
-            {
-                DirectoryUtility.Delete(tempPath);
             }
         }
 

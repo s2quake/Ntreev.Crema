@@ -154,89 +154,89 @@ namespace JSSoft.Crema.Services.Test
             var logs2 = await dataBase.GetLogAsync(authentication, logs1.Random().Revision);
         }
 
-        [TestMethod]
-        public async Task GetDataSetAsync_Admin_TestAsync()
-        {
-            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
-            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.GetDataSetAsync(authentication, DataSetType.All, null, null);
-        }
+        // [TestMethod]
+        // public async Task GetDataSetAsync_Admin_TestAsync()
+        // {
+        //     var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+        //     var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
+        //     var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+        //     await dataBase.GetDataSetAsync(authentication, DataSetType.All, null, null);
+        // }
 
-        [TestMethod]
-        public async Task GetDataSetAsync_Member_TestAsync()
-        {
-            var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
-            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
-            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.GetDataSetAsync(authentication, DataSetType.All, null, null);
-        }
+        // [TestMethod]
+        // public async Task GetDataSetAsync_Member_TestAsync()
+        // {
+        //     var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
+        //     var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
+        //     var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+        //     await dataBase.GetDataSetAsync(authentication, DataSetType.All, null, null);
+        // }
 
-        [TestMethod]
-        public async Task GetDataSetAsync_Guest_TestAsync()
-        {
-            var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
-            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
-            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.GetDataSetAsync(authentication, DataSetType.All, null, null);
-        }
+        // [TestMethod]
+        // public async Task GetDataSetAsync_Guest_TestAsync()
+        // {
+        //     var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
+        //     var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
+        //     var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+        //     await dataBase.GetDataSetAsync(authentication, DataSetType.All, null, null);
+        // }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public async Task GetDataSetAsync_NotLoaded_FailTestAsync()
-        {
-            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
-            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.GetDataSetAsync(authentication, DataSetType.All, null, null);
-        }
+        // [TestMethod]
+        // [ExpectedException(typeof(InvalidOperationException))]
+        // public async Task GetDataSetAsync_NotLoaded_FailTestAsync()
+        // {
+        //     var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+        //     var dataBaseFilter = new DataBaseFilter(DataBaseFlags.NotLoaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
+        //     var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+        //     await dataBase.GetDataSetAsync(authentication, DataSetType.All, null, null);
+        // }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public async Task GetDataSetAsync_Arg0_Null_FailTestAsync()
-        {
-            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
-            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.GetDataSetAsync(null, DataSetType.All, null, null);
-        }
+        // [TestMethod]
+        // [ExpectedException(typeof(ArgumentNullException))]
+        // public async Task GetDataSetAsync_Arg0_Null_FailTestAsync()
+        // {
+        //     var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+        //     var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
+        //     var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+        //     await dataBase.GetDataSetAsync(null, DataSetType.All, null, null);
+        // }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public async Task GetDataSetAsync_Arg3_Empty_FailTestAsync()
-        {
-            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
-            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.GetDataSetAsync(authentication, DataSetType.All, null, string.Empty);
-        }
+        // [TestMethod]
+        // [ExpectedException(typeof(ArgumentException))]
+        // public async Task GetDataSetAsync_Arg3_Empty_FailTestAsync()
+        // {
+        //     var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+        //     var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
+        //     var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+        //     await dataBase.GetDataSetAsync(authentication, DataSetType.All, null, string.Empty);
+        // }
 
-        [TestMethod]
-        [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task GetDataSetAsync_Expired_FailTestAsync()
-        {
-            var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked)
-            {
-                Settings = DataBaseSettings.Default
-            };
-            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.GetDataSetAsync(expiredAuthentication, DataSetType.All, null, null);
-        }
+        // [TestMethod]
+        // [ExpectedException(typeof(AuthenticationExpiredException))]
+        // public async Task GetDataSetAsync_Expired_FailTestAsync()
+        // {
+        //     var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
+        //     var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked)
+        //     {
+        //         Settings = DataBaseSettings.Default
+        //     };
+        //     var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+        //     await dataBase.GetDataSetAsync(expiredAuthentication, DataSetType.All, null, null);
+        // }
 
-        [TestMethod]
-        [ExpectedException(typeof(PermissionDeniedException))]
-        public async Task GetDataSetAsync_Private_FailTestAsync()
-        {
-            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Private | DataBaseFlags.NotLocked)
-            {
-                Settings = DataBaseSettings.Default
-            };
-            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            var accessInfo = dataBase.AccessInfo;
-            var authentication = await this.TestContext.LoginRandomAsync(item => accessInfo.IsNotMember(item.ID) == true && accessInfo.UserID != item.ID);
-            await dataBase.GetDataSetAsync(authentication, DataSetType.All, null, null);
-        }
+        // [TestMethod]
+        // [ExpectedException(typeof(PermissionDeniedException))]
+        // public async Task GetDataSetAsync_Private_FailTestAsync()
+        // {
+        //     var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Private | DataBaseFlags.NotLocked)
+        //     {
+        //         Settings = DataBaseSettings.Default
+        //     };
+        //     var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+        //     var accessInfo = dataBase.AccessInfo;
+        //     var authentication = await this.TestContext.LoginRandomAsync(item => accessInfo.IsNotMember(item.ID) == true && accessInfo.UserID != item.ID);
+        //     await dataBase.GetDataSetAsync(authentication, DataSetType.All, null, null);
+        // }
 
         [TestMethod]
         public async Task BeginTransactionAsync_TestAsync()

@@ -73,7 +73,7 @@ namespace JSSoft.Crema.RuntimeService
                 }
                 else
                 {
-                    var dataSet = await this.DataBase.GetDataSetAsync(this.authentication, DataSetType.All, filterExpression, revision);
+                    var dataSet = await this.DataBase.GetDataSetAsync(this.authentication, CremaDataSetFilter.Default, revision);
                     var tables = dataSet.Tables.Select(item => item.TableInfo).ToArray();
                     var types = dataSet.Types.Select(item => item.TypeInfo).ToArray();
                     var codeSet = new GenerationSet(types, tables)
@@ -130,7 +130,7 @@ namespace JSSoft.Crema.RuntimeService
                 }
                 else
                 {
-                    var dataSet = await this.DataBase.GetDataSetAsync(this.authentication, DataSetType.All, filterExpression, revision);
+                    var dataSet = await this.DataBase.GetDataSetAsync(this.authentication, CremaDataSetFilter.Default, revision);
                     var serializedSet = new SerializationSet(dataSet)
                     {
                         Name = this.DataBaseName,

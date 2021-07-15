@@ -67,7 +67,7 @@ namespace JSSoft.Crema.Commands.Spreadsheet
             var authentication = this.CommandContext.GetAuthentication(this);
             var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[this.DataBaseName]);
             var revision = dataBase.Dispatcher.Invoke(() => this.Revision ?? dataBase.DataBaseInfo.Revision);
-            var dataSet = await dataBase.GetDataSetAsync(authentication, DataSetTypeProperties.DataSetType, FilterProperties.FilterExpression, revision);
+            var dataSet = await dataBase.GetDataSetAsync(authentication, CremaDataSetFilter.Default, revision);
             var settings = new SpreadsheetWriterSettings()
             {
                 OmitAttribute = this.OmitAttribute,
@@ -89,6 +89,7 @@ namespace JSSoft.Crema.Commands.Spreadsheet
         [CommandMethod]
         [CommandMethodProperty(nameof(Message))]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
+        [System.Obsolete]
         public async Task ImportAsync(string filename)
         {
             var path = PathUtility.GetFullPath(filename, this.CommandContext.BaseDirectory);
@@ -104,7 +105,7 @@ namespace JSSoft.Crema.Commands.Spreadsheet
                         select sheet;
             var filterExpression = string.Join(";", query);
             var revision = dataBase.Dispatcher.Invoke(() => dataBase.DataBaseInfo.Revision);
-            var dataSet = await dataBase.GetDataSetAsync(authentication, DataSetType.OmitContent, filterExpression, revision);
+            var dataSet = await dataBase.GetDataSetAsync(authentication, CremaDataSetFilter.Default, revision);
             this.ReadDataSet(dataSet, path);
             await dataBase.ImportAsync(authentication, dataSet, this.Message);
             this.Out.WriteLine($"importing data has been completed.");

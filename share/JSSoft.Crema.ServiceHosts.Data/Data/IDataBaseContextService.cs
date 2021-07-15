@@ -36,7 +36,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         Task<ResultBase> UnsubscribeAsync(Guid token);
 
         [OperationContract]
-        Task<ResultBase<CremaDataSet>> GetDataSetAsync(Guid authenticationToken, string dataBaseName, DataSetType dataSetType, string filterExpression, string revision);
+        Task<ResultBase<CremaDataSet>> GetDataSetAsync(Guid authenticationToken, string dataBaseName, CremaDataSetFilter filter, string revision);
 
         [OperationContract]
         Task<ResultBase> SetPublicAsync(Guid authenticationToken, string dataBaseName);

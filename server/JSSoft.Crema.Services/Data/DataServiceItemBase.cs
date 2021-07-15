@@ -130,7 +130,7 @@ namespace JSSoft.Crema.Services.Data
             var dataSet = null as CremaDataSet;
             try
             {
-                dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, DataSetType.All, null, null);
+                dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, CremaDataSetFilter.Default, null);
             }
             finally
             {
@@ -507,9 +507,10 @@ namespace JSSoft.Crema.Services.Data
                     {
                         var revision = this.DataBase.DataBaseInfo.Revision;
                         var contains = await this.DataBase.Dispatcher.InvokeAsync(() => this.DataBase.Contains(this.Authentication));
+                        var filter = CremaDataSetFilter.Default;
                         if (contains == false)
                             await this.DataBase.EnterAsync(this.Authentication);
-                        var dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, DataSetType.All, null, null);
+                        var dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, filter, null);
                         if (contains == false && this.DataBase.DataBaseState == DataBaseState.Loaded)
                             await this.DataBase.LeaveAsync(this.Authentication);
                         return new Tuple<string, CremaDataSet>(revision, dataSet);

@@ -1028,31 +1028,31 @@ namespace JSSoft.Crema.Data
             }
         }
 
-        private static bool Filter(string filterExpression, string basePath, string itemPath)
-        {
-            if (filterExpression == null)
-                return true;
+        // private static bool Filter(string filterExpression, string basePath, string itemPath)
+        // {
+        //     if (filterExpression == null)
+        //         return true;
 
-            var patterns = StringUtility.Split(filterExpression, ';');
-            var namePattern = string.Join(";", patterns.Where(item => item.IndexOf(PathUtility.SeparatorChar) < 0));
-            var pathPattern = string.Join(";", patterns.Where(item => item.IndexOf(PathUtility.SeparatorChar) >= 0));
-            var path = FileUtility.RemoveExtension(itemPath);
-            var relativePath = UriUtility.MakeRelativeOfDirectory(basePath, path);
-            var items = StringUtility.SplitPath(relativePath);
-            var itemName = ItemName.Create(items);
+        //     var patterns = StringUtility.Split(filterExpression, ';');
+        //     var namePattern = string.Join(";", patterns.Where(item => item.IndexOf(PathUtility.SeparatorChar) < 0));
+        //     var pathPattern = string.Join(";", patterns.Where(item => item.IndexOf(PathUtility.SeparatorChar) >= 0));
+        //     var path = FileUtility.RemoveExtension(itemPath);
+        //     var relativePath = UriUtility.MakeRelativeOfDirectory(basePath, path);
+        //     var items = StringUtility.SplitPath(relativePath);
+        //     var itemName = ItemName.Create(items);
 
-            if (namePattern != string.Empty && StringUtility.GlobMany(itemName.Name, namePattern) == true)
-            {
-                return true;
-            }
+        //     if (namePattern != string.Empty && StringUtility.GlobMany(itemName.Name, namePattern) == true)
+        //     {
+        //         return true;
+        //     }
 
-            if (pathPattern != string.Empty && StringUtility.GlobMany(itemName.CategoryPath, pathPattern) == true)
-            {
-                return true;
-            }
+        //     if (pathPattern != string.Empty && StringUtility.GlobMany(itemName.CategoryPath, pathPattern) == true)
+        //     {
+        //         return true;
+        //     }
 
-            return false;
-        }
+        //     return false;
+        // }
 
         private void GetSerializableData(IDictionary<string, string> items)
         {

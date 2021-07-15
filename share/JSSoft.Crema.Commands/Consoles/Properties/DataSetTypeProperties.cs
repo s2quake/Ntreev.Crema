@@ -26,6 +26,7 @@ using System.ComponentModel;
 namespace JSSoft.Crema.Commands.Consoles.Properties
 {
     [ResourceUsageDescription("../Resources")]
+    [System.Obsolete]
     public static class DataSetTypeProperties
     {
         [CommandProperty]
@@ -51,18 +52,6 @@ namespace JSSoft.Crema.Commands.Consoles.Properties
         public static bool OmitContent
         {
             get; set;
-        }
-
-        public static DataSetType DataSetType
-        {
-            get
-            {
-                if (OmitContent == true)
-                    return DataSetType.OmitContent;
-                else if (TypeOnly == true)
-                    return DataSetType.TypeOnly;
-                return DataSetType.All;
-            }
         }
     }
 }

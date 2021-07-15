@@ -52,7 +52,7 @@ namespace JSSoft.Crema.Services
 
         Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision);
 
-        Task<CremaDataSet> GetDataSetAsync(Authentication authentication, DataSetType dataSetType, string filterExpression, string revision);
+        Task<CremaDataSet> GetDataSetAsync(Authentication authentication, CremaDataSetFilter filter, string revision);
 
         Task<ITransaction> BeginTransactionAsync(Authentication authentication);
 
