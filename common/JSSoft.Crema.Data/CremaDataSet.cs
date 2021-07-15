@@ -212,9 +212,10 @@ namespace JSSoft.Crema.Data
 
         public static CremaDataSet ReadFromDirectory(string path)
         {
-            return ReadFromDirectory(path, null);
+            return ReadFromDirectory(path, CremaDataSetFilter.Default);
         }
 
+        [Obsolete]
         public static CremaDataSet ReadFromDirectory(string path, string filterExpression)
         {
             return ReadFromDirectory(path, filterExpression, ReadTypes.All);
@@ -229,72 +230,37 @@ namespace JSSoft.Crema.Data
         /// </param>
         /// <param name="readType"></param>
         /// <returns></returns>
+        [Obsolete]
         public static CremaDataSet ReadFromDirectory(string path, string filterExpression, ReadTypes readType)
         {
-            ValidateReadFromDirectory(path);
+            var filter = new CremaDataSetFilter();
+            if (filterExpression is not null)
+            {
+                filter.Tables = StringUtility.Split(filterExpression, ';');
+            }
+            if (readType == ReadTypes.OmitContent)
+            {
+                filter.OmitContent = true;
+            }
+            else if (readType == ReadTypes.TypeOnly)
+            {
+                filter.OmitTable = true;
+            }
+            return ReadFromDirectory(path, filter);
+        }
+
+        public static CremaDataSet ReadFromDirectory(string path, CremaDataSetFilter filter)
+        {
+            ValidateReadFromDirectory(path, filter);
 
             var dataSet = new CremaDataSet();
-
             var fullPath = new DirectoryInfo(path).FullName;
-            var tablePath = Path.Combine(fullPath, CremaSchemaObsolete.TableDirectoryObsolete);
-            var typePath = Path.Combine(fullPath, CremaSchemaObsolete.TypeDirectoryObsolete);
+            var tablePath = Path.Combine(fullPath, CremaSchema.TableDirectory);
+            var typePath = Path.Combine(fullPath, CremaSchema.TypeDirectory);
+            var typeFiles = filter.FilterTypes(typePath, $"*{CremaSchema.SchemaExtension}");
+            var tableFiles = filter.FilterTables(tablePath, $"*{CremaSchema.XmlExtension}");
 
-            if (Directory.Exists(tablePath) == true || Directory.Exists(typePath) == true)
-            {
-                dataSet.Namespace = CremaSchemaObsolete.BaseNamespaceObsolete;
-            }
-            else
-            {
-                tablePath = Path.Combine(fullPath, CremaSchema.TableDirectory);
-                typePath = Path.Combine(fullPath, CremaSchema.TypeDirectory);
-            }
-
-            var typeFiles = DirectoryUtility.Exists(typePath) ? DirectoryUtility.GetAllFiles(typePath, "*" + CremaSchema.SchemaExtension) : new string[] { };
-            var tableFiles = DirectoryUtility.Exists(tablePath) ? DirectoryUtility.GetAllFiles(tablePath, "*" + CremaSchema.XmlExtension) : new string[] { };
-
-            switch (readType)
-            {
-                case ReadTypes.All:
-                case ReadTypes.OmitContent:
-                    {
-                        if (filterExpression != null)
-                        {
-                            var query1 = from item in tableFiles
-                                         where Filter(filterExpression, tablePath, item)
-                                         select item;
-
-                            var query2 = from item in query1
-                                         let readInfo = new CremaXmlReadInfo(item)
-                                         from item2 in readInfo.GetTypePaths()
-                                         select item2;
-                            tableFiles = query1.ToArray();
-                            typeFiles = query2.Distinct().ToArray();
-                        }
-                    }
-                    break;
-                case ReadTypes.TypeOnly:
-                    {
-                        if (filterExpression != null)
-                        {
-                            var query1 = from item in typeFiles
-                                         where Filter(filterExpression, typePath, item)
-                                         select item;
-                        }
-                        else
-                        {
-                            tableFiles = new string[] { };
-                        }
-                    }
-                    break;
-            }
-
-            dataSet.ReadMany(typeFiles, tableFiles, readType == ReadTypes.OmitContent);
-
-            if (dataSet.Namespace == CremaSchemaObsolete.BaseNamespaceObsolete)
-            {
-                dataSet.Namespace = CremaSchema.BaseNamespace;
-            }
-
+            dataSet.ReadMany(typeFiles, tableFiles, filter.OmitContent);
             return dataSet;
         }
 
@@ -1000,44 +966,32 @@ namespace JSSoft.Crema.Data
 
         public static void ValidateDirectory(string path)
         {
-            ValidateDirectory(path, null as string);
+            ValidateDirectory(path, CremaDataSetFilter.Default);
         }
 
-        public static void ValidateDirectory(string path, string pattern)
+        public static void ValidateDirectory(string path, CremaDataSetFilter filter)
         {
-            ValidateDirectory(path, pattern, DefaultValidationEventHandler);
+            ValidateDirectory(path, filter, DefaultValidationEventHandler);
         }
 
         public static void ValidateDirectory(string path, ValidationEventHandler validationEventHandler)
         {
-            ValidateDirectory(path, null, validationEventHandler);
+            ValidateDirectory(path, CremaDataSetFilter.Default, validationEventHandler);
         }
 
-        public static void ValidateDirectory(string path, string pattern, ValidationEventHandler validationEventHandler)
+        public static void ValidateDirectory(string path, CremaDataSetFilter filter, ValidationEventHandler validationEventHandler)
         {
             if (validationEventHandler == null)
                 throw new ArgumentNullException(nameof(validationEventHandler));
-            ValidateReadFromDirectory(path);
+            ValidateReadFromDirectory(path, filter);
 
-            var tablePath = Path.Combine(path, CremaSchemaObsolete.TableDirectoryObsolete);
-            var typePath = Path.Combine(path, CremaSchemaObsolete.TypeDirectoryObsolete);
-
-            if (Directory.Exists(tablePath) == true || Directory.Exists(typePath) == true)
-            {
-
-            }
-            else
-            {
-                tablePath = Path.Combine(path, CremaSchema.TableDirectory);
-                typePath = Path.Combine(path, CremaSchema.TypeDirectory);
-            }
-
-            var query = from item in DirectoryUtility.Exists(tablePath) ? DirectoryUtility.GetAllFiles(tablePath, "*" + CremaSchema.XmlExtension) : new string[] { }
-                        where StringUtility.GlobMany(Path.GetFileNameWithoutExtension(item), pattern)
-                        select item;
+            var tablePath = Path.Combine(path, CremaSchema.TableDirectory);
+            var typePath = Path.Combine(path, CremaSchema.TypeDirectory);
+            var typeFiles = filter.FilterTypes(typePath, $"*{CremaSchema.SchemaExtension}");
+            var tableFiles = filter.FilterTables(tablePath, $"*{CremaSchema.XmlExtension}");
 
             var errorList = new List<ValidationEventArgs>();
-            foreach (var item in query)
+            foreach (var item in tableFiles)
             //Parallel.ForEach(query, item =>
             {
                 Validate(item, (s, e) =>
@@ -1137,27 +1091,20 @@ namespace JSSoft.Crema.Data
             });
         }
 
-        private static void ValidateReadFromDirectory(string path)
+        private static void ValidateReadFromDirectory(string path, CremaDataSetFilter filter)
         {
-            // 이전 버전 경로 확인
-            {
-                var tablePath = Path.Combine(path, CremaSchemaObsolete.TableDirectoryObsolete);
-                var typePath = Path.Combine(path, CremaSchemaObsolete.TypeDirectoryObsolete);
-                if (Directory.Exists(tablePath) == true || Directory.Exists(typePath) == true)
-                    return;
-            }
+            if (path is null)
+                throw new ArgumentNullException(nameof(path));
+            if (filter is null)
+                throw new ArgumentNullException(nameof(filter));
 
-            {
-                var tablePath = Path.Combine(path, CremaSchema.TableDirectory);
-                var typePath = Path.Combine(path, CremaSchema.TypeDirectory);
-                if (Directory.Exists(tablePath) == true || Directory.Exists(typePath) == true)
-                    return;
+            var typePath = Path.Combine(path, CremaSchema.TypeDirectory);
+            if (Directory.Exists(typePath) == false)
+                throw new DirectoryNotFoundException(string.Format(Resources.Exception_NotFoundDirectory_Format, typePath));
 
-                if (Directory.Exists(tablePath) == false)
-                    throw new DirectoryNotFoundException(string.Format(Resources.Exception_NotFoundDirectory_Format, tablePath));
-                if (Directory.Exists(typePath) == false)
-                    throw new DirectoryNotFoundException(string.Format(Resources.Exception_NotFoundDirectory_Format, typePath));
-            }
+            var tablePath = Path.Combine(path, CremaSchema.TableDirectory);
+            if (Directory.Exists(tablePath) == false)
+                throw new DirectoryNotFoundException(string.Format(Resources.Exception_NotFoundDirectory_Format, tablePath));
         }
 
         private void ValidateReadXmlSchema()

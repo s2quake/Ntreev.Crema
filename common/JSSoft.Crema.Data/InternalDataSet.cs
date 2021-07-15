@@ -243,18 +243,8 @@ namespace JSSoft.Crema.Data
             set
             {
                 base.Namespace = value;
-
-                if (base.Namespace == CremaSchemaObsolete.BaseNamespaceObsolete)
-                {
-                    this.TableNamespace = UriUtility.Combine(base.Namespace, CremaSchemaObsolete.TableDirectoryObsolete);
-                    this.TypeNamespace = UriUtility.Combine(base.Namespace, CremaSchemaObsolete.TypeDirectoryObsolete);
-                }
-                else
-                {
-                    this.TableNamespace = UriUtility.Combine(base.Namespace, CremaSchema.TableDirectory);
-                    this.TypeNamespace = UriUtility.Combine(base.Namespace, CremaSchema.TypeDirectory);
-                }
-
+                this.TableNamespace = UriUtility.Combine(base.Namespace, CremaSchema.TableDirectory);
+                this.TypeNamespace = UriUtility.Combine(base.Namespace, CremaSchema.TypeDirectory);
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Namespace)));
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.TableNamespace)));
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.TypeNamespace)));

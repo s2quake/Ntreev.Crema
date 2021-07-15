@@ -368,7 +368,7 @@ namespace JSSoft.Crema.Data.Xml.Schema
                 return;
             }
 
-            var attributeName = schemaAttribute.Name == CremaSchemaObsolete.DataLocation ? CremaSchema.Tags : schemaAttribute.Name;
+            var attributeName = schemaAttribute.Name;
             var attribute = dataTable.Attributes[attributeName];
 
             if (attribute == null)
@@ -405,9 +405,13 @@ namespace JSSoft.Crema.Data.Xml.Schema
             }
 
             if (this.version >= new Version(3, 0))
+            {
                 this.ReadColumnInfo(element, dataColumn);
+            }
             else
-                this.ReadColumnInfoVersion2(element, dataColumn);
+            {
+                throw new NotImplementedException($"not supported version: '{this.version.Major}'");
+            }
 
             dataTable.Columns.Add(dataColumn);
         }
@@ -617,9 +621,13 @@ namespace JSSoft.Crema.Data.Xml.Schema
         private void ReadTable(XmlSchemaComplexType complexType, CremaDataTable dataTable)
         {
             if (this.version >= new Version(3, 0))
+            {
                 this.ReadTableInfo(complexType, dataTable);
+            }
             else
-                this.ReadTableInfoVersion2(complexType, dataTable);
+            {
+                throw new NotImplementedException($"not supported version: '{this.version.Major}'");
+            }
 
             foreach (var item in complexType.GetAttributes())
             {
@@ -759,9 +767,7 @@ namespace JSSoft.Crema.Data.Xml.Schema
 
             if (this.version < new Version(3, 0))
             {
-                dataType.Comment = contentType.ReadDescription();
-                this.ReadTypeInfoVersion2(contentType, dataType);
-                return;
+                throw new NotImplementedException($"not supported version: '{this.version.Major}'");
             }
             else if (this.version == new Version(3, 0))
             {
@@ -810,7 +816,7 @@ namespace JSSoft.Crema.Data.Xml.Schema
             var member = dataType.NewMember();
             member.Name = facet.Value;
             member.Comment = facet.ReadDescription();
-            member.Value = facet.ReadAppInfoComfortableAsInt64(CremaSchema.TypeInfo, CremaSchema.Value, CremaSchemaObsolete.ValueObsolete);
+            member.Value = facet.ReadAppInfoComfortableAsInt64(CremaSchema.TypeInfo, CremaSchema.Value);
             member.CreationInfo = facet.ReadAppInfoAsSigunatureDate(CremaSchema.TypeInfo, CremaSchema.Creator, CremaSchema.CreatedDateTime);
             member.ModificationInfo = facet.ReadAppInfoAsSigunatureDate(CremaSchema.TypeInfo, CremaSchema.Modifier, CremaSchema.ModifiedDateTime);
             member.IsEnabled = facet.ReadAppInfoAsBoolean(CremaSchema.TypeInfo, CremaSchema.Enable, true);
@@ -845,34 +851,7 @@ namespace JSSoft.Crema.Data.Xml.Schema
             }
             else
             {
-                var keyName = GetTableNameObsolete(constraint);
-
-                if (this.itemName == null)
-                {
-                    var tableName = CremaDataSet.GetTableName(CremaSchemaObsolete.TableNamespaceObsolete, constraint.QualifiedName.Namespace);
-                    var categoryPath = CremaDataSet.GetTableCategoryPath(CremaSchemaObsolete.TableNamespaceObsolete, constraint.QualifiedName.Namespace);
-                    if (keyName == tableName)
-                    {
-                        return this.DataSet.Tables[tableName, categoryPath];
-                    }
-                    else
-                    {
-                        return this.DataSet.Tables[tableName + "." + keyName, categoryPath];
-                    }
-                }
-                else
-                {
-                    var tableName = CremaDataSet.GetTableName(CremaSchemaObsolete.TableNamespaceObsolete, constraint.QualifiedName.Namespace);
-                    var categoryPath = CremaDataSet.GetTableCategoryPath(CremaSchemaObsolete.TableNamespaceObsolete, constraint.QualifiedName.Namespace);
-                    if (keyName == tableName)
-                    {
-                        return this.DataSet.Tables[itemName.Name, itemName.CategoryPath];
-                    }
-                    else
-                    {
-                        return this.DataSet.Tables[itemName.Name + "." + keyName, itemName.CategoryPath];
-                    }
-                }
+                throw new NotImplementedException($"not supported version: '{this.version.Major}'");
             }
             throw new CremaDataException();
         }
@@ -909,34 +888,7 @@ namespace JSSoft.Crema.Data.Xml.Schema
             }
             else
             {
-                var keyName = GetTableNameObsolete(constraint);
-
-                if (this.itemName == null)
-                {
-                    var tableName = CremaDataSet.GetTableName(CremaSchemaObsolete.TableNamespaceObsolete, constraint.QualifiedName.Namespace);
-                    var categoryPath = CremaDataSet.GetTableCategoryPath(CremaSchemaObsolete.TableNamespaceObsolete, constraint.QualifiedName.Namespace);
-                    if (keyName == tableName)
-                    {
-                        return this.DataSet.Tables[tableName, categoryPath];
-                    }
-                    else
-                    {
-                        return this.DataSet.Tables[tableName + "." + keyName, categoryPath];
-                    }
-                }
-                else
-                {
-                    var tableName = CremaDataSet.GetTableName(CremaSchemaObsolete.TableNamespaceObsolete, constraint.QualifiedName.Namespace);
-                    var categoryPath = CremaDataSet.GetTableCategoryPath(CremaSchemaObsolete.TableNamespaceObsolete, constraint.QualifiedName.Namespace);
-                    if (keyName == tableName)
-                    {
-                        return this.DataSet.Tables[itemName.Name, itemName.CategoryPath];
-                    }
-                    else
-                    {
-                        return this.DataSet.Tables[itemName.Name + "." + keyName, itemName.CategoryPath];
-                    }
-                }
+                throw new NotImplementedException($"not supported version: '{this.version.Major}'");
             }
             throw new CremaDataException();
         }
@@ -951,64 +903,6 @@ namespace JSSoft.Crema.Data.Xml.Schema
                 throw new CremaDataException();
             }
             return XmlConvert.DecodeName(name);
-        }
-
-        //[Obsolete("for 2.0")]
-        /// <summary>
-        /// for version 2.0
-        /// </summary>
-        private void ReadTableInfoVersion2(XmlSchemaComplexType complexType, CremaDataTable dataTable)
-        {
-            string textValue;
-
-            dataTable.InternalCreationInfo = complexType.ReadAppInfoAsSigunatureDate(CremaSchema.TableInfo, CremaSchemaObsolete.CreatorObsolete, CremaSchema.CreatedDateTime);
-            dataTable.InternalModificationInfo = complexType.ReadAppInfoAsSigunatureDate(CremaSchema.TableInfo, CremaSchema.Modifier, CremaSchema.ModifiedDateTime);
-
-            textValue = complexType.ReadAppInfoAsString(CremaSchema.TableInfo, CremaSchema.ID);
-            if (textValue != null)
-                dataTable.InternalTableID = Guid.Parse(textValue);
-            else
-                dataTable.InternalTableID = GuidUtility.FromName(dataTable.Name);
-
-            dataTable.InternalTags = complexType.ReadAppInfoAsTagInfo(CremaSchema.TableInfo, CremaSchema.Tags);
-            dataTable.InternalComment = complexType.ReadDescription();
-
-            var properties = new PropertyCollection();
-            this.ReadExtendedProperties(complexType, properties);
-            if (properties.ContainsKey(CremaSchemaObsolete.DataLocation) == true)
-            {
-                dataTable.InternalTags = new TagInfo(properties[CremaSchemaObsolete.DataLocation] as string);
-                properties.Remove(CremaSchemaObsolete.DataLocation);
-            }
-        }
-
-        /// <summary>
-        /// for version 2.0
-        /// </summary>
-        private void ReadTypeInfoVersion2(XmlSchemaSimpleType simpleType, CremaDataType dataType)
-        {
-            dataType.InternalCreationInfo = simpleType.ReadAppInfoAsSigunatureDate(CremaSchema.TypeInfo, CremaSchemaObsolete.CreatorObsolete, CremaSchema.CreatedDateTime);
-            dataType.InternalModificationInfo = simpleType.ReadAppInfoAsSigunatureDate(CremaSchema.TypeInfo, CremaSchema.Modifier, CremaSchema.ModifiedDateTime);
-        }
-
-        /// <summary>
-        /// for version 2.0
-        /// </summary>
-        private void ReadColumnInfoVersion2(XmlSchemaAnnotated annotated, CremaDataColumn dataColumn)
-        {
-            dataColumn.InternalCreationInfo = annotated.ReadAppInfoAsSigunatureDate(CremaSchema.ColumnInfo, CremaSchemaObsolete.CreatorObsolete, CremaSchema.CreatedDateTime);
-            dataColumn.InternalModificationInfo = annotated.ReadAppInfoAsSigunatureDate(CremaSchema.ColumnInfo, CremaSchema.Modifier, CremaSchema.ModifiedDateTime);
-            dataColumn.InternalAutoIncrement = annotated.ReadAppInfoAsBoolean(CremaSchema.ColumnInfo, CremaSchema.AutoIncrement);
-            dataColumn.InternalColumnID = annotated.ReadAppInfoAsGuidVersion2(CremaSchema.ColumnInfo, CremaSchema.ID, dataColumn.ColumnName);
-            dataColumn.InternalTags = annotated.ReadAppInfoAsTagInfo(CremaSchema.ColumnInfo, CremaSchema.Tags);
-
-            var properties = new PropertyCollection();
-            this.ReadExtendedProperties(annotated, properties);
-            if (properties.ContainsKey(CremaSchemaObsolete.DataLocation) == true)
-            {
-                dataColumn.InternalTags = new TagInfo(properties[CremaSchemaObsolete.DataLocation] as string);
-                properties.Remove(CremaSchemaObsolete.DataLocation);
-            }
         }
     }
 }

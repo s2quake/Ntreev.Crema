@@ -483,7 +483,7 @@ namespace JSSoft.Crema.Data.Xml
             {
                 reader.MoveToAttribute(i);
 
-                var columnName = reader.Name == CremaSchemaObsolete.DataLocation ? CremaSchema.Tags : reader.Name;
+                var columnName = reader.Name;
                 if (columnName == CremaSchema.RelationID)
                 {
                     dataRow.RelationID = reader.Value;

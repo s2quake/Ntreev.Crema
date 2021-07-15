@@ -201,7 +201,6 @@ namespace JSSoft.Crema.Data.Xml.Schema
 
         public static string[] ReservedNames { get; } = new string[]
         {
-            CremaSchemaObsolete.DataLocation ,
             CremaSchema.RelationID,
         };
 

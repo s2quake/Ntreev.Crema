@@ -70,7 +70,6 @@ namespace JSSoft.Crema.Data.Xml
 
                     if (version.Major >= 3)
                     {
-
                         FindSchemaLocation(reader, xmlPath, out var schemaPath, out string tableNamespace);
                         var categoryPath = CremaDataSet.GetTableCategoryPath(CremaSchema.TableNamespace, tableNamespace);
                         var tableName = CremaDataSet.GetTableName(CremaSchema.TableNamespace, tableNamespace);
@@ -79,11 +78,7 @@ namespace JSSoft.Crema.Data.Xml
                     }
                     else
                     {
-                        FindSchemaLocationVersion2(reader, xmlPath, out var schemaPath, out string tableNamespace);
-                        var categoryPath = CremaDataSet.GetTableCategoryPath(CremaSchemaObsolete.TableNamespaceObsolete, tableNamespace);
-                        var tableName = CremaDataSet.GetTableName(CremaSchemaObsolete.TableNamespaceObsolete, tableNamespace);
-                        this.SchemaPath = schemaPath;
-                        this.ItemName = new ItemName(categoryPath, tableName);
+                        throw new NotImplementedException($"not supported version: '{version.Major}'");
                     }
                 }
                 this.IsInherited = true;
@@ -136,36 +131,6 @@ namespace JSSoft.Crema.Data.Xml
             {
                 xsdPath = new Uri(new Uri(xmlPath), xsdPath).LocalPath;
             }
-        }
-
-        private static void FindSchemaLocationVersion2(XmlReader reader, string xmlPath, out string xsdPath, out string tableNamespace)
-        {
-            var targetNamespace = reader.NamespaceURI;
-            var relativeNamespace = UriUtility.MakeRelativeOfDirectory(CremaSchemaObsolete.TableNamespaceObsolete, targetNamespace);
-            var relativeXsdPath = PathUtility.ConvertFromUri(relativeNamespace + CremaSchema.SchemaExtension);
-            var path = xmlPath;
-            var index = 0;
-            xsdPath = null;
-            while ((index = path.LastIndexOf(Path.DirectorySeparatorChar + CremaSchemaObsolete.TableDirectoryObsolete + Path.DirectorySeparatorChar)) >= 0)
-            {
-                var targetPath = Path.Combine(xmlPath.Remove(index), CremaSchemaObsolete.TableDirectoryObsolete);
-                var xsdFilename = Path.GetFileName(relativeXsdPath);
-                var found = Directory.GetFiles(targetPath, xsdFilename, SearchOption.AllDirectories).Where(item => item.EndsWith(relativeXsdPath)).FirstOrDefault();
-                if (File.Exists(found) == true)
-                {
-                    xsdPath = found;
-                    break;
-                }
-                path = path.Remove(index);
-            }
-
-            if (xsdPath == null)
-                throw new Exception();
-
-            var basePath = xsdPath.Replace(relativeXsdPath, string.Empty);
-            var relative = FileUtility.RemoveExtension(xmlPath.Replace(basePath, string.Empty));
-            var uri = new Uri(new Uri(CremaSchemaObsolete.TableNamespaceObsolete + Path.AltDirectorySeparatorChar), relative);
-            tableNamespace = uri.ToString();
         }
     }
 }

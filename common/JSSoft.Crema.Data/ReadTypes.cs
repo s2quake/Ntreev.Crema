@@ -21,6 +21,7 @@
 
 namespace JSSoft.Crema.Data
 {
+    [System.Obsolete]
     public enum ReadTypes
     {
         /// <summary>
