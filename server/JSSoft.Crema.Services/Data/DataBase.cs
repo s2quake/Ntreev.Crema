@@ -820,20 +820,12 @@ namespace JSSoft.Crema.Services.Data
                     this.ValidateGetDataSet(authentication, revision);
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, revision);
                 });
-                var tempPath = PathUtility.GetTempPath(false);
-                try
-                {
-                    return await Task.Run(() =>
-                    {
-                        var uri = this.Repository.GetUri(this.BasePath, revision);
-                        var exportPath = this.Repository.Export(uri, tempPath);
-                        return CremaDataSet.ReadFromDirectory(exportPath, filter);
-                    });
-                }
-                finally
-                {
-                    DirectoryUtility.Delete(tempPath);
-                }
+                return await this.GetDataAsync(filter, revision);
+            }
+            catch (UriFormatException e)
+            {
+                this.CremaHost.Error(e);
+                throw new ArgumentException(e.Message, nameof(revision), e);
             }
             catch (Exception e)
             {
@@ -1189,6 +1181,24 @@ namespace JSSoft.Crema.Services.Data
         protected virtual void OnTaskCompleted(TaskCompletedEventArgs e)
         {
             this.taskCompleted?.Invoke(this, e);
+        }
+
+        private async Task<CremaDataSet> GetDataAsync(CremaDataSetFilter filter, string revision)
+        {
+            var tempPath = PathUtility.GetTempPath(false);
+            try
+            {
+                return await Task.Run(() =>
+                {
+                    var uri = this.Repository.GetUri(this.BasePath, revision);
+                    var exportPath = this.Repository.Export(uri, tempPath);
+                    return CremaDataSet.ReadFromDirectory(exportPath, filter);
+                });
+            }
+            finally
+            {
+                DirectoryUtility.Delete(tempPath);
+            }
         }
 
         private void AttachDomainHost()
