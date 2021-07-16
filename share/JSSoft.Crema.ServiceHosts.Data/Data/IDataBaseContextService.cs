@@ -69,7 +69,7 @@ namespace JSSoft.Crema.ServiceHosts.Data
         Task<ResultBase<DataBaseInfo>> CreateAsync(Guid authenticationToken, string dataBaseName, string comment);
 
         [OperationContract]
-        Task<ResultBase<DataBaseInfo>> CopyAsync(Guid authenticationToken, string dataBaseName, string newDataBaseName, string comment, bool force);
+        Task<ResultBase<DataBaseInfo>> CopyAsync(Guid authenticationToken, string dataBaseName, string newDataBaseName, string comment, string revision);
 
         [OperationContract]
         Task<ResultBase> RenameAsync(Guid authenticationToken, string dataBaseName, string newDataBaseName);

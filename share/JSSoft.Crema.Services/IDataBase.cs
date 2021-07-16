@@ -56,7 +56,7 @@ namespace JSSoft.Crema.Services
 
         Task<ITransaction> BeginTransactionAsync(Authentication authentication);
 
-        Task<IDataBase> CopyAsync(Authentication authentication, string newDataBaseName, string comment, bool force);
+        Task<IDataBase> CopyAsync(Authentication authentication, string newDataBaseName, string comment, string revision);
 
         string Name { get; }
 

@@ -1806,9 +1806,9 @@ namespace JSSoft.Crema.Services.Data
             return this.ImportAsync(authentication, dataSet, comment);
         }
 
-        async Task<IDataBase> IDataBase.CopyAsync(Authentication authentication, string newDataBaseName, string comment, bool force)
+        async Task<IDataBase> IDataBase.CopyAsync(Authentication authentication, string newDataBaseName, string comment, string revision)
         {
-            return await this.DataBaseContext.CopyDataBaseAsync(authentication, this, newDataBaseName, comment, force);
+            return await this.DataBaseContext.CopyDataBaseAsync(authentication, this, newDataBaseName, comment, revision);
         }
 
         async Task<ITransaction> IDataBase.BeginTransactionAsync(Authentication authentication)

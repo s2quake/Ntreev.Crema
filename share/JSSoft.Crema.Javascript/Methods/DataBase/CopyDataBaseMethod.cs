@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class CopyDataBaseMethod : ScriptActionTaskBase<string, string, string, bool?>
+    class CopyDataBaseMethod : ScriptActionTaskBase<string, string, string, string>
     {
         [ImportingConstructor]
         public CopyDataBaseMethod(ICremaHost cremaHost)
@@ -39,11 +39,11 @@ namespace JSSoft.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override async Task OnExecuteAsync(string dataBaseName, string newDataBaseName, string comment, bool? force)
+        protected override async Task OnExecuteAsync(string dataBaseName, string newDataBaseName, string comment, string revision)
         {
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
             var authentication = this.Context.GetAuthentication(this);
-            await dataBase.CopyAsync(authentication, newDataBaseName, comment, force ?? false);
+            await dataBase.CopyAsync(authentication, newDataBaseName, comment, revision);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace JSSoft.Crema.Services
 
         void CreateRepository(string author, string basePath, string initPath, string comment, params LogPropertyInfo[] properties);
 
-        void CopyRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, params LogPropertyInfo[] properties);
+        void CopyRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, string revision, params LogPropertyInfo[] properties);
 
         void RenameRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, params LogPropertyInfo[] properties);
 

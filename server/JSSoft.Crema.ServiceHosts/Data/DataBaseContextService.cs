@@ -221,12 +221,12 @@ namespace JSSoft.Crema.ServiceHosts.Data
             return result;
         }
 
-        public async Task<ResultBase<DataBaseInfo>> CopyAsync(Guid authenticationToken, string dataBaseName, string newDataBaseName, string comment, bool force)
+        public async Task<ResultBase<DataBaseInfo>> CopyAsync(Guid authenticationToken, string dataBaseName, string newDataBaseName, string comment, string revision)
         {
             var authentication = this.peer[authenticationToken];
             var result = new ResultBase<DataBaseInfo>();
             var dataBase = await this.GetDataBaseAsync(dataBaseName);
-            var newDataBase = await dataBase.CopyAsync(authentication, newDataBaseName, comment, force);
+            var newDataBase = await dataBase.CopyAsync(authentication, newDataBaseName, comment, revision);
             result.TaskID = GuidUtility.FromName(newDataBaseName + comment);
             result.Value = await newDataBase.Dispatcher.InvokeAsync(() => newDataBase.DataBaseInfo);
             result.SignatureDate = authentication.SignatureDate;

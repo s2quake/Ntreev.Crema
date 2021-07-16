@@ -157,7 +157,7 @@ namespace JSSoft.Crema.Services.Data
             }
         }
 
-        public async Task<DataBase> CopyDataBaseAsync(Authentication authentication, DataBase dataBase, string newDataBaseName, string comment, bool force)
+        public async Task<DataBase> CopyDataBaseAsync(Authentication authentication, DataBase dataBase, string newDataBaseName, string comment, string revision)
         {
             try
             {
@@ -171,12 +171,14 @@ namespace JSSoft.Crema.Services.Data
                     throw new ArgumentNullException(nameof(newDataBaseName));
                 if (comment is null)
                     throw new ArgumentNullException(nameof(comment));
+                if (revision is null)
+                    throw new ArgumentNullException(nameof(revision));
 
                 this.ValidateExpired();
                 var dataBaseName = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(CopyDataBaseAsync), dataBase, newDataBaseName, comment);
-                    this.ValidateCopyDataBase(authentication, dataBase, newDataBaseName, force);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CopyDataBaseAsync), dataBase, newDataBaseName, comment, revision);
+                    this.ValidateCopyDataBase(authentication, dataBase, newDataBaseName, revision);
                     this.CremaHost.Sign(authentication);
                     return dataBase.Name;
                 });
@@ -184,7 +186,7 @@ namespace JSSoft.Crema.Services.Data
                 await this.RepositoryDispatcher.InvokeAsync(() =>
                 {
                     var message = EventMessageBuilder.CreateDataBase(authentication, newDataBaseName) + ": " + comment;
-                    this.repositoryProvider.CopyRepository(authentication, this.RemotePath, dataBaseName, newDataBaseName, comment);
+                    this.repositoryProvider.CopyRepository(authentication, this.RemotePath, dataBaseName, newDataBaseName, comment, revision);
                 });
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -774,16 +776,16 @@ namespace JSSoft.Crema.Services.Data
 
         protected override bool UseKeyNotFoundException => true;
 
-        private void ValidateCopyDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName, bool force)
+        private void ValidateCopyDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName, string revision)
         {
+            if (revision == string.Empty)
+                throw new ArgumentException("empty string is not allowed", nameof(revision));
+
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
                 throw new PermissionDeniedException();
 
             if (this.ContainsKey(newDataBaseName) == true)
                 throw new ArgumentException(string.Format(Resources.Exception_DataBaseIsAlreadyExisted_Format, newDataBaseName), nameof(newDataBaseName));
-
-            if (force == true)
-                return;
 
             if (dataBase.IsLoaded == true)
                 throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);

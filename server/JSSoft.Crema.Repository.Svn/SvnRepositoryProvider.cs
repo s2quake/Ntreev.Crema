@@ -122,7 +122,8 @@ namespace JSSoft.Crema.Repository.Svn
             importCommand.Run();
         }
 
-        public void CopyRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, params LogPropertyInfo[] properties)
+        [System.Obsolete("revision으로 복사하는 기능 추가해야됨.")]
+        public void CopyRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, string revision, params LogPropertyInfo[] properties)
         {
             var uri = this.GetUrl(basePath, repositoryName);
             var newUri = this.GenerateUrl(basePath, newRepositoryName);

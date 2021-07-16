@@ -81,12 +81,13 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(MessageProperties))]
-        [CommandMethodProperty(nameof(Force))]
+        [CommandMethodProperty(nameof(Revision))]
         public async Task CopyAsync([CommandCompletion(nameof(GetDataBaseNamesAsync))] string dataBaseName, string newDataBaseName)
         {
             var dataBase = GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            await dataBase.CopyAsync(authentication, newDataBaseName, MessageProperties.Message, this.Force);
+            var revision = this.Revision;
+            await dataBase.CopyAsync(authentication, newDataBaseName, MessageProperties.Message, revision);
         }
 
         [CommandMethod]
@@ -211,8 +212,8 @@ namespace JSSoft.Crema.Commands.Consoles
             await this.Out.WriteAsync(sb.ToString());
         }
 
-        [CommandProperty('f', AllowName = true)]
-        public bool Force
+        [CommandProperty]
+        public string Revision
         {
             get; set;
         }

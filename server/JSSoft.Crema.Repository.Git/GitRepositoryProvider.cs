@@ -42,14 +42,14 @@ namespace JSSoft.Crema.Repository.Git
 
         private static readonly ISerializer propertySerializer = new SerializerBuilder().Build();
 
-        public void CopyRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, params LogPropertyInfo[] properties)
+        public void CopyRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, string revision, params LogPropertyInfo[] properties)
         {
             var baseUri = new Uri(basePath);
             var repositoryPath = baseUri.LocalPath;
             var branchCommand = new GitCommand(repositoryPath, "branch")
             {
                 newRepositoryName,
-                repositoryName,
+                revision ?? repositoryName,
             };
             branchCommand.Run();
             this.SetID(repositoryPath, newRepositoryName, Guid.NewGuid());

@@ -36,9 +36,9 @@ namespace JSSoft.Crema.Services
             repositoryProvider.RenameRepository(authentication.ID, basePath, repositoryName, newRepositoryName, comment, new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion });
         }
 
-        public static void CopyRepository(this IRepositoryProvider repositoryProvider, Authentication authentication, string basePath, string repositoryName, string newRepositoryName, string comment)
+        public static void CopyRepository(this IRepositoryProvider repositoryProvider, Authentication authentication, string basePath, string repositoryName, string newRepositoryName, string comment, string revision)
         {
-            repositoryProvider.CopyRepository(authentication.ID, basePath, repositoryName, newRepositoryName, comment, new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion });
+            repositoryProvider.CopyRepository(authentication.ID, basePath, repositoryName, newRepositoryName, comment, revision, new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion });
         }
 
         public static void DeleteRepository(this IRepositoryProvider repositoryProvider, Authentication authentication, string basePath, string repositoryName, string comment)
