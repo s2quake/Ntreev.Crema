@@ -778,9 +778,6 @@ namespace JSSoft.Crema.Services.Data
 
         private void ValidateCopyDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName, string revision)
         {
-            if (revision == string.Empty)
-                throw new ArgumentException("empty string is not allowed", nameof(revision));
-
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
                 throw new PermissionDeniedException();
 

@@ -49,7 +49,7 @@ namespace JSSoft.Crema.Repository.Git
             var branchCommand = new GitCommand(repositoryPath, "branch")
             {
                 newRepositoryName,
-                revision ?? repositoryName,
+                revision == string.Empty ? repositoryName : revision,
             };
             branchCommand.Run();
             this.SetID(repositoryPath, newRepositoryName, Guid.NewGuid());

@@ -104,7 +104,7 @@ namespace JSSoft.Crema.Repository.Git
 
         public static GitLogInfo[] GetRepositoryLogs(string repositoryPath, string repositoryName, string revision)
         {
-            if (revision == null)
+            if (revision == string.Empty)
             {
                 var logCommand = new GitCommand(repositoryPath, "log")
                 {

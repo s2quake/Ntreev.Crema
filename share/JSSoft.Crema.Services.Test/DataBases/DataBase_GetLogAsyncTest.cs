@@ -101,17 +101,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.GetLogAsync(null, null);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public async Task GetLogAsync_Arg1_Empty_FailTestAsync()
-        {
-            var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
-            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
-            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.GetLogAsync(authentication, string.Empty);
+            await dataBase.GetLogAsync(null, string.Empty);
         }
 
         [TestMethod]
@@ -131,7 +121,7 @@ namespace JSSoft.Crema.Services.Test
         {
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.GetLogAsync(expiredAuthentication, null);
+            await dataBase.GetLogAsync(expiredAuthentication, string.Empty);
         }
 
         [TestMethod]
@@ -278,7 +268,7 @@ namespace JSSoft.Crema.Services.Test
 
         private async Task Base_TestAsync(IDataBase dataBase, Authentication authentication)
         {
-            var logs1 = await dataBase.GetLogAsync(authentication, null);
+            var logs1 = await dataBase.GetLogAsync(authentication, string.Empty);
             var revision = logs1.Random().Revision;
             var logs2 = await dataBase.GetLogAsync(authentication, revision);
             Assert.AreEqual(logs1.First().Revision, dataBase.DataBaseInfo.Revision);

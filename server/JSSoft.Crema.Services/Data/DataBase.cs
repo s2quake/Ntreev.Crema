@@ -579,6 +579,8 @@ namespace JSSoft.Crema.Services.Data
                     throw new ArgumentNullException(nameof(authentication));
                 if (authentication.IsExpired == true)
                     throw new AuthenticationExpiredException(nameof(authentication));
+                if (revision is null)
+                    throw new ArgumentNullException(nameof(revision));
 
                 this.ValidateExpired();
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
@@ -686,8 +688,6 @@ namespace JSSoft.Crema.Services.Data
 
         public void ValidateGetDataSet(Authentication authentication, string revision)
         {
-            if (revision == string.Empty)
-                throw new ArgumentException("empty string is not allowed", nameof(revision));
             if (this.IsLoaded == false)
                 throw new InvalidOperationException(Resources.Exception_DataBaseHasNotBeenLoaded);
             if (this.VerifyAccessType(authentication, AccessType.Guest) == false)
@@ -813,6 +813,8 @@ namespace JSSoft.Crema.Services.Data
                     throw new ArgumentNullException(nameof(authentication));
                 if (authentication.IsExpired == true)
                     throw new AuthenticationExpiredException(nameof(authentication));
+                if (revision is null)
+                    throw new ArgumentNullException(nameof(revision));
 
                 this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
@@ -1589,8 +1591,6 @@ namespace JSSoft.Crema.Services.Data
 
         private void ValidateGetLog(Authentication authentication, string revision)
         {
-            if (revision == string.Empty)
-                throw new ArgumentException("empty string is not allowed", nameof(revision));
             if (this.VerifyAccessType(authentication, AccessType.Guest) == false)
                 throw new PermissionDeniedException();
         }
