@@ -36,6 +36,7 @@ using JSSoft.Library.IO;
 using JSSoft.Crema.Data;
 using JSSoft.Library;
 using System.Linq;
+using System.IO;
 
 namespace JSSoft.Crema.Services.Test
 {
@@ -45,7 +46,12 @@ namespace JSSoft.Crema.Services.Test
 
         public async Task InitializeAsync(TestContext context)
         {
-            var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory, "repo", context.FullyQualifiedTestClassName);
+            var basePath = Path.Combine(context.TestRunDirectory, "repo");
+            var repositoryPath = Path.Combine(basePath, context.FullyQualifiedTestClassName);
+            if (repositoryPath.Length > 168)
+            {
+                repositoryPath = Path.Combine(basePath, $"{Guid.NewGuid()}");
+            }
             var userInfos = UserInfoGenerator.Generate(0, 0);
             var dataSet = new CremaDataSet();
             await Task.Run(() => CremaBootstrapper.CreateRepositoryInternal(this, repositoryPath, "git", "xml", string.Empty, userInfos, dataSet));

@@ -31,7 +31,7 @@ using JSSoft.Library.Random;
 namespace JSSoft.Crema.Services.Test
 {
     [TestClass]
-    public class DataBase_RenameAsyncTest
+    public class DataBase_RenameAsync_Test
     {
         private static TestApplication app;
         private static IDataBaseContext dataBaseContext;

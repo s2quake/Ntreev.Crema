@@ -20,11 +20,13 @@
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 using JSSoft.Library;
+using System;
 using System.Runtime.Serialization;
 
 namespace JSSoft.Crema.ServiceModel
 {
     [DataContract(Namespace = SchemaUtility.Namespace)]
+    [Flags]
     public enum DataBaseFlags
     {
         [EnumMember]

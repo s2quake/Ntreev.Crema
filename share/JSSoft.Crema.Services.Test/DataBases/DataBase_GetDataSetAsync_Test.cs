@@ -27,11 +27,12 @@ using System;
 using System.Linq;
 using JSSoft.Library.Random;
 using JSSoft.Crema.Services.Random;
+using JSSoft.Crema.Data;
 
 namespace JSSoft.Crema.Services.Test
 {
     [TestClass]
-    public class DataBase_GetLogAsyncTest
+    public class DataBase_GetDataSetAsync_Test
     {
         private static TestApplication app;
         private static IDataBaseContext dataBaseContext;
@@ -69,7 +70,7 @@ namespace JSSoft.Crema.Services.Test
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        public async Task GetLogAsync_Admin_TestAsync()
+        public async Task GetDataSetAsync_Admin_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
@@ -78,7 +79,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task GetLogAsync_Member_TestAsync()
+        public async Task GetDataSetAsync_Member_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
@@ -87,7 +88,7 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task GetLogAsync_Guest_TestAsync()
+        public async Task GetDataSetAsync_Guest_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
@@ -97,56 +98,80 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async Task GetLogAsync_Arg0_Null_FailTestAsync()
+        public async Task GetDataSetAsync_Arg0_Null_FailTestAsync()
         {
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.GetLogAsync(null, string.Empty);
+            var filter = CremaDataSetFilter.Default;
+            await dataBase.GetDataSetAsync(null, filter, string.Empty);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task GetDataSetAsync_Arg1_Null_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            await dataBase.GetDataSetAsync(authentication, null, string.Empty);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async Task GetDataSetAsync_Arg3_Null_FailTestAsync()
+        {
+            var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
+            var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
+            var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
+            var filter = CremaDataSetFilter.Default;
+            await dataBase.GetDataSetAsync(authentication, filter, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public async Task GetLogAsync_Arg1_InvalidRevision_FailTestAsync()
+        public async Task GetDataSetAsync_Arg1_InvalidRevision_FailTestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Guest);
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
             var revision = RandomUtility.NextInvalidName();
-            await dataBase.GetLogAsync(authentication, revision);
+            var filter = CremaDataSetFilter.Default;
+            await dataBase.GetDataSetAsync(authentication, filter, revision);
         }
 
         [TestMethod]
         [ExpectedException(typeof(AuthenticationExpiredException))]
-        public async Task GetLogAsync_Expired_FailTestAsync()
+        public async Task GetDataSetAsync_Expired_FailTestAsync()
         {
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-            await dataBase.GetLogAsync(expiredAuthentication, string.Empty);
+            var filter = CremaDataSetFilter.Default;
+            await dataBase.GetDataSetAsync(expiredAuthentication, filter, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public Task GetLogAsync_Private_Admin_AccessTypeNone_FailTestAsync()
+        public Task GetDataSetAsync_Private_Admin_AccessTypeNone_FailTestAsync()
         {
-            return this.GetLogAsync_Private_AccessTypeNone_FailTestAsync(Authority.Admin);
+            return this.GetDataSetAsync_Private_AccessTypeNone_FailTestAsync(Authority.Admin);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public Task GetLogAsync_Private_Member_AccessTypeNone_FailTestAsync()
+        public Task GetDataSetAsync_Private_Member_AccessTypeNone_FailTestAsync()
         {
-            return this.GetLogAsync_Private_AccessTypeNone_FailTestAsync(Authority.Member);
+            return this.GetDataSetAsync_Private_AccessTypeNone_FailTestAsync(Authority.Member);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public Task GetLogAsync_Private_Guest_AccessTypeNone_FailTestAsync()
+        public Task GetDataSetAsync_Private_Guest_AccessTypeNone_FailTestAsync()
         {
-            return this.GetLogAsync_Private_AccessTypeNone_FailTestAsync(Authority.Guest);
+            return this.GetDataSetAsync_Private_AccessTypeNone_FailTestAsync(Authority.Guest);
         }
 
         [TestMethod]
-        public async Task GetLogAsync_Private_Admin_Owner_TestAsync()
+        public async Task GetDataSetAsync_Private_Admin_Owner_TestAsync()
         {
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Private | DataBaseFlags.NotLocked);
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
@@ -156,54 +181,54 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public Task GetLogAsync_Private_Admin_Master_TestAsync()
+        public Task GetDataSetAsync_Private_Admin_Master_TestAsync()
         {
-            return this.GetLogAsync_Private_TestAsync(Authority.Admin, AccessType.Master);
+            return this.GetDataSetAsync_Private_TestAsync(Authority.Admin, AccessType.Master);
         }
 
         [TestMethod]
-        public Task GetLogAsync_Private_Admin_Developer_TestAsync()
+        public Task GetDataSetAsync_Private_Admin_Developer_TestAsync()
         {
-            return this.GetLogAsync_Private_TestAsync(Authority.Admin, AccessType.Developer);
+            return this.GetDataSetAsync_Private_TestAsync(Authority.Admin, AccessType.Developer);
         }
 
         [TestMethod]
-        public Task GetLogAsync_Private_Admin_Editor_TestAsync()
+        public Task GetDataSetAsync_Private_Admin_Editor_TestAsync()
         {
-            return this.GetLogAsync_Private_TestAsync(Authority.Admin, AccessType.Editor);
+            return this.GetDataSetAsync_Private_TestAsync(Authority.Admin, AccessType.Editor);
         }
 
         [TestMethod]
-        public Task GetLogAsync_Private_Admin_Guest_TestAsync()
+        public Task GetDataSetAsync_Private_Admin_Guest_TestAsync()
         {
-            return this.GetLogAsync_Private_TestAsync(Authority.Admin, AccessType.Guest);
+            return this.GetDataSetAsync_Private_TestAsync(Authority.Admin, AccessType.Guest);
         }
 
         [TestMethod]
-        public Task GetLogAsync_Private_Member_Developer_TestAsync()
+        public Task GetDataSetAsync_Private_Member_Developer_TestAsync()
         {
-            return this.GetLogAsync_Private_TestAsync(Authority.Member, AccessType.Developer);
+            return this.GetDataSetAsync_Private_TestAsync(Authority.Member, AccessType.Developer);
         }
 
         [TestMethod]
-        public Task GetLogAsync_Private_Member_Editor_TestAsync()
+        public Task GetDataSetAsync_Private_Member_Editor_TestAsync()
         {
-            return this.GetLogAsync_Private_TestAsync(Authority.Member, AccessType.Editor);
+            return this.GetDataSetAsync_Private_TestAsync(Authority.Member, AccessType.Editor);
         }
 
         [TestMethod]
-        public Task GetLogAsync_Private_Member_Guest_TestAsync()
+        public Task GetDataSetAsync_Private_Member_Guest_TestAsync()
         {
-            return this.GetLogAsync_Private_TestAsync(Authority.Member, AccessType.Guest);
+            return this.GetDataSetAsync_Private_TestAsync(Authority.Member, AccessType.Guest);
         }
 
         [TestMethod]
-        public Task GetLogAsync_Private_Guest_Guest_TestAsync()
+        public Task GetDataSetAsync_Private_Guest_Guest_TestAsync()
         {
-            return this.GetLogAsync_Private_TestAsync(Authority.Guest, AccessType.Guest);
+            return this.GetDataSetAsync_Private_TestAsync(Authority.Guest, AccessType.Guest);
         }
 
-        public async Task GetLogAsync_Locked_Admin_Locker_TestAsync()
+        public async Task GetDataSetAsync_Locked_Admin_Locker_TestAsync()
         {
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.Locked);
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
@@ -214,26 +239,26 @@ namespace JSSoft.Crema.Services.Test
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public Task GetLogAsync_Locked_Admin_NotLocker_FailTestAsync()
+        public Task GetDataSetAsync_Locked_Admin_NotLocker_FailTestAsync()
         {
-            return this.GetLogAsync_Locked_NotLocker_FailTestAsync(Authority.Admin);
+            return this.GetDataSetAsync_Locked_NotLocker_FailTestAsync(Authority.Admin);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public Task GetLogAsync_Locked_Member_NotLocker_FailTestAsync()
+        public Task GetDataSetAsync_Locked_Member_NotLocker_FailTestAsync()
         {
-            return this.GetLogAsync_Locked_NotLocker_FailTestAsync(Authority.Member);
+            return this.GetDataSetAsync_Locked_NotLocker_FailTestAsync(Authority.Member);
         }
 
         [TestMethod]
         [ExpectedException(typeof(PermissionDeniedException))]
-        public Task GetLogAsync_Locked_Guest_NotLocker_FailTestAsync()
+        public Task GetDataSetAsync_Locked_Guest_NotLocker_FailTestAsync()
         {
-            return this.GetLogAsync_Locked_NotLocker_FailTestAsync(Authority.Guest);
+            return this.GetDataSetAsync_Locked_NotLocker_FailTestAsync(Authority.Guest);
         }
 
-        private async Task GetLogAsync_Private_TestAsync(Authority authority, AccessType accessType)
+        private async Task GetDataSetAsync_Private_TestAsync(Authority authority, AccessType accessType)
         {
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Private | DataBaseFlags.NotLocked)
             {
@@ -248,7 +273,7 @@ namespace JSSoft.Crema.Services.Test
             await this.Base_TestAsync(dataBase, authentication);
         }
 
-        private async Task GetLogAsync_Private_AccessTypeNone_FailTestAsync(Authority authority)
+        private async Task GetDataSetAsync_Private_AccessTypeNone_FailTestAsync(Authority authority)
         {
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Private | DataBaseFlags.NotLocked);
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
@@ -257,7 +282,7 @@ namespace JSSoft.Crema.Services.Test
             await this.Base_TestAsync(dataBase, authentication);
         }
 
-        private async Task GetLogAsync_Locked_NotLocker_FailTestAsync(Authority authority)
+        private async Task GetDataSetAsync_Locked_NotLocker_FailTestAsync(Authority authority)
         {
             var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Loaded | DataBaseFlags.Public | DataBaseFlags.Locked);
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
@@ -268,11 +293,13 @@ namespace JSSoft.Crema.Services.Test
 
         private async Task Base_TestAsync(IDataBase dataBase, Authentication authentication)
         {
+            var filter = CremaDataSetFilter.Default;
+            var dataSet1 = await dataBase.GetDataSetAsync(authentication, filter, string.Empty);
             var logs1 = await dataBase.GetLogAsync(authentication, string.Empty);
             var revision = logs1.Random().Revision;
-            var logs2 = await dataBase.GetLogAsync(authentication, revision);
-            Assert.AreEqual(logs1.First().Revision, dataBase.DataBaseInfo.Revision);
-            Assert.AreEqual(logs2.First().Revision, revision);
+            var dataSet2 = await dataBase.GetDataSetAsync(authentication, filter, revision);
+            Assert.IsNotNull(dataSet1);
+            Assert.IsNotNull(dataSet2);
         }
     }
 }

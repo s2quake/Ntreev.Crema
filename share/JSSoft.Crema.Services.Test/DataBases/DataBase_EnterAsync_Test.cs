@@ -29,7 +29,7 @@ using System.Linq;
 namespace JSSoft.Crema.Services.Test
 {
     [TestClass]
-    public class DataBase_EnterAsyncTest
+    public class DataBase_EnterAsync_Test
     {
         private static TestApplication app;
         private static IDataBaseContext dataBaseContext;

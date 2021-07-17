@@ -36,7 +36,7 @@ namespace JSSoft.Crema.Services.Random
 
         public static async Task InitializeRandomAsync(this ITableTemplate template, Authentication authentication)
         {
-            var tableName = RandomUtility.NextIdentifier();
+            var tableName = GenerateTableName(template);
             await template.SetTableNameAsync(authentication, tableName);
             if (RandomUtility.Within(50) == true)
                 await template.SetTagsAsync(authentication, (TagInfo)TagInfoUtility.Names.Random());
@@ -81,5 +81,18 @@ namespace JSSoft.Crema.Services.Random
         public static int MinColumnCount { get; set; }
 
         public static int MaxColumnCount { get; set; }
+
+        private static string GenerateTableName(ITableTemplate template)
+        {
+            var tableName = RandomUtility.NextIdentifier();
+            if (template.Target is ITable table && table.Parent != null)
+            {
+                while(tableName == table.Parent.TableName)
+                {
+                    tableName = RandomUtility.NextIdentifier();
+                }
+            }
+            return tableName;
+        }
     }
 }

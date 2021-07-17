@@ -38,7 +38,7 @@ using JSSoft.Crema.Services.Test.Common.Extensions;
 
 namespace JSSoft.Crema.Services.Test
 {
-    partial class TestApplication : CremaBootstrapper
+    public partial class TestApplication : CremaBootstrapper
     {
         private ICremaHost cremaHost;
         private Guid token;

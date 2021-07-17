@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Services
 {
+    [Obsolete("해제가 비동기가 아니라서 async await내에서 사용시 문제 발생")]
     public class UsingDataBase : IDisposable
     {
         private readonly Action action;

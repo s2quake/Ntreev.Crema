@@ -340,5 +340,10 @@ namespace JSSoft.Crema.Repository.Svn
                 }
             }
         }
+
+        public void ExportRepository(string basePath, string repositoryName, string revision, string exportPath)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

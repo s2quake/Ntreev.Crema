@@ -178,7 +178,7 @@ namespace JSSoft.Crema.Services.Data
                 var dataBaseName = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyDataBaseAsync), dataBase, newDataBaseName, comment, revision);
-                    this.ValidateCopyDataBase(authentication, dataBase, newDataBaseName, revision);
+                    this.ValidateCopyDataBase(authentication, dataBase, newDataBaseName, comment, revision);
                     this.CremaHost.Sign(authentication);
                     return dataBase.Name;
                 });
@@ -186,7 +186,8 @@ namespace JSSoft.Crema.Services.Data
                 await this.RepositoryDispatcher.InvokeAsync(() =>
                 {
                     var message = EventMessageBuilder.CreateDataBase(authentication, newDataBaseName) + ": " + comment;
-                    this.repositoryProvider.CopyRepository(authentication, this.RemotePath, dataBaseName, newDataBaseName, comment, revision);
+                    var basePath = dataBase.IsLoaded == true ? dataBase.BasePath : this.RemotePath;
+                    this.repositoryProvider.CopyRepository(authentication, basePath, dataBaseName, newDataBaseName, comment, revision);
                 });
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -776,16 +777,18 @@ namespace JSSoft.Crema.Services.Data
 
         protected override bool UseKeyNotFoundException => true;
 
-        private void ValidateCopyDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName, string revision)
+        private void ValidateCopyDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName, string comment, string revision)
         {
+            NameValidator.ValidateName(newDataBaseName);
+
+            if (comment == string.Empty)
+                throw new ArgumentException("empty string is not allowed", nameof(revision));
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
                 throw new PermissionDeniedException();
-
+            if (dataBase.VerifyAccessType(authentication, AccessType.Master) == false)
+                throw new PermissionDeniedException();
             if (this.ContainsKey(newDataBaseName) == true)
                 throw new ArgumentException(string.Format(Resources.Exception_DataBaseIsAlreadyExisted_Format, newDataBaseName), nameof(newDataBaseName));
-
-            if (dataBase.IsLoaded == true)
-                throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);
         }
 
         private void ValidateCreateDataBase(Authentication authentication, string dataBaseName, string comment)

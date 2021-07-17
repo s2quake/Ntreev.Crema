@@ -31,7 +31,7 @@ using JSSoft.Library.Random;
 namespace JSSoft.Crema.Services.Test
 {
     [TestClass]
-    public class DataBase_RevertAsyncTest
+    public class DataBase_RevertAsync_Test
     {
         private static TestApplication app;
         private static IDataBaseContext dataBaseContext;
@@ -329,7 +329,7 @@ namespace JSSoft.Crema.Services.Test
 
         private async Task<string> GetRevisionAsync(IDataBase dataBase)
         {
-            var logs = await dataBase.GetLogAsync(Authentication.System, null);
+            var logs = await dataBase.GetLogAsync(Authentication.System, string.Empty);
             var log = logs.Skip(1).Random();
             return log.Revision;
         }

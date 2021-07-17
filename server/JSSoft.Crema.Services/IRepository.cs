@@ -46,8 +46,10 @@ namespace JSSoft.Crema.Services
 
         LogInfo[] GetLog(string[] paths, string revision);
 
+        [Obsolete]
         Uri GetUri(string path, string revision);
 
+        [Obsolete]
         string Export(Uri uri, string exportPath);
 
         RepositoryItem[] Status(params string[] paths);

@@ -19,6 +19,7 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using JSSoft.Crema.Data;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
 using JSSoft.Library;
@@ -28,6 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using YamlDotNet.Serialization;
@@ -236,6 +238,31 @@ namespace JSSoft.Crema.Repository.Git
                 };
                 abortCommand.TryRun();
                 throw;
+            }
+        }
+
+        public void ExportRepository(string basePath, string repositoryName, string revision, string exportPath)
+        {
+            var tempPath = PathUtility.GetTempFileName();
+            try
+            {
+                if (Directory.Exists(exportPath) == false)
+                    Directory.CreateDirectory(exportPath);
+                if (DirectoryUtility.IsEmpty(exportPath) == true)
+                    new CremaDataSet().WriteToDirectory(exportPath);
+                var revisionValue = revision == string.Empty ? repositoryName : revision;
+                var archiveCommand = new GitCommand(basePath, "archive")
+                {
+                    new GitCommandItem($"output={(GitPath)tempPath}"),
+                    new GitCommandItem("format=zip"),
+                    revisionValue
+                };
+                archiveCommand.Run();
+                ZipFile.ExtractToDirectory(tempPath, exportPath);
+            }
+            finally
+            {
+                FileUtility.Delete(tempPath);
             }
         }
 

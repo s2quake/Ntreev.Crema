@@ -37,6 +37,8 @@ namespace JSSoft.Crema.Services
 
         void RevertRepository(string author, string basePath, string repositoryName, string revision, string comment);
 
+        void ExportRepository(string basePath, string repositoryName, string revision, string exportPath);
+
         IRepository CreateInstance(RepositorySettings settings);
 
         string[] GetRepositories(string basePath);

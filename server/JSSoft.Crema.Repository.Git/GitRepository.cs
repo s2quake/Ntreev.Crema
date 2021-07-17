@@ -305,14 +305,15 @@ namespace JSSoft.Crema.Repository.Git
 
         public Uri GetUri(string path, string revision)
         {
+            var revisionValue = revision == string.Empty ? this.repositoryInfo.Revision : revision;
             if (DirectoryUtility.IsDirectory(path) == true)
             {
-                var uri = new Uri($"{path}@{revision ?? this.repositoryInfo.Revision}");
+                var uri = new Uri($"{path}@{revisionValue}");
                 var uriString = uri.ToString();
                 var text = Regex.Replace(uriString, "file:///", "dir:///");
                 return new Uri(text);
             }
-            return new Uri($"{path}@{revision ?? this.repositoryInfo.Revision}");
+            return new Uri($"{path}@{revisionValue}");
         }
 
         public void Move(string srcPath, string toPath)

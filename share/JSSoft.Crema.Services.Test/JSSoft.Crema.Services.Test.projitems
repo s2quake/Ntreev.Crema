@@ -9,15 +9,23 @@
     <Import_RootNamespace>JSSoft.Crema.Services.Test</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_DeleteAsyncTest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_EnterAsyncTest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_GetDataSetAsyncTest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_GetLogAsyncTest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_LeaveAsyncTest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_LoadAsyncTest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_RenameAsyncTest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_RevertAsyncTest.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_UnLoadAsyncTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_CopyAsync_Loaded_RandomRevision_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_CopyAsync_Loaded_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_CopyAsync_NotLoaded_RandomRevision_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_CopyAsync_TestBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_DeleteAsync_OnlyOne_FailTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_DeleteAsync_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_EnterAsync_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_GetDataSetAsync_NotLoaded_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_GetDataSetAsync_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_GetLogAsync_NotLoaded_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_GetLogAsync_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_LeaveAsync_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_CopyAsync_NotLoaded_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_LoadAsync_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_RenameAsync_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_RevertAsync_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_UnLoadAsync_Test.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBaseTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CreationTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaHostTest.cs" />

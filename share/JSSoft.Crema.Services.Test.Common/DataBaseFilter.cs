@@ -30,7 +30,7 @@ namespace JSSoft.Crema.Services.Test.Common
             var dataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
             var testContext = serviceProvider.GetService(typeof(ITestContext)) as ITestContext;
             var dataBase = await dataBaseContext.GetRandomDataBaseAsync(this);
-            if (dataBase is null)
+            if (dataBase is null || this.IsNew == true)
             {
                 var dataBaseName = await dataBaseContext.GenerateNewDataBaseNameAsync();
                 var comment = RandomUtility.NextString();
@@ -66,8 +66,9 @@ namespace JSSoft.Crema.Services.Test.Common
             if (isLoaded == false)
                 await dataBase.LoadAsync(authentication);
             await dataBase.InitializeRandomItemsAsync(authentication, settings);
-                if (isLoaded == false)
+            if (isLoaded == false)
                 await dataBase.UnloadAsync(authentication);
+            dataBase.ExtendedProperties[typeof(DataBaseSettings)] = settings;
         }
 
         private async Task InitializeAccessAsync(IServiceProvider serviceProvider, IDataBase dataBase, Authentication authentication, AccessType accessType)
@@ -76,9 +77,11 @@ namespace JSSoft.Crema.Services.Test.Common
             var userFlags = UserFlags.Offline | UserFlags.NotBanned;
             var excludeList = new List<string>() { authentication.ID };
             if (isLoaded == false)
+            {
                 await dataBase.LoadAsync(authentication);
+            }
             await dataBase.SetPrivateAsync(authentication);
-            if (accessType.HasFlag(AccessType.Master) == true)
+            //if (accessType.HasFlag(AccessType.Master) == true)
             {
                 foreach (var item in new[] { UserFlags.Admin, UserFlags.Member })
                 {
@@ -88,7 +91,7 @@ namespace JSSoft.Crema.Services.Test.Common
                     excludeList.Add(user.ID);
                 }
             }
-            if (accessType.HasFlag(AccessType.Developer) == true)
+            //if (accessType.HasFlag(AccessType.Developer) == true)
             {
                 foreach (var item in new[] { UserFlags.Admin, UserFlags.Member })
                 {
@@ -98,7 +101,7 @@ namespace JSSoft.Crema.Services.Test.Common
                     excludeList.Add(user.ID);
                 }
             }
-            if (accessType.HasFlag(AccessType.Editor) == true)
+            //if (accessType.HasFlag(AccessType.Editor) == true)
             {
                 foreach (var item in new[] { UserFlags.Admin, UserFlags.Member })
                 {
@@ -108,7 +111,7 @@ namespace JSSoft.Crema.Services.Test.Common
                     excludeList.Add(user.ID);
                 }
             }
-            if (accessType.HasFlag(AccessType.Guest) == true)
+            //if (accessType.HasFlag(AccessType.Guest) == true)
             {
                 foreach (var item in new[] { UserFlags.Admin, UserFlags.Member, UserFlags.Guest })
                 {
@@ -119,12 +122,14 @@ namespace JSSoft.Crema.Services.Test.Common
                 }
             }
             if (isLoaded == false)
+            {
                 await dataBase.UnloadAsync(authentication);
+            }
         }
 
         public string[] ExcludedDataBaseNames { get; set; }
 
-        public DataBaseSettings Settings { get;set;}
+        public DataBaseSettings Settings { get; set; }
 
         public DataBaseFlags DataBaseFlags { get; set; }
 
@@ -132,7 +137,7 @@ namespace JSSoft.Crema.Services.Test.Common
 
         public Func<IDataBase, bool> Predicate { get; set; }
 
-        public int LogCount { get; set; }
+        public bool IsNew { get; set; }
 
         public static implicit operator Func<IDataBase, bool>(DataBaseFilter filter)
         {
@@ -146,6 +151,8 @@ namespace JSSoft.Crema.Services.Test.Common
             if (this.ExcludedDataBaseNames != null && this.ExcludedDataBaseNames.Contains(dataBase.Name) == true)
                 return false;
             if (this.AccessType != AccessType.None && TestAccessType(dataBase, this.AccessType) == false)
+                return false;
+            if (this.Settings != null && object.Equals(dataBase.ExtendedProperties[typeof(DataBaseSettings)], this.Settings) == false)
                 return false;
             // if (this.IncludedIDs != null && TestEnter(dataBase, this.IncludedIDs) == false)
             //     return false;
@@ -163,11 +170,9 @@ namespace JSSoft.Crema.Services.Test.Common
 
         private static bool TestDataBaseStateFlags(IDataBase dataBase, DataBaseFlags dataBaseFlags)
         {
-            if (dataBase.DataBaseFlags != DataBaseFlags.NotLoaded || dataBase.DataBaseFlags != DataBaseFlags.Loaded)
+            if (dataBaseFlags.HasFlag(DataBaseFlags.NotLoaded) == true && dataBase.IsLoaded == true)
                 return false;
-            if (dataBaseFlags.HasFlag(DataBaseFlags.NotLoaded) == true && dataBase.DataBaseState != DataBaseState.None)
-                return false;
-            if (dataBaseFlags.HasFlag(DataBaseFlags.Loaded) == true && dataBase.DataBaseState != DataBaseState.Loaded)
+            if (dataBaseFlags.HasFlag(DataBaseFlags.Loaded) == true && dataBase.IsLoaded == false)
                 return false;
             return true;
         }
@@ -194,36 +199,17 @@ namespace JSSoft.Crema.Services.Test.Common
         {
             if (dataBase.IsPrivate == true)
             {
-                if (accessType.HasFlag(AccessType.Master) == true && dataBase.AccessInfo.Members.Any(item => item.AccessType == AccessType.Master) == false)
+                var accessInfo = dataBase.AccessInfo;
+                if (accessType.HasFlag(AccessType.Master) == true && accessInfo.Members.Any(item => item.AccessType == AccessType.Master) == false)
                     return false;
-                if (accessType.HasFlag(AccessType.Developer) == true && dataBase.AccessInfo.Members.Any(item => item.AccessType == AccessType.Developer) == false)
+                if (accessType.HasFlag(AccessType.Developer) == true && accessInfo.Members.Any(item => item.AccessType == AccessType.Developer) == false)
                     return false;
-                if (accessType.HasFlag(AccessType.Editor) == true && dataBase.AccessInfo.Members.Any(item => item.AccessType == AccessType.Editor) == false)
+                if (accessType.HasFlag(AccessType.Editor) == true && accessInfo.Members.Any(item => item.AccessType == AccessType.Editor) == false)
                     return false;
-                if (accessType.HasFlag(AccessType.Guest) == true && dataBase.AccessInfo.Members.Any(item => item.AccessType == AccessType.Guest) == false)
+                if (accessType.HasFlag(AccessType.Guest) == true && accessInfo.Members.Any(item => item.AccessType == AccessType.Guest) == false)
                     return false;
             }
             return true;
         }
-
-        // private static bool TestEnter(IDataBase dataBase, string[] includedIDs)
-        // {
-        //     foreach (var item in dataBase.AuthenticationInfos)
-        //     {
-        //         if (includedIDs.Contains(item.ID) == true)
-        //             return true;
-        //     }
-        //     return false;
-        // }
-
-        // private static bool TestLeft(IDataBase dataBase, string[] excludedIDs)
-        // {
-        //     foreach (var item in dataBase.AuthenticationInfos)
-        //     {
-        //         if (excludedIDs.Contains(item.ID) == true)
-        //             return false;
-        //     }
-        //     return true;
-        // }
     }
 }

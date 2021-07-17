@@ -26,6 +26,7 @@ using JSSoft.Crema.Services.Data.Serializations;
 using JSSoft.Crema.Services.Domains;
 using JSSoft.Crema.Services.Properties;
 using JSSoft.Crema.Services.Users;
+using JSSoft.Library;
 using JSSoft.Library.IO;
 using JSSoft.Library.Linq;
 using JSSoft.Library.ObjectModel;
@@ -688,8 +689,6 @@ namespace JSSoft.Crema.Services.Data
 
         public void ValidateGetDataSet(Authentication authentication, string revision)
         {
-            if (this.IsLoaded == false)
-                throw new InvalidOperationException(Resources.Exception_DataBaseHasNotBeenLoaded);
             if (this.VerifyAccessType(authentication, AccessType.Guest) == false)
                 throw new PermissionDeniedException();
         }
@@ -817,12 +816,20 @@ namespace JSSoft.Crema.Services.Data
                     throw new ArgumentNullException(nameof(revision));
 
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                var basePath = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ValidateGetDataSet(authentication, revision);
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, revision);
+                    if (this.IsLoaded == true)
+                        return this.BasePath;
+                    return this.CremaHost.GetPath(CremaPath.RepositoryDataBases);
                 });
-                return await this.GetDataAsync(filter, revision);
+                return await this.GetDataAsync(basePath, filter, revision);
+            }
+            catch (CommandHostException e)
+            {
+                this.CremaHost.Error(e);
+                throw new ArgumentException(e.Message, nameof(revision), e);
             }
             catch (UriFormatException e)
             {
@@ -1165,6 +1172,8 @@ namespace JSSoft.Crema.Services.Data
                 throw new PermissionDeniedException();
             if (this.IsLoaded == true)
                 throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);
+            if (this.DataBaseContext.Count <= 1)
+                throw new InvalidOperationException("데이터 베이스 개수가 1개일때는 삭제할 수 없습니다.");
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -1185,16 +1194,16 @@ namespace JSSoft.Crema.Services.Data
             this.taskCompleted?.Invoke(this, e);
         }
 
-        private async Task<CremaDataSet> GetDataAsync(CremaDataSetFilter filter, string revision)
+        private async Task<CremaDataSet> GetDataAsync(string basePath, CremaDataSetFilter filter, string revision)
         {
             var tempPath = PathUtility.GetTempPath(false);
             try
             {
                 return await Task.Run(() =>
                 {
-                    var uri = this.Repository.GetUri(this.BasePath, revision);
-                    var exportPath = this.Repository.Export(uri, tempPath);
-                    return CremaDataSet.ReadFromDirectory(exportPath, filter);
+                    var repositoryName = this.Name;
+                    this.repositoryProvider.ExportRepository(basePath, repositoryName, revision, tempPath);
+                    return CremaDataSet.ReadFromDirectory(tempPath, filter);
                 });
             }
             finally
