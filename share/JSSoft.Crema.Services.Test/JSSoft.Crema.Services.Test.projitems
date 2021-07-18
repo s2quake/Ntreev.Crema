@@ -25,7 +25,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_LoadAsync_Test.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_RenameAsync_Test.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_RevertAsync_Test.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_UnLoadAsync_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_ImportAsync_Test.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBase_UnloadAsync_Test.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBases\DataBaseTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CreationTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaHostTest.cs" />

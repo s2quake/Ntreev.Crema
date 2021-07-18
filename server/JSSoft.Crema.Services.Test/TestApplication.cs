@@ -37,12 +37,24 @@ using JSSoft.Crema.Data;
 using JSSoft.Library;
 using System.Linq;
 using System.IO;
+using System.Text;
 
 namespace JSSoft.Crema.Services.Test
 {
     partial class TestApplication : CremaBootstrapper, ITestContext
     {
         private TestContext context;
+
+        static TestApplication()
+        {
+#if NETCOREAPP
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                CommandHostBase.DefaultEncoding = Encoding.GetEncoding(949);
+            }
+#endif
+        }
 
         public async Task InitializeAsync(TestContext context)
         {

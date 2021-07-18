@@ -42,16 +42,7 @@ namespace JSSoft.Crema.Services.Random
             var typeCategoryCollection = typeContext.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
             while (await typeCategoryCollection.GetCountAsync() < count)
             {
-                try
-                {
-                    if (typeContext is null)
-                        throw new ArgumentNullException(nameof(typeContext));
-                    await typeContext.AddRandomCategoryAsync(authentication);
-                }
-                catch (System.NullReferenceException e)
-                {
-                    System.Diagnostics.Debugger.Launch();
-                }
+                await typeContext.AddRandomCategoryAsync(authentication);
             }
         }
 
@@ -61,18 +52,18 @@ namespace JSSoft.Crema.Services.Random
             return category.AddNewCategoryAsync(authentication, categoryName);
         }
 
-        public static Task<ITypeCategory> AddRandomCategoryAsync(this ITypeContext typeContext, Authentication authentication)
+        public static async Task<ITypeCategory> AddRandomCategoryAsync(this ITypeContext typeContext, Authentication authentication)
         {
             if (RandomUtility.Within(33) == true)
             {
-                return typeContext.Root.AddRandomCategoryAsync(authentication);
+                return await typeContext.Root.AddRandomCategoryAsync(authentication);
             }
             else
             {
                 var category = typeContext.Categories.Random();
                 if (GetLevel(category, (i) => i.Parent) > 4)
                     return null;
-                return category.AddRandomCategoryAsync(authentication);
+                return await category.AddRandomCategoryAsync(authentication);
             }
         }
 

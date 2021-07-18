@@ -390,10 +390,10 @@ namespace JSSoft.Crema.Services.Data
             dataBaseSet.ModifyTable();
         }
 
-        public void Modify(CremaDataSet dataSet)
+        public void Modify(DataBaseSet dataBaseSet)
         {
             this.Dispatcher.VerifyAccess();
-            DataBaseSet.Modify(dataSet, this.dataBase);
+            dataBaseSet.Modify();
         }
 
         public Version Version

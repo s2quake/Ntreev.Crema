@@ -372,10 +372,9 @@ namespace JSSoft.Crema.Services.Data
             }
         }
 
-        public static void Modify(CremaDataSet dataSet, DataBase dataBase)
+        public void Modify()
         {
-            var dataBaseSet = new DataBaseSet(dataBase, dataSet, DataBaseSetOptions.None);
-            dataBaseSet.Serialize();
+            this.Serialize();
         }
 
         public CremaDataSet DataSet { get; }

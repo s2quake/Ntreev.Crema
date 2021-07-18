@@ -32,7 +32,6 @@ namespace JSSoft.Crema.Services.Test
     public class DataBase_DeleteAsync_Test
     {
         private static TestApplication app;
-        private static IDataBaseContext dataBaseContext;
         private static Authentication expiredAuthentication;
 
         [ClassInitialize]
@@ -41,7 +40,6 @@ namespace JSSoft.Crema.Services.Test
             app = new();
             await app.InitializeAsync(context);
             await app.OpenAsync();
-            dataBaseContext = app.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
             expiredAuthentication = app.ExpiredAuthentication;
         }
 

@@ -95,12 +95,6 @@ namespace JSSoft.Crema.Services.Test
         }
 
         [TestMethod]
-        public async Task ImportAsync_TestAsync()
-        {
-
-        }
-
-        [TestMethod]
         public async Task Contains_TestAsync()
         {
             var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
@@ -133,26 +127,6 @@ namespace JSSoft.Crema.Services.Test
             var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
             dataBase.Contains(authentication);
         }
-
-        //[TestMethod]
-        //public async Task GetLogAsync_Admin_TestAsync()
-        //{
-        //    var authentication = await this.TestContext.LoginRandomAsync(Authority.Admin);
-        //    var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
-        //    var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-        //    var logs1 = await dataBase.GetLogAsync(authentication, null);
-        //    var logs2 = await dataBase.GetLogAsync(authentication, logs1.Random().Revision);
-        //}
-
-        //[TestMethod]
-        //public async Task GetLogAsync_Member_TestAsync()
-        //{
-        //    var authentication = await this.TestContext.LoginRandomAsync(Authority.Member);
-        //    var dataBaseFilter = new DataBaseFilter(DataBaseFlags.Public | DataBaseFlags.NotLocked) { Settings = DataBaseSettings.Default };
-        //    var dataBase = await dataBaseFilter.GetDataBaseAsync(app);
-        //    var logs1 = await dataBase.GetLogAsync(authentication, null);
-        //    var logs2 = await dataBase.GetLogAsync(authentication, logs1.Random().Revision);
-        //}
 
         [TestMethod]
         public async Task BeginTransactionAsync_TestAsync()

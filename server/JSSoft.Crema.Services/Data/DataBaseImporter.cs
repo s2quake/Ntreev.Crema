@@ -36,6 +36,15 @@ namespace JSSoft.Crema.Services.Data
         {
             try
             {
+                if (authentication is null)
+                    throw new ArgumentNullException(nameof(authentication));
+                if (authentication.IsExpired == true)
+                    throw new AuthenticationExpiredException(nameof(authentication));
+                if (dataSet is null)
+                    throw new ArgumentNullException(nameof(dataSet));
+                if (comment is null)
+                    throw new ArgumentNullException(nameof(comment));
+
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(ImportAsync), comment);
@@ -49,13 +58,12 @@ namespace JSSoft.Crema.Services.Data
                     Tables = dataSet.Tables.Select(item => item.Name).ToArray(),
                     OmitContent = true
                 };
-                var targetSet = await this.GetDataSetAsync(authentication, filter, null);
+                var targetSet = await this.GetDataSetAsync(authentication, filter, string.Empty);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.LockTypes(authentication, targetSet, comment);
                     this.LockTables(authentication, targetSet, comment);
                 });
-
 
                 try
                 {
@@ -76,18 +84,24 @@ namespace JSSoft.Crema.Services.Data
                         item.ContentsInfo = authentication.SignatureDate;
                         item.EndLoad();
                     }
-                    try
+                    var dataBaseSet = await DataBaseSet.CreateAsync(this, targetSet);
+                    await this.Repository.Dispatcher.InvokeAsync(() =>
                     {
-                        this.Repository.Modify(targetSet);
-                        this.Repository.Commit(authentication, comment);
-                    }
-                    catch
+                        try
+                        {
+                            this.Repository.Modify(dataBaseSet);
+                            this.Repository.Commit(authentication, comment);
+                        }
+                        catch
+                        {
+                            this.Repository.Revert();
+                            throw;
+                        }
+                    });
+                    await this.Dispatcher.InvokeAsync(() =>
                     {
-                        this.Repository.Revert();
-                        throw;
-                    }
-
-                    this.UpdateTables(authentication, targetSet);
+                        this.UpdateTables(authentication, targetSet);
+                    });
                     return taskID;
                 }
                 finally
@@ -108,12 +122,6 @@ namespace JSSoft.Crema.Services.Data
 
         private void ValidateImport(Authentication authentication, CremaDataSet dataSet, string comment)
         {
-            if (dataSet == null)
-                throw new ArgumentNullException(nameof(dataSet));
-            //if (dataSet.Tables.Any() == false)
-            //    throw new ArgumentException(Resources.Exception_EmptyDataSetCannotImport, nameof(dataSet));
-            if (comment == null)
-                throw new ArgumentNullException(nameof(comment));
             if (comment == string.Empty)
                 throw new ArgumentException(Resources.Exception_EmptyStringIsNotAllowed);
 

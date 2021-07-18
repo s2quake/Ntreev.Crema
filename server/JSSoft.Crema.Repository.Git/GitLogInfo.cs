@@ -24,7 +24,9 @@ using JSSoft.Library.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using YamlDotNet.Serialization;
 
@@ -189,7 +191,7 @@ namespace JSSoft.Crema.Repository.Git
                 index = item.Index;
             }
             {
-                var logInfo = GitLogInfo.Parse(currentText);
+                var logInfo = GitLogInfo.Parse(currentText + Environment.NewLine);
                 itemList.Add(logInfo);
             }
 
@@ -355,10 +357,20 @@ namespace JSSoft.Crema.Repository.Git
 
         private static string ParseComment(ref string text, ref GitLogInfo logInfo)
         {
-            text = text.Remove(0, Environment.NewLine.Length);
-            text = text.Remove(0, "    ".Length);
-            logInfo.Comment = text;
-            return text;
+            var pattern = Environment.NewLine.Aggregate(string.Empty, (s, n) => s += $"\\{n}");
+            var match = Regex.Match(text, $"{pattern}(.+){pattern}");
+            if (match.Success == false)
+            {
+                throw new ArgumentException("invalid comment format", nameof(text));
+            }
+            var sr = new StringReader(match.Groups[1].Value);
+            var lineList = new List<string>();
+            while(sr.ReadLine() is string line)
+            {
+                lineList.Add(line.Remove(0, "    ".Length));
+            }
+            logInfo.Comment = string.Join(Environment.NewLine, lineList);
+            return string.Empty;
         }
 
         private static Match Match(ref string input, string pattern)
