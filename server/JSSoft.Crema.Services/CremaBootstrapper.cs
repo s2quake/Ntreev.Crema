@@ -84,9 +84,9 @@ namespace JSSoft.Crema.Services
                 var tempPath = Path.Combine(validationPath, item);
                 var repositorySettings = new RepositorySettings()
                 {
-                    BasePath = repositoryPath,
+                    RemotePath = repositoryPath,
                     RepositoryName = item,
-                    WorkingPath = tempPath,
+                    BasePath = tempPath,
                     LogService = logService,
                 };
                 var repository = repositoryProvider.CreateInstance(repositorySettings);
@@ -126,9 +126,9 @@ namespace JSSoft.Crema.Services
                 var tempPath = Path.Combine(upgradePath, item);
                 var repositorySettings = new RepositorySettings()
                 {
-                    BasePath = repositoryPath,
+                    RemotePath = repositoryPath,
                     RepositoryName = item,
-                    WorkingPath = tempPath,
+                    BasePath = tempPath,
                     LogService = logService,
                 };
                 try

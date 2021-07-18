@@ -42,9 +42,16 @@ namespace JSSoft.Crema.Services.Random
             var typeCategoryCollection = typeContext.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
             while (await typeCategoryCollection.GetCountAsync() < count)
             {
-                if (typeContext is null)
-                    throw new ArgumentNullException(nameof(typeContext));
-                await typeContext.AddRandomCategoryAsync(authentication);
+                try
+                {
+                    if (typeContext is null)
+                        throw new ArgumentNullException(nameof(typeContext));
+                    await typeContext.AddRandomCategoryAsync(authentication);
+                }
+                catch (System.NullReferenceException e)
+                {
+                    System.Diagnostics.Debugger.Launch();
+                }
             }
         }
 
@@ -91,8 +98,16 @@ namespace JSSoft.Crema.Services.Random
         {
             var template = await category.NewTypeAsync(authentication);
             await template.InitializeRandomAsync(authentication);
-            await template.EndEditAsync(authentication);
-            return template.Type;
+            try
+            {
+                await template.EndEditAsync(authentication);
+                return template.Type;
+            }
+            catch (Exception)
+            {
+                await template.CancelEditAsync(authentication);
+                return null;
+            }
         }
 
         public static Task<ITypeItem> GetRandomTypeItemAsync(this ITypeContext typeContext)

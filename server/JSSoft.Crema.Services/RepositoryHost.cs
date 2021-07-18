@@ -149,6 +149,20 @@ namespace JSSoft.Crema.Services
             this.OnChanged(EventArgs.Empty);
         }
 
+        public void Clone(Authentication authentication, string newRepositoryName, string comment, string revision, params LogPropertyInfo[] properties)
+        {
+            this.Dispatcher.VerifyAccess();
+            var propList = new List<LogPropertyInfo>
+            {
+                new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion},
+            };
+
+            if (properties != null)
+                propList.AddRange(properties);
+
+            this.Repository.Clone(authentication.ID, newRepositoryName, comment, revision, propList.ToArray());
+        }
+
         public LogInfo[] GetLog(string[] paths, string revision)
         {
             return this.Repository.GetLog(paths, revision);

@@ -23,11 +23,11 @@ namespace JSSoft.Crema.Services
 {
     public class RepositorySettings
     {
-        public string BasePath { get; set; }
+        public string RemotePath { get; set; }
 
         public string RepositoryName { get; set; }
 
-        public string WorkingPath { get; set; }
+        public string BasePath { get; set; }
 
         public string TransactionPath { get; set; }
 

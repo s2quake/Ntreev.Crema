@@ -38,7 +38,8 @@ namespace JSSoft.Crema.Repository.Git
     class GitRepository : IRepository
     {
         private static readonly ISerializer propertySerializer = new SerializerBuilder().Build();
-        private readonly string transactionPath;
+        private readonly GitRepositoryProvider repositoryProvider;
+        private readonly RepositorySettings settings;
         private readonly ILogService logService;
         private readonly GitCommand resetCommand;
         private readonly GitCommand cleanCommand;
@@ -49,11 +50,11 @@ namespace JSSoft.Crema.Repository.Git
         private string transactionPatchPath;
         private RepositoryInfo repositoryInfo;
 
-        public GitRepository(ILogService logService, string repositoryPath, string transactionPath, RepositoryInfo repositoryInfo)
+        public GitRepository(GitRepositoryProvider repositoryProvider, RepositorySettings settings, RepositoryInfo repositoryInfo)
         {
-            this.logService = logService;
-            this.BasePath = repositoryPath;
-            this.transactionPath = transactionPath;
+            this.repositoryProvider = repositoryProvider;
+            this.settings = settings;
+            this.logService = settings.LogService;
             this.repositoryInfo = repositoryInfo;
             this.resetCommand = new GitCommand(this.BasePath, "reset")
             {
@@ -84,7 +85,7 @@ namespace JSSoft.Crema.Repository.Git
 
         public RepositoryInfo RepositoryInfo => this.repositoryInfo;
 
-        public string BasePath { get; }
+        public string BasePath => this.settings.BasePath;
 
         public void Add(string path)
         {
@@ -114,7 +115,7 @@ namespace JSSoft.Crema.Repository.Git
             this.transactionName = name;
             this.transactionMessageList = new List<string>();
             this.transactionPropertyList = new List<LogPropertyInfo>();
-            this.transactionPatchPath = Path.Combine(this.transactionPath, this.transactionName + ".patch");
+            this.transactionPatchPath = Path.Combine(this.settings.TransactionPath, this.transactionName + ".patch");
         }
 
         public void EndTransaction()
@@ -160,6 +161,14 @@ namespace JSSoft.Crema.Repository.Git
             this.transactionMessageList = null;
             this.transactionPropertyList = null;
             this.transactionPatchPath = null;
+        }
+
+        public void Clone(string author, string newRepositoryName, string comment, string revision, params LogPropertyInfo[] properties)
+        {
+            var repositoryName = this.settings.RepositoryName;
+            var basePath = this.settings.RemotePath;
+            this.Sync();
+            this.repositoryProvider.CloneRepository(author, basePath, repositoryName, newRepositoryName, comment, revision, properties);
         }
 
         public void Commit(string author, string comment, params LogPropertyInfo[] properties)
@@ -250,17 +259,7 @@ namespace JSSoft.Crema.Repository.Git
 
         public void Dispose()
         {
-            this.Pull();
-            this.PullNotes();
-            this.Push();
-            try
-            {
-                this.PushNotes();
-            }
-            catch (Exception e)
-            {
-                this.logService.Error(e);
-            }
+            this.Sync();
         }
 
         public string Export(Uri uri, string exportPath)
@@ -358,6 +357,21 @@ namespace JSSoft.Crema.Repository.Git
                 itemList.Add(repositoryItem);
             }
             return itemList.ToArray();
+        }
+
+        private void Sync()
+        {
+            this.Pull();
+            this.PullNotes();
+            this.Push();
+            try
+            {
+                this.PushNotes();
+            }
+            catch (Exception e)
+            {
+                this.logService.Error(e);
+            }
         }
 
         private void Pull()

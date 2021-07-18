@@ -336,5 +336,10 @@ namespace JSSoft.Crema.Repository.Svn
         {
             DirectoryUtility.Delete(this.BasePath);
         }
+
+        public void Clone(string author, string newRepositoryName, string comment, string revision, params LogPropertyInfo[] properties)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

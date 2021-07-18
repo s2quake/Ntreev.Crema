@@ -326,9 +326,9 @@ namespace JSSoft.Crema.Services.Data
                     this.DataBaseContext.InvokeItemsStateChangedEvent(authentication, items);
                     return new RepositorySettings()
                     {
-                        BasePath = this.DataBaseContext.RemotePath,
+                        RemotePath = this.DataBaseContext.RemotePath,
                         RepositoryName = this.Name,
-                        WorkingPath = this.BasePath,
+                        BasePath = this.BasePath,
                         TransactionPath = this.CremaHost.GetPath(CremaPath.Transactions, $"{this.ID}"),
                         LogService = this.CremaHost,
                     };

@@ -44,7 +44,7 @@ namespace JSSoft.Crema.Repository.Git
 
         private static readonly ISerializer propertySerializer = new SerializerBuilder().Build();
 
-        public void CopyRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, string revision, params LogPropertyInfo[] properties)
+        public void CloneRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, string revision, params LogPropertyInfo[] properties)
         {
             var baseUri = new Uri(basePath);
             var repositoryPath = baseUri.LocalPath;
@@ -61,40 +61,40 @@ namespace JSSoft.Crema.Repository.Git
 
         public IRepository CreateInstance(RepositorySettings settings)
         {
+            var remoteUri = new Uri(settings.RemotePath);
             var baseUri = new Uri(settings.BasePath);
-            var workingUri = new Uri(settings.WorkingPath);
-            var originUri = UriUtility.MakeRelativeOfDirectory(workingUri, baseUri);
+            var originUri = UriUtility.MakeRelativeOfDirectory(baseUri, remoteUri);
             var repositoryName = settings.RepositoryName == string.Empty ? "master" : settings.RepositoryName;
 
-            if (Directory.Exists(settings.WorkingPath) == false)
+            if (Directory.Exists(settings.BasePath) == false)
             {
                 var cloneCommand = new GitCommand(null, "clone")
                 {
-                    (GitPath)baseUri,
+                    (GitPath)remoteUri,
                     new GitCommandItem('b'),
                     repositoryName,
-                    (GitPath)settings.WorkingPath,
+                    (GitPath)settings.BasePath,
                     new GitCommandItem("single-branch")
                 };
                 cloneCommand.Run();
 
-                var fetchCommand = new GitCommand(settings.WorkingPath, "fetch")
+                var fetchCommand = new GitCommand(settings.BasePath, "fetch")
                 {
                     "origin",
                     "refs/notes/commits:refs/notes/commits",
                 };
                 fetchCommand.Run();
 
-                var id = this.GetID(settings.BasePath, repositoryName);
-                this.SetID(settings.WorkingPath, repositoryName, id);
-                GitConfig.SetValue(settings.WorkingPath, "remote.origin.url", originUri);
-                var repositoryInfo = this.GetRepositoryInfo(settings.BasePath, repositoryName);
-                return new GitRepository(settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
+                var id = this.GetID(settings.RemotePath, repositoryName);
+                this.SetID(settings.BasePath, repositoryName, id);
+                GitConfig.SetValue(settings.BasePath, "remote.origin.url", originUri);
+                var repositoryInfo = this.GetRepositoryInfo(settings.RemotePath, repositoryName);
+                return new GitRepository(this, settings, repositoryInfo);
             }
             else
             {
-                var repositoryInfo = this.GetRepositoryInfo(settings.WorkingPath, repositoryName);
-                return new GitRepository(settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
+                var repositoryInfo = this.GetRepositoryInfo(settings.BasePath, repositoryName);
+                return new GitRepository(this, settings, repositoryInfo);
             }
         }
 

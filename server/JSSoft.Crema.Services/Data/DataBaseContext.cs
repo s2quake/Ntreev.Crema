@@ -183,12 +183,23 @@ namespace JSSoft.Crema.Services.Data
                     return dataBase.Name;
                 });
                 var taskID = GuidUtility.FromName(newDataBaseName + comment);
-                await this.RepositoryDispatcher.InvokeAsync(() =>
+                var message = EventMessageBuilder.CreateDataBase(authentication, newDataBaseName) + ": " + comment;
+                if (dataBase.IsLoaded == true)
                 {
-                    var message = EventMessageBuilder.CreateDataBase(authentication, newDataBaseName) + ": " + comment;
-                    var basePath = dataBase.IsLoaded == true ? dataBase.BasePath : this.RemotePath;
-                    this.repositoryProvider.CopyRepository(authentication, basePath, dataBaseName, newDataBaseName, comment, revision);
-                });
+                    var repository = dataBase.Repository;
+                    await repository.Dispatcher.InvokeAsync(() =>
+                    {
+                        repository.Clone(authentication, newDataBaseName, comment, revision);
+                    });
+                }
+                else
+                {
+                    await this.RepositoryDispatcher.InvokeAsync(() =>
+                    {
+                        var basePath = this.RemotePath;
+                        this.repositoryProvider.CopyRepository(authentication, basePath, dataBaseName, newDataBaseName, comment, revision);
+                    });
+                }
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     var newDataBase = new DataBase(this, newDataBaseName);

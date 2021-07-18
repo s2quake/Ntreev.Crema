@@ -44,6 +44,8 @@ namespace JSSoft.Crema.Services
 
         void CancelTransaction();
 
+        void Clone(string author, string newRepositoryName, string comment, string revision, params LogPropertyInfo[] properties);
+
         LogInfo[] GetLog(string[] paths, string revision);
 
         [Obsolete]

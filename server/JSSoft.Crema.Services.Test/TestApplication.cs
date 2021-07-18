@@ -47,17 +47,23 @@ namespace JSSoft.Crema.Services.Test
         public async Task InitializeAsync(TestContext context)
         {
             var basePath = Path.Combine(context.TestRunDirectory, "repo");
-            var repositoryPath = Path.Combine(basePath, context.FullyQualifiedTestClassName);
-            if (repositoryPath.Length > 168)
-            {
-                repositoryPath = Path.Combine(basePath, $"{Guid.NewGuid()}");
-            }
+            var repositoryPath = GenerateRepositoryPath();
             var userInfos = UserInfoGenerator.Generate(0, 0);
             var dataSet = new CremaDataSet();
             await Task.Run(() => CremaBootstrapper.CreateRepositoryInternal(this, repositoryPath, "git", "xml", string.Empty, userInfos, dataSet));
             this.BasePath = repositoryPath;
             this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
             this.context = context;
+
+            string GenerateRepositoryPath()
+            {
+                var repositoryPath = Path.Combine(basePath, context.FullyQualifiedTestClassName);
+                if (repositoryPath.Length > 168)
+                {
+                    repositoryPath = Path.Combine(basePath, $"{Guid.NewGuid()}");
+                }
+                return repositoryPath;
+            }
         }
 
         public async Task ReleaseAsync()

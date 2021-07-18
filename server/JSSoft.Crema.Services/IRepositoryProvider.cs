@@ -29,7 +29,7 @@ namespace JSSoft.Crema.Services
 
         void CreateRepository(string author, string basePath, string initPath, string comment, params LogPropertyInfo[] properties);
 
-        void CopyRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, string revision, params LogPropertyInfo[] properties);
+        void CloneRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, string revision, params LogPropertyInfo[] properties);
 
         void RenameRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, params LogPropertyInfo[] properties);
 
@@ -49,11 +49,6 @@ namespace JSSoft.Crema.Services
 
         string[] GetRepositoryItemList(string basePath, string repositoryName);
 
-        /// <summary>
-        /// 해당 저장소의 로그 목록을 가져옵니다. 지정된 revision 부터 과거 순입니다.
-        /// revision 이 null 값일때는 최신 로그를 가져옵니다. 
-        /// 만약 로그 갯수가 많아서 개수가 제한될때는 마지막에 LogInfo.Empty 의 유무를 확인해 로그 기록이 더 있음을 확인할 수 있습니다.
-        /// </summary>
         LogInfo[] GetLog(string basePath, string repositoryName, string revision);
 
         string Name { get; }

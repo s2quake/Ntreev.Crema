@@ -49,16 +49,16 @@ namespace JSSoft.Crema.Repository.Svn
 
         public IRepository CreateInstance(RepositorySettings settings)
         {
-            var baseUri = new Uri(settings.BasePath);
+            var baseUri = new Uri(settings.RemotePath);
             var repositoryName = settings.RepositoryName == string.Empty ? SvnString.Default : settings.RepositoryName;
             var url = repositoryName == SvnString.Default ? UriUtility.Combine(baseUri, SvnString.Trunk) : UriUtility.Combine(baseUri, SvnString.Branches, settings.RepositoryName);
 
-            if (Directory.Exists(settings.WorkingPath) == false)
+            if (Directory.Exists(settings.BasePath) == false)
             {
                 var checkoutCommand = new SvnCommand("checkout")
                 {
                     (SvnPath)url,
-                    (SvnPath)settings.WorkingPath,
+                    (SvnPath)settings.BasePath,
                 };
                 checkoutCommand.Run();
             }
@@ -66,13 +66,13 @@ namespace JSSoft.Crema.Repository.Svn
             {
                 var updateCommand = new SvnCommand("update")
                 {
-                    (SvnPath)settings.WorkingPath,
+                    (SvnPath)settings.BasePath,
                 };
                 updateCommand.Run();
             }
 
-            var repositoryInfo = this.GetRepositoryInfo(settings.BasePath, repositoryName);
-            return new SvnRepository(settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
+            var repositoryInfo = this.GetRepositoryInfo(settings.RemotePath, repositoryName);
+            return new SvnRepository(settings.LogService, settings.BasePath, settings.TransactionPath, repositoryInfo);
         }
 
         public void InitializeRepository(string basePath, string initPath, params LogPropertyInfo[] properties)
@@ -123,7 +123,7 @@ namespace JSSoft.Crema.Repository.Svn
         }
 
         [System.Obsolete("revision으로 복사하는 기능 추가해야됨.")]
-        public void CopyRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, string revision, params LogPropertyInfo[] properties)
+        public void CloneRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, string revision, params LogPropertyInfo[] properties)
         {
             var uri = this.GetUrl(basePath, repositoryName);
             var newUri = this.GenerateUrl(basePath, newRepositoryName);

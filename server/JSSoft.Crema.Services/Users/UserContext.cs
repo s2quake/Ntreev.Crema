@@ -60,9 +60,9 @@ namespace JSSoft.Crema.Services.Users
 
             this.Repository = new UserRepositoryHost(this, this.CremaHost.RepositoryProvider.CreateInstance(new RepositorySettings()
             {
-                BasePath = this.remotePath,
+                RemotePath = this.remotePath,
                 RepositoryName = string.Empty,
-                WorkingPath = this.BasePath,
+                BasePath = this.BasePath,
                 LogService = this.CremaHost
             }));
 
